@@ -11,7 +11,6 @@ import SwiftUI
 import UIKit
 
 struct ColorImagePickerView: View {
-    // TODO: color picking doesn't work right
     @Binding var color: OpaliteColor
 
     @State private var selectedImage: UIImage?
@@ -72,6 +71,11 @@ struct ColorImagePickerView: View {
                                 .contentShape(Rectangle())
                                 .gesture(
                                     DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            sampleColor(from: uiImage,
+                                                        at: value.location,
+                                                        in: proxy.size)
+                                        }
                                         .onEnded { value in
                                             sampleColor(from: uiImage,
                                                         at: value.location,
@@ -119,6 +123,7 @@ struct ColorImagePickerView: View {
     }
 
     /// Given a tap/drag point in the view space and the view size, sample the corresponding pixel color from the UIImage.
+    /// Coordinates are mapped assuming the image is drawn with a top-left origin, matching SwiftUI/CGImage default behavior.
     private func sampleColor(from image: UIImage, at location: CGPoint, in viewSize: CGSize) {
         guard let cgImage = image.cgImage else { return }
 
@@ -148,9 +153,9 @@ struct ColorImagePickerView: View {
         let normalizedX = (location.x - drawRect.minX) / drawRect.width
         let normalizedY = (location.y - drawRect.minY) / drawRect.height
 
-        // Map to pixel coordinates in the original image (fix coordinate inversion)
-        let pixelX = Int(normalizedX * CGFloat(cgImage.width))
-        let pixelY = Int((1.0 - normalizedY) * CGFloat(cgImage.height - 1))
+        // Map to pixel coordinates in the original image (top-left origin)
+        let pixelX = Int(normalizedX * CGFloat(cgImage.width - 1))
+        let pixelY = Int(normalizedY * CGFloat(cgImage.height - 1))
 
         // Sample an average color from a small area around the tap point
         guard let uiColor = averageColor(in: cgImage, aroundX: pixelX, y: pixelY, radius: 3) else { return }
@@ -172,45 +177,76 @@ struct ColorImagePickerView: View {
         sampledImagePoint = location
     }
 
-    /// Reads a single pixel's color from the given CGImage.
+    /// Reads a single pixel's color from the given CGImage by accessing its raw data buffer.
+    /// This avoids any coordinate transforms or scaling issues from Core Graphics drawing.
     private func colorAtPixel(in cgImage: CGImage, x: Int, y: Int) -> UIColor? {
         guard x >= 0, x < cgImage.width,
               y >= 0, y < cgImage.height else {
             return nil
         }
 
-        let width = 1
-        let height = 1
-        let bitsPerComponent = 8
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * width
-        let bitmapInfo = CGBitmapInfo.byteOrder32Big.union(CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue))
-
-        var pixelData: [UInt8] = [0, 0, 0, 0]
-
-        pixelData.withUnsafeMutableBytes { ptr in
-            if let context = CGContext(data: ptr.baseAddress,
-                                       width: width,
-                                       height: height,
-                                       bitsPerComponent: bitsPerComponent,
-                                       bytesPerRow: bytesPerRow,
-                                       space: CGColorSpaceCreateDeviceRGB(),
-                                       bitmapInfo: bitmapInfo.rawValue) {
-
-                // Draw the 1x1 area of the image we care about into the context
-                context.translateBy(x: CGFloat(-x), y: CGFloat(-(cgImage.height - 1 - y)))
-                context.draw(cgImage, in: CGRect(x: 0, y: 0,
-                                                 width: CGFloat(cgImage.width),
-                                                 height: CGFloat(cgImage.height)))
-            }
+        guard let dataProvider = cgImage.dataProvider,
+              let cfData = dataProvider.data else {
+            return nil
         }
 
-        let r = CGFloat(pixelData[0]) / 255.0
-        let g = CGFloat(pixelData[1]) / 255.0
-        let b = CGFloat(pixelData[2]) / 255.0
-        let a = CGFloat(pixelData[3]) / 255.0
+        guard let rawBytes = CFDataGetBytePtr(cfData) else {
+            return nil
+        }
+        // Use a non-optional pointer for subscript access
+        let bytes: UnsafePointer<UInt8> = rawBytes
+        let bytesPerPixel = max(1, cgImage.bitsPerPixel / 8)
+        let bytesPerRow = cgImage.bytesPerRow
 
-        return UIColor(red: r, green: g, blue: b, alpha: a)
+        let offset = y * bytesPerRow + x * bytesPerPixel
+
+        let bitmapInfo = cgImage.bitmapInfo
+        let alphaInfo = cgImage.alphaInfo
+        let isLittleEndian = bitmapInfo.contains(.byteOrder32Little)
+        let isBigEndian = bitmapInfo.contains(.byteOrder32Big)
+
+        // Determine channel order. On iOS most images are BGRA little-endian with premultipliedFirst/noneSkipFirst.
+        // We'll branch for BGRA vs RGBA, ignoring premultiplication for reading.
+        if isLittleEndian {
+            // BGRA order in memory
+            let b = CGFloat(bytes[offset + 0]) / 255.0
+            let g = CGFloat(bytes[offset + 1]) / 255.0
+            let r = CGFloat(bytes[offset + 2]) / 255.0
+            // Alpha may be first (premultipliedFirst/first) or noneSkipFirst; in all cases, the 4th byte is alpha or padding.
+            let a: CGFloat
+            switch alphaInfo {
+            case .premultipliedFirst, .first, .noneSkipFirst:
+                a = CGFloat(bytes[offset + 3]) / 255.0
+            case .premultipliedLast, .last, .noneSkipLast:
+                // Rare with little-endian, but handle just in case
+                a = CGFloat(bytes[offset + 3]) / 255.0
+            default:
+                a = 1.0
+            }
+            return UIColor(red: r, green: g, blue: b, alpha: a)
+        } else if isBigEndian {
+            // RGBA order in memory
+            let r = CGFloat(bytes[offset + 0]) / 255.0
+            let g = CGFloat(bytes[offset + 1]) / 255.0
+            let b = CGFloat(bytes[offset + 2]) / 255.0
+            let a: CGFloat
+            switch alphaInfo {
+            case .premultipliedLast, .last, .noneSkipLast:
+                a = CGFloat(bytes[offset + 3]) / 255.0
+            case .premultipliedFirst, .first, .noneSkipFirst:
+                a = CGFloat(bytes[offset + 3]) / 255.0
+            default:
+                a = 1.0
+            }
+            return UIColor(red: r, green: g, blue: b, alpha: a)
+        } else {
+            // Fallback: assume RGBA
+            let r = CGFloat(bytes[offset + 0]) / 255.0
+            let g = CGFloat(bytes[offset + 1]) / 255.0
+            let b = CGFloat(bytes[offset + 2]) / 255.0
+            let a = CGFloat(bytes[offset + 3]) / 255.0
+            return UIColor(red: r, green: g, blue: b, alpha: a)
+        }
     }
 
     /// Computes an average color from a small square region around the given pixel.
@@ -315,4 +351,3 @@ private struct ColorImagePickerPreviewContainer: View {
 }
 
 #endif
-

@@ -6,85 +6,66 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ColorDetailView: View {
-    let color: OpaliteColor
-
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @State private var isDetailsExpanded: Bool = true
-
-    // MARK: - Derived Properties
-    private var displayTitle: String {
-        if let name = color.name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return name
-        }
-        return color.hexString
+    @Environment(ColorManager.self) private var colorManager
+    
+    let color: OpaliteColor
+    @State private var viewModel: ViewModel
+    @FocusState private var isNameFieldFocused: Bool
+    
+    init(color: OpaliteColor) {
+        self.color = color
+        self._viewModel = State(initialValue: ViewModel(color: color))
     }
-
-    private var swatchColor: Color { color.swiftUIColor }
-
-    private var createdAtText: String {
-        color.createdAt.formatted(date: .abbreviated, time: .shortened)
-    }
-
-    private var updatedAtText: String {
-        color.updatedAt.formatted(date: .abbreviated, time: .shortened)
-    }
-
-    private var createdByText: String { color.createdByDisplayName ?? "—" }
-    private var createdOnDeviceText: String { color.createdOnDeviceName ?? "—" }
-    private var updatedOnDeviceText: String { color.updatedOnDeviceName ?? "—" }
-
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Large Swatch
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(swatchColor)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 220)
-                    .overlay(alignment: .bottomTrailing) {
-                        // Hex overlay chip
-                        Text(color.hexString)
-                            .font(.headline)
-                            .monospaced()
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(.ultraThickMaterial, in: Capsule())
-                            .padding(12)
-                    }
-                    .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: 8)
-
-                // Details Section
-                Group {
-                    if horizontalSizeClass == .compact {
-                        DisclosureGroup(isExpanded: $isDetailsExpanded) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                DetailRow(label: "Created By", systemImage: "person", value: createdByText)
-                                DetailRow(label: "Created On", systemImage: "desktopcomputer", value: createdOnDeviceText)
-                                DetailRow(label: "Created At", systemImage: "calendar", value: createdAtText)
-
-                                Divider().padding(.vertical, 4)
-
-                                DetailRow(label: "Updated At", systemImage: "clock.arrow.circlepath", value: updatedAtText)
-                                DetailRow(label: "Updated On", systemImage: "laptopcomputer", value: updatedOnDeviceText)
+                LargeSwatchView(
+                    viewModel: viewModel,
+                    isNameFieldFocused: $isNameFieldFocused
+                )
+                
+                ColorMetadataView(
+                    isExpanded: $viewModel.isDetailsExpanded,
+                    createdByText: viewModel.createdByText,
+                    createdOnDeviceText: viewModel.createdOnDeviceText,
+                    createdAtText: viewModel.createdAtText,
+                    updatedAtText: viewModel.updatedAtText,
+                    updatedOnDeviceText: viewModel.updatedOnDeviceText
+                )
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    SectionHeaderView(title: "Other Colors", systemImage: "paintpalette")
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            OtherColorTileView(
+                                color: viewModel.color.complementaryColor(),
+                                badge: "Complementary",
+                                saveColor: {
+                                    viewModel.saveOtherColor(viewModel.color.complementaryColor(), using: colorManager)
+                                },
+                                saveToPalette: {
+                                    viewModel.saveColorToPalette(color: viewModel.color.complementaryColor())
+                                }
+                            )
+                            ForEach(viewModel.color.harmoniousColors(), id: \.id) { harm in
+                                OtherColorTileView(
+                                    color: harm,
+                                    badge: "Harmonious",
+                                    saveColor: {
+                                        viewModel.saveOtherColor(harm, using: colorManager)
+                                    },
+                                    saveToPalette: {
+                                        viewModel.saveColorToPalette(color: harm)
+                                    }
+                                )
                             }
-                        } label: {
-                            SectionHeader(title: "Details", systemImage: "info.circle")
                         }
-                    } else {
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionHeader(title: "Details", systemImage: "info.circle")
-
-                            DetailRow(label: "Created By", systemImage: "person", value: createdByText)
-                            DetailRow(label: "Created On", systemImage: "desktopcomputer", value: createdOnDeviceText)
-                            DetailRow(label: "Created At", systemImage: "calendar", value: createdAtText)
-
-                            Divider().padding(.vertical, 4)
-
-                            DetailRow(label: "Updated At", systemImage: "clock.arrow.circlepath", value: updatedAtText)
-                            DetailRow(label: "Updated On", systemImage: "laptopcomputer", value: updatedOnDeviceText)
-                        }
+                        .padding(.horizontal, 4)
                     }
                 }
                 .padding(16)
@@ -94,44 +75,6 @@ struct ColorDetailView: View {
                         .strokeBorder(.separator, lineWidth: 1)
                 )
                 
-                // Complementary Colors
-                VStack(alignment: .leading, spacing: 12) {
-                    SectionHeader(title: "Complementary", systemImage: "arrow.triangle.2.circlepath")
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach([color.complementaryColor()], id: \.id) { comp in
-                                ColorTile(color: comp)
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                    }
-                }
-                .padding(16)
-                .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .strokeBorder(.separator, lineWidth: 1)
-                )
-
-                // Harmonious Colors
-                VStack(alignment: .leading, spacing: 12) {
-                    SectionHeader(title: "Harmonious", systemImage: "heart.fill")
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(color.harmoniousColors(), id: \.id) { harm in
-                                ColorTile(color: harm)
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                    }
-                }
-                .padding(16)
-                .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .strokeBorder(.separator, lineWidth: 1)
-                )
-
                 Spacer(minLength: 8)
             }
             .padding()
@@ -139,104 +82,120 @@ struct ColorDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    // TODO: Edit action
+                    withAnimation {
+                        viewModel.isEditingColor = true
+                    }
                 } label: {
                     Label("Edit", systemImage: "pencil")
                         .labelStyle(.titleOnly)
                 }
                 
                 Button {
-                    // TODO: Name action
+                    viewModel.beginEditName()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        isNameFieldFocused = true
+                    }
                 } label: {
                     Label("Name", systemImage: "character.cursor.ibeam")
                 }
                 
                 Button {
-                    // TODO: Hashtag action
+                    viewModel.saveColorToPalette(color: viewModel.color)
                 } label: {
-                    Label("Hashtag", systemImage: "number")
+                    Label("Palette", systemImage: "swatchpalette")
                 }
                 
                 Button {
-                    // TODO: Share action
+                    viewModel.copyHex()
+                } label: {
+                    Label("Hashtag", systemImage: viewModel.didCopyHex ? "checkmark" : "number")
+                }
+                
+                Menu {
+                    // TODO: fix color data sharing
+                    ShareLink(item: (viewModel.color.name?.isEmpty == false ? "\(viewModel.color.name!) (\(viewModel.color.hexString))" : viewModel.color.hexString)) {
+                        Label("Share Color", systemImage: "square.and.arrow.up")
+                    }
+                    
+                    Button {
+                        viewModel.shareColorAsImage()
+                    } label: {
+                        Label("Share As Image", systemImage: "photo")
+                    }
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
             }
         }
-    }
-}
-
-// MARK: - Subviews
-private struct SectionHeader: View {
-    let title: String
-    let systemImage: String
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: systemImage)
-                .foregroundStyle(.secondary)
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.primary)
+        .sheet(isPresented: $viewModel.isShowingPalettePicker) {
+            PaletteSelectionSheet(
+                palettes: colorManager.palettes,
+                onCancel: {
+                    viewModel.cancelPaletteSelection()
+                },
+                onCreateAndSelect: { name in
+                    viewModel.createPaletteAndSavePendingColor(named: name, using: colorManager)
+                },
+                onSelect: { palette in
+                    viewModel.savePendingColor(to: palette, using: colorManager)
+                }
+            )
+            #if os(iOS) || os(visionOS)
+            .presentationDetents([.medium, .large])
+            .interactiveDismissDisabled()
+            #endif
         }
-        .padding(.bottom, 4)
-    }
-}
-
-private struct DetailRow: View {
-    let label: String
-    let systemImage: String
-    let value: String
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Image(systemName: systemImage)
-                .frame(width: 20)
-                .foregroundStyle(.secondary)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Text(value)
-                    .font(.body)
-                    .foregroundStyle(.primary)
-                    .textSelection(.enabled)
+        .sheet(isPresented: $viewModel.isEditingColor) {
+            NavigationStack {
+                ColorEditorView(
+                    color: viewModel.color,
+                    onCancel: {
+                        viewModel.isEditingColor = false
+                    },
+                    onApprove: { editedColor in
+                        viewModel.approveEdit(with: editedColor, using: colorManager)
+                    }
+                )
             }
-            Spacer()
+            #if os(iOS) || os(visionOS)
+            .presentationDetents([.large])
+            .interactiveDismissDisabled()
+            #endif
         }
-        .padding(.vertical, 4)
-    }
-}
-
-private struct ColorTile: View {
-    let color: OpaliteColor
-
-    private var title: String {
-        if let name = color.name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return name
-        }
-        return color.hexString
-    }
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(color.swiftUIColor)
-            .frame(width: 130, height: 130)
-            .overlay(alignment: .bottomLeading) {
-                Text(title)
-                    .font(.caption).bold()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.ultraThickMaterial, in: Capsule())
-                    .padding(8)
-            }
-            .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 6)
     }
 }
 
 #Preview {
-    ColorDetailView(color: OpaliteColor.sample)
+    let container: ModelContainer
+    do {
+        container = try ModelContainer(for: OpaliteColor.self, OpalitePalette.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    } catch {
+        fatalError("Preview ModelContainer setup failed: \(error)")
+    }
+    let colorManager = ColorManager(context: container.mainContext)
+
+    // Insert sample data into the in-memory context for previews
+    // Assumes `OpalitePalette.sample` and `OpaliteColor.sample` static properties exist
+    let paletteSample = OpalitePalette.sample
+    let colorSample = OpaliteColor.sample
+    let colorSample2 = OpaliteColor.sample2
+
+    // Associate the sample color with the sample palette if not already associated
+    colorSample.palette = paletteSample
+    if paletteSample.colors == nil { paletteSample.colors = [] }
+    if !(paletteSample.colors?.contains(where: { $0.id == colorSample.id }) ?? false) {
+        paletteSample.colors?.append(colorSample)
+    }
+
+    // Insert into the context
+    container.mainContext.insert(paletteSample)
+    container.mainContext.insert(colorSample)
+    container.mainContext.insert(colorSample2)
+
+    // Optionally refresh the manager's caches for immediate display
+    Task { await colorManager.refresh() }
+
+    return ColorDetailView(color: OpaliteColor.sample)
+        .modelContainer(container)
+        .environment(colorManager)
 }

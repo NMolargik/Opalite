@@ -38,17 +38,27 @@ struct MainView: View {
             // MARK: Palette Tab
             NavigationStack {
                 PaletteTabView()
-                    .navigationTitle("Opalite")
+                    .navigationTitle(AppTab.palette.rawValue)
             }
             .tabItem {
                 AppTab.palette.icon()
                 Text(AppTab.palette.rawValue)
             }
             
+            // MARK: Swatches Tab
+            NavigationStack {
+                Text("Swatches")
+                    .navigationTitle(AppTab.swatch.rawValue)
+            }
+            .tabItem {
+                AppTab.swatch.icon()
+                Text(AppTab.swatch.rawValue)
+            }
+            
             // MARK: Canvas Tab
             NavigationStack {
                 Text("Canvas")
-                    .navigationTitle("Canvas")
+                    .navigationTitle(AppTab.canvas.rawValue)
             }
             .tabItem {
                 AppTab.canvas.icon()
@@ -58,7 +68,7 @@ struct MainView: View {
             // MARK: Settings Tab
             NavigationStack {
                 Text("Settings")
-                    .navigationTitle("Settings")
+                    .navigationTitle(AppTab.settings.rawValue)
             }
             .tabItem {
                 AppTab.settings.icon()
@@ -76,6 +86,13 @@ struct MainView: View {
                     AppTab.palette.icon()
                     Text(AppTab.palette.rawValue)
                 }
+            
+            Text("Swatches")
+                .tabItem {
+                    AppTab.swatch.icon()
+                    Text(AppTab.swatch.rawValue)
+                }
+            
             CanvasTabView()
                 .tabItem {
                     AppTab.canvas.icon()

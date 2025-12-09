@@ -9,6 +9,7 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
     case palette = "Palette"
+    case swatch = "Swatches"
     case canvas = "Canvas"
     case settings = "Settings"
     
@@ -18,6 +19,8 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .palette:
             return Image(systemName: "paintpalette")
+        case .swatch:
+            return Image(systemName: "square.stack")
         case .canvas:
             return Image(systemName: "pencil.and.scribble")
         case .settings:

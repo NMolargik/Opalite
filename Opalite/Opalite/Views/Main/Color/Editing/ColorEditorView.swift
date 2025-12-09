@@ -81,9 +81,9 @@ struct ColorEditorView: View {
 
                     if viewModel.isExpanded {
                         VStack {
-                            modePickerView
-
                             modeContentView
+                            
+                            modePickerView
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .frame(maxWidth: .infinity, alignment: .topLeading)
