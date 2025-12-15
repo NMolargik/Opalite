@@ -24,9 +24,9 @@ struct ContentView: View {
                         }
                     }
                 )
-                    .id("splash")
-                    .transition(viewModel.leadingTransition)
-                    .zIndex(1)
+                .id("splash")
+                .transition(viewModel.leadingTransition)
+                .zIndex(1)
             case .onboarding:
                 OnboardingView(
                     onContinue: {
@@ -35,16 +35,16 @@ struct ContentView: View {
                         }
                     }
                 )
-                    .environment(colorManager)
-                    .id("onboarding")
-                    .transition(viewModel.leadingTransition)
-                    .zIndex(1)
+                .environment(colorManager)
+                .id("onboarding")
+                .transition(viewModel.leadingTransition)
+                .zIndex(1)
             case .main:
                 MainView()
-                    .environment(colorManager)
-                    .id("main")
-                    .transition(viewModel.leadingTransition)
-                    .zIndex(0)
+                .environment(colorManager)
+                .id("main")
+                .transition(viewModel.leadingTransition)
+                .zIndex(0)
             }
         }
         .task {
@@ -53,7 +53,7 @@ struct ContentView: View {
     }
     
     private func prepareApp() async {
-        await colorManager.refresh()
+        await colorManager.refreshAll()
         viewModel.appStage = isOnboardingComplete ? .main : .splash
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 extension MainView {
     @Observable
     class ViewModel {
-        var appTab: AppTab = .palette
+        var appTab: AppTab = .portfolio
         
     }
 }

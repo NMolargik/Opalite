@@ -1,50 +1,36 @@
-//
-//  OpaliteApp.swift
-//  Opalite
-//
-//  Created by Nick Molargik on 12/6/25.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
+@MainActor
 struct OpaliteApp: App {
-    private let colorManager: ColorManager
-    
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            OpaliteColor.self, OpalitePalette.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    let sharedModelContainer: ModelContainer
+    let colorManager: ColorManager
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-    
     init() {
+        let schema = Schema([
+            OpaliteColor.self,
+            OpalitePalette.self,
+        ])
+
         let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"
 
-        do {
-            let config = ModelConfiguration(
-                cloudKitDatabase: .private(cloudKitContainerID)
-            )
+        let config = ModelConfiguration(
+            schema: schema,
+            cloudKitDatabase: .private(cloudKitContainerID)
+        )
 
+        do {
             sharedModelContainer = try ModelContainer(
-                for: OpaliteColor.self, OpalitePalette.self,
-                configurations: config
+                for: schema,
+                configurations: [config]
             )
         } catch {
             fatalError("[Opalite] Failed to initialize ModelContainer: \(error)")
         }
-        
+
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
     }
-    
-    // MARK: Entrypoint
 
     var body: some Scene {
         WindowGroup {
@@ -53,4 +39,16 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
     }
+}
+
+func copyHex(for color: OpaliteColor) {
+    let hex = color.hexString
+    #if os(iOS) || os(visionOS)
+    UIPasteboard.general.string = hex
+    #elseif os(macOS)
+    NSPasteboard.general.clearContents()
+    NSPasteboard.general.setString(hex, forType: .string)
+    #else
+    _ = hex // No-op for unsupported platforms
+    #endif
 }

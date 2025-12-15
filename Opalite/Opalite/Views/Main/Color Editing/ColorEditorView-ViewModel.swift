@@ -11,7 +11,6 @@ extension ColorEditorView {
     @Observable
     class ViewModel {
         var originalColor: OpaliteColor?
-        var palette: OpalitePalette?
 
         var tempColor: OpaliteColor
         var mode: ColorPickerTab = .grid
@@ -19,16 +18,14 @@ extension ColorEditorView {
         var isExpanded: Bool = true
         var didCopyHex: Bool = false
 
-        init(color: OpaliteColor?, palette: OpalitePalette?) {
+        init(color: OpaliteColor?) {
             self.originalColor = color
-            self.palette = palette
 
             if let color {
                 // Create a temporary copy so edits don't immediately mutate the original
                 self.tempColor = OpaliteColor(
                     name: color.name,
                     notes: color.notes,
-                    isPinned: color.isPinned,
                     createdByDisplayName: color.createdByDisplayName,
                     createdOnDeviceName: color.createdOnDeviceName,
                     createdAt: color.createdAt,
@@ -37,7 +34,7 @@ extension ColorEditorView {
                     green: color.green,
                     blue: color.blue,
                     alpha: color.alpha,
-                    palette: color.palette
+                    palette: nil
                 )
             } else {
                 // Default tempColor to pure white when creating a brand new color
@@ -52,3 +49,4 @@ extension ColorEditorView {
         }
     }
 }
+

@@ -26,7 +26,7 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
         case .sliders:
             return Image(systemName: "slider.horizontal.3")
         case .codes:
-            return Image(systemName: "chevron.left.slash.chevron.right")
+            return Image(systemName: "number")
         case .image:
             return Image(systemName: "eyedropper.halffull")
         }

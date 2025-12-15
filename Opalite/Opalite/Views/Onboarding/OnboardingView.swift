@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
     var onContinue: () -> Void
 
     var body: some View {
-        Button("Continue") {
+        Button("Onboarding") {
             onContinue()
+            isOnboardingComplete = true
         }
     }
 }

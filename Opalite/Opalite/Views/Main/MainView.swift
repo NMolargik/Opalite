@@ -10,25 +10,11 @@ import SwiftData
 
 struct MainView: View {
     @Environment(\.horizontalSizeClass) private var hSizeClass
-    @Environment(\.verticalSizeClass) private var vSizeClass
-    @Environment(\.scenePhase) private var scenePhase
-    
     @Environment(ColorManager.self) private var colorManager: ColorManager
-    
     @State private var viewModel: MainView.ViewModel = ViewModel()
     
-    private var isCompactWidth: Bool {
-        hSizeClass == .compact
-    }
-    
     var body: some View {
-        Group {
-            if isCompactWidth {
-                compactWidthView()
-            } else {
-                regularWidthView()
-            }
-        }
+        if hSizeClass == .compact { compactWidthView() } else { regularWidthView() }
     }
     
     // MARK: - Compact View
@@ -37,23 +23,23 @@ struct MainView: View {
         TabView(selection: $viewModel.appTab) {
             // MARK: Palette Tab
             NavigationStack {
-                PaletteTabView()
-                    .navigationTitle(AppTab.palette.rawValue)
+                PortfolioView()
+                    .navigationTitle("Palettes")
             }
             .tabItem {
-                AppTab.palette.icon()
-                Text(AppTab.palette.rawValue)
+                Label("Palettes", systemImage: "swatchpalette.fill")
             }
+            .tag(AppTab.portfolio)
             
-            // MARK: Swatches Tab
+            // MARK: Colors Tab
             NavigationStack {
-                Text("Swatches")
-                    .navigationTitle(AppTab.swatch.rawValue)
+                Text("Colors")
+                    .navigationTitle("Colors")
             }
             .tabItem {
-                AppTab.swatch.icon()
-                Text(AppTab.swatch.rawValue)
+                Label("Colors", systemImage: AppTab.portfolio.iconName())
             }
+            .tag(AppTab.swatch)
             
             // MARK: Canvas Tab
             NavigationStack {
@@ -61,9 +47,9 @@ struct MainView: View {
                     .navigationTitle(AppTab.canvas.rawValue)
             }
             .tabItem {
-                AppTab.canvas.icon()
-                Text(AppTab.canvas.rawValue)
+                Label(AppTab.canvas.rawValue, systemImage: AppTab.canvas.iconName())
             }
+            .tag(AppTab.canvas)
             
             // MARK: Settings Tab
             NavigationStack {
@@ -71,74 +57,76 @@ struct MainView: View {
                     .navigationTitle(AppTab.settings.rawValue)
             }
             .tabItem {
-                AppTab.settings.icon()
-                Text(AppTab.settings.rawValue)
+                Label(AppTab.settings.rawValue, systemImage: AppTab.settings.iconName())
             }
+            .tag(AppTab.settings)
         }
     }
     
     // MARK: - Regular View
     @ViewBuilder
     private func regularWidthView() -> some View {
-        TabView {
-            PaletteTabView()
-                .tabItem {
-                    AppTab.palette.icon()
-                    Text(AppTab.palette.rawValue)
+        NavigationSplitView {
+            List {
+                
+                // TODO: remove Swatch and expand Canvas
+                Button {
+                    viewModel.appTab = .portfolio
+                } label: {
+                    Label(AppTab.portfolio.rawValue, systemImage: AppTab.portfolio.iconName())
                 }
-            
-            Text("Swatches")
-                .tabItem {
-                    AppTab.swatch.icon()
-                    Text(AppTab.swatch.rawValue)
+                Button {
+                    viewModel.appTab = .swatch
+                } label: {
+                    Label(AppTab.swatch.rawValue, systemImage: AppTab.swatch.iconName())
                 }
-            
-            CanvasTabView()
-                .tabItem {
-                    AppTab.canvas.icon()
-                    Text(AppTab.canvas.rawValue)
+//                Button {
+//                    viewModel.appTab = .canvas
+//                } label: {
+//                    Label(AppTab.canvas.rawValue, systemImage: AppTab.canvas.iconName())
+//                }
+                Button {
+                    viewModel.appTab = .settings
+                } label: {
+                    Label(AppTab.settings.rawValue, systemImage: AppTab.settings.iconName())
                 }
-            
-            SettingsTabView()
-                .tabItem {
-                    AppTab.settings.icon()
-                    Text(AppTab.settings.rawValue)
+            }
+            .navigationTitle("Opalite")
+        } detail: {
+            NavigationStack {
+                Group {
+                    switch viewModel.appTab {
+                    case .portfolio:
+                        PortfolioView()
+                    case .swatch:
+                        Text("Swatches")
+                            .navigationTitle(AppTab.swatch.rawValue)
+                    case .canvas:
+                        CanvasView()
+                            .navigationTitle(AppTab.canvas.rawValue)
+                    case .settings:
+                        SettingsView()
+                            .navigationTitle(AppTab.settings.rawValue)
+                    }
                 }
+            }
         }
-        .tabViewStyle(.sidebarAdaptable)
-        
     }
 }
 
 #Preview {
-    let container: ModelContainer
-    do {
-        container = try ModelContainer(for: OpaliteColor.self, OpalitePalette.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-    } catch {
-        fatalError("Preview ModelContainer setup failed: \(error)")
-    }
+    let container = try! ModelContainer(
+        for: OpaliteColor.self,
+        OpalitePalette.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
     let colorManager = ColorManager(context: container.mainContext)
-
-    // Insert sample data into the in-memory context for previews
-    // Assumes `OpalitePalette.sample` and `OpaliteColor.sample` static properties exist
-    let paletteSample = OpalitePalette.sample
-    let colorSample = OpaliteColor.sample
-    let colorSample2 = OpaliteColor.sample2
-
-    // Associate the sample color with the sample palette if not already associated
-    colorSample.palette = paletteSample
-    if paletteSample.colors == nil { paletteSample.colors = [] }
-    if !(paletteSample.colors?.contains(where: { $0.id == colorSample.id }) ?? false) {
-        paletteSample.colors?.append(colorSample)
+    do {
+        try colorManager.loadSamples()
+    } catch {
+        print("Failed to load samples")
     }
 
-    // Insert into the context
-    container.mainContext.insert(paletteSample)
-    container.mainContext.insert(colorSample)
-    container.mainContext.insert(colorSample2)
-
-    // Optionally refresh the manager's caches for immediate display
-    Task { await colorManager.refresh() }
 
     return MainView()
         .modelContainer(container)

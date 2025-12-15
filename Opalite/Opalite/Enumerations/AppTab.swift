@@ -8,23 +8,23 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
-    case palette = "Palette"
+    case portfolio = "Portfolio"
     case swatch = "Swatches"
     case canvas = "Canvas"
     case settings = "Settings"
     
     var id: String { self.rawValue }
     
-    func icon() -> Image {
+    func iconName() -> String {
         switch self {
-        case .palette:
-            return Image(systemName: "paintpalette")
+        case .portfolio:
+            return "paintpalette"
         case .swatch:
-            return Image(systemName: "square.stack")
+            return "square.stack"
         case .canvas:
-            return Image(systemName: "pencil.and.scribble")
+            return "pencil.and.scribble"
         case .settings:
-            return Image(systemName: "gear")
+            return "gear"
         }
     }
 }

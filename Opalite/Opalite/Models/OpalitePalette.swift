@@ -21,7 +21,6 @@ final class OpalitePalette {
     // User-facing metadata
     var notes: String?
     var tags: [String] = []
-    var isPinned: Bool = false
     
     // Relationship
     @Relationship var colors: [OpaliteColor]? = []
@@ -35,7 +34,6 @@ final class OpalitePalette {
         createdByDisplayName: String? = nil,
         notes: String? = nil,
         tags: [String] = [],
-        isPinned: Bool = false,
         colors: [OpaliteColor] = []
     ) {
         self.id = id
@@ -45,7 +43,6 @@ final class OpalitePalette {
         self.createdByDisplayName = createdByDisplayName
         self.notes = notes
         self.tags = tags
-        self.isPinned = isPinned
         self.colors = colors
     }
 }
@@ -63,7 +60,6 @@ extension OpalitePalette {
             "createdByDisplayName": createdByDisplayName as Any,
             "notes": notes as Any,
             "tags": tags,
-            "isPinned": isPinned,
             "colors": (colors ?? []).map { $0.dictionaryRepresentation }
         ]
     }
@@ -87,23 +83,13 @@ extension OpalitePalette {
 extension OpalitePalette {
     /// Sample palette for SwiftUI previews
     static var sample: OpalitePalette {
-        let color1 = OpaliteColor(
+        let color = OpaliteColor(
             name: "Sunset Orange",
             red: 0.95,
             green: 0.45,
             blue: 0.30,
             alpha: 1.0
         )
-
-        let color2 = OpaliteColor(
-            name: "Ocean Blue",
-            red: 0.20,
-            green: 0.50,
-            blue: 0.90,
-            alpha: 1.0
-        )
-
-        let color3 = OpaliteColor.sample
 
         let palette = OpalitePalette(
             name: "Sample Palette",
@@ -112,8 +98,7 @@ extension OpalitePalette {
             createdByDisplayName: "Nick Molargik",
             notes: "Example palette for SwiftUI previews.",
             tags: ["preview", "sample"],
-            isPinned: true,
-            colors: [color1, color2, color3]
+            colors: [color, OpaliteColor.sample, OpaliteColor.sample2]
         )
 
         return palette

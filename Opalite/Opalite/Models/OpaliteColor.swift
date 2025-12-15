@@ -22,7 +22,6 @@ final class OpaliteColor {
     // MARK: - Display
     var name: String?
     var notes: String?
-    var isPinned: Bool = false
     
     // MARK: - Author
     var createdByDisplayName: String?
@@ -73,7 +72,6 @@ final class OpaliteColor {
         id: UUID = UUID(),
         name: String? = nil,
         notes: String? = nil,
-        isPinned: Bool = false,
         createdByDisplayName: String? = nil,
         createdOnDeviceName: String? = nil,
         updatedOnDeviceName: String? = nil,
@@ -88,7 +86,6 @@ final class OpaliteColor {
         self.id = id
         self.name = name
         self.notes = notes
-        self.isPinned = isPinned
         self.createdByDisplayName = createdByDisplayName
         self.createdOnDeviceName = createdOnDeviceName
         self.updatedOnDeviceName = updatedOnDeviceName
@@ -308,85 +305,14 @@ extension OpaliteColor {
     }
     
     /// Returns black or white depending on which has better contrast on this color
-    func idealTextColor() -> OpaliteColor {
+    func idealTextColor() -> Color {
         let black = OpaliteColor(name: "Black", red: 0, green: 0, blue: 0, alpha: 1)
         let white = OpaliteColor(name: "White", red: 1, green: 1, blue: 1, alpha: 1)
         
         let blackContrast = black.contrastRatio(against: self)
         let whiteContrast = white.contrastRatio(against: self)
         
-        return blackContrast >= whiteContrast ? black : white
-    }
-    
-    /// Returns whether this color is considered "light" (useful for UI logic)
-    var isLight: Bool {
-        relativeLuminance > 0.5
-    }
-
-    // MARK: - Transformations
-
-    /// Returns a lighter version of this color by increasing lightness
-    func lighter(by percentage: Double) -> OpaliteColor {
-        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-        let clamped = max(-1, min(1, percentage))
-        let newL = max(0, min(1, l + clamped * (1 - l)))
-        
-        let rgb = Self.hslToRGB(h: h, s: s, l: newL)
-        return OpaliteColor(
-            name: "\(name ?? "Color") Lighter",
-            red: rgb.r,
-            green: rgb.g,
-            blue: rgb.b,
-            alpha: alpha
-        )
-    }
-
-    /// Returns a darker version of this color by decreasing lightness
-    func darker(by percentage: Double) -> OpaliteColor {
-        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-        let clamped = max(-1, min(1, percentage))
-        let newL = max(0, min(1, l * (1 - clamped)))
-        
-        let rgb = Self.hslToRGB(h: h, s: s, l: newL)
-        return OpaliteColor(
-            name: "\(name ?? "Color") Darker",
-            red: rgb.r,
-            green: rgb.g,
-            blue: rgb.b,
-            alpha: alpha
-        )
-    }
-
-    /// Increases saturation by a given percentage (0–1)
-    func saturated(by percentage: Double) -> OpaliteColor {
-        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-        let clamped = max(-1, min(1, percentage))
-        let newS = max(0, min(1, s + clamped * (1 - s)))
-        
-        let rgb = Self.hslToRGB(h: h, s: newS, l: l)
-        return OpaliteColor(
-            name: "\(name ?? "Color") Saturated",
-            red: rgb.r,
-            green: rgb.g,
-            blue: rgb.b,
-            alpha: alpha
-        )
-    }
-
-    /// Decreases saturation (towards grayscale)
-    func desaturated(by percentage: Double) -> OpaliteColor {
-        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-        let clamped = max(0, min(1, percentage))
-        let newS = max(0, min(1, s * (1 - clamped)))
-        
-        let rgb = Self.hslToRGB(h: h, s: newS, l: l)
-        return OpaliteColor(
-            name: "\(name ?? "Color") Desaturated",
-            red: rgb.r,
-            green: rgb.g,
-            blue: rgb.b,
-            alpha: alpha
-        )
+        return blackContrast >= whiteContrast ? Color.black : Color.white
     }
     
     /// Returns a copy of this color with a different alpha
@@ -395,7 +321,6 @@ extension OpaliteColor {
         return OpaliteColor(
             name: name,
             notes: notes,
-            isPinned: isPinned,
             createdByDisplayName: createdByDisplayName,
             createdAt: createdAt,
             updatedAt: Date(),
@@ -404,25 +329,6 @@ extension OpaliteColor {
             blue: blue,
             alpha: clampedAlpha,
             palette: palette
-        )
-    }
-
-    // MARK: - Blending
-
-    /// Linear blend between this color and another (0 = self, 1 = other)
-    func mixed(with other: OpaliteColor, ratio t: Double) -> OpaliteColor {
-        let clamped = max(0, min(1, t))
-        let r = red   + (other.red   - red)   * clamped
-        let g = green + (other.green - green) * clamped
-        let b = blue  + (other.blue  - blue)  * clamped
-        let a = alpha + (other.alpha - alpha) * clamped
-        
-        return OpaliteColor(
-            name: "\(name ?? "Color")–\(other.name ?? "Other Color") Mix",
-            red: r,
-            green: g,
-            blue: b,
-            alpha: a
         )
     }
 }
@@ -465,9 +371,8 @@ extension OpaliteColor {
     /// A convenient sample color for SwiftUI previews
     static let sample: OpaliteColor = OpaliteColor(
         id: UUID(),
-        name: "Sample Blue",
+        name: "Sample Blue Blue Blue Blue",
         notes: "A nice blue color",
-        isPinned: false,
         createdByDisplayName: "Nick Molargik",
         createdOnDeviceName: "iPhone 17 Pro",
         updatedOnDeviceName: "iPhone 17 Pro",
@@ -476,15 +381,13 @@ extension OpaliteColor {
         red: 0.20,
         green: 0.50,
         blue: 0.80,
-        alpha: 1.0,
-        palette: nil
+        alpha: 1.0
     )
     
     static let sample2: OpaliteColor = OpaliteColor(
         id: UUID(),
         name: "Sample Red",
         notes: "A nice red color",
-        isPinned: false,
         createdByDisplayName: "Nick Molargik",
         createdOnDeviceName: "iPhone 17 Pro",
         updatedOnDeviceName: "iPhone 17 Pro",
@@ -493,8 +396,7 @@ extension OpaliteColor {
         red: 0.80,
         green: 0.20,
         blue: 0.50,
-        alpha: 1.0,
-        palette: nil
+        alpha: 1.0
     )
 }
 #endif

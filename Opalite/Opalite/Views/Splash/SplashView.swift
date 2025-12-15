@@ -11,7 +11,7 @@ struct SplashView: View {
     var onContinue: () -> Void
 
     var body: some View {
-        Button("Continue") {
+        Button("Splash") {
             onContinue()
         }
     }
