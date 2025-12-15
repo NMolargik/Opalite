@@ -11,9 +11,9 @@ import SwiftData
 struct PortfolioView: View {
     @Environment(\.horizontalSizeClass) private var hSizeClass
     @Environment(ColorManager.self) private var colorManager
-    @State private var isColorsExpanded: Bool = true
-    @State private var isPaletteExpanded: Bool = true
     @State private var paletteSelectionColor: OpaliteColor?
+    @State private var shareImage: UIImage?
+    @State private var isShowingShareSheet = false
 
     var body: some View {
         ScrollView {
@@ -26,6 +26,7 @@ struct PortfolioView: View {
         .refreshable {
             Task { await colorManager.refreshAll() }
         }
+        .background(shareSheet(image: shareImage))
     }
     
     @ViewBuilder func compactView() -> some View {
@@ -45,19 +46,22 @@ struct PortfolioView: View {
                                     Button {
                                         copyHex(for: color)
                                     } label: {
-                                        Label("Copy Hex", systemImage: "doc.on.doc")
+                                        Label("Copy Hex", systemImage: "number")
                                     }
                                     
                                     Button {
-                                        // TODO: share color as image
+                                        if let image = solidColorImage(from: color) {
+                                            shareImage = image
+                                            isShowingShareSheet = true
+                                        }
                                     } label: {
-                                        Label("Share As Image", systemImage: "doc.on.doc")
+                                        Label("Share As Image", systemImage: "photo.on.rectangle")
                                     }
-                                    
+
                                     Button {
-                                        // TODO: share color data
+                                        // TODO: Share Color
                                     } label: {
-                                        Label("Share Color", systemImage: "doc.on.doc")
+                                        Label("Share Color", systemImage: "square.and.arrow.up")
                                     }
                                     
                                     Divider()
@@ -109,13 +113,6 @@ struct PortfolioView: View {
     
     @ViewBuilder func regularView() -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Text("Colors")
-                    .font(.title)
-                    .bold()
-                    .padding(.leading, 20)
-            }
-
             SwatchRowView(
                 colors: colorManager.colors.filter({ $0.palette == nil }),
                 swatchWidth: 175,
@@ -133,7 +130,7 @@ struct PortfolioView: View {
                             Button {
                                 paletteSelectionColor = color
                             } label: {
-                                Label("Add To Palette", systemImage: "swatchpalette")
+                                Label("Add To Palette", systemImage: "swatchpalette.fill")
                             }
                             
                             Divider()
@@ -172,19 +169,22 @@ struct PortfolioView: View {
                                     Button {
                                         copyHex(for: color)
                                     } label: {
-                                        Label("Copy Hex", systemImage: "doc.on.doc")
+                                        Label("Copy Hex", systemImage: "number")
                                     }
                                     
                                     Button {
-                                        // TODO: share color as image
+                                        if let image = solidColorImage(from: color) {
+                                            shareImage = image
+                                            isShowingShareSheet = true
+                                        }
                                     } label: {
-                                        Label("Share As Image", systemImage: "doc.on.doc")
+                                        Label("Share As Image", systemImage: "photo.on.rectangle")
                                     }
-                                    
+
                                     Button {
-                                        // TODO: share color data
+                                        // TODO: Share Color
                                     } label: {
-                                        Label("Share Color", systemImage: "doc.on.doc")
+                                        Label("Share Color", systemImage: "square.and.arrow.up")
                                     }
                                     
                                     Divider()
@@ -205,6 +205,15 @@ struct PortfolioView: View {
             PaletteSelectionSheet(color: color)
                 .environment(colorManager)
         }
+        .navigationTitle("Opalite")
+    }
+    
+    @ViewBuilder
+    private func shareSheet(image: UIImage?) -> some View {
+        EmptyView()
+            .background(
+                ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
     }
 }
 

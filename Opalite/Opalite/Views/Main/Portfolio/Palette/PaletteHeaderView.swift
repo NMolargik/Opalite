@@ -11,15 +11,20 @@ import SwiftData
 struct PaletteHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
     @State private var showDeleteConfirmation = false
+    @State private var shareImage: UIImage?
+    @State private var isShowingShareSheet = false
     let palette: OpalitePalette
     
     var body: some View {
         HStack {
             Menu {
                 Button {
-                    // TODO: Share Palette as Image
+                    if let image = gradientImage(from: palette.colors ?? []) {
+                        shareImage = image
+                        isShowingShareSheet = true
+                    }
                 } label: {
-                    Label("Share Palette As Image", systemImage: "photo.on.rectangle")
+                    Label("Share As Image", systemImage: "photo.on.rectangle")
                 }
 
                 Button {
@@ -81,16 +86,50 @@ struct PaletteHeaderView: View {
                 }
             }
 
-            Button("Delete Palette and Colors", role: .destructive) {
-                do {
-                    try colorManager.deletePalette(palette, andColors: true)
-                } catch {
-                    // TODO: error handling
+            if (!(palette.colors?.isEmpty ?? false)) {
+                Button("Delete Palette and Colors", role: .destructive) {
+                    do {
+                        try colorManager.deletePalette(palette, andColors: true)
+                    } catch {
+                        // TODO: error handling
+                    }
                 }
             }
         } message: {
             Text("This action cannot be undone.")
         }
+        .background(shareSheet(image: shareImage))
+    }
+    
+    @ViewBuilder
+    private func shareSheet(image: UIImage?) -> some View {
+        EmptyView()
+            .background(
+                ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
+    }
+    
+    // MARK: - Helpers
+    private func gradientImage(from colors: [OpaliteColor], size: CGSize = CGSize(width: 512, height: 512)) -> UIImage? {
+        let uiColors: [Color] = colors.map { $0.swiftUIColor }
+        let gradientColors = uiColors.isEmpty ? [Color.clear, Color.clear] : uiColors
+        let view = LinearGradient(
+            colors: gradientColors,
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .frame(width: size.width, height: size.height)
+        .clipped()
+
+        // Render SwiftUI view to UIImage
+        let renderer = ImageRenderer(content: view)
+        renderer.proposedSize = .init(size)
+        #if canImport(UIKit)
+        renderer.scale = UIScreen.main.scale
+        return renderer.uiImage
+        #else
+        return nil
+        #endif
     }
 }
 

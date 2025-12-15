@@ -12,7 +12,6 @@ struct SwatchRowView: View {
     let colors: [OpaliteColor]
     let swatchWidth: CGFloat
     let swatchHeight: CGFloat
-    let swatchSpacing: CGFloat = 12
     var onReceiveSwatch: (([NSItemProvider]) -> Bool)? = nil
     var showBadge: Bool = false
     var menuContent: ((OpaliteColor) -> AnyView)? = nil
@@ -21,41 +20,68 @@ struct SwatchRowView: View {
     @State private var isDropTargeted: Bool = false
     
     var body: some View {
-        if (colors.isEmpty) {
-            
-        } else {
-            ScrollView(.horizontal) {
-                HStack(spacing: swatchSpacing) {
-                    ForEach(colors, id: \.self) { color in
-                        NavigationLink {
-                            ColorDetailView(color: color)
-                        } label: {
-                            SwatchView(
-                                fill: [color],
-                                width: swatchWidth,
-                                height: swatchHeight,
-                                badgeText: showBadge ? (color.name ?? color.hexString) : nil,
-                                menu: menuContent?(color),
-                                contextMenu: contextMenuContent?(color)
-                            )
+        Group {
+            if (colors.isEmpty) {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.turn.down.right")
+                        .bold()
+                    
+                    Button {
+                        // TODO: show color creator
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "questionmark.square.dashed")
+                                .font(.title2)
+                            
+                            Text("Add New or Existing Colors")
                         }
-                        .buttonStyle(.plain)
+                        .bold()
+                        .foregroundStyle(.inverseTheme)
+                        .padding(.horizontal, 10)
+                        .frame(height: 20)
+                        .padding(8)
+                        .multilineTextAlignment(.center)
+                        .glassEffect(.clear.tint(.blue).interactive())
+                        .contentShape(RoundedRectangle(cornerRadius: 16))
+                        .hoverEffect(.lift)
                     }
-                    .padding(.vertical, 5)
                 }
-                .padding(.leading)
+                .padding(.leading, 35)
+            } else {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 12) {
+                        ForEach(colors, id: \.self) { color in
+                            NavigationLink {
+                                ColorDetailView(color: color)
+                            } label: {
+                                SwatchView(
+                                    fill: [color],
+                                    width: swatchWidth,
+                                    height: swatchHeight,
+                                    badgeText: showBadge ? (color.name ?? color.hexString) : nil,
+                                    menu: menuContent?(color),
+                                    contextMenu: contextMenuContent?(color)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.vertical, 5)
+                    }
+                    .padding(.leading)
+                }
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
-            .onDrop(of: [UTType.opaliteColorID, .image, .png, .jpeg], isTargeted: $isDropTargeted) { providers in
-                return onReceiveSwatch?(providers) ?? false
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
-                    .opacity(isDropTargeted ? 1 : 0)
-                    .padding(.leading, 10)
-            )
         }
+        .onDrop(of: [UTType.opaliteColorID, .image, .png, .jpeg], isTargeted: $isDropTargeted) { providers in
+            return onReceiveSwatch?(providers) ?? false
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(colors.isEmpty ? .inverseTheme : .blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
+                .opacity(isDropTargeted ? 1 : 0)
+                .padding(.leading, colors.isEmpty ? 65 : 10)
+                .padding(.trailing, colors.isEmpty ? 0 : -20) // bleed past trailing edge
+        )
     }
 }
 

@@ -371,7 +371,7 @@ class ColorManager {
         ]
 
         // Ensure relationships are consistent (colors' palette back-references)
-        let palettesToInsert: [OpalitePalette] = [sunrise, ocean, neon, grayscale]
+        let palettesToInsert: [OpalitePalette] = [sunrise, ocean, neon, grayscale, OpalitePalette(name: "New Palette")]
         for p in palettesToInsert {
             p.colors = p.colors ?? []
             for c in p.colors ?? [] {

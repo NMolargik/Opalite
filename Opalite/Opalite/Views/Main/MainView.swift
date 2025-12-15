@@ -75,11 +75,11 @@ struct MainView: View {
                 } label: {
                     Label(AppTab.portfolio.rawValue, systemImage: AppTab.portfolio.iconName())
                 }
-                Button {
-                    viewModel.appTab = .swatch
-                } label: {
-                    Label(AppTab.swatch.rawValue, systemImage: AppTab.swatch.iconName())
-                }
+//                Button {
+//                    viewModel.appTab = .swatch
+//                } label: {
+//                    Label(AppTab.swatch.rawValue, systemImage: AppTab.swatch.iconName())
+//                }
 //                Button {
 //                    viewModel.appTab = .canvas
 //                } label: {

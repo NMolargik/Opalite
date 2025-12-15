@@ -40,15 +40,3 @@ struct OpaliteApp: App {
         .environment(colorManager)
     }
 }
-
-func copyHex(for color: OpaliteColor) {
-    let hex = color.hexString
-    #if os(iOS) || os(visionOS)
-    UIPasteboard.general.string = hex
-    #elseif os(macOS)
-    NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(hex, forType: .string)
-    #else
-    _ = hex // No-op for unsupported platforms
-    #endif
-}
