@@ -50,8 +50,7 @@ struct ColorImagePickerView: View {
                     } label: {
                         Label("Camera", systemImage: "camera")
                     }
-                    .foregroundStyle(.black)
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
                     .controlSize(.small)
                 }
 

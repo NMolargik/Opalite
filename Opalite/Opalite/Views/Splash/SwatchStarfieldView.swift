@@ -118,7 +118,9 @@ struct SwatchStarfieldView: View {
         SwatchView(
             fill: star.fill,
             width: starSize,
-            height: starSize
+            height: starSize,
+            badgeText: "",
+            showOverlays: false
         )
         .opacity(alpha)
         .clipShape(RoundedRectangle(cornerRadius: star.cornerRadius, style: .continuous))
@@ -259,6 +261,7 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: .constant(nil)
                 )
 
@@ -267,6 +270,7 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: $isEditing
                 )
 
@@ -275,13 +279,16 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: .constant(nil)
                 )
 
                 SwatchView(
                     fill: [OpaliteColor(red: 1, green: 1.0, blue: 0.5)],
                       width: 75,
-                      height: 75
+                      height: 75,
+                    badgeText: "",
+                    showOverlays: false
                   )
             }
 
@@ -289,6 +296,7 @@ private struct StatefulPreview: View {
                 fill: sampleColors,
                 height: 350,
                 badgeText: "Sample Color",
+                showOverlays: false,
                 isEditingBadge: $isEditing
             )
         }

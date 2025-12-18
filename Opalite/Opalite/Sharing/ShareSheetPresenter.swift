@@ -21,6 +21,12 @@ struct ShareSheetPresenter: UIViewControllerRepresentable {
         activity.completionWithItemsHandler = { _, _, _, _ in
             DispatchQueue.main.async { isPresented = false }
         }
+        // Configure popover for iPad to avoid crash: sourceView/sourceRect required
+        if let popover = activity.popoverPresentationController {
+            popover.sourceView = uiViewController.view
+            popover.sourceRect = uiViewController.view.bounds
+            popover.permittedArrowDirections = []
+        }
         if uiViewController.presentedViewController == nil {
             uiViewController.present(activity, animated: true)
         }
@@ -60,16 +66,4 @@ func solidColorImage(from color: OpaliteColor, size: CGSize = CGSize(width: 512,
     renderer.proposedSize = .init(size)
     renderer.isOpaque = color.alpha >= 1.0
     return renderer.uiImage
-}
-
-func copyHex(for color: OpaliteColor) {
-    let hex = color.hexString
-    #if os(iOS) || os(visionOS)
-    UIPasteboard.general.string = hex
-    #elseif os(macOS)
-    NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(hex, forType: .string)
-    #else
-    _ = hex // No-op for unsupported platforms
-    #endif
 }

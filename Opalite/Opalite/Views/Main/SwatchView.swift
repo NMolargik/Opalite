@@ -17,10 +17,16 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct SwatchView: View {
+    private var palette: OpalitePalette? = nil
+    @State private var isDropTargeted: Bool = false
+    private var matchedNamespace: Namespace.ID? = nil
+    private var matchedID: AnyHashable? = nil
+
     private var fill: [OpaliteColor]
     private var width: CGFloat?
-    private var height: CGFloat
-    private var badgeText: String?
+    private var height: CGFloat?
+    private var badgeText: String
+    private var showOverlays: Bool
     @Binding var isEditingBadge: Bool?
     private var saveBadge: ((String) -> Void)?
     private var menu: AnyView?
@@ -28,14 +34,19 @@ struct SwatchView: View {
     
     @State private var editedBadgeText: String = ""
     @State private var isMenuPresented: Bool = false
+    @FocusState private var badgeFocused: Bool
 
     init(
         fill: [OpaliteColor],
         width: CGFloat? = nil,
-        height: CGFloat,
-        badgeText: String? = nil,
+        height: CGFloat? = nil,
+        badgeText: String,
+        showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        palette: OpalitePalette? = nil,
+        matchedNamespace: Namespace.ID? = nil,
+        matchedID: AnyHashable? = nil,
         menu: AnyView? = nil,
         contextMenu: AnyView? = nil
     ) {
@@ -43,8 +54,12 @@ struct SwatchView: View {
         self.width = width
         self.height = height
         self.badgeText = badgeText
+        self.showOverlays = showOverlays
         self._isEditingBadge = isEditingBadge
         self.saveBadge = saveBadge
+        self.palette = palette
+        self.matchedNamespace = matchedNamespace
+        self.matchedID = matchedID
         self.menu = menu
         self.contextMenu = contextMenu
     }
@@ -52,10 +67,14 @@ struct SwatchView: View {
     init<MenuContent: View>(
         fill: [OpaliteColor],
         width: CGFloat? = nil,
-        height: CGFloat,
-        badgeText: String? = nil,
+        height: CGFloat? = nil,
+        badgeText: String,
+        showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        palette: OpalitePalette? = nil,
+        matchedNamespace: Namespace.ID? = nil,
+        matchedID: AnyHashable? = nil,
         @ViewBuilder menu: @escaping () -> MenuContent
     ) {
         self.init(
@@ -63,8 +82,12 @@ struct SwatchView: View {
             width: width,
             height: height,
             badgeText: badgeText,
+            showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
             saveBadge: saveBadge,
+            palette: palette,
+            matchedNamespace: matchedNamespace,
+            matchedID: matchedID,
             menu: AnyView(menu())
         )
     }
@@ -72,10 +95,14 @@ struct SwatchView: View {
     init<ContextMenuContent: View>(
         fill: [OpaliteColor],
         width: CGFloat? = nil,
-        height: CGFloat,
-        badgeText: String? = nil,
+        height: CGFloat? = nil,
+        badgeText: String,
+        showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        palette: OpalitePalette? = nil,
+        matchedNamespace: Namespace.ID? = nil,
+        matchedID: AnyHashable? = nil,
         @ViewBuilder contextMenu: @escaping () -> ContextMenuContent
     ) {
         self.init(
@@ -83,8 +110,12 @@ struct SwatchView: View {
             width: width,
             height: height,
             badgeText: badgeText,
+            showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
             saveBadge: saveBadge,
+            palette: palette,
+            matchedNamespace: matchedNamespace,
+            matchedID: matchedID,
             menu: nil,
             contextMenu: AnyView(contextMenu())
         )
@@ -100,16 +131,12 @@ struct SwatchView: View {
                     endPoint: .trailing
                 )
             )
-            .if(!fill.isEmpty) { view in
-                view.onDrag {
-                    provideDragItem()
-                }
-            }
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(.thinMaterial, lineWidth: 5)
             )
-            .frame(width: width, height: height)
+            .frame(width: width)
+            .frame(minHeight: height)
             .overlay(alignment: .topLeading) {
                 badgeContent
                     .frame(maxWidth: 500, alignment: .leading)
@@ -117,15 +144,29 @@ struct SwatchView: View {
             .overlay(alignment: .bottomTrailing) {
                 menuContent
             }
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
+                    .opacity(isDropTargeted ? 1 : 0)
+            )
             .contextMenu {
                 contextMenuContent
+            }
+            .if(matchedNamespace != nil && matchedID != nil) { view in
+                view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
+            }
+            .zIndex(2)
+            .if(!fill.isEmpty && isEditingBadge != true) { view in
+                view.onDrag {
+                    provideDragItem()
+                }
             }
     }
     
     // MARK: - Badge Content
     @ViewBuilder
     private var badgeContent: some View {
-        if let badgeText {
+        if showOverlays {
             ZStack(alignment: .leading) {
                 // Read-only label state
                 if isEditingBadge != true {
@@ -146,6 +187,7 @@ struct SwatchView: View {
                         .foregroundStyle(fill.first?.idealTextColor() ?? .black)
                         .bold()
                         .submitLabel(.done)
+                        .focused($badgeFocused)
                         .onSubmit {
                             let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
                             saveBadge?(finalText)
@@ -170,6 +212,19 @@ struct SwatchView: View {
                         .contentShape(Circle())
                         .hoverEffect(.lift)
                     }
+                    .onAppear {
+                        // Ensure the TextField receives focus right after it appears
+                        DispatchQueue.main.async {
+                            badgeFocused = true
+                        }
+                    }
+                }
+            }
+            .onChange(of: isEditingBadge) { _, to in
+                if to == true {
+                    DispatchQueue.main.async {
+                        badgeFocused = true
+                    }
                 }
             }
             .frame(height: 20)
@@ -187,24 +242,26 @@ struct SwatchView: View {
     // MARK: - Menu Content
     @ViewBuilder
     private var menuContent: some View {
-        if let menu {
-            Menu {
-                menu
-            } label: {
-                Image(systemName: "ellipsis")
-                    .imageScale(.large)
-                    .foregroundStyle(fill.first?.idealTextColor() ?? .black)
-                    .frame(width: 8, height: 8)
-                    .padding(12)
-                    .background(
-                        Circle().fill(.clear)
-                    )
-                    .glassEffect(.clear)
-                    .contentShape(Circle())
-                    .hoverEffect(.lift)
+        if showOverlays {
+            if let menu = menu {
+                Menu {
+                    menu
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .imageScale(.large)
+                        .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                        .frame(width: 8, height: 8)
+                        .padding(12)
+                        .background(
+                            Circle().fill(.clear)
+                        )
+                        .glassEffect(.clear)
+                        .contentShape(Circle())
+                        .hoverEffect(.lift)
+                }
+                .menuStyle(.automatic)
+                .padding(8)
             }
-            .menuStyle(.automatic)
-            .padding(8)
         }
     }
 
@@ -220,19 +277,23 @@ struct SwatchView: View {
 
     // MARK: - Drag Support
     private func provideDragItem() -> NSItemProvider {
-        // If single color, provide a 512x512 square image of the rounded rectangle with that fill for cross-app drops
-        if fill.count == 1 {
-            if let imageData = renderSwatchImage(size: CGSize(width: 512, height: 512)) {
-                let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
-                return provider
+        // Always provide a PNG preview of the swatch
+        let size = CGSize(width: 512, height: 512)
+        guard let imageData = renderSwatchImage(size: size) else {
+            return NSItemProvider()
+        }
+
+        let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
+
+        // Additionally, when dragging a single color, include its ID so drops can attach/detach via ColorManager
+        if fill.count == 1, let first = fill.first, let idData = first.id.uuidString.data(using: .utf8) {
+            provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColorID.identifier, visibility: .all) { completion in
+                completion(idData, nil)
+                return nil
             }
         }
-        // For multiple colors (or fallback), still provide an image of the current swatch appearance
-        if let imageData = renderSwatchImage(size: CGSize(width: 512, height: 512)) {
-            let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
-            return provider
-        }
-        return NSItemProvider()
+
+        return provider
     }
 
     private func renderSwatchImage(size: CGSize) -> Data? {
@@ -316,17 +377,6 @@ struct SwatchView: View {
     }
 }
 
-private extension View {
-    @ViewBuilder
-    func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
-    }
-}
-
 #Preview("With Menu") {
     StatefulPreview()
 }
@@ -350,6 +400,7 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: .constant(nil),
                     menu: {
                         Button("Edit") {}
@@ -364,6 +415,7 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: $isEditing,
                     menu: {
                         Button("Edit") {}
@@ -378,6 +430,7 @@ private struct StatefulPreview: View {
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
+                    showOverlays: true,
                     isEditingBadge: .constant(nil),
                     menu: {
                         Button("Edit") {}
@@ -390,7 +443,9 @@ private struct StatefulPreview: View {
                 SwatchView(
                     fill: [OpaliteColor(red: 1, green: 1.0, blue: 0.5)],
                       width: 75,
-                      height: 75
+                      height: 75,
+                    badgeText: "",
+                    showOverlays: false
                   )
             }
 
@@ -398,10 +453,10 @@ private struct StatefulPreview: View {
                 fill: sampleColors,
                 height: 350,
                 badgeText: "Sample Color",
+                showOverlays: false,
                 isEditingBadge: $isEditing
             )
         }
         .padding()
     }
 }
-

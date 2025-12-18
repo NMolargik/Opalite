@@ -1,5 +1,5 @@
 //
-//  PaletteHeaderView.swift
+//  PaletteRowHeaderView.swift
 //  Opalite
 //
 //  Created by Nick Molargik on 12/14/25.
@@ -8,16 +8,26 @@
 import SwiftUI
 import SwiftData
 
-struct PaletteHeaderView: View {
+struct PaletteRowHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
     @State private var showDeleteConfirmation = false
     @State private var shareImage: UIImage?
     @State private var isShowingShareSheet = false
+    @State private var isShowingColorEditor = false
+    
     let palette: OpalitePalette
     
     var body: some View {
         HStack {
             Menu {
+                Button(role: .confirm) {
+                    isShowingColorEditor.toggle()
+                } label: {
+                    Label("New Color", systemImage: "plus.square.dashed")
+                }
+                
+                Divider()
+                
                 Button {
                     if let image = gradientImage(from: palette.colors ?? []) {
                         shareImage = image
@@ -99,6 +109,25 @@ struct PaletteHeaderView: View {
             Text("This action cannot be undone.")
         }
         .background(shareSheet(image: shareImage))
+        .fullScreenCover(isPresented: $isShowingColorEditor) {
+            ColorEditorView(
+                color: nil,
+                palette: palette,
+                onCancel: {
+                    isShowingColorEditor = false
+                },
+                onApprove: { newColor in
+                    do {
+                        let createdColor = try colorManager.createColor(existing: newColor)
+                        colorManager.attachColor(createdColor, to: palette)
+                    } catch {
+                        // TODO: error handling
+                    }
+                    
+                    isShowingColorEditor.toggle()
+                }
+            )
+        }
     }
     
     @ViewBuilder
@@ -142,7 +171,7 @@ struct PaletteHeaderView: View {
     )
 
     let manager = ColorManager(context: container.mainContext)
-    return PaletteHeaderView(
+    return PaletteRowHeaderView(
         palette: OpalitePalette.sample
     )
     .environment(manager)

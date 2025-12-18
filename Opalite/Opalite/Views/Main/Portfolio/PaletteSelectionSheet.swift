@@ -29,7 +29,7 @@ struct PaletteSelectionSheet: View {
                         Button {
                             createNewPaletteAndAttach()
                         } label: {
-                            Label("Create New Palette", systemImage: "plus.circle")
+                            Label("Create New Palette", systemImage: "plus.square.on.square")
                                 .font(.headline)
                                 .labelStyle(.titleOnly)
                         }

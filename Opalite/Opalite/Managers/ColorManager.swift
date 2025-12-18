@@ -21,6 +21,9 @@ class ColorManager {
     // MARK: - Cached data for views to consume
     var palettes: [OpalitePalette] = []
     var colors: [OpaliteColor] = []
+    var looseColors: [OpaliteColor] {
+        colors.filter { $0.palette == nil }
+    }
     
     // MARK: - Fetch Helpers
     private var paletteSort: [SortDescriptor<OpalitePalette>] {
@@ -62,6 +65,9 @@ class ColorManager {
             if !exists {
                 palette.colors?.append(color)
             }
+            // Touch timestamps since the relationship list may have changed
+            palette.updatedAt = .now
+            color.updatedAt = .now
         } else {
             // If attached to a different palette, remove it from there first
             if let old = color.palette, old.id != palette.id {
@@ -79,6 +85,9 @@ class ColorManager {
                 palette.colors?.remove(at: dupIdx)
             }
             palette.colors?.append(color)
+            // Touch timestamps for the new attachment
+            palette.updatedAt = .now
+            color.updatedAt = .now
         }
         
         do {
@@ -395,3 +404,4 @@ class ColorManager {
         reloadCache()
     }
 }
+

@@ -15,7 +15,7 @@ extension ColorEditorView {
         var tempColor: OpaliteColor
         var mode: ColorPickerTab = .grid
         var isShowingPaletteStrip: Bool = false
-        var isExpanded: Bool = true
+        var isColorExpanded: Bool = false
         var didCopyHex: Bool = false
 
         init(color: OpaliteColor?) {
@@ -40,9 +40,9 @@ extension ColorEditorView {
                 // Default tempColor to pure white when creating a brand new color
                 self.tempColor = OpaliteColor(
                     name: nil,
-                    red: 1.0,
-                    green: 1.0,
-                    blue: 1.0,
+                    red: 0.5,
+                    green: 0.6,
+                    blue: 0.7,
                     alpha: 1.0
                 )
             }

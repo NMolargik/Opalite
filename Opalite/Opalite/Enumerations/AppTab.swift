@@ -9,7 +9,6 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
     case portfolio = "Portfolio"
-    case swatch = "Swatches"
     case canvas = "Canvas"
     case settings = "Settings"
     
@@ -19,12 +18,25 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .portfolio:
             return "paintpalette"
-        case .swatch:
-            return "square.stack"
         case .canvas:
             return "pencil.and.scribble"
         case .settings:
             return "gear"
+        }
+    }
+    
+    @ViewBuilder
+    func destinationView() -> some View {
+        switch self {
+        case .portfolio:
+            PortfolioView()
+                .navigationTitle(self.rawValue)
+        case .canvas:
+            CanvasView()
+                .navigationTitle(self.rawValue)
+        case .settings:
+            SettingsView()
+                .navigationTitle(self.rawValue)
         }
     }
 }

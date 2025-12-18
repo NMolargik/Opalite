@@ -93,8 +93,11 @@ struct ColorCodesPickerView: View {
                         } label: {
                             if didCopyHex {
                                 Label("Copied", systemImage: "checkmark")
+                                    .frame(height: 18)
                             } else {
                                 Label("Copy", systemImage: "doc.on.doc")
+                                    .frame(height: 18)
+
                             }
                         }
                         .tint(didCopyHex ? .green : .primary)
@@ -103,9 +106,11 @@ struct ColorCodesPickerView: View {
                         .controlSize(.small)
                         #endif
 
+
                         Button("Apply") {
                             applyHexInput()
                         }
+                        
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)

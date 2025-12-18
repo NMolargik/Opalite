@@ -13,8 +13,6 @@ struct ColorSpectrumPickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-
-            // Header
             HStack(spacing: 8) {
                 Image(systemName: "lightspectrum.horizontal")
                     .imageScale(.medium)
@@ -30,7 +28,6 @@ struct ColorSpectrumPickerView: View {
             VStack(alignment: .leading, spacing: 16) {
                 GeometryReader { proxy in
                     ZStack {
-                        // Base rainbow gradient (hue horizontally)
                         LinearGradient(
                             gradient: Gradient(stops: [
                                 .init(color: .red, location: 0.0),
@@ -130,7 +127,6 @@ struct ColorSpectrumPickerView: View {
         }
     }
 }
-
 
 private struct ColorSpectrumPickerPreviewContainer: View {
     @State var color: OpaliteColor = .sample

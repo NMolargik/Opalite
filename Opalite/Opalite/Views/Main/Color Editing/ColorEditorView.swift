@@ -18,277 +18,223 @@ import AppKit
 
 struct ColorEditorView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.dismiss) private var dismiss
     @Namespace private var swatchNamespace
     
+    var onCancel: () -> Void
     var onApprove: (OpaliteColor) -> Void
-
     
     @State private var viewModel: ViewModel
-    private let otherColors: [OpaliteColor]
+    let palette: OpalitePalette?
+    
+    private var paletteColors: [OpaliteColor] {
+        palette?.colors ?? []
+    }
+
+    private var paletteColorsExcludingOriginal: [OpaliteColor] {
+        guard let original = viewModel.originalColor else { return paletteColors }
+        return paletteColors.filter { $0.id != original.id }
+    }
+
+    private var paletteStripColors: [OpaliteColor] {
+        // Never show the current working color in the strip
+        paletteColorsExcludingOriginal.filter { $0.id != viewModel.tempColor.id }
+    }
+
+    private var canShowPaletteStripToggle: Bool {
+        !paletteStripColors.isEmpty
+    }
     
     init(
         color: OpaliteColor? = nil,
-        otherColors: [OpaliteColor] = [],
+        palette: OpalitePalette? = nil,
+        onCancel: @escaping () -> Void = {},
         onApprove: @escaping (OpaliteColor) -> Void = { _ in }
     ) {
         let viewModel = ViewModel(
             color: color
         )
         _viewModel = State(initialValue: viewModel)
-        self.otherColors = otherColors
+        self.palette = palette
+        self.onCancel = onCancel
         self.onApprove = onApprove
     }
     
     var body: some View {
-        Group {
-            if horizontalSizeClass == .compact {
-                VStack(spacing: 16) {
-//                    if viewModel.isShowingPaletteStrip,
-//                       !otherColors.isEmpty {
-//                        // Filter out the current tempColor so we don't duplicate it in the strip
-//                        let colors = otherColors.filter { $0.hexString != viewModel.tempColor.hexString }
-//
-//                        HStack(spacing: 12) {
-//                            // Current working color in the middle
-//                            TinyColorSwatchView(color: viewModel.tempColor.swiftUIColor) {
-//                                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                    viewModel.isExpanded.toggle()
-//                                }
-//                            }
-//                            .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
-//                            
-//                            Divider()
-//
-//                            // Trailing colors
-//                            ForEach(colors, id: \.self) { color in
-//                                TinyColorSwatchView(color: color.swiftUIColor) {
-//                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                        viewModel.isExpanded.toggle()
-//                                    }
-//                                }
-//                                .transition(.scale(scale: 0.2, anchor: .bottom))
-//
-//                            }
-//                        }
-//                    } else {
-//                        TinyColorSwatchView(color: viewModel.tempColor.swiftUIColor) {
-//                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                viewModel.isExpanded.toggle()
-//                            }
-//                        }
-//                        .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
-//                    }
+        NavigationStack {
+            Group {
+                if horizontalSizeClass == .compact {
+                    VStack(spacing: 16) {
+                        swatchAreaCompact
 
-                    if viewModel.isExpanded {
-                        VStack {
-                            modeContentView
-                            
-                            modePickerView
+                        if !viewModel.isColorExpanded {
+                            VStack {
+                                ScrollView {
+                                    modeContentView
+                                }
+
+                                modePickerView
+                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
                         }
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
                     }
-                }
-            } else {
-                HStack(spacing: 16) {
-//                    if viewModel.isShowingPaletteStrip,
-//                       !otherColors.isEmpty {
-//                        // Filter out the current tempColor so we don't duplicate it in the strip
-//                        let colors = otherColors.filter { $0.id != viewModel.tempColor.id }
-//
-//                        VStack(spacing: 12) {
-//                            let midIndex = colors.count / 2
-//
-//                            // Leading colors
-//                            ForEach(0..<midIndex, id: \.self) { index in
-//                                let paletteColor = colors[index]
-//                                TinyColorSwatchView(color: paletteColor.swiftUIColor) {
-//                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                        viewModel.isExpanded.toggle()
-//                                    }
-//                                }
-//                                .transition(.scale(scale: 0.2, anchor: .top))
-//
-//                            }
-//
-//                            // Current working color in the middle
-//                            TinyColorSwatchView(color: viewModel.tempColor.swiftUIColor) {
-//                                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                    viewModel.isExpanded.toggle()
-//                                }
-//                            }
-//                            .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
-//
-//                            // Trailing colors
-//                            ForEach(midIndex..<colors.count, id: \.self) { index in
-//                                let paletteColor = colors[index]
-//                                TinyColorSwatchView(color: paletteColor.swiftUIColor) {
-//                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                        viewModel.isExpanded.toggle()
-//                                    }
-//                                }
-//                                .transition(.scale(scale: 0.2, anchor: .bottom))
-//                            }
-//                        }
-//                    } else {
-//                        TinyColorSwatchView(color: viewModel.tempColor.swiftUIColor) {
-//                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-//                                viewModel.isExpanded.toggle()
-//                            }
-//                        }
-//                        .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
-//                    }
+                    .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                } else {
+                    HStack(spacing: 16) {
+                        swatchAreaRegular
 
-                    if viewModel.isExpanded {
-                        VStack {
-                            Spacer()
-                            
-                            modeContentView
+                        if !viewModel.isColorExpanded {
+                            VStack {
+                                Spacer()
 
-                            modePickerView
+                                modeContentView
+                                modePickerView
+                            }
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .frame(maxHeight: viewModel.isColorExpanded ? 0 : nil)
                         }
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
                     }
+                    .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
                 }
             }
-        }
-        .padding()
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.mode)
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.isExpanded)
-        .toolbar {
-            if !otherColors.isEmpty {
+            .padding()
+            .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.mode)
+            .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.isColorExpanded)
+            .toolbar {
+                if canShowPaletteStripToggle {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                viewModel.isShowingPaletteStrip.toggle()
+                            }
+                        } label: {
+                            Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
+                                .foregroundStyle(.purple, .blue, .red)
+                        }
+                    }
+                }
+                
+                #if os(iOS) || os(visionOS)
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        let hex = viewModel.tempColor.hexString
+                        #if os(iOS) || os(visionOS)
+                        UIPasteboard.general.string = hex
+                        #elseif os(macOS)
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(hex, forType: .string)
+                        #endif
+                        
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.didCopyHex = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.didCopyHex = false
+                            }
+                        }
+                    } label: {
+                        Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
+                    }
+                }
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                            viewModel.isShowingPaletteStrip.toggle()
+                            viewModel.isColorExpanded.toggle()
                         }
                     } label: {
-                        Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                            .foregroundStyle(.purple, .blue, .red)
+                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
                 }
-            }
-            
-            #if os(iOS) || os(visionOS)
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    let hex = viewModel.tempColor.hexString
-                    #if os(iOS) || os(visionOS)
-                    UIPasteboard.general.string = hex
-                    #elseif os(macOS)
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(hex, forType: .string)
-                    #endif
-
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        viewModel.didCopyHex = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.didCopyHex = false
-                        }
-                    }
-                } label: {
-                    Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
-                }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                        viewModel.isExpanded.toggle()
-                    }
-                } label: {
-                    Image(systemName: viewModel.isExpanded ? "rectangle.expand.diagonal" : "pencil")
-                }
-            }
-            
-            ToolbarItemGroup(placement: .topBarLeading) {
-                Button {
-                    withAnimation(.easeInOut) {
-                        dismiss()
-                    }
-                } label: {
-                    Label("Cancel", systemImage: "xmark")
-                }
-                .tint(.red)
                 
-                Button {
-                    withAnimation(.easeInOut) {
-                        onApprove(viewModel.tempColor)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        withAnimation(.easeInOut) {
+                            onCancel()
+                        }
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
                     }
-                } label: {
-                    Label("Save", systemImage: "checkmark")
+                    .tint(.red)
                 }
-                .tint(.green)
-            }
-            
-            #elseif os(macOS)
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    let hex = viewModel.tempColor.hexString
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(hex, forType: .string)
-
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        viewModel.didCopyHex = true
+                                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        withAnimation(.easeInOut) {
+                            onApprove(viewModel.tempColor)
+                        }
+                    } label: {
+                        Label("Save", systemImage: "checkmark")
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                }
+                
+                #elseif os(macOS)
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        let hex = viewModel.tempColor.hexString
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(hex, forType: .string)
+                        
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.didCopyHex = false
+                            viewModel.didCopyHex = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.didCopyHex = false
+                            }
+                        }
+                    } label: {
+                        Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
+                    }
+                }
+                
+                if canShowPaletteStripToggle {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                viewModel.isShowingPaletteStrip.toggle()
+                            }
+                        } label: {
+                            Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
+                                .foregroundStyle(.purple, .blue, .red)
                         }
                     }
-                } label: {
-                    Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
                 }
-            }
-            
-            if !otherColors.isEmpty {
+                
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                            viewModel.isShowingPaletteStrip.toggle()
+                            viewModel.isColorExpanded.toggle()
                         }
                     } label: {
-                        Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                            .foregroundStyle(.purple, .blue, .red)
+                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
                 }
-            }
-
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                        viewModel.isExpanded.toggle()
-                    }
-                } label: {
-                    Image(systemName: viewModel.isExpanded ? "rectangle.expand.diagonal" : "pencil")
-                }
-            }
-            
-            ToolbarItemGroup(placement: .principal) {
-                Button {
-                    withAnimation(.easeInOut) {
-                        onCancel()
-                    }
-                } label: {
-                    Label("Cancel", systemImage: "xmark")
-                }
-                .tint(.red)
                 
-                Button {
-                    withAnimation(.easeInOut) {
-                        onApprove(viewModel.tempColor)
+                ToolbarItemGroup(placement: .principal) {
+                    Button {
+                        withAnimation(.easeInOut) {
+                            onCancel()
+                        }
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
                     }
-                } label: {
-                    Label("Save", systemImage: "checkmark")
+                    .tint(.red)
+                    
+                    Button {
+                        withAnimation(.easeInOut) {
+                            onApprove(viewModel.tempColor)
+                        }
+                    } label: {
+                        Label("Save", systemImage: "checkmark")
+                    }
+                    .tint(.green)
+                    
                 }
-                .tint(.green)
-
+                #endif
             }
-            #endif
         }
     }
     
@@ -298,15 +244,8 @@ struct ColorEditorView: View {
     private var modePickerView: some View {
         Picker("Input Mode", selection: $viewModel.mode) {
             ForEach(ColorPickerTab.allCases) { option in
-                Label {
-                    // Only show text for the currently selected mode
-                    if option == viewModel.mode {
-                        Text(option.rawValue)
-                    }
-                } icon: {
-                    option.symbol
-                }
-                .tag(option)
+                option.symbol
+                    .tag(option)
             }
         }
         .pickerStyle(.segmented)
@@ -329,13 +268,107 @@ struct ColorEditorView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private var swatchAreaCompact: some View {
+        Group {
+            if viewModel.isShowingPaletteStrip, !paletteStripColors.isEmpty {
+                HStack(spacing: 12) {
+                    SwatchView(
+                        fill: [viewModel.tempColor],
+                        height: viewModel.isColorExpanded ? nil : 60,
+                        badgeText: "",
+                        showOverlays: false,
+                    )
+                        .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
+
+                    Divider()
+
+                    ForEach(paletteStripColors, id: \.self) { color in
+                        SwatchView(
+                            fill: [color],
+                            height: viewModel.isColorExpanded ? nil : 60,
+                            badgeText: "",
+                            showOverlays: false,
+                        )
+                            .transition(.scale(scale: 0.2, anchor: .bottom))
+                    }
+                }
+                .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+            } else {
+                SwatchView(
+                    fill: [viewModel.tempColor],
+                    height: viewModel.isColorExpanded ? nil : 60,
+                    badgeText: "",
+                    showOverlays: false
+                )
+                    .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
+            }
+        }
+        .frame(maxHeight: viewModel.isColorExpanded ? nil : 100)
+        .onTapGesture {
+            viewModel.isColorExpanded.toggle()
+        }
+    }
+
+    @ViewBuilder
+    private var swatchAreaRegular: some View {
+        Group {
+            if viewModel.isShowingPaletteStrip, !paletteStripColors.isEmpty {
+                let colors = paletteStripColors
+                let midIndex = colors.count / 2
+
+                VStack(spacing: 12) {
+                    ForEach(0..<midIndex, id: \.self) { index in
+                        SwatchView(
+                            fill: [colors[index]],
+                            height: viewModel.isColorExpanded ? nil : 60,
+                            badgeText: "",
+                            showOverlays: false
+                        )
+                            .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                            .transition(.scale(scale: 0.2, anchor: .top))
+                    }
+
+                    SwatchView(
+                        fill: [viewModel.tempColor],
+                        height: viewModel.isColorExpanded ? nil : 60,
+                        badgeText: "",
+                        showOverlays: false
+                    )
+                        .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                        .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
+
+                    ForEach(midIndex..<colors.count, id: \.self) { index in
+                        SwatchView(
+                            fill: [colors[index]],
+                            height: viewModel.isColorExpanded ? nil : 60,
+                            badgeText: "",
+                            showOverlays: false
+                        )
+                            .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                            .transition(.scale(scale: 0.2, anchor: .bottom))
+                    }
+                }
+                .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+            } else {
+                SwatchView(
+                    fill: [viewModel.tempColor],
+                    height: viewModel.isColorExpanded ? nil : 60,
+                    badgeText: "",
+                    showOverlays: false
+                )
+                    .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                    .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
+            }
+        }
+    }
 }
 
 #Preview {
     NavigationStack {
         ColorEditorView(
             color: OpaliteColor.sample2,
-            otherColors: (OpalitePalette.sample.colors ?? []),
             onApprove: { _ in }
         )
     }

@@ -1,0 +1,274 @@
+//
+//  PaletteDetailView.swift
+//  Opalite
+//
+//  Created by Nick Molargik on 12/14/25.
+//
+
+import SwiftUI
+import SwiftData
+
+struct PaletteDetailView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(ColorManager.self) private var colorManager
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    @State private var shareImage: UIImage?
+    @State private var isShowingShareSheet = false
+    @State private var showDeleteConfirmation = false
+    @State private var isShowingColorEditor = false
+    @State private var isEditingName: Bool? = false
+    @State private var notesDraft: String = ""
+    @State private var isSavingNotes: Bool = false
+    @State private var isShowingPaletteSelection: Bool = false
+    @State private var showDetachConfirmation: Bool = false
+    
+    let palette: OpalitePalette
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                SwatchView(
+                    fill: palette.colors ?? [],
+                    height: 260,
+                    badgeText: palette.name,
+                    showOverlays: true,
+                    isEditingBadge: $isEditingName,
+                    saveBadge: { newName in
+                        do {
+                            try colorManager.updatePalette(palette) { pal in
+                                pal.name = newName.isEmpty ? palette.name : newName
+                            }
+                        } catch {
+                            // TODO: error handling
+                        }
+                    }
+                )
+                if horizontalSizeClass == .regular {
+                    HStack(alignment: .top, spacing: 16) {
+                        DetailsSectionView(color: palette.colors?.first ?? .sample)
+                            .frame(maxWidth: .infinity, alignment: .top)
+
+                        VStack(alignment: .leading, spacing: 16) {
+//                            ColorRecommendedColorsView(
+//                                baseColor: color,
+//                                onCreateColor: { suggested in
+//                                    do {
+//                                        // TODO: get real device
+//                                        _ = try colorManager.createColor(
+//                                            name: nil,
+//                                            notes: suggested.notes,
+//                                            author: color.createdByDisplayName,
+//                                            device: nil,
+//                                            red: suggested.red,
+//                                            green: suggested.green,
+//                                            blue: suggested.blue,
+//                                            alpha: suggested.alpha
+//                                        )
+//                                    } catch {
+//                                        // TODO: error handling
+//                                    }
+//                                }
+//                            )
+
+                            NotesSectionView(
+                                notes: $notesDraft,
+                                isSaving: $isSavingNotes,
+                                onSave: {
+                                    isSavingNotes = true
+                                    defer { isSavingNotes = false }
+
+                                    do {
+                                        try colorManager.updatePalette(palette) { pal in
+                                            let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            pal.notes = trimmed.isEmpty ? nil : trimmed
+                                        }
+                                    } catch {
+                                        // TODO: error handling
+                                    }
+                                }
+                            )
+                        }
+                        .frame(maxWidth: .infinity, alignment: .top)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+//                        ColorRecommendedColorsView(
+//                            baseColor: color,
+//                            onCreateColor: { suggested in
+//                                do {
+//                                    _ = try colorManager.createColor(
+//                                        name: suggested.name,
+//                                        notes: suggested.notes,
+//                                        author: nil,
+//                                        device: nil,
+//                                        red: suggested.red,
+//                                        green: suggested.green,
+//                                        blue: suggested.blue,
+//                                        alpha: suggested.alpha
+//                                    )
+//                                } catch {
+//                                    // TODO: error handling
+//                                }
+//                            }
+//                        )
+                        
+//                        DetailsSectionView(color: color)
+
+                        NotesSectionView(
+                            notes: $notesDraft,
+                            isSaving: $isSavingNotes,
+                            onSave: {
+                                isSavingNotes = true
+                                defer { isSavingNotes = false }
+
+                                do {
+                                    try colorManager.updatePalette(palette) { pal in
+                                        let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        pal.notes = trimmed.isEmpty ? nil : trimmed
+                                    }
+                                } catch {
+                                    // TODO: error handling
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+            .padding()
+        }
+        .onAppear {
+            notesDraft = palette.notes ?? ""
+        }
+        .navigationTitle("Palette")
+        .navigationBarTitleDisplayMode(.inline)
+        .background(shareSheet(image: shareImage))
+        .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {}
+
+            Button("Delete Palette", role: .destructive) {
+                dismiss()
+                
+                do {
+                    try colorManager.deletePalette(palette, andColors: false)
+                } catch {
+                    // TODO: error handling
+                }
+            }
+
+            if (!(palette.colors?.isEmpty ?? false)) {
+                Button("Delete Palette and Colors", role: .destructive) {
+                    dismiss()
+
+                    do {
+                        try colorManager.deletePalette(palette, andColors: true)
+                    } catch {
+                        // TODO: error handling
+                    }
+                }
+            }
+        } message: {
+            Text("This action cannot be undone.")
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button(role: .destructive){
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                } label: {
+                    Label("Options", systemImage: "ellipsis.circle")
+                }
+            }
+            
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isEditingName = true
+                } label: {
+                    Label("Rename", systemImage: "character.cursor.ibeam")
+                }
+            }
+            
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            
+            ToolbarItem(placement: .confirmationAction) {
+                Menu {
+                    Button {
+                        if let image = gradientImage(from: palette.colors ?? []) {
+                            shareImage = image
+                            isShowingShareSheet = true
+                        }
+                    } label: {
+                        Label("Share As Image", systemImage: "photo.badge.plus")
+                    }
+                    
+                    Button {
+                        // TODO:
+                    } label: {
+                        Label("Share Palette", systemImage: "swatchpalette.fill")
+                    }
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func shareSheet(image: UIImage?) -> some View {
+        EmptyView()
+            .background(
+                ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
+    }
+}
+
+#Preview("Palette Detail") {
+    // In-memory SwiftData container for previews
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: OpalitePalette.self,
+        OpaliteColor.self,
+        configurations: config
+    )
+    
+    let manager = ColorManager(context: container.mainContext)
+    do {
+        try manager.loadSamples()
+    } catch {
+        print("Failed to load samples into context")
+    }
+    
+    return NavigationStack {
+        PaletteDetailView(palette: OpalitePalette.sample)
+            .environment(manager)
+    }
+}
+
+#Preview("Color Detail") {
+    // In-memory SwiftData container for previews
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: OpalitePalette.self,
+            OpaliteColor.self,
+        configurations: config
+    )
+
+    let manager = ColorManager(context: container.mainContext)
+    do {
+        try manager.loadSamples()
+    } catch {
+        print("Failed to load samples into context")
+    }
+
+    return NavigationStack {
+        ColorDetailView(color: OpaliteColor.sample)
+    }
+    .environment(manager)
+    .modelContainer(container)
+}
+
