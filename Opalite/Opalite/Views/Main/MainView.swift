@@ -36,6 +36,7 @@ struct MainView: View {
     @ViewBuilder
     private func regularWidthView() -> some View {
         NavigationSplitView {
+            // TODO: Needs a lot of work
             List(AppTab.allCases, id: \.self) { tab in
                 Button {
                     viewModel.appTab = tab

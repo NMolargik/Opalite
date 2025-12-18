@@ -20,6 +20,7 @@ struct ColorRecommendedColorsView: View {
                 swatchWidth: 180,
                 swatchHeight: 150,
                 showOverlays: true,
+                showsNavigation: false,
                 menuContent: { color in
                     AnyView(
                         Group {
@@ -37,7 +38,7 @@ struct ColorRecommendedColorsView: View {
                             }
                         }
                     )
-                }, showsNavigation: false
+                }
             )
         }
     }
@@ -82,4 +83,18 @@ struct ColorRecommendedColorsView: View {
 
         return recommended
     }
+}
+
+#Preview("Recommended Colors") {
+    ColorRecommendedColorsView(
+        baseColor: OpaliteColor(
+            name: "Base Color",
+            red: 0.5,
+            green: 0.3,
+            blue: 0.7,
+            alpha: 1.0
+        ),
+        onCreateColor: { _ in }
+    )
+    .padding()
 }

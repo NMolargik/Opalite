@@ -307,4 +307,3 @@ struct PortfolioView: View {
         .environment(manager)
         .modelContainer(container)
 }
-

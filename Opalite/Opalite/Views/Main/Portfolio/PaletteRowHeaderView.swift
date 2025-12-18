@@ -137,29 +137,6 @@ struct PaletteRowHeaderView: View {
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
             )
     }
-    
-    // MARK: - Helpers
-    private func gradientImage(from colors: [OpaliteColor], size: CGSize = CGSize(width: 512, height: 512)) -> UIImage? {
-        let uiColors: [Color] = colors.map { $0.swiftUIColor }
-        let gradientColors = uiColors.isEmpty ? [Color.clear, Color.clear] : uiColors
-        let view = LinearGradient(
-            colors: gradientColors,
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-        .frame(width: size.width, height: size.height)
-        .clipped()
-
-        // Render SwiftUI view to UIImage
-        let renderer = ImageRenderer(content: view)
-        renderer.proposedSize = .init(size)
-        #if canImport(UIKit)
-        renderer.scale = UIScreen.main.scale
-        return renderer.uiImage
-        #else
-        return nil
-        #endif
-    }
 }
 
 #Preview("Palette Header") {

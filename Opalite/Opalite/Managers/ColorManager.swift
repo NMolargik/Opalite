@@ -7,6 +7,9 @@
 
 import SwiftUI
 import SwiftData
+#if canImport(DeviceKit)
+import DeviceKit
+#endif
 
 @MainActor
 @Observable
@@ -120,10 +123,10 @@ class ColorManager {
             // TODO: error handling
         }
 
-//        #if canImport(DeviceKit)
-//        color.updatedOnDeviceName = Device.current.safeDescription
-//        #endif
-//        color.updatedAt = .now
+        #if canImport(DeviceKit)
+        color.updatedOnDeviceName = Device.current.safeDescription
+        #endif
+        color.updatedAt = .now
     }
     
     // MARK: - Public API: Refresh
@@ -220,16 +223,17 @@ class ColorManager {
         blue: Double,
         alpha: Double = 1.0,
     ) throws -> OpaliteColor {
-//        #if canImport(DeviceKit)
-//        let resolvedDeviceName = device ?? Device.current.safeDescription
-//        #else
-//        let resolvedDeviceName = device
-//        #endif
+        #if canImport(DeviceKit)
+        let resolvedDeviceName = device ?? Device.current.safeDescription
+        #else
+        let resolvedDeviceName = device
+        #endif
         let color = OpaliteColor(
             name: name,
             notes: notes,
             createdByDisplayName: author,
-            createdOnDeviceName: "Fix me",
+            createdOnDeviceName: resolvedDeviceName,
+            updatedOnDeviceName: resolvedDeviceName,
             createdAt: .now,
             updatedAt: .now,
             red: red,
@@ -247,6 +251,10 @@ class ColorManager {
     
     // Insert an existing color into the context
     func createColor(existing color: OpaliteColor) throws -> OpaliteColor {
+        #if canImport(DeviceKit)
+        color.createdOnDeviceName = Device.current.safeDescription
+        color.updatedOnDeviceName = Device.current.safeDescription
+        #endif
         context.insert(color)
         try saveContext()
         reloadCache()
@@ -265,9 +273,9 @@ class ColorManager {
     /// Applies changes to a color and saves.
     func updateColor(_ color: OpaliteColor, applying changes: ((OpaliteColor) -> Void)? = nil) throws {
         changes?(color)
-//        #if canImport(DeviceKit)
-//        color.updatedOnDeviceName = Device.current.safeDescription
-//        #endif
+        #if canImport(DeviceKit)
+        color.updatedOnDeviceName = Device.current.safeDescription
+        #endif
         color.updatedAt = .now
         try saveContext()
         reloadCache()

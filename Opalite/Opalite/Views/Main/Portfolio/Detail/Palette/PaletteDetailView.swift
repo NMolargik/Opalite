@@ -46,30 +46,13 @@ struct PaletteDetailView: View {
                 )
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
-                        DetailsSectionView(color: palette.colors?.first ?? .sample)
+                        PaletteDetailsSectionView(palette: palette)
                             .frame(maxWidth: .infinity, alignment: .top)
 
                         VStack(alignment: .leading, spacing: 16) {
-//                            ColorRecommendedColorsView(
-//                                baseColor: color,
-//                                onCreateColor: { suggested in
-//                                    do {
-//                                        // TODO: get real device
-//                                        _ = try colorManager.createColor(
-//                                            name: nil,
-//                                            notes: suggested.notes,
-//                                            author: color.createdByDisplayName,
-//                                            device: nil,
-//                                            red: suggested.red,
-//                                            green: suggested.green,
-//                                            blue: suggested.blue,
-//                                            alpha: suggested.alpha
-//                                        )
-//                                    } catch {
-//                                        // TODO: error handling
-//                                    }
-//                                }
-//                            )
+                            PaletteMembersView(palette: palette, onRemoveColor: { color in
+                                colorManager.detachColorFromPalette(color)
+                            })
 
                             NotesSectionView(
                                 notes: $notesDraft,
@@ -93,27 +76,11 @@ struct PaletteDetailView: View {
                     }
                 } else {
                     VStack(alignment: .leading, spacing: 16) {
-//                        ColorRecommendedColorsView(
-//                            baseColor: color,
-//                            onCreateColor: { suggested in
-//                                do {
-//                                    _ = try colorManager.createColor(
-//                                        name: suggested.name,
-//                                        notes: suggested.notes,
-//                                        author: nil,
-//                                        device: nil,
-//                                        red: suggested.red,
-//                                        green: suggested.green,
-//                                        blue: suggested.blue,
-//                                        alpha: suggested.alpha
-//                                    )
-//                                } catch {
-//                                    // TODO: error handling
-//                                }
-//                            }
-//                        )
+                        PaletteMembersView(palette: palette, onRemoveColor: { color in
+                            colorManager.detachColorFromPalette(color)
+                        })
                         
-//                        DetailsSectionView(color: color)
+                        PaletteDetailsSectionView(palette: palette)
 
                         NotesSectionView(
                             notes: $notesDraft,
@@ -207,7 +174,7 @@ struct PaletteDetailView: View {
                     }
                     
                     Button {
-                        // TODO:
+                        // TODO: share palette
                     } label: {
                         Label("Share Palette", systemImage: "swatchpalette.fill")
                     }
@@ -248,27 +215,3 @@ struct PaletteDetailView: View {
             .environment(manager)
     }
 }
-
-#Preview("Color Detail") {
-    // In-memory SwiftData container for previews
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: OpalitePalette.self,
-            OpaliteColor.self,
-        configurations: config
-    )
-
-    let manager = ColorManager(context: container.mainContext)
-    do {
-        try manager.loadSamples()
-    } catch {
-        print("Failed to load samples into context")
-    }
-
-    return NavigationStack {
-        ColorDetailView(color: OpaliteColor.sample)
-    }
-    .environment(manager)
-    .modelContainer(container)
-}
-

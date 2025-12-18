@@ -1,5 +1,5 @@
 //
-//  DetailsSectionView.swift
+//  ColorDetailsSectionView.swift
 //  Opalite
 //
 //  Created by Nick Molargik on 12/17/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DetailsSectionView: View {
+struct ColorDetailsSectionView: View {
     let color: OpaliteColor
 
     var body: some View {
@@ -57,4 +57,17 @@ struct DetailsSectionView: View {
             }
         }
     }
+}
+
+#Preview("Color Details") {
+    ColorDetailsSectionView(
+        color: OpaliteColor(
+            name: "Sky Blue",
+            red: 0.2,
+            green: 0.6,
+            blue: 0.9,
+            alpha: 1.0
+        )
+    )
+    .padding()
 }

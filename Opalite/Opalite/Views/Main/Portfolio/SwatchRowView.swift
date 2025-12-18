@@ -16,10 +16,10 @@ struct SwatchRowView: View {
     let swatchWidth: CGFloat
     let swatchHeight: CGFloat
     var showOverlays: Bool = false
+    var showsNavigation: Bool = true
     var menuContent: ((OpaliteColor) -> AnyView)? = nil
     var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
     var matchedNamespace: Namespace.ID? = nil
-    var showsNavigation: Bool = true
     
     @State private var isDropTargeted: Bool = false
     @State private var showingColorEditor: Bool = false

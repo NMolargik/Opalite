@@ -49,3 +49,24 @@ struct NotesSectionView: View {
     }
 }
 
+#Preview("Notes Section") {
+    struct NotesPreviewHost: View {
+        @State private var notes: String = "Some initial notes..."
+        @State private var isSaving: Bool = false
+        var body: some View {
+            NotesSectionView(
+                notes: $notes,
+                isSaving: $isSaving,
+                onSave: {
+                    // Simulate a save cycle
+                    isSaving = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        isSaving = false
+                    }
+                }
+            )
+            .padding()
+        }
+    }
+    return NotesPreviewHost()
+}

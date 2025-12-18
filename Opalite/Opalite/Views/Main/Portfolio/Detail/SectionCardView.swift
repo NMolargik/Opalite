@@ -38,3 +38,46 @@ struct SectionCard<Content: View>: View {
         )
     }
 }
+
+#Preview("Section Card") {
+    SectionCard(title: "Details", systemImage: "info.circle") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("This is example content inside the card.")
+            Divider()
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(.blue)
+                    .frame(width: 10, height: 10)
+                Text("Status: Active")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Button("Primary Action") {}
+                .buttonStyle(.borderedProminent)
+        }
+        .padding(.horizontal, 16)
+    }
+    .padding()
+}
+
+#Preview("Section Card – Dark") {
+    SectionCard(title: "Details", systemImage: "info.circle") {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("This is example content inside the card.")
+            Divider()
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(.blue)
+                    .frame(width: 10, height: 10)
+                Text("Status: Active")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Button("Primary Action") {}
+                .buttonStyle(.borderedProminent)
+        }
+        .padding(.horizontal, 16)
+    }
+    .padding()
+    .preferredColorScheme(.dark)
+}

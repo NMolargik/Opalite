@@ -50,9 +50,10 @@ struct ColorDetailView: View {
                         }
                     }
                 )
+                
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
-                        DetailsSectionView(color: color)
+                        ColorDetailsSectionView(color: color)
                             .frame(maxWidth: .infinity, alignment: .top)
 
                         VStack(alignment: .leading, spacing: 16) {
@@ -60,8 +61,7 @@ struct ColorDetailView: View {
                                 baseColor: color,
                                 onCreateColor: { suggested in
                                     do {
-                                        // TODO: get real device
-                                        _ = try colorManager.createColor(
+                                        let createdColor = try colorManager.createColor(
                                             name: nil,
                                             notes: suggested.notes,
                                             author: color.createdByDisplayName,
@@ -71,29 +71,17 @@ struct ColorDetailView: View {
                                             blue: suggested.blue,
                                             alpha: suggested.alpha
                                         )
-                                    } catch {
-                                        // TODO: error handling
-                                    }
-                                }
-                            )
-
-                            NotesSectionView(
-                                notes: $notesDraft,
-                                isSaving: $isSavingNotes,
-                                onSave: {
-                                    isSavingNotes = true
-                                    defer { isSavingNotes = false }
-
-                                    do {
-                                        try colorManager.updateColor(color) { c in
-                                            let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                                            c.notes = trimmed.isEmpty ? nil : trimmed
+                                        
+                                        if let palette = color.palette {
+                                            colorManager.attachColor(createdColor, to: palette)
                                         }
                                     } catch {
                                         // TODO: error handling
                                     }
                                 }
                             )
+
+                            notesSection
                         }
                         .frame(maxWidth: .infinity, alignment: .top)
                     }
@@ -119,25 +107,9 @@ struct ColorDetailView: View {
                             }
                         )
                         
-                        DetailsSectionView(color: color)
+                        ColorDetailsSectionView(color: color)
 
-                        NotesSectionView(
-                            notes: $notesDraft,
-                            isSaving: $isSavingNotes,
-                            onSave: {
-                                isSavingNotes = true
-                                defer { isSavingNotes = false }
-
-                                do {
-                                    try colorManager.updateColor(color) { c in
-                                        let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                                        c.notes = trimmed.isEmpty ? nil : trimmed
-                                    }
-                                } catch {
-                                    // TODO: error handling
-                                }
-                            }
-                        )
+                        notesSection
                     }
                 }
             }
@@ -277,6 +249,29 @@ struct ColorDetailView: View {
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
             )
     }
+
+    @ViewBuilder
+    private var notesSection: some View {
+        NotesSectionView(
+            notes: $notesDraft,
+            isSaving: $isSavingNotes,
+            onSave: saveNotes
+        )
+    }
+
+    private func saveNotes() {
+        isSavingNotes = true
+        defer { isSavingNotes = false }
+
+        do {
+            try colorManager.updateColor(color) { c in
+                let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                c.notes = trimmed.isEmpty ? nil : trimmed
+            }
+        } catch {
+            // TODO: error handling
+        }
+    }
 }
 
 #Preview("Color Detail") {
@@ -301,4 +296,3 @@ struct ColorDetailView: View {
     .environment(manager)
     .modelContainer(container)
 }
-

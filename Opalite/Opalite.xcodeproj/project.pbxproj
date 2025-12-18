@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = EB224D022EF38D9B00F350D4 /* DeviceKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EBD4AD2E2EE48DF400012D16 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,12 +90,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EB224D012EF38D9B00F350D4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		EBD4AD132EE48DF300012D16 = {
 			isa = PBXGroup;
 			children = (
 				EBD4AD1E2EE48DF300012D16 /* Opalite */,
 				EBD4AD302EE48DF400012D16 /* OpaliteTests */,
 				EBD4AD3A2EE48DF400012D16 /* OpaliteUITests */,
+				EB224D012EF38D9B00F350D4 /* Frameworks */,
 				EBD4AD1D2EE48DF300012D16 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,6 +138,7 @@
 			);
 			name = Opalite;
 			packageProductDependencies = (
+				EB224D022EF38D9B00F350D4 /* DeviceKit */,
 			);
 			productName = Opalite;
 			productReference = EBD4AD1C2EE48DF300012D16 /* Opalite.app */;
@@ -209,6 +223,7 @@
 			mainGroup = EBD4AD132EE48DF300012D16;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EBD4AD1D2EE48DF300012D16 /* Products */;
@@ -642,6 +657,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EB224D022EF38D9B00F350D4 /* DeviceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			productName = DeviceKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EBD4AD142EE48DF300012D16 /* Project object */;
 }
