@@ -18,10 +18,20 @@ struct SettingsView: View {
                 .font(.title)
                 .bold()
 
+            Button {
+                do {
+                    try colorManager.loadSamples()
+                } catch {
+                    print("Failed to load samples: \(error)")
+                }
+            } label: {
+                Label("Load Sample Data", systemImage: "tray.and.arrow.down")
+            }
+
             Button(role: .destructive) {
                 isShowingDeleteAllAlert = true
             } label: {
-                Label("Delete All Colors", systemImage: "trash")
+                Label("Delete Everything", systemImage: "trash")
             }
             .buttonStyle(.borderedProminent)
         }
@@ -32,6 +42,10 @@ struct SettingsView: View {
                 do {
                     for color in colorManager.colors {
                         try colorManager.deleteColor(color)
+                    }
+                    
+                    for palette in colorManager.palettes {
+                        try colorManager.deletePalette(palette)
                     }
                 } catch {
                     print("Failed to delete all colors: \(error)")
@@ -48,3 +62,4 @@ struct SettingsView: View {
 //#Preview {
 //    SettingsTabView()
 //}
+

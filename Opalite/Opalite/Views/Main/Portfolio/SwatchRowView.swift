@@ -17,6 +17,7 @@ struct SwatchRowView: View {
     let swatchHeight: CGFloat
     var showOverlays: Bool = false
     var showsNavigation: Bool = true
+    var onTap: ((OpaliteColor) -> Void)? = nil
     var menuContent: ((OpaliteColor) -> AnyView)? = nil
     var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
     var matchedNamespace: Namespace.ID? = nil
@@ -58,9 +59,17 @@ struct SwatchRowView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 12) {
                         ForEach(colors.sorted(by: { $0.updatedAt > $1.updatedAt }), id: \.self) { color in
-                            if showsNavigation {
+                            if let onTap = onTap {
+                                Button {
+                                    onTap(color)
+                                } label: {
+                                    swatchCell(for: color)
+                                }
+                                .buttonStyle(.plain)
+                            } else if showsNavigation {
                                 NavigationLink {
                                     ColorDetailView(color: color)
+                                        .tint(.none)
                                 } label: {
                                     swatchCell(for: color)
                                 }

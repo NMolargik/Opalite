@@ -59,7 +59,7 @@ struct PaletteRowHeaderView: View {
                     .background(
                         Circle().fill(.clear)
                     )
-                    .glassEffect(.clear)
+                    .glassEffect(.regular)
                     .contentShape(Circle())
                     .hoverEffect(.lift)
             }
@@ -67,6 +67,7 @@ struct PaletteRowHeaderView: View {
 
             NavigationLink {
                 PaletteDetailView(palette: palette)
+                    .tint(.none)
             } label: {
                 HStack {
                     Text(palette.name)

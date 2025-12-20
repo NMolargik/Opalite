@@ -110,7 +110,7 @@ struct ColorEditorView: View {
                             }
                         } label: {
                             Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                                .foregroundStyle(.purple, .blue, .red)
+                                .foregroundStyle(.purple, .orange, .red)
                         }
                     }
                 }
@@ -198,7 +198,7 @@ struct ColorEditorView: View {
                             }
                         } label: {
                             Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                                .foregroundStyle(.purple, .blue, .red)
+                                .foregroundStyle(.purple, .orange, .red)
                         }
                     }
                 }

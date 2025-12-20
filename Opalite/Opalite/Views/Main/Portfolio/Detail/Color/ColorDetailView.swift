@@ -118,7 +118,6 @@ struct ColorDetailView: View {
         .onAppear {
             notesDraft = color.notes ?? ""
         }
-        .navigationTitle("Color")
         .navigationBarTitleDisplayMode(.inline)
         .background(shareSheet(image: shareImage))
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
@@ -175,7 +174,7 @@ struct ColorDetailView: View {
                 Button {
                     isShowingColorEditor = true
                 } label: {
-                    Text("Edit")
+                    Text("Modify")
                 }
             }
             
@@ -215,7 +214,8 @@ struct ColorDetailView: View {
                         isShowingPaletteSelection = true
                     }
                 } label: {
-                    Label("Palette", systemImage: "swatchpalette.fill")
+                    Label("Palette", systemImage: (color.palette != nil) ? "swatchpalette.fill" : "swatchpalette")
+                        .foregroundStyle(.purple, .orange, .red)
                 }
             }
             

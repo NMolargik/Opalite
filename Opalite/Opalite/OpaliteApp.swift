@@ -8,11 +8,13 @@ struct OpaliteApp: App {
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
+    let canvasManager: CanvasManager
 
     init() {
         let schema = Schema([
             OpaliteColor.self,
             OpalitePalette.self,
+            CanvasFile.self,
         ])
 
         let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"
@@ -32,6 +34,7 @@ struct OpaliteApp: App {
         }
 
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
+        canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
     }
 
     var body: some Scene {
@@ -40,11 +43,13 @@ struct OpaliteApp: App {
                 .onChange(of: scenePhase) { oldPhase, newPhase in
                     Task { @MainActor in
                         await colorManager.refreshAll()
+                        await canvasManager.refreshAll()
                     }
                 }
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
+        .environment(canvasManager)
     }
 }
 

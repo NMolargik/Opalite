@@ -10,8 +10,10 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
+    @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
-    @State private var viewModel: ContentView.ViewModel = ViewModel()
+    
+    @State private var viewModel: ContentView.ViewModel = .init()
     
     var body: some View {
         ZStack {
@@ -36,12 +38,14 @@ struct ContentView: View {
                     }
                 )
                 .environment(colorManager)
+                .environment(canvasManager)
                 .id("onboarding")
                 .transition(viewModel.leadingTransition)
                 .zIndex(1)
             case .main:
                 MainView()
                 .environment(colorManager)
+                .environment(canvasManager)
                 .id("main")
                 .transition(viewModel.leadingTransition)
                 .zIndex(0)
@@ -54,6 +58,7 @@ struct ContentView: View {
     
     private func prepareApp() async {
         await colorManager.refreshAll()
+        await canvasManager.refreshAll()
         viewModel.appStage = isOnboardingComplete ? .main : .splash
     }
 }
@@ -61,12 +66,14 @@ struct ContentView: View {
 #Preview {
     let container: ModelContainer
     do {
-        container = try ModelContainer(for: OpaliteColor.self, OpalitePalette.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        container = try ModelContainer(for: OpaliteColor.self, OpalitePalette.self, CanvasFile.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     } catch {
         fatalError("Preview ModelContainer setup failed: \(error)")
     }
     let colorManager = ColorManager(context: container.mainContext)
+    let canvasManager = CanvasManager(context: container.mainContext)
     return ContentView()
         .modelContainer(container)
         .environment(colorManager)
+        .environment(canvasManager)
 }
