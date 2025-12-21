@@ -10,6 +10,7 @@ import SwiftData
 
 struct MainView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
 
@@ -29,13 +30,6 @@ struct MainView: View {
                     .tint(.none)
             }
             
-            // MARK: - SwatchBoard Tab - Compact Only, "regular" has a whole Window
-            Tab(Tabs.swatchBoard.name, systemImage: Tabs.swatchBoard.symbol, value: .swatchBoard) {
-                SwatchBoardTabView()
-                    .tint(.none)
-            }
-            .hidden(horizontalSizeClass == .regular)
-            
             // MARK: - Canvas Tab - Compact Only, "regular" has a TabSection
             Tab(Tabs.canvas.name, systemImage: Tabs.canvas.symbol, value: .canvas) {
                 CanvasListView()
@@ -54,9 +48,15 @@ struct MainView: View {
                 SettingsView()
                     .tint(.none)
             }
-            
+
+            // MARK: - SwatchBar Tab - Regular size class only (iPad/Mac), hidden when already open
+            Tab(Tabs.swatchBar.name, systemImage: Tabs.swatchBar.symbol, value: .swatchBar) {
+                // Empty view - this tab just opens the window
+                Color.clear
+            }
+            .hidden(horizontalSizeClass == .compact || colorManager.isSwatchBarOpen)
+
             // MARK: - Canvas Body Tab - All screens
-#if !os(visionOS)
             TabSection {
                 if canvasManager.canvases.isEmpty {
                     // Keep the section visible so the "New Canvas" section action is always available.
@@ -122,8 +122,6 @@ struct MainView: View {
             }
             .defaultVisibility(.hidden, for: .tabBar)
             .hidden(horizontalSizeClass == .compact)
-#endif
-            
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(selectedTab.symbolColor())
@@ -145,6 +143,15 @@ struct MainView: View {
                     }
                 }
                 canvasToRename = nil
+            }
+        }
+        .onChange(of: selectedTab) { oldTab, newTab in
+            if newTab == .swatchBar {
+                // Only open if not already open (iOS check; macOS Window handles this automatically)
+                if !colorManager.isSwatchBarOpen {
+                    openWindow(id: "swatchBar")
+                }
+                selectedTab = .portfolio
             }
         }
     }

@@ -27,6 +27,13 @@ class ColorManager {
     var looseColors: [OpaliteColor] {
         colors.filter { $0.palette == nil }
     }
+
+    /// Color selected from SwatchBar to apply to canvas drawing tool.
+    /// CanvasView observes this to update the current ink color.
+    var selectedCanvasColor: OpaliteColor? = nil
+
+    /// Tracks whether the SwatchBar window is currently open (iOS only, for single-instance enforcement).
+    var isSwatchBarOpen: Bool = false
     
     // MARK: - Fetch Helpers
     private var paletteSort: [SortDescriptor<OpalitePalette>] {

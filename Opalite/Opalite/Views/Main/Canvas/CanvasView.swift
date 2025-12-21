@@ -321,6 +321,15 @@ struct CanvasView: View {
                 }
             ))
         }
+        .onChange(of: colorManager.selectedCanvasColor) { _, newColor in
+            // Apply color from SwatchBar window to current drawing tool
+            if let color = newColor {
+                selectedInkColor = color.uiColor
+                forceColorUpdate = UUID()
+                // Clear the selection so it can be set again
+                colorManager.selectedCanvasColor = nil
+            }
+        }
     }
 
     // MARK: - Title Editing

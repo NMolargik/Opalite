@@ -50,6 +50,32 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+
+#if os(macOS)
+        Window("SwatchBar", id: "swatchBar") {
+            SwatchBarView()
+        }
+        .modelContainer(sharedModelContainer)
+        .environment(colorManager)
+        .environment(canvasManager)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 56, height: 400)
+#elseif os(iOS)
+        WindowGroup(id: "swatchBar") {
+            SwatchBarView()
+                .onAppear {
+                    colorManager.isSwatchBarOpen = true
+                }
+                .onDisappear {
+                    colorManager.isSwatchBarOpen = false
+                }
+        }
+        .modelContainer(sharedModelContainer)
+        .environment(colorManager)
+        .environment(canvasManager)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 56, height: 400)
+#endif
     }
 }
 

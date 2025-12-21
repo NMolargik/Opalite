@@ -8,8 +8,13 @@
 import SwiftUI
 import SwiftData
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 struct PortfolioView: View {
     @Environment(\.horizontalSizeClass) private var hSizeClass
+    @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager
     
     @State private var paletteSelectionColor: OpaliteColor?
@@ -24,6 +29,16 @@ struct PortfolioView: View {
     @Namespace private var swatchNS
     
     var isCompact: Bool { hSizeClass == .compact }
+
+    private var isIPadOrMac: Bool {
+#if os(macOS)
+        return true
+#elseif targetEnvironment(macCatalyst)
+        return true
+#else
+        return UIDevice.current.userInterfaceIdiom == .pad
+#endif
+    }
     
     var body: some View {
         NavigationStack() {
@@ -174,6 +189,18 @@ struct PortfolioView: View {
                 )
             }
             .toolbar {
+                if isIPadOrMac && !colorManager.isSwatchBarOpen {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            openWindow(id: "swatchBar")
+                        } label: {
+                            Label("Open SwatchBar", systemImage: "rectangle.split.1x2")
+                        }
+                    }
+
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                }
+                
                 if !isCompact {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
@@ -185,6 +212,7 @@ struct PortfolioView: View {
                         }
                     }
                 }
+                
                 ToolbarItem(placement: .confirmationAction) {
                     Menu {
                         Button(action: {
