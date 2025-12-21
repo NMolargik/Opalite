@@ -35,6 +35,8 @@ class ColorManager {
     /// Tracks whether the SwatchBar window is currently open (iOS only, for single-instance enforcement).
     var isSwatchBarOpen: Bool = false
     
+    var author: String = "User"
+    
     // MARK: - Fetch Helpers
     private var paletteSort: [SortDescriptor<OpalitePalette>] {
         [
@@ -186,7 +188,6 @@ class ColorManager {
     @discardableResult
     func createPalette(
         name: String,
-        author: String? = nil,
         notes: String? = nil,
         tags: [String] = [],
         colors: [OpaliteColor] = []
@@ -195,7 +196,7 @@ class ColorManager {
             name: name,
             createdAt: .now,
             updatedAt: .now,
-            createdByDisplayName: author,
+            createdByDisplayName: self.author,
             notes: notes,
             tags: tags,
             colors: colors
@@ -223,7 +224,6 @@ class ColorManager {
     func createColor(
         name: String? = nil,
         notes: String? = nil,
-        author: String? = nil,
         device: String? = nil,
         red: Double,
         green: Double,
@@ -238,7 +238,7 @@ class ColorManager {
         let color = OpaliteColor(
             name: name,
             notes: notes,
-            createdByDisplayName: author,
+            createdByDisplayName: self.author,
             createdOnDeviceName: resolvedDeviceName,
             updatedOnDeviceName: resolvedDeviceName,
             createdAt: .now,

@@ -10,47 +10,51 @@ import SwiftData
 
 struct SwatchBarView: View {
     @Environment(ColorManager.self) private var colorManager
-
-    private let swatchSize: CGFloat = 200
-
-    /// Tracks which color just had its hex copied, for feedback overlay
+    
     @State private var copiedColorID: UUID? = nil
-
-    /// Tracks expanded state for each palette (collapsed by default)
     @State private var expandedPalettes: Set<UUID> = []
+    @State private var showingSwatchBarInfo: Bool = false
+    
+    private let swatchSize: CGFloat = 200
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    // MARK: - Palette Sections (collapsible with sticky headers)
-                    ForEach(colorManager.palettes.sorted(by: { $0.updatedAt > $1.updatedAt })) { palette in
-                        let paletteColors = palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? []
-                        if !paletteColors.isEmpty {
-                            Section {
-                                if expandedPalettes.contains(palette.id) {
-                                    ForEach(paletteColors) { color in
+            Group {
+                if (colorManager.colors.isEmpty) {
+                    ContentUnavailableView("No Colors Created", systemImage: "questionmark.square.dashed")
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                            // MARK: - Palette Sections (collapsible with sticky headers)
+                            ForEach(colorManager.palettes.sorted(by: { $0.updatedAt > $1.updatedAt })) { palette in
+                                let paletteColors = palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? []
+                                if !paletteColors.isEmpty {
+                                    Section {
+                                        if expandedPalettes.contains(palette.id) {
+                                            ForEach(paletteColors) { color in
+                                                swatchCell(for: color)
+                                                    .padding(.horizontal)
+                                                    .padding(.vertical, 4)
+                                            }
+                                        }
+                                    } header: {
+                                        sectionHeader(for: palette)
+                                    }
+                                }
+                            }
+                            
+                            // MARK: - Loose Colors Section
+                            if !colorManager.looseColors.isEmpty {
+                                Section {
+                                    ForEach(colorManager.looseColors.sorted(by: { $0.updatedAt > $1.updatedAt })) { color in
                                         swatchCell(for: color)
                                             .padding(.horizontal)
                                             .padding(.vertical, 4)
                                     }
+                                } header: {
+                                    looseColorsHeader
                                 }
-                            } header: {
-                                sectionHeader(for: palette)
                             }
-                        }
-                    }
-
-                    // MARK: - Loose Colors Section
-                    if !colorManager.looseColors.isEmpty {
-                        Section {
-                            ForEach(colorManager.looseColors.sorted(by: { $0.updatedAt > $1.updatedAt })) { color in
-                                swatchCell(for: color)
-                                    .padding(.horizontal)
-                                    .padding(.vertical, 4)
-                            }
-                        } header: {
-                            looseColorsHeader
                         }
                     }
                 }
@@ -58,6 +62,23 @@ struct SwatchBarView: View {
             .background(.ultraThinMaterial)
             .navigationTitle("Opalite SwatchBar")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem {
+                    Button {
+                        showingSwatchBarInfo = true
+                    } label: {
+                        Label("Info", systemImage: "info")
+                    }
+                    .tint(.blue)
+                }
+            }
+            .sheet(isPresented: $showingSwatchBarInfo) {
+                Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .presentationDetents([.fraction(0.2)])
+            }
         }
     }
 

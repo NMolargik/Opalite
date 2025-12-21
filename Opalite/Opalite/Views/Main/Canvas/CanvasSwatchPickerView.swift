@@ -7,6 +7,9 @@
 
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct CanvasSwatchPickerView: View {
     @Environment(ColorManager.self) private var colorManager
@@ -61,6 +64,9 @@ struct CanvasSwatchPickerView: View {
     @ViewBuilder
     private func swatchButton(for color: OpaliteColor) -> some View {
         Button {
+            #if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            #endif
             onColorSelected(color)
 
             // Show checkmark briefly
@@ -86,8 +92,8 @@ struct CanvasSwatchPickerView: View {
                 if selectedColorID == color.id {
                     Image(systemName: "checkmark")
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                        .foregroundStyle(color.idealTextColor())
+                        .shadow(color: color.idealTextColor().opacity(0.5), radius: 2, x: 0, y: 1)
                 }
             }
         }

@@ -66,7 +66,6 @@ struct ColorDetailView: View {
                                         let createdColor = try colorManager.createColor(
                                             name: nil,
                                             notes: suggested.notes,
-                                            author: color.createdByDisplayName,
                                             device: nil,
                                             red: suggested.red,
                                             green: suggested.green,
@@ -96,7 +95,6 @@ struct ColorDetailView: View {
                                     _ = try colorManager.createColor(
                                         name: suggested.name,
                                         notes: suggested.notes,
-                                        author: nil,
                                         device: nil,
                                         red: suggested.red,
                                         green: suggested.green,

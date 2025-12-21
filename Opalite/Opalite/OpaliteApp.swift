@@ -1,42 +1,6 @@
 import SwiftUI
 import SwiftData
 
-#if os(iOS)
-/// Handles home screen quick actions
-class AppDelegate: NSObject, UIApplicationDelegate {
-    /// Pending quick action type to handle after launch
-    static var pendingShortcutType: String?
-
-    func application(
-        _ application: UIApplication,
-        configurationForConnecting connectingSceneSession: UISceneSession,
-        options: UIScene.ConnectionOptions
-    ) -> UISceneConfiguration {
-        // Check if launched via quick action
-        if let shortcutItem = options.shortcutItem {
-            AppDelegate.pendingShortcutType = shortcutItem.type
-        }
-
-        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-        config.delegateClass = SceneDelegate.self
-        return config
-    }
-}
-
-/// Handles quick actions when app is already running
-class SceneDelegate: NSObject, UIWindowSceneDelegate {
-    func windowScene(
-        _ windowScene: UIWindowScene,
-        performActionFor shortcutItem: UIApplicationShortcutItem,
-        completionHandler: @escaping (Bool) -> Void
-    ) {
-        // Set pending type so SwiftUI can handle it
-        AppDelegate.pendingShortcutType = shortcutItem.type
-        completionHandler(true)
-    }
-}
-#endif
-
 @main
 @MainActor
 struct OpaliteApp: App {
@@ -46,6 +10,21 @@ struct OpaliteApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openWindow) private var openWindow
+    
+    @AppStorage("userName") private var userName: String = "User"
+    @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
+
+    private var preferredColorScheme: ColorScheme? {
+        let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
+        switch option {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -99,6 +78,10 @@ struct OpaliteApp: App {
                     }
                     #endif
                 }
+                .onChange(of: userName) { _, newName in
+                    colorManager.author = userName
+                }
+                .preferredColorScheme(preferredColorScheme)
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)

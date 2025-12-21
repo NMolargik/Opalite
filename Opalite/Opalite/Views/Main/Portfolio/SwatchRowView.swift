@@ -10,7 +10,9 @@ import SwiftData
 import UniformTypeIdentifiers
 
 struct SwatchRowView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(ColorManager.self) private var colorManager
+    
     let colors: [OpaliteColor]
     let palette: OpalitePalette?
     let swatchWidth: CGFloat
@@ -22,11 +24,13 @@ struct SwatchRowView: View {
     var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
     var matchedNamespace: Namespace.ID? = nil
     
+    var isCompact: Bool { horizontalSizeClass == .compact }
+    
     @State private var isDropTargeted: Bool = false
     @State private var showingColorEditor: Bool = false
     
     var body: some View {
-        Group {
+        HStack {
             if (colors.isEmpty) {
                 HStack(spacing: 10) {
                     Image(systemName: "arrow.turn.down.right")
@@ -39,16 +43,16 @@ struct SwatchRowView: View {
                             Image(systemName: "questionmark.square.dashed")
                                 .font(.title2)
                             
-                            Text("Create New Color")
+                            Text("Create A New Color")
                         }
                         .bold()
                         .foregroundStyle(.white)
                         .padding(.horizontal, 10)
-                        .frame(height: 20)
+                        .frame(height: isCompact ? 20 : 40)
                         .padding(8)
                         .multilineTextAlignment(.center)
                         .glassEffect(.clear.tint(.blue).interactive())
-                        .contentShape(RoundedRectangle(cornerRadius: 16))
+                        .contentShape(RoundedRectangle(cornerRadius: 8))
                         .hoverEffect(.lift)
                     }
                     

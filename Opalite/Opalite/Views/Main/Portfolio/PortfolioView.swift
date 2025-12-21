@@ -104,15 +104,15 @@ struct PortfolioView: View {
                                 }
                             } label: {
                                 HStack(spacing: 10) {
-                                    Image(systemName: "plus.square.on.square")
+                                    Image(systemName: "swatchpalette")
                                         .font(.title2)
                                     
-                                    Text("Create New Palette")
+                                    Text("Create A New Palette")
                                 }
                                 .bold()
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
-                                .frame(height: 20)
+                                .frame(height: isCompact ? 20 : 40)
                                 .padding(8)
                                 .multilineTextAlignment(.center)
                                 .glassEffect(.clear.tint(.blue).interactive())

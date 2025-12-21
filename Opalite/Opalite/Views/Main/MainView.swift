@@ -39,7 +39,7 @@ struct MainView: View {
             
             // MARK: - Search Tab - All screens
             Tab(Tabs.search.name, systemImage: Tabs.search.symbol, value: .search, role: .search) {
-                Text("Search View")
+                SearchView()
                     .tint(.none)
             }
             
@@ -98,12 +98,14 @@ struct MainView: View {
                             } label: {
                                 Label("Rename Canvas", systemImage: "pencil")
                             }
+                            .tint(.none)
 
                             Button(role: .destructive) {
                                 try? canvasManager.deleteCanvas(canvasFile)
                             } label: {
                                 Label("Delete Canvas", systemImage: "trash")
                             }
+                            .tint(.red)
                         }
                     }
                 }

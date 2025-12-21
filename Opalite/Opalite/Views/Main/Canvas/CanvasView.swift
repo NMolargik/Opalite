@@ -16,7 +16,6 @@ enum CanvasShape: String, CaseIterable {
     case triangle
     case line
     case arrow
-    case star
 
     var displayName: String {
         rawValue.capitalized
@@ -29,7 +28,6 @@ enum CanvasShape: String, CaseIterable {
         case .triangle: return "triangle"
         case .line: return "line.diagonal"
         case .arrow: return "arrow.right"
-        case .star: return "star"
         }
     }
 }
@@ -48,9 +46,8 @@ struct CanvasView: View {
     @State private var pendingShape: CanvasShape? = nil
     @State private var shapePreviewLocation: CGPoint? = nil
     @State private var shapeRotation: Angle = .zero
-    @State private var isEditingTitle: Bool = false
     @State private var editedTitle: String = ""
-    @FocusState private var isTitleFieldFocused: Bool
+    @State private var showRenameTitleAlert: Bool = false
     @State private var showClearConfirmation: Bool = false
     @State private var showDeleteConfirmation: Bool = false
 
@@ -178,7 +175,6 @@ struct CanvasView: View {
             backgroundImage = canvasManager.loadBackgroundImage(from: canvasFile)
         }
         .onChange(of: drawing) { _, newValue in
-            // TODO: debounce?
             do {
                 try canvasManager.saveDrawing(newValue, to: canvasFile)
             } catch {
@@ -192,45 +188,19 @@ struct CanvasView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                if isEditingTitle {
-                    HStack(spacing: 8) {
-                        TextField("Canvas Title", text: $editedTitle)
-                            .textFieldStyle(.plain)
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                            .submitLabel(.done)
-                            .focused($isTitleFieldFocused)
-                            .onSubmit {
-                                saveTitle()
-                            }
+            ToolbarItem(placement: .principal) {
+                Text(canvasFile.title)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
 
-                        Button {
-                            saveTitle()
-                        } label: {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
-                        }
-                    }
-                    .frame(maxWidth: 200)
-                } else {
-                    Button {
-                        editedTitle = canvasFile.title
-                        isEditingTitle = true
-                        DispatchQueue.main.async {
-                            isTitleFieldFocused = true
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(canvasFile.title)
-                                .font(.headline)
-                            Image(systemName: "pencil")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.horizontal)
-                    }
-                    .buttonStyle(.plain)
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    editedTitle = canvasFile.title
+                    showRenameTitleAlert = true
+                } label: {
+                    Label("Rename", systemImage: "character.cursor.ibeam")
                 }
             }
 
@@ -330,14 +300,26 @@ struct CanvasView: View {
                 colorManager.selectedCanvasColor = nil
             }
         }
+        .alert("Rename Canvas", isPresented: $showRenameTitleAlert) {
+            TextField("Canvas Title", text: $editedTitle)
+
+            Button("Cancel", role: .cancel) {
+                editedTitle = ""
+            }
+
+            Button("Save") {
+                saveTitle()
+            }
+        } message: {
+            Text("Enter a new title for this canvas.")
+        }
     }
 
     // MARK: - Title Editing
     private func saveTitle() {
         let trimmed = editedTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            isTitleFieldFocused = false
-            isEditingTitle = false
+            showRenameTitleAlert = false
             return
         }
 
@@ -348,8 +330,7 @@ struct CanvasView: View {
         } catch {
             // TODO: error handling
         }
-        isTitleFieldFocused = false
-        isEditingTitle = false
+        showRenameTitleAlert = false
     }
 
     // MARK: - Shape Placement
@@ -360,8 +341,6 @@ struct CanvasView: View {
 
         // For shapes that need multiple strokes (like arrow), we handle them separately
         switch shape {
-        case .star:
-            newStrokes = createStarStrokes(center: center, size: shapeSize, ink: ink, rotation: rotation)
         case .arrow:
             newStrokes = createArrowStrokes(center: center, size: shapeSize, ink: ink, rotation: rotation)
         default:
@@ -441,7 +420,7 @@ struct CanvasView: View {
                 CGPoint(x: center.x + halfSize, y: center.y)
             ]
 
-        case .arrow, .star:
+        case .arrow:
             // Handled separately with multiple strokes
             return []
         }
@@ -651,11 +630,6 @@ struct ShapePreviewView: View {
                 ArrowShape()
                     .stroke(.black, lineWidth: 2)
                     .frame(width: size, height: size * 0.5)
-
-            case .star:
-                StarShape()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size, height: size)
             }
         }
         .opacity(0.6)
@@ -967,8 +941,6 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
                 let newTool = PKInkingTool(ink.inkType, color: inkColor, width: ink.width)
                 context.coordinator.isProgrammaticToolChange = true
                 uiView.tool = newTool
-                // Also update the tool picker's selected tool to reflect the color visually
-                context.coordinator.toolPicker?.selectedTool = newTool
                 context.coordinator.isProgrammaticToolChange = false
             }
         } else if shouldForceUpdate {
@@ -976,7 +948,6 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             let newTool = PKInkingTool(.pen, color: inkColor, width: 4)
             context.coordinator.isProgrammaticToolChange = true
             uiView.tool = newTool
-            context.coordinator.toolPicker?.selectedTool = newTool
             context.coordinator.isProgrammaticToolChange = false
         }
     }
@@ -1007,7 +978,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
 
         func attachToolPicker(to canvasView: PKCanvasView) {
             self.canvasView = canvasView
-            guard let window = canvasView.window else {
+            guard canvasView.window != nil else {
                 DispatchQueue.main.async { [weak self, weak canvasView] in
                     if let canvasView { self?.attachToolPicker(to: canvasView) }
                 }
