@@ -29,6 +29,7 @@ struct SwatchView: View {
     private var showOverlays: Bool
     @Binding var isEditingBadge: Bool?
     private var saveBadge: ((String) -> Void)?
+    private var allowBadgeTapToEdit: Bool
     private var menu: AnyView?
     private var contextMenu: AnyView?
     
@@ -44,6 +45,7 @@ struct SwatchView: View {
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        allowBadgeTapToEdit: Bool = false,
         palette: OpalitePalette? = nil,
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
@@ -57,6 +59,7 @@ struct SwatchView: View {
         self.showOverlays = showOverlays
         self._isEditingBadge = isEditingBadge
         self.saveBadge = saveBadge
+        self.allowBadgeTapToEdit = allowBadgeTapToEdit
         self.palette = palette
         self.matchedNamespace = matchedNamespace
         self.matchedID = matchedID
@@ -72,6 +75,7 @@ struct SwatchView: View {
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        allowBadgeTapToEdit: Bool = false,
         palette: OpalitePalette? = nil,
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
@@ -85,6 +89,7 @@ struct SwatchView: View {
             showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
             saveBadge: saveBadge,
+            allowBadgeTapToEdit: allowBadgeTapToEdit,
             palette: palette,
             matchedNamespace: matchedNamespace,
             matchedID: matchedID,
@@ -100,6 +105,7 @@ struct SwatchView: View {
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
         saveBadge: ((String) -> Void)? = nil,
+        allowBadgeTapToEdit: Bool = false,
         palette: OpalitePalette? = nil,
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
@@ -113,6 +119,7 @@ struct SwatchView: View {
             showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
             saveBadge: saveBadge,
+            allowBadgeTapToEdit: allowBadgeTapToEdit,
             palette: palette,
             matchedNamespace: matchedNamespace,
             matchedID: matchedID,
@@ -173,7 +180,13 @@ struct SwatchView: View {
                     Text(badgeText)
                         .foregroundStyle(fill.first?.idealTextColor() ?? .black)
                         .bold()
-
+                        .if(allowBadgeTapToEdit && saveBadge != nil) { view in
+                            view.onTapGesture {
+                                withAnimation(.easeInOut) {
+                                    isEditingBadge = true
+                                }
+                            }
+                        }
                 }
 
                 // Editing state
@@ -207,7 +220,7 @@ struct SwatchView: View {
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
                                 .imageScale(.large)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.white, .green)
                         }
                         .contentShape(Circle())
                         .hoverEffect(.lift)

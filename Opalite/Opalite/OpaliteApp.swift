@@ -1,10 +1,51 @@
 import SwiftUI
 import SwiftData
 
+#if os(iOS)
+/// Handles home screen quick actions
+class AppDelegate: NSObject, UIApplicationDelegate {
+    /// Pending quick action type to handle after launch
+    static var pendingShortcutType: String?
+
+    func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
+        // Check if launched via quick action
+        if let shortcutItem = options.shortcutItem {
+            AppDelegate.pendingShortcutType = shortcutItem.type
+        }
+
+        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        config.delegateClass = SceneDelegate.self
+        return config
+    }
+}
+
+/// Handles quick actions when app is already running
+class SceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        // Set pending type so SwiftUI can handle it
+        AppDelegate.pendingShortcutType = shortcutItem.type
+        completionHandler(true)
+    }
+}
+#endif
+
 @main
 @MainActor
 struct OpaliteApp: App {
+    #if os(iOS)
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    #endif
+
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openWindow) private var openWindow
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -45,6 +86,18 @@ struct OpaliteApp: App {
                         await colorManager.refreshAll()
                         await canvasManager.refreshAll()
                     }
+
+                    #if os(iOS)
+                    // Handle pending quick action when app becomes active
+                    if newPhase == .active, let shortcutType = AppDelegate.pendingShortcutType {
+                        AppDelegate.pendingShortcutType = nil
+                        if shortcutType == "OpenSwatchBarAction" {
+                            if !colorManager.isSwatchBarOpen {
+                                openWindow(id: "swatchBar")
+                            }
+                        }
+                    }
+                    #endif
                 }
         }
         .modelContainer(sharedModelContainer)
@@ -58,7 +111,7 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
         .defaultSize(width: 56, height: 400)
 #elseif os(iOS)
         WindowGroup(id: "swatchBar") {
@@ -73,7 +126,7 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
         .defaultSize(width: 56, height: 400)
 #endif
     }

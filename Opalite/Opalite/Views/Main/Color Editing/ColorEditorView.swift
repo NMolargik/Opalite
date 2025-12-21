@@ -135,10 +135,15 @@ struct ColorEditorView: View {
                             }
                         }
                     } label: {
-                        Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
+                        if viewModel.didCopyHex {
+                            Text("Hex Copied")
+                        } else {
+                            Image(systemName: "number")
+                        }
                     }
+                    .tint(viewModel.didCopyHex ? .green : nil)
                 }
-                
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {

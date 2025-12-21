@@ -43,18 +43,19 @@ struct MainView: View {
                     .tint(.none)
             }
             
-            // MARK: - Settings Tab - All screens
-            Tab(Tabs.settings.name, systemImage: Tabs.settings.symbol, value: .settings) {
-                SettingsView()
-                    .tint(.none)
-            }
-
             // MARK: - SwatchBar Tab - Regular size class only (iPad/Mac), hidden when already open
             Tab(Tabs.swatchBar.name, systemImage: Tabs.swatchBar.symbol, value: .swatchBar) {
                 // Empty view - this tab just opens the window
                 Color.clear
             }
             .hidden(horizontalSizeClass == .compact || colorManager.isSwatchBarOpen)
+            .defaultVisibility(.hidden, for: .tabBar)
+            
+            // MARK: - Settings Tab - All screens
+            Tab(Tabs.settings.name, systemImage: Tabs.settings.symbol, value: .settings) {
+                SettingsView()
+                    .tint(.none)
+            }
 
             // MARK: - Canvas Body Tab - All screens
             TabSection {

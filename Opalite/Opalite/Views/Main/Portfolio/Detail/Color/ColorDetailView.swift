@@ -28,7 +28,8 @@ struct ColorDetailView: View {
     @State private var isSavingNotes: Bool = false
     @State private var isShowingPaletteSelection: Bool = false
     @State private var showDetachConfirmation: Bool = false
-    
+    @State private var didCopyHex: Bool = false
+
     let color: OpaliteColor
 
     var body: some View {
@@ -48,7 +49,8 @@ struct ColorDetailView: View {
                         } catch {
                             // TODO: error handling
                         }
-                    }
+                    },
+                    allowBadgeTapToEdit: true
                 )
                 
                 if horizontalSizeClass == .regular {
@@ -174,37 +176,11 @@ struct ColorDetailView: View {
                 Button {
                     isShowingColorEditor = true
                 } label: {
-                    Text("Modify")
+                    Text("Edit")
                 }
             }
             
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button {
-                        copyHex(for: color)
-                    } label: {
-                        Label("Copy Hex", systemImage: "number")
-                    }
-                    
-                    Button {
-                        isEditingName = true
-                    } label: {
-                        Label("Rename", systemImage: "character.cursor.ibeam")
-                    }
-                    
-                    Divider()
-                    
-                    Button(role: .destructive){
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                } label: {
-                    Label("Options", systemImage: "ellipsis.circle")
-                }
-            }
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -217,6 +193,43 @@ struct ColorDetailView: View {
                     Label("Palette", systemImage: (color.palette != nil) ? "swatchpalette.fill" : "swatchpalette")
                         .foregroundStyle(.purple, .orange, .red)
                 }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    copyHex(for: color)
+                    withAnimation(.easeIn(duration: 0.15)) {
+                        didCopyHex = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            didCopyHex = false
+                        }
+                    }
+                } label: {
+                    Label(
+                        didCopyHex ? "Copied" : "Copy Hex",
+                        systemImage: didCopyHex ? "checkmark" : "number"
+                    )
+                }
+                .tint(didCopyHex ? .green : nil)
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isEditingName = true
+                } label: {
+                    Label("Rename", systemImage: "character.cursor.ibeam")
+                }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive){
+                    showDeleteConfirmation = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .tint(.red)
             }
             
             ToolbarItem(placement: .confirmationAction) {

@@ -194,7 +194,7 @@ struct PortfolioView: View {
                         Button {
                             openWindow(id: "swatchBar")
                         } label: {
-                            Label("Open SwatchBar", systemImage: "rectangle.split.1x2")
+                            Label("Open SwatchBar", systemImage: "square.stack")
                         }
                     }
 

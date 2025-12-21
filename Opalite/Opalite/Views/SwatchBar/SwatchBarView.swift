@@ -56,7 +56,7 @@ struct SwatchBarView: View {
                 }
             }
             .background(.ultraThinMaterial)
-            .navigationTitle("SwatchBar")
+            .navigationTitle("Opalite SwatchBar")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

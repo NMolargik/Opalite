@@ -8,5 +8,16 @@
 		<string>processing</string>
 		<string>fetch</string>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>OpenSwatchBarAction</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Open SwatchBar</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>square.stack</string>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -42,7 +42,8 @@ struct PaletteDetailView: View {
                         } catch {
                             // TODO: error handling
                         }
-                    }
+                    },
+                    allowBadgeTapToEdit: true
                 )
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
@@ -139,15 +140,12 @@ struct PaletteDetailView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button(role: .destructive){
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
+                Button(role: .destructive){
+                    showDeleteConfirmation = true
                 } label: {
-                    Label("Options", systemImage: "ellipsis.circle")
+                    Label("Delete", systemImage: "trash")
                 }
+                .tint(.red)
             }
             
             ToolbarSpacer(.fixed, placement: .topBarTrailing)

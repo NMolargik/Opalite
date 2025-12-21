@@ -43,7 +43,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
         case .canvas: "pencil.and.scribble"
         case .settings: "gear"
         case .search: "magnifyingglass"
-        case .swatchBar: "rectangle.split.1x2"
+        case .swatchBar: "square.stack"
         case .canvasBody(_): "scribble.variable"
         }
     }
