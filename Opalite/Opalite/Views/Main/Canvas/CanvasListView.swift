@@ -17,6 +17,10 @@ struct CanvasListView: View {
     @State private var searchText = ""
     @State private var selectedCanvasFile: CanvasFile? = nil
 
+    // Rename canvas state
+    @State private var canvasToRename: CanvasFile? = nil
+    @State private var renameText: String = ""
+
     private var filteredCanvases: [CanvasFile] {
         let sorted = canvasManager.canvases.sorted(by: { $0.createdAt > $1.createdAt })
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return sorted }
@@ -45,6 +49,15 @@ struct CanvasListView: View {
                     }
                     .buttonStyle(.plain)
                     .contextMenu {
+                        Button {
+                            renameText = canvasFile.title
+                            canvasToRename = canvasFile
+                        } label: {
+                            Label("Rename", systemImage: "pencil")
+                        }
+
+                        Divider()
+
                         Button(role: .destructive) {
                             do {
                                 try canvasManager.deleteCanvas(canvasFile)
@@ -97,6 +110,26 @@ struct CanvasListView: View {
                         Label("New Canvas", systemImage: "plus")
                     })
                     .tint(.red)
+                }
+            }
+            .alert("Rename Canvas", isPresented: Binding(
+                get: { canvasToRename != nil },
+                set: { if !$0 { canvasToRename = nil } }
+            )) {
+                TextField("Canvas name", text: $renameText)
+                Button("Cancel", role: .cancel) {
+                    canvasToRename = nil
+                }
+                Button("Rename") {
+                    if let canvas = canvasToRename {
+                        let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmed.isEmpty {
+                            try? canvasManager.updateCanvas(canvas) { c in
+                                c.title = trimmed
+                            }
+                        }
+                    }
+                    canvasToRename = nil
                 }
             }
         }

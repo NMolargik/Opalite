@@ -30,6 +30,10 @@ final class CanvasFile {
     @Attribute(.externalStorage)
     var thumbnailData: Data? = nil
 
+    // MARK: - Background Image (composited placed images)
+    @Attribute(.externalStorage)
+    var backgroundImageData: Data? = nil
+
     // MARK: - Init
     init(
         title: String = "Untitled Canvas",
@@ -55,6 +59,18 @@ extension CanvasFile {
     /// Persist changes from a Canvas/PencilKit view
     func saveDrawing(_ drawing: PKDrawing) {
         self.drawingData = drawing.dataRepresentation()
+        self.updatedAt = Date()
+    }
+
+    /// Load the background image (composited placed images)
+    func loadBackgroundImage() -> UIImage? {
+        guard let data = backgroundImageData else { return nil }
+        return UIImage(data: data)
+    }
+
+    /// Save a background image (composited placed images)
+    func saveBackgroundImage(_ image: UIImage?) {
+        self.backgroundImageData = image?.pngData()
         self.updatedAt = Date()
     }
 }

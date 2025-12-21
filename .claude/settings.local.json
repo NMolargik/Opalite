@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"/Users/nickmolargik/Developer/Molargik Software LLC/Opalite\" remote -v)",
+      "Bash(cat:*)",
+      "WebSearch"
+    ]
+  }
+}

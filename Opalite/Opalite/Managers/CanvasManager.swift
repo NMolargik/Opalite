@@ -137,6 +137,21 @@ final class CanvasManager {
         canvas.loadDrawing()
     }
 
+    /// Loads the background image from a canvas (returns nil if none).
+    func loadBackgroundImage(from canvas: CanvasFile) -> UIImage? {
+        canvas.loadBackgroundImage()
+    }
+
+    // MARK: - Background Image
+    /// Saves a background image to the canvas.
+    func saveBackgroundImage(_ image: UIImage?, to canvas: CanvasFile) throws {
+        canvas.saveBackgroundImage(image)
+        #if canImport(DeviceKit)
+        canvas.lastEditedDeviceName = Device.current.safeDescription
+        #endif
+        try saveContext()
+    }
+
     // MARK: - Deleting
     func deleteCanvas(_ canvas: CanvasFile) throws {
         context.delete(canvas)

@@ -54,6 +54,18 @@ struct CanvasView: View {
     @State private var showClearConfirmation: Bool = false
     @State private var showDeleteConfirmation: Bool = false
 
+    // MARK: - Image Placement State
+    @State private var pendingImage: UIImage? = nil
+    @State private var imagePreviewLocation: CGPoint? = nil
+    @State private var imageRotation: Angle = .zero
+
+    // MARK: - Image Picker Sheet State
+    @State private var showPhotosPicker: Bool = false
+    @State private var showFilesPicker: Bool = false
+
+    // MARK: - Background Image (flattened placed images)
+    @State private var backgroundImage: UIImage? = nil
+
     var body: some View {
         ZStack {
             // Background layer
@@ -61,7 +73,13 @@ struct CanvasView: View {
                 .ignoresSafeArea()
 
             // Drawing canvas with Apple Pencil support
-            PencilKitCanvas(drawing: $drawing, inkColor: $selectedInkColor, forceColorUpdate: forceColorUpdate, appearTrigger: appearTrigger)
+            PencilKitCanvas(
+                drawing: $drawing,
+                inkColor: $selectedInkColor,
+                forceColorUpdate: forceColorUpdate,
+                appearTrigger: appearTrigger,
+                backgroundImage: backgroundImage
+            )
 
             // Shape placement overlay
             if let shape = pendingShape {
@@ -104,16 +122,60 @@ struct CanvasView: View {
                     )
                 }
             }
+
+            // Image placement overlay
+            if let image = pendingImage {
+                ZStack {
+                    Color.black.opacity(0.1)
+                        .ignoresSafeArea()
+
+                    // Image preview at hover location
+                    if let location = imagePreviewLocation {
+                        ImagePreviewView(image: image)
+                            .rotationEffect(imageRotation)
+                            .position(location)
+                            .allowsHitTesting(false)
+                    }
+                }
+                .overlay(alignment: .top) {
+                    VStack(spacing: 8) {
+                        Text("Tap to place image")
+                            .font(.headline)
+                        if imageRotation != .zero {
+                            Text("Rotation: \(Int(imageRotation.degrees))°")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .padding(.top, 80)
+                }
+                .overlay {
+                    PencilHoverView(
+                        hoverLocation: $imagePreviewLocation,
+                        rollAngle: $imageRotation,
+                        onTap: { location in
+                            placeImage(image, at: location, rotation: imageRotation)
+                            pendingImage = nil
+                            imagePreviewLocation = nil
+                            imageRotation = .zero
+                        }
+                    )
+                }
+            }
         }
         .environment(\.colorScheme, .light)
         .id(canvasFile.id)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             drawing = canvasManager.loadDrawing(from: canvasFile)
+            backgroundImage = canvasManager.loadBackgroundImage(from: canvasFile)
             appearTrigger = UUID()
         }
         .onChange(of: canvasFile.id) { _, _ in
             drawing = canvasManager.loadDrawing(from: canvasFile)
+            backgroundImage = canvasManager.loadBackgroundImage(from: canvasFile)
         }
         .onChange(of: drawing) { _, newValue in
             // TODO: debounce?
@@ -176,13 +238,13 @@ struct CanvasView: View {
                 Menu {
                     Section("Import") {
                         Button {
-                            // TODO: import image from photo library
+                            showPhotosPicker = true
                         } label: {
                             Label("Image from Photos", systemImage: "photo.on.rectangle")
                         }
 
                         Button {
-                            // TODO: import image from files
+                            showFilesPicker = true
                         } label: {
                             Label("Image from Files", systemImage: "folder")
                         }
@@ -238,6 +300,26 @@ struct CanvasView: View {
             }
         } message: {
             Text("This will permanently delete \"\(canvasFile.title)\". This action cannot be undone.")
+        }
+        .sheet(isPresented: $showPhotosPicker) {
+            PhotoPickerView(selectedImage: Binding(
+                get: { nil },
+                set: { image in
+                    if let image {
+                        pendingImage = image
+                    }
+                }
+            ))
+        }
+        .sheet(isPresented: $showFilesPicker) {
+            FilePickerView(selectedImage: Binding(
+                get: { nil },
+                set: { image in
+                    if let image {
+                        pendingImage = image
+                    }
+                }
+            ))
         }
     }
 
@@ -457,6 +539,75 @@ struct CanvasView: View {
         }
         return []
     }
+
+    // MARK: - Image Placement
+
+    private func placeImage(_ image: UIImage, at center: CGPoint, rotation: Angle) {
+        // Get the canvas size (use screen bounds as approximation)
+        let canvasSize = UIScreen.main.bounds.size
+
+        // Calculate the image size (max 200pt dimension, preserving aspect ratio)
+        let maxDimension: CGFloat = 200
+        let aspectRatio = image.size.width / image.size.height
+        let imageSize: CGSize
+        if aspectRatio > 1 {
+            imageSize = CGSize(width: maxDimension, height: maxDimension / aspectRatio)
+        } else {
+            imageSize = CGSize(width: maxDimension * aspectRatio, height: maxDimension)
+        }
+
+        // Flatten the image to the background
+        flattenToBackground(image: image, at: center, rotation: rotation, size: imageSize, canvasSize: canvasSize)
+    }
+
+    private func flattenToBackground(image: UIImage, at center: CGPoint, rotation: Angle, size: CGSize, canvasSize: CGSize) {
+        // Create a new image context
+        UIGraphicsBeginImageContextWithOptions(canvasSize, false, UIScreen.main.scale)
+        defer { UIGraphicsEndImageContext() }
+
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+
+        // Draw white background
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(CGRect(origin: .zero, size: canvasSize))
+
+        // Draw existing background image if any
+        if let existingBackground = backgroundImage {
+            existingBackground.draw(at: .zero)
+        }
+
+        // Save state before transformations
+        context.saveGState()
+
+        // Move to center point and apply rotation
+        context.translateBy(x: center.x, y: center.y)
+        context.rotate(by: CGFloat(rotation.radians))
+
+        // Draw the new image centered at the origin (which is now at center point)
+        let drawRect = CGRect(
+            x: -size.width / 2,
+            y: -size.height / 2,
+            width: size.width,
+            height: size.height
+        )
+        image.draw(in: drawRect)
+
+        // Restore state
+        context.restoreGState()
+
+        // Get the composited image
+        guard let compositeImage = UIGraphicsGetImageFromCurrentImageContext() else { return }
+
+        // Update the background image state
+        backgroundImage = compositeImage
+
+        // Save to the canvas file
+        do {
+            try canvasManager.saveBackgroundImage(compositeImage, to: canvasFile)
+        } catch {
+            // TODO: error handling
+        }
+    }
 }
 
 // MARK: - Shape Preview View
@@ -569,10 +720,10 @@ struct PencilHoverView: UIViewRepresentable {
     func makeUIView(context: Context) -> HoverDetectionView {
         let view = HoverDetectionView()
         view.backgroundColor = .clear
-        view.onHoverUpdate = { location, angle in
+        view.onHoverUpdate = { location, relativeAngle in
             DispatchQueue.main.async {
                 self.hoverLocation = location
-                if let angle = angle {
+                if let angle = relativeAngle {
                     self.rollAngle = Angle(radians: Double(angle))
                 }
             }
@@ -588,13 +739,29 @@ struct PencilHoverView: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: HoverDetectionView, context: Context) {}
+    func updateUIView(_ uiView: HoverDetectionView, context: Context) {
+        // Reset baseline when rollAngle is reset to zero (new placement session)
+        if rollAngle == .zero && uiView.baselineRollAngle != nil {
+            uiView.resetBaseline()
+        }
+    }
 }
 
 class HoverDetectionView: UIView {
     var onHoverUpdate: ((CGPoint, CGFloat?) -> Void)?
     var onHoverEnd: (() -> Void)?
     var onTap: ((CGPoint) -> Void)?
+
+    // Baseline roll angle captured on first touch - rotation is relative to this
+    private(set) var baselineRollAngle: CGFloat?
+
+    // Haptic feedback for Apple Pencil Pro rotation
+    private lazy var canvasFeedbackGenerator: UICanvasFeedbackGenerator = {
+        UICanvasFeedbackGenerator(view: self)
+    }()
+
+    // Track the last 10-degree threshold crossed for haptic feedback
+    private var lastHapticThreshold: Int = 0
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -604,6 +771,11 @@ class HoverDetectionView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupGestures()
+    }
+
+    func resetBaseline() {
+        baselineRollAngle = nil
+        lastHapticThreshold = 0
     }
 
     private func setupGestures() {
@@ -621,6 +793,7 @@ class HoverDetectionView: UIView {
         case .began, .changed:
             let location = gesture.location(in: self)
             // Hover only provides location - roll angle comes from touch events
+            // During hover, we don't update rotation (API limitation: rollAngle requires touch)
             onHoverUpdate?(location, nil)
         case .ended, .cancelled:
             onHoverEnd?()
@@ -634,12 +807,32 @@ class HoverDetectionView: UIView {
         onTap?(location)
     }
 
-    // Override to capture pencil touches for roll angle
-    private func snappedRollAngle(from touch: UITouch) -> CGFloat {
+    // Calculate relative roll angle from baseline, snapped to 5° increments
+    private func relativeRollAngle(from touch: UITouch) -> CGFloat {
         let rawAngle = -touch.rollAngle
-        let degrees = rawAngle * 180 / .pi
-        let snappedDegrees = (degrees / 10).rounded() * 10
+
+        // Capture baseline on first touch
+        if baselineRollAngle == nil {
+            baselineRollAngle = rawAngle
+        }
+
+        // Calculate relative angle from baseline
+        let relativeAngle = rawAngle - (baselineRollAngle ?? 0)
+
+        // Snap to 5° increments for finer control
+        let degrees = relativeAngle * 180 / .pi
+        let snappedDegrees = (degrees / 5).rounded() * 5
         return snappedDegrees * .pi / 180
+    }
+
+    // Check if rotation crossed a 10-degree threshold and trigger haptic
+    private func checkRotationHaptic(degrees: CGFloat, at location: CGPoint) {
+        let currentThreshold = Int(degrees / 10)
+        if currentThreshold != lastHapticThreshold {
+            lastHapticThreshold = currentThreshold
+            // Trigger Apple Pencil Pro haptic feedback for alignment/snap
+            canvasFeedbackGenerator.alignmentOccurred(at: location)
+        }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -647,7 +840,7 @@ class HoverDetectionView: UIView {
         guard let touch = touches.first else { return }
 
         let location = touch.location(in: self)
-        let rollAngle = snappedRollAngle(from: touch)
+        let rollAngle = relativeRollAngle(from: touch)
         onHoverUpdate?(location, rollAngle)
     }
 
@@ -656,7 +849,12 @@ class HoverDetectionView: UIView {
         guard let touch = touches.first else { return }
 
         let location = touch.location(in: self)
-        let rollAngle = snappedRollAngle(from: touch)
+        let rollAngle = relativeRollAngle(from: touch)
+
+        // Trigger haptic every 10 degrees of rotation
+        let degrees = rollAngle * 180 / .pi
+        checkRotationHaptic(degrees: degrees, at: location)
+
         onHoverUpdate?(location, rollAngle)
     }
 
@@ -674,10 +872,17 @@ struct PencilKitCanvas: View {
     @Binding var inkColor: UIColor
     var forceColorUpdate: UUID
     var appearTrigger: UUID
+    var backgroundImage: UIImage?
 
     var body: some View {
-        CanvasDetail_PencilKitRepresentable(drawing: $drawing, inkColor: $inkColor, forceColorUpdate: forceColorUpdate, appearTrigger: appearTrigger)
-            .ignoresSafeArea(edges: .bottom)
+        CanvasDetail_PencilKitRepresentable(
+            drawing: $drawing,
+            inkColor: $inkColor,
+            forceColorUpdate: forceColorUpdate,
+            appearTrigger: appearTrigger,
+            backgroundImage: backgroundImage
+        )
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
@@ -687,6 +892,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     @Binding var inkColor: UIColor
     var forceColorUpdate: UUID
     var appearTrigger: UUID
+    var backgroundImage: UIImage?
 
     func makeUIView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
@@ -696,6 +902,15 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         view.alwaysBounceVertical = true
         view.drawingPolicy = .default
         view.delegate = context.coordinator
+
+        // Add background image view
+        let imageView = UIImageView()
+        imageView.contentMode = .topLeft
+        imageView.frame = view.bounds
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        imageView.image = backgroundImage
+        view.insertSubview(imageView, at: 0)
+        context.coordinator.backgroundImageView = imageView
 
         // Attach tool picker
         context.coordinator.attachToolPicker(to: view)
@@ -716,6 +931,11 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     func updateUIView(_ uiView: PKCanvasView, context: Context) {
         if uiView.drawing != drawing {
             uiView.drawing = drawing
+        }
+
+        // Update background image if changed
+        if context.coordinator.backgroundImageView?.image !== backgroundImage {
+            context.coordinator.backgroundImageView?.image = backgroundImage
         }
 
         // Re-attach tool picker when view reappears
@@ -759,6 +979,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     final class Coordinator: NSObject, PKCanvasViewDelegate, PKToolPickerObserver {
         @Binding var drawing: PKDrawing
         weak var canvasView: PKCanvasView?
+        weak var backgroundImageView: UIImageView?
         var toolPicker: PKToolPicker?
         var userChangedTool = false
         var isProgrammaticToolChange = false
@@ -819,6 +1040,7 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
     @Binding var inkColor: UIColor
     var forceColorUpdate: UUID
     var appearTrigger: UUID
+    var backgroundImage: UIImage?
 
     func makeNSView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
@@ -827,6 +1049,17 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
         view.isOpaque = false
         view.drawingPolicy = .default
         view.delegate = context.coordinator
+
+        // Add background image view
+        if let nsImage = backgroundImage {
+            let imageView = NSImageView()
+            imageView.image = NSImage(cgImage: nsImage.cgImage!, size: NSSize(width: nsImage.size.width, height: nsImage.size.height))
+            imageView.imageScaling = .scaleNone
+            imageView.frame = view.bounds
+            imageView.autoresizingMask = [.width, .height]
+            view.addSubview(imageView, positioned: .below, relativeTo: nil)
+            context.coordinator.backgroundImageView = imageView
+        }
 
         // Initialize with current color (pen as default)
         view.tool = PKInkingTool(.pen, color: inkColor, width: 4)
@@ -838,7 +1071,15 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
             nsView.drawing = drawing
         }
 
-        // Only update the tool if the color changed or we’re not currently using an inking tool
+        // Update background image if changed
+        if let bgImageView = context.coordinator.backgroundImageView, let uiImage = backgroundImage {
+            let nsImage = NSImage(cgImage: uiImage.cgImage!, size: NSSize(width: uiImage.size.width, height: uiImage.size.height))
+            if bgImageView.image !== nsImage {
+                bgImageView.image = nsImage
+            }
+        }
+
+        // Only update the tool if the color changed or we're not currently using an inking tool
         let currentWidth: CGFloat
         let currentType: PKInkingTool.InkType
         if let ink = nsView.tool as? PKInkingTool {
@@ -859,6 +1100,7 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
 
     final class Coordinator: NSObject, PKCanvasViewDelegate {
         @Binding var drawing: PKDrawing
+        weak var backgroundImageView: NSImageView?
 
         init(drawing: Binding<PKDrawing>) {
             _drawing = drawing

@@ -15,6 +15,9 @@ struct CanvasSwatchPickerView: View {
 
     private let swatchSize: CGFloat = 44
 
+    // Track which color was just selected for checkmark animation
+    @State private var selectedColorID: UUID? = nil
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -59,6 +62,18 @@ struct CanvasSwatchPickerView: View {
     private func swatchButton(for color: OpaliteColor) -> some View {
         Button {
             onColorSelected(color)
+
+            // Show checkmark briefly
+            withAnimation(.linear(duration: 0.15)) {
+                selectedColorID = color.id
+            }
+
+            // Hide checkmark after delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                withAnimation(.linear(duration: 0.15)) {
+                    selectedColorID = nil
+                }
+            }
         } label: {
             SwatchView(
                 fill: [color],
@@ -67,6 +82,14 @@ struct CanvasSwatchPickerView: View {
                 badgeText: "",
                 showOverlays: false
             )
+            .overlay {
+                if selectedColorID == color.id {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                }
+            }
         }
         .buttonStyle(.plain)
         .hoverEffect(.lift)
