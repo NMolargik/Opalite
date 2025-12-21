@@ -29,6 +29,8 @@ struct ColorDetailView: View {
     @State private var isShowingPaletteSelection: Bool = false
     @State private var showDetachConfirmation: Bool = false
     @State private var didCopyHex: Bool = false
+    @State private var shareFileURL: URL?
+    @State private var isShowingFileShareSheet = false
 
     let color: OpaliteColor
 
@@ -242,7 +244,12 @@ struct ColorDetailView: View {
                     }
                     
                     Button {
-                        // TODO: share color
+                        do {
+                            shareFileURL = try SharingService.exportColor(color)
+                            isShowingFileShareSheet = true
+                        } catch {
+                            // Export failed silently
+                        }
                     } label: {
                         Label("Share Color", systemImage: "paintpalette.fill")
                     }
@@ -258,6 +265,9 @@ struct ColorDetailView: View {
         EmptyView()
             .background(
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
+            .background(
+                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
             )
     }
 

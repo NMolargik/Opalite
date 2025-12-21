@@ -24,6 +24,8 @@ struct PortfolioView: View {
     @State private var pendingPaletteToAddTo: OpalitePalette? = nil
     @State private var swatchSize: SwatchSize = .small
     @State private var navigationPath = [PortfolioNavigationNode]()
+    @State private var shareFileURL: URL?
+    @State private var isShowingFileShareSheet = false
     
     @Namespace private var namespace
     @Namespace private var swatchNS
@@ -257,6 +259,9 @@ struct PortfolioView: View {
             .background(
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
             )
+            .background(
+                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
+            )
     }
     
     @ViewBuilder
@@ -289,7 +294,12 @@ struct PortfolioView: View {
                 }
                 
                 Button {
-                    // TODO: Share Color
+                    do {
+                        shareFileURL = try SharingService.exportColor(color)
+                        isShowingFileShareSheet = true
+                    } catch {
+                        // Export failed silently
+                    }
                 } label: {
                     Label("Share Color", systemImage: "square.and.arrow.up")
                 }

@@ -14,6 +14,8 @@ struct PaletteRowHeaderView: View {
     @State private var shareImage: UIImage?
     @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
+    @State private var shareFileURL: URL?
+    @State private var isShowingFileShareSheet = false
     
     let palette: OpalitePalette
     
@@ -38,7 +40,12 @@ struct PaletteRowHeaderView: View {
                 }
 
                 Button {
-                    // TODO: Share Palette
+                    do {
+                        shareFileURL = try SharingService.exportPalette(palette)
+                        isShowingFileShareSheet = true
+                    } catch {
+                        // Export failed silently
+                    }
                 } label: {
                     Label("Share Palette", systemImage: "square.and.arrow.up")
                 }
@@ -136,6 +143,9 @@ struct PaletteRowHeaderView: View {
         EmptyView()
             .background(
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
+            .background(
+                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
             )
     }
 }

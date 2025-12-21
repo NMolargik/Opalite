@@ -72,7 +72,7 @@ struct CanvasSwatchPickerView: View {
                 // Trigger Apple Pencil Pro haptic feedback
                 let frame = geometry.frame(in: .global)
                 let centerPoint = CGPoint(x: frame.midX, y: frame.midY)
-                canvasFeedbackGenerator.selectionChanged(at: centerPoint)
+                canvasFeedbackGenerator.alignmentOccurred(at: centerPoint)
                 #endif
                 onColorSelected(color)
 

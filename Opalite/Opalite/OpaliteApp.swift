@@ -10,7 +10,7 @@ struct OpaliteApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openWindow) private var openWindow
-    
+
     @AppStorage("userName") private var userName: String = "User"
     @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
 
@@ -29,6 +29,7 @@ struct OpaliteApp: App {
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
     let canvasManager: CanvasManager
+    let importCoordinator = ImportCoordinator()
 
     init() {
         let schema = Schema([
@@ -82,10 +83,44 @@ struct OpaliteApp: App {
                     colorManager.author = userName
                 }
                 .preferredColorScheme(preferredColorScheme)
+                .onOpenURL { url in
+                    importCoordinator.handleIncomingURL(url, colorManager: colorManager)
+                }
+                .sheet(isPresented: Binding(
+                    get: { importCoordinator.isShowingColorImport },
+                    set: { importCoordinator.isShowingColorImport = $0 }
+                )) {
+                    if let preview = importCoordinator.pendingColorImport {
+                        ColorImportConfirmationSheet(preview: preview) {
+                            Task { await colorManager.refreshAll() }
+                        }
+                        .environment(colorManager)
+                    }
+                }
+                .sheet(isPresented: Binding(
+                    get: { importCoordinator.isShowingPaletteImport },
+                    set: { importCoordinator.isShowingPaletteImport = $0 }
+                )) {
+                    if let preview = importCoordinator.pendingPaletteImport {
+                        PaletteImportConfirmationSheet(preview: preview) {
+                            Task { await colorManager.refreshAll() }
+                        }
+                        .environment(colorManager)
+                    }
+                }
+                .alert("Import Error", isPresented: Binding(
+                    get: { importCoordinator.showingImportError },
+                    set: { importCoordinator.showingImportError = $0 }
+                )) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
+                }
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(importCoordinator)
 
 #if os(macOS)
         Window("SwatchBar", id: "swatchBar") {

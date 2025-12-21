@@ -22,6 +22,8 @@ struct PaletteDetailView: View {
     @State private var isSavingNotes: Bool = false
     @State private var isShowingPaletteSelection: Bool = false
     @State private var showDetachConfirmation: Bool = false
+    @State private var shareFileURL: URL?
+    @State private var isShowingFileShareSheet = false
     
     let palette: OpalitePalette
 
@@ -172,7 +174,12 @@ struct PaletteDetailView: View {
                     }
                     
                     Button {
-                        // TODO: share palette
+                        do {
+                            shareFileURL = try SharingService.exportPalette(palette)
+                            isShowingFileShareSheet = true
+                        } catch {
+                            // Export failed silently
+                        }
                     } label: {
                         Label("Share Palette", systemImage: "swatchpalette.fill")
                     }
@@ -188,6 +195,9 @@ struct PaletteDetailView: View {
         EmptyView()
             .background(
                 ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+            )
+            .background(
+                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
             )
     }
 }
