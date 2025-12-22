@@ -12,6 +12,7 @@ struct PaletteRowHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
     @State private var showDeleteConfirmation = false
     @State private var shareImage: UIImage?
+    @State private var shareImageTitle: String = "Shared from Opalite"
     @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
     @State private var shareFileURL: URL?
@@ -33,6 +34,7 @@ struct PaletteRowHeaderView: View {
                 Button {
                     if let image = gradientImage(from: palette.colors ?? []) {
                         shareImage = image
+                        shareImageTitle = palette.name
                         isShowingShareSheet = true
                     }
                 } label: {
@@ -142,7 +144,7 @@ struct PaletteRowHeaderView: View {
     private func shareSheet(image: UIImage?) -> some View {
         EmptyView()
             .background(
-                ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
             )
             .background(
                 FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)

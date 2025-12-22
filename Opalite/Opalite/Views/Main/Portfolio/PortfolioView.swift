@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 #if canImport(UIKit)
 import UIKit
@@ -19,6 +20,7 @@ struct PortfolioView: View {
     
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var shareImage: UIImage?
+    @State private var shareImageTitle: String = "Shared from Opalite"
     @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
     @State private var pendingPaletteToAddTo: OpalitePalette? = nil
@@ -26,7 +28,10 @@ struct PortfolioView: View {
     @State private var navigationPath = [PortfolioNavigationNode]()
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
-    
+    @State private var isShowingFileImporter = false
+    @State private var importError: String?
+    @State private var isShowingImportError = false
+
     @Namespace private var namespace
     @Namespace private var swatchNS
     
@@ -185,10 +190,22 @@ struct PortfolioView: View {
                         } catch {
                             // TODO: error handling
                         }
-                        
+
                         isShowingColorEditor.toggle()
                     }
                 )
+            }
+            .fileImporter(
+                isPresented: $isShowingFileImporter,
+                allowedContentTypes: [.opaliteColor, .opalitePalette],
+                allowsMultipleSelection: false
+            ) { result in
+                handleFileImport(result)
+            }
+            .alert("Import Error", isPresented: $isShowingImportError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(importError ?? "An unknown error occurred.")
             }
             .toolbar {
                 if isIPadOrMac && !colorManager.isSwatchBarOpen {
@@ -220,15 +237,10 @@ struct PortfolioView: View {
                         Button(action: {
                             isShowingColorEditor.toggle()
                         }, label: {
-                            HStack {
-                                Image(systemName: "paintpalette.fill")
-                                    .foregroundStyle(.green)
-                                
-                                Text("New Color")
-                                    .bold()
-                            }
+                            Label("New Color", systemImage: "paintpalette.fill")
                         })
-                        
+                        .tint(.blue)
+
                         Button(action: {
                             do {
                                 try colorManager.createPalette(name: "New Palette")
@@ -236,13 +248,15 @@ struct PortfolioView: View {
                                 // TODO: error handling
                             }
                         }, label: {
-                            HStack {
-                                Image(systemName: "swatchpalette.fill")
-                                    .foregroundStyle(.purple, .orange, .red)
-                                
-                                Text("New Palette")
-                                    .bold()
-                            }
+                            Label("New Palette", systemImage: "swatchpalette.fill")
+                        })
+
+                        Divider()
+
+                        Button(action: {
+                            isShowingFileImporter = true
+                        }, label: {
+                            Label("Import From File", systemImage: "square.and.arrow.down")
                         })
                     } label: {
                         Label("Create", systemImage: "plus")
@@ -257,13 +271,69 @@ struct PortfolioView: View {
     private func shareSheet(image: UIImage?) -> some View {
         EmptyView()
             .background(
-                ShareSheetPresenter(image: image, isPresented: $isShowingShareSheet)
+                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
             )
             .background(
                 FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
             )
     }
     
+    private func handleFileImport(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+
+            // Gain security-scoped access
+            guard url.startAccessingSecurityScopedResource() else {
+                importError = "Unable to access the selected file."
+                isShowingImportError = true
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+
+            let pathExtension = url.pathExtension.lowercased()
+
+            do {
+                if pathExtension == "opalitecolor" {
+                    let preview = try SharingService.previewColorImport(
+                        from: url,
+                        existingColors: colorManager.colors
+                    )
+                    if preview.willSkip {
+                        importError = "This color already exists in your portfolio."
+                        isShowingImportError = true
+                    } else {
+                        _ = try colorManager.createColor(existing: preview.color)
+                        Task { await colorManager.refreshAll() }
+                    }
+                } else if pathExtension == "opalitepalette" {
+                    let preview = try SharingService.previewPaletteImport(
+                        from: url,
+                        existingPalettes: colorManager.palettes,
+                        existingColors: colorManager.colors
+                    )
+                    if preview.willUpdate {
+                        importError = "A palette with this ID already exists."
+                        isShowingImportError = true
+                    } else {
+                        _ = try colorManager.createPalette(existing: preview.palette)
+                        Task { await colorManager.refreshAll() }
+                    }
+                } else {
+                    importError = "Unsupported file type."
+                    isShowingImportError = true
+                }
+            } catch {
+                importError = error.localizedDescription
+                isShowingImportError = true
+            }
+
+        case .failure(let error):
+            importError = error.localizedDescription
+            isShowingImportError = true
+        }
+    }
+
     @ViewBuilder
     private func menuContent(color: OpaliteColor, palette: OpalitePalette? = nil) -> AnyView {
         AnyView(
@@ -287,6 +357,7 @@ struct PortfolioView: View {
                 Button {
                     if let image = solidColorImage(from: color) {
                         shareImage = image
+                        shareImageTitle = color.name ?? color.hexString
                         isShowingShareSheet = true
                     }
                 } label: {

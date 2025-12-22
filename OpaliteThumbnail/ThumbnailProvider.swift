@@ -13,7 +13,6 @@ class ThumbnailProvider: QLThumbnailProvider {
     override func provideThumbnail(for request: QLFileThumbnailRequest, _ handler: @escaping (QLThumbnailReply?, Error?) -> Void) {
 
         let maximumSize = request.maximumSize
-        let scale = request.scale
 
         do {
             let data = try Data(contentsOf: request.fileURL)
@@ -31,10 +30,10 @@ class ThumbnailProvider: QLThumbnailProvider {
                     return
                 }
 
-                let reply = QLThumbnailReply(contextSize: maximumSize) { context -> Bool in
-                    self.drawColorThumbnail(color: color, in: context, size: maximumSize, scale: scale)
+                let reply = QLThumbnailReply(contextSize: maximumSize, currentContextDrawing: { () -> Bool in
+                    self.drawColorThumbnail(color: color, size: maximumSize)
                     return true
-                }
+                })
                 handler(reply, nil)
 
             } else if pathExtension == "opalitepalette" {
@@ -46,10 +45,10 @@ class ThumbnailProvider: QLThumbnailProvider {
 
                 let colors = colorDicts.compactMap { decodeColor(from: $0) }
 
-                let reply = QLThumbnailReply(contextSize: maximumSize) { context -> Bool in
-                    self.drawPaletteThumbnail(colors: colors, in: context, size: maximumSize, scale: scale)
+                let reply = QLThumbnailReply(contextSize: maximumSize, currentContextDrawing: { () -> Bool in
+                    self.drawPaletteThumbnail(colors: colors, size: maximumSize)
                     return true
-                }
+                })
                 handler(reply, nil)
             } else {
                 handler(nil, ThumbnailError.invalidFormat)
@@ -74,32 +73,35 @@ class ThumbnailProvider: QLThumbnailProvider {
 
     // MARK: - Drawing
 
-    private func drawColorThumbnail(color: UIColor, in context: CGContext, size: CGSize, scale: CGFloat) {
-        let rect = CGRect(origin: .zero, size: size)
-        let cornerRadius: CGFloat = min(size.width, size.height) * 0.15
-
-        // Draw rounded rectangle with color
-        let path = UIBezierPath(roundedRect: rect.insetBy(dx: 2, dy: 2), cornerRadius: cornerRadius)
-        context.addPath(path.cgPath)
-        context.setFillColor(color.cgColor)
-        context.fillPath()
-
-        // Draw border
-        context.addPath(path.cgPath)
-        context.setStrokeColor(UIColor.systemGray4.cgColor)
-        context.setLineWidth(2)
-        context.strokePath()
-    }
-
-    private func drawPaletteThumbnail(colors: [UIColor], in context: CGContext, size: CGSize, scale: CGFloat) {
+    private func drawColorThumbnail(color: UIColor, size: CGSize) {
         let rect = CGRect(origin: .zero, size: size)
         let cornerRadius: CGFloat = min(size.width, size.height) * 0.15
         let insetRect = rect.insetBy(dx: 2, dy: 2)
 
-        // Create clipping path
+        let path = UIBezierPath(roundedRect: insetRect, cornerRadius: cornerRadius)
+
+        // Fill with color
+        color.setFill()
+        path.fill()
+
+        // Draw border
+        UIColor.systemGray4.setStroke()
+        path.lineWidth = 2
+        path.stroke()
+    }
+
+    private func drawPaletteThumbnail(colors: [UIColor], size: CGSize) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+
+        let rect = CGRect(origin: .zero, size: size)
+        let cornerRadius: CGFloat = min(size.width, size.height) * 0.15
+        let insetRect = rect.insetBy(dx: 2, dy: 2)
+
         let clipPath = UIBezierPath(roundedRect: insetRect, cornerRadius: cornerRadius)
-        context.addPath(clipPath.cgPath)
-        context.clip()
+
+        // Save state and clip
+        context.saveGState()
+        clipPath.addClip()
 
         // Draw gradient with all colors
         let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -114,12 +116,11 @@ class ThumbnailProvider: QLThumbnailProvider {
             )
         }
 
-        // Reset clip and draw border
-        context.resetClip()
-        context.addPath(clipPath.cgPath)
-        context.setStrokeColor(UIColor.systemGray4.cgColor)
-        context.setLineWidth(2)
-        context.strokePath()
+        // Restore state and draw border
+        context.restoreGState()
+        UIColor.systemGray4.setStroke()
+        clipPath.lineWidth = 2
+        clipPath.stroke()
     }
 }
 

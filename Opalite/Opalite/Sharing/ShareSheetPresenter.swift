@@ -6,10 +6,51 @@
 //
 
 import SwiftUI
+import LinkPresentation
+
+// MARK: - Image Activity Item Source
+
+final class ImageActivityItemSource: NSObject, UIActivityItemSource {
+    let image: UIImage
+    let title: String
+
+    init(image: UIImage, title: String) {
+        self.image = image
+        self.title = title
+    }
+
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        image
+    }
+
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        image
+    }
+
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        title
+    }
+
+    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
+        let metadata = LPLinkMetadata()
+        metadata.title = title
+        metadata.imageProvider = NSItemProvider(object: image)
+        return metadata
+    }
+}
+
+// MARK: - Share Sheet Presenter
 
 struct ShareSheetPresenter: UIViewControllerRepresentable {
     let image: UIImage?
+    let title: String
     @Binding var isPresented: Bool
+
+    init(image: UIImage?, title: String = "Shared from Opalite", isPresented: Binding<Bool>) {
+        self.image = image
+        self.title = title
+        self._isPresented = isPresented
+    }
 
     func makeUIViewController(context: Context) -> UIViewController {
         UIViewController()
@@ -17,7 +58,8 @@ struct ShareSheetPresenter: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         guard isPresented, let image else { return }
-        let activity = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        let itemSource = ImageActivityItemSource(image: image, title: title)
+        let activity = UIActivityViewController(activityItems: [itemSource], applicationActivities: nil)
         activity.completionWithItemsHandler = { _, _, _, _ in
             DispatchQueue.main.async { isPresented = false }
         }

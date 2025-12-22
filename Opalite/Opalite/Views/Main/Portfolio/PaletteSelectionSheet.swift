@@ -17,25 +17,50 @@ struct PaletteSelectionSheet: View {
     @State private var newPaletteName: String = ""
     @State private var isCreating: Bool = false
 
+    private var canCreate: Bool {
+        !newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isCreating
+    }
+
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    VStack(alignment: .leading, spacing: 10) {
-                        TextField("New palette name", text: $newPaletteName)
-                            .textInputAutocapitalization(.words)
-                            .textFieldStyle(.roundedBorder)
+                    VStack(spacing: 12) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "character.cursor.ibeam")
+                                .foregroundStyle(.secondary)
+                                .font(.body)
+
+                            TextField("Palette name", text: $newPaletteName)
+                                .textInputAutocapitalization(.words)
+                                .submitLabel(.done)
+                                .onSubmit {
+                                    if canCreate {
+                                        createNewPaletteAndAttach()
+                                    }
+                                }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 10))
 
                         Button {
                             createNewPaletteAndAttach()
                         } label: {
-                            Label("Create New Palette", systemImage: "plus.square.on.square")
-                                .font(.headline)
-                                .labelStyle(.titleOnly)
+                            HStack {
+                                Spacer()
+                                Label("Create New Palette", systemImage: "plus")
+                                    .font(.headline)
+                                Spacer()
+                            }
+                            .padding(.vertical, 10)
+                            .foregroundStyle(.white)
                         }
-                        .disabled(isCreating)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!canCreate)
                     }
-                    .padding(.vertical, 6)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                 } header: {
                     Text("Create")
                 }
@@ -85,12 +110,6 @@ struct PaletteSelectionSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                }
-            }
-            .onAppear {
-                // A friendly default name
-                if newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    newPaletteName = "New Palette"
                 }
             }
         }

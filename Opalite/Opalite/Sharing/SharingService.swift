@@ -61,7 +61,13 @@ enum SharingService {
     static func exportColor(_ color: OpaliteColor) throws -> URL {
         do {
             let data = try color.jsonRepresentation()
-            let filename = sanitizeFilename(color.name ?? color.hexString) + ".opalitecolor"
+            let baseName: String
+            if let name = color.name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                baseName = sanitizeFilename(name)
+            } else {
+                baseName = filenameFromHex(color.hexString)
+            }
+            let filename = baseName + ".opalitecolor"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
             try data.write(to: tempURL)
             return tempURL
@@ -249,10 +255,29 @@ enum SharingService {
     // MARK: - Helpers
 
     private static func sanitizeFilename(_ name: String) -> String {
-        let sanitized = name
+        // Capitalize first letter of each word and remove whitespace
+        let words = name
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "[^A-Za-z0-9_-]+", with: "-", options: .regularExpression)
-            .lowercased()
-        return sanitized.isEmpty ? "untitled" : sanitized
+            .components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+
+        let capitalized = words.map { word -> String in
+            guard let first = word.first else { return word }
+            return first.uppercased() + word.dropFirst()
+        }.joined()
+
+        // Remove any non-alphanumeric characters except underscore and hyphen
+        let sanitized = capitalized.replacingOccurrences(
+            of: "[^A-Za-z0-9_-]",
+            with: "",
+            options: .regularExpression
+        )
+
+        return sanitized.isEmpty ? "Untitled" : sanitized
+    }
+
+    /// Creates a clean filename from a hex code (e.g., "#FF5733" -> "FF5733")
+    private static func filenameFromHex(_ hex: String) -> String {
+        hex.replacingOccurrences(of: "#", with: "")
     }
 }
