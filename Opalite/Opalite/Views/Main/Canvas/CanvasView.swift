@@ -37,8 +37,16 @@ struct CanvasView: View {
     @State private var showPhotosPicker: Bool = false
     @State private var showFilesPicker: Bool = false
 
+    // MARK: - Color Sampling State
+    @State private var isColorSampling: Bool = false
+    @State private var sampledColor: UIColor? = nil
+    @State private var samplingLocation: CGPoint? = nil
+
     // MARK: - Background Image (flattened placed images)
     @State private var backgroundImage: UIImage? = nil
+
+    // MARK: - Canvas Size
+    @State private var effectiveCanvasSize: CGSize? = nil
 
     var body: some View {
         ZStack {
@@ -52,7 +60,8 @@ struct CanvasView: View {
                 inkColor: $selectedInkColor,
                 forceColorUpdate: forceColorUpdate,
                 appearTrigger: appearTrigger,
-                backgroundImage: backgroundImage
+                backgroundImage: backgroundImage,
+                canvasSize: effectiveCanvasSize
             )
 
             // Shape placement overlay
@@ -138,18 +147,27 @@ struct CanvasView: View {
                     )
                 }
             }
+
+            // Color sampling overlay
+            if isColorSampling {
+                colorSamplingOverlay
+            }
         }
         .environment(\.colorScheme, .light)
         .id(canvasFile.id)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         .onAppear {
             drawing = canvasManager.loadDrawing(from: canvasFile)
             backgroundImage = canvasManager.loadBackgroundImage(from: canvasFile)
+            initializeCanvasSize()
             appearTrigger = UUID()
         }
         .onChange(of: canvasFile.id) { _, _ in
             drawing = canvasManager.loadDrawing(from: canvasFile)
             backgroundImage = canvasManager.loadBackgroundImage(from: canvasFile)
+            initializeCanvasSize()
         }
         .onChange(of: drawing) { _, newValue in
             do {
@@ -168,6 +186,7 @@ struct CanvasView: View {
             ToolbarItem(placement: .principal) {
                 Text(canvasFile.title)
                     .font(.headline)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
@@ -178,6 +197,14 @@ struct CanvasView: View {
                     showRenameTitleAlert = true
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
+                }
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isColorSampling = true
+                } label: {
+                    Label("Sample Color", systemImage: "eyedropper")
                 }
             }
 
@@ -208,6 +235,13 @@ struct CanvasView: View {
                     }
 
                     Section {
+                        Button {
+                            flattenCanvas()
+                        } label: {
+                            Label("Flatten Canvas", systemImage: "square.on.square.squareshape.controlhandles")
+                        }
+                        .disabled(drawing.strokes.isEmpty)
+
                         Button(role: .destructive) {
                             showClearConfirmation = true
                         } label: {
@@ -308,6 +342,203 @@ struct CanvasView: View {
             // TODO: error handling
         }
         showRenameTitleAlert = false
+    }
+
+    // MARK: - Canvas Size Management
+    private func initializeCanvasSize() {
+        // Use stored canvas size if available, otherwise use current screen size
+        if let storedSize = canvasFile.canvasSize {
+            effectiveCanvasSize = storedSize
+        } else {
+            // First time opening - set the canvas size to current screen
+            let screenSize = UIScreen.main.bounds.size
+            canvasFile.setCanvasSize(screenSize)
+            effectiveCanvasSize = screenSize
+            do {
+                try canvasManager.saveContext()
+            } catch {
+                // Ignore save errors for canvas size
+            }
+        }
+    }
+
+    private func getEffectiveCanvasSize() -> CGSize {
+        effectiveCanvasSize ?? UIScreen.main.bounds.size
+    }
+
+    /// Flattens current strokes into the background image, making them permanent and scalable.
+    private func flattenCanvas() {
+        guard !drawing.strokes.isEmpty else { return }
+
+        let canvasSize = getEffectiveCanvasSize()
+        let scale: CGFloat = 2.0
+
+        UIGraphicsBeginImageContextWithOptions(canvasSize, true, scale)
+        defer { UIGraphicsEndImageContext() }
+
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+
+        // Draw white background
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(CGRect(origin: .zero, size: canvasSize))
+
+        // Draw existing background if any
+        if let existingBackground = backgroundImage {
+            existingBackground.draw(in: CGRect(origin: .zero, size: canvasSize))
+        }
+
+        // Draw current strokes
+        let drawingImage = drawing.image(from: CGRect(origin: .zero, size: canvasSize), scale: scale)
+        drawingImage.draw(at: .zero)
+
+        guard let compositeImage = UIGraphicsGetImageFromCurrentImageContext() else { return }
+
+        // Clear strokes and update background
+        drawing = PKDrawing()
+        backgroundImage = compositeImage
+
+        do {
+            try canvasManager.saveBackgroundImage(compositeImage, to: canvasFile)
+            try canvasManager.saveDrawing(drawing, to: canvasFile)
+        } catch {
+            // TODO: error handling
+        }
+    }
+
+    // MARK: - Color Sampling
+
+    @ViewBuilder
+    private var colorSamplingOverlay: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Semi-transparent background
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+
+                // Crosshair and color preview at sampling location
+                if let location = samplingLocation, let color = sampledColor {
+                    VStack(spacing: 0) {
+                        // Color preview circle
+                        Circle()
+                            .fill(Color(uiColor: color))
+                            .frame(width: 60, height: 60)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 3)
+                            )
+                            .shadow(radius: 4)
+
+                        // Crosshair line
+                        Rectangle()
+                            .fill(Color.white)
+                            .frame(width: 2, height: 20)
+                    }
+                    .position(x: location.x, y: location.y - 50)
+                }
+            }
+            .overlay(alignment: .top) {
+                VStack(spacing: 12) {
+                    Text("Tap to sample a color")
+                        .font(.headline)
+
+                    if sampledColor != nil {
+                        Text("Tap again to save, or drag to adjust")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Button("Cancel") {
+                        isColorSampling = false
+                        sampledColor = nil
+                        samplingLocation = nil
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding()
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.top, 80)
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        samplingLocation = value.location
+                        sampledColor = sampleColor(at: value.location, in: geometry.size)
+                    }
+                    .onEnded { value in
+                        if let color = sampledColor {
+                            saveColorToPortfolio(color)
+                        }
+                        isColorSampling = false
+                        sampledColor = nil
+                        samplingLocation = nil
+                    }
+            )
+        }
+    }
+
+    private func sampleColor(at point: CGPoint, in viewSize: CGSize) -> UIColor? {
+        // First, try to sample from the background image
+        if let bgImage = backgroundImage {
+            // Convert point to image coordinates
+            let imageSize = bgImage.size
+            let scaleX = imageSize.width / viewSize.width
+            let scaleY = imageSize.height / viewSize.height
+            let imagePoint = CGPoint(x: point.x * scaleX, y: point.y * scaleY)
+
+            if let color = bgImage.pixelColor(at: imagePoint) {
+                return color
+            }
+        }
+
+        // If no background or point is outside, sample from the drawing
+        // Create a snapshot of the current canvas state
+        let canvasSize = getEffectiveCanvasSize()
+        UIGraphicsBeginImageContextWithOptions(canvasSize, true, 1.0)
+        defer { UIGraphicsEndImageContext() }
+
+        guard let context = UIGraphicsGetCurrentContext() else { return .white }
+
+        // Draw white background
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(CGRect(origin: .zero, size: canvasSize))
+
+        // Draw background image if present
+        if let bgImage = backgroundImage {
+            bgImage.draw(in: CGRect(origin: .zero, size: canvasSize))
+        }
+
+        // Draw the PKDrawing
+        let drawingImage = drawing.image(from: CGRect(origin: .zero, size: canvasSize), scale: 1.0)
+        drawingImage.draw(at: .zero)
+
+        guard let snapshot = UIGraphicsGetImageFromCurrentImageContext() else { return .white }
+
+        // Convert view point to snapshot coordinates
+        let scaleX = canvasSize.width / viewSize.width
+        let scaleY = canvasSize.height / viewSize.height
+        let snapshotPoint = CGPoint(x: point.x * scaleX, y: point.y * scaleY)
+
+        return snapshot.pixelColor(at: snapshotPoint) ?? .white
+    }
+
+    private func saveColorToPortfolio(_ color: UIColor) {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+
+        do {
+            _ = try colorManager.createColor(
+                name: nil,
+                notes: "Sampled from \(canvasFile.title)",
+                device: nil,
+                red: Double(r),
+                green: Double(g),
+                blue: Double(b),
+                alpha: Double(a)
+            )
+        } catch {
+            // TODO: error handling
+        }
     }
 
     // MARK: - Shape Placement
@@ -508,8 +739,8 @@ struct CanvasView: View {
     // MARK: - Image Placement
 
     private func placeImage(_ image: UIImage, at center: CGPoint, rotation: Angle) {
-        // Get the canvas size (use screen bounds as approximation)
-        let canvasSize = UIScreen.main.bounds.size
+        // Use the stored canvas size
+        let canvasSize = getEffectiveCanvasSize()
 
         // Calculate the image size (max 200pt dimension, preserving aspect ratio)
         let maxDimension: CGFloat = 200
@@ -521,13 +752,18 @@ struct CanvasView: View {
             imageSize = CGSize(width: maxDimension * aspectRatio, height: maxDimension)
         }
 
-        // Flatten the image to the background
-        flattenToBackground(image: image, at: center, rotation: rotation, size: imageSize, canvasSize: canvasSize)
+        // Flatten everything into the drawing
+        flattenImageIntoDrawing(image: image, at: center, rotation: rotation, size: imageSize, canvasSize: canvasSize)
     }
 
-    private func flattenToBackground(image: UIImage, at center: CGPoint, rotation: Angle, size: CGSize, canvasSize: CGSize) {
-        // Create a new image context
-        UIGraphicsBeginImageContextWithOptions(canvasSize, false, UIScreen.main.scale)
+    /// Flattens the placed image along with existing strokes into a new composite drawing.
+    /// This ensures images scale properly with the canvas.
+    private func flattenImageIntoDrawing(image: UIImage, at center: CGPoint, rotation: Angle, size: CGSize, canvasSize: CGSize) {
+        // Use a consistent scale for quality
+        let scale: CGFloat = 2.0
+
+        // Create a composite image of everything
+        UIGraphicsBeginImageContextWithOptions(canvasSize, true, scale)
         defer { UIGraphicsEndImageContext() }
 
         guard let context = UIGraphicsGetCurrentContext() else { return }
@@ -536,19 +772,23 @@ struct CanvasView: View {
         context.setFillColor(UIColor.white.cgColor)
         context.fill(CGRect(origin: .zero, size: canvasSize))
 
-        // Draw existing background image if any
+        // Draw existing flattened content if any
         if let existingBackground = backgroundImage {
-            existingBackground.draw(at: .zero)
+            existingBackground.draw(in: CGRect(origin: .zero, size: canvasSize))
         }
 
-        // Save state before transformations
+        // Draw existing PKDrawing strokes
+        let drawingImage = drawing.image(from: CGRect(origin: .zero, size: canvasSize), scale: scale)
+        drawingImage.draw(at: .zero)
+
+        // Save state before transformations for the new image
         context.saveGState()
 
         // Move to center point and apply rotation
         context.translateBy(x: center.x, y: center.y)
         context.rotate(by: CGFloat(rotation.radians))
 
-        // Draw the new image centered at the origin (which is now at center point)
+        // Draw the new image centered at the origin
         let drawRect = CGRect(
             x: -size.width / 2,
             y: -size.height / 2,
@@ -563,15 +803,60 @@ struct CanvasView: View {
         // Get the composited image
         guard let compositeImage = UIGraphicsGetImageFromCurrentImageContext() else { return }
 
+        // Clear the PKDrawing strokes (they're now in the composite)
+        drawing = PKDrawing()
+
         // Update the background image state
         backgroundImage = compositeImage
 
-        // Save to the canvas file
+        // Save both the cleared drawing and new background
         do {
             try canvasManager.saveBackgroundImage(compositeImage, to: canvasFile)
+            try canvasManager.saveDrawing(drawing, to: canvasFile)
         } catch {
             // TODO: error handling
         }
+    }
+}
+
+// MARK: - UIImage Color Sampling Extension
+
+private extension UIImage {
+    func pixelColor(at point: CGPoint) -> UIColor? {
+        guard let cgImage = self.cgImage else { return nil }
+
+        let width = cgImage.width
+        let height = cgImage.height
+
+        // Ensure point is within bounds
+        let x = Int(point.x)
+        let y = Int(point.y)
+        guard x >= 0, x < width, y >= 0, y < height else { return nil }
+
+        // Create a 1x1 pixel context to read the color
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        var pixelData: [UInt8] = [0, 0, 0, 0]
+
+        guard let context = CGContext(
+            data: &pixelData,
+            width: 1,
+            height: 1,
+            bitsPerComponent: 8,
+            bytesPerRow: 4,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+
+        // Draw the single pixel
+        context.draw(cgImage, in: CGRect(x: -CGFloat(x), y: -CGFloat(y), width: CGFloat(width), height: CGFloat(height)))
+
+        // Extract color components
+        let red = CGFloat(pixelData[0]) / 255.0
+        let green = CGFloat(pixelData[1]) / 255.0
+        let blue = CGFloat(pixelData[2]) / 255.0
+        let alpha = CGFloat(pixelData[3]) / 255.0
+
+        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
 

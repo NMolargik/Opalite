@@ -250,6 +250,7 @@ struct PortfolioView: View {
                         }, label: {
                             Label("New Palette", systemImage: "swatchpalette.fill")
                         })
+                        .tint(.purple)
 
                         Divider()
 

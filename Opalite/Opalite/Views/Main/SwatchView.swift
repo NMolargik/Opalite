@@ -220,7 +220,7 @@ struct SwatchView: View {
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
                                 .imageScale(.large)
-                                .foregroundStyle(.white, .green)
+                                .foregroundStyle(fill.first?.idealTextColor() ?? .black, .green)
                         }
                         .contentShape(Circle())
                         .hoverEffect(.lift)

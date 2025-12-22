@@ -14,6 +14,7 @@ struct PencilKitCanvas: View {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var backgroundImage: UIImage?
+    var canvasSize: CGSize?
 
     var body: some View {
         CanvasDetail_PencilKitRepresentable(
@@ -21,7 +22,8 @@ struct PencilKitCanvas: View {
             inkColor: $inkColor,
             forceColorUpdate: forceColorUpdate,
             appearTrigger: appearTrigger,
-            backgroundImage: backgroundImage
+            backgroundImage: backgroundImage,
+            canvasSize: canvasSize
         )
         .ignoresSafeArea(edges: .bottom)
     }
@@ -34,6 +36,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var backgroundImage: UIImage?
+    var canvasSize: CGSize?
 
     func makeUIView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
@@ -41,14 +44,27 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         view.backgroundColor = .clear
         view.isOpaque = false
         view.alwaysBounceVertical = true
+        view.alwaysBounceHorizontal = true
         view.drawingPolicy = .default
         view.delegate = context.coordinator
 
-        // Add background image view
+        // Enable zooming
+        view.minimumZoomScale = 0.5
+        view.maximumZoomScale = 4.0
+        view.bouncesZoom = true
+
+        // Set content size if we have a stored canvas size
+        if let size = canvasSize {
+            view.contentSize = size
+            context.coordinator.storedCanvasSize = size
+        }
+
+        // Add background image view - scales with content
         let imageView = UIImageView()
-        imageView.contentMode = .topLeft
-        imageView.frame = view.bounds
-        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        imageView.contentMode = .scaleToFill
+        imageView.clipsToBounds = true
+        let contentSize = canvasSize ?? view.bounds.size
+        imageView.frame = CGRect(origin: .zero, size: contentSize)
         imageView.image = backgroundImage
         view.insertSubview(imageView, at: 0)
         context.coordinator.backgroundImageView = imageView
@@ -74,9 +90,20 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             uiView.drawing = drawing
         }
 
+        // Update canvas size if it changed
+        if let size = canvasSize, context.coordinator.storedCanvasSize != size {
+            context.coordinator.storedCanvasSize = size
+            uiView.contentSize = size
+            context.coordinator.backgroundImageView?.frame = CGRect(origin: .zero, size: size)
+        }
+
         // Update background image if changed
         if context.coordinator.backgroundImageView?.image !== backgroundImage {
             context.coordinator.backgroundImageView?.image = backgroundImage
+            // Ensure the image view frame matches the canvas size
+            if let size = canvasSize {
+                context.coordinator.backgroundImageView?.frame = CGRect(origin: .zero, size: size)
+            }
         }
 
         // Re-attach tool picker when view reappears
@@ -123,6 +150,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         var isProgrammaticToolChange = false
         var lastForceColorUpdate: UUID?
         var lastAppearTrigger: UUID?
+        var storedCanvasSize: CGSize?
 
         init(drawing: Binding<PKDrawing>) {
             _drawing = drawing
@@ -179,6 +207,7 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var backgroundImage: UIImage?
+    var canvasSize: CGSize?
 
     func makeNSView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()

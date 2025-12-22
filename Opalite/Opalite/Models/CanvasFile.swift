@@ -21,6 +21,11 @@ final class CanvasFile {
     // Optional bookkeeping for future conflict/debug use
     var lastEditedDeviceName: String? = nil
 
+    // MARK: - Canvas Dimensions
+    // Store the canvas size to maintain consistency across devices
+    var canvasWidth: Double = 0
+    var canvasHeight: Double = 0
+
     // MARK: - PencilKit Drawing Data
     // Store rich, editable drawing data (PKDrawing.dataRepresentation())
     @Attribute(.externalStorage)
@@ -72,5 +77,31 @@ extension CanvasFile {
     func saveBackgroundImage(_ image: UIImage?) {
         self.backgroundImageData = image?.pngData()
         self.updatedAt = Date()
+    }
+
+    /// Get the canvas size, or nil if not yet set
+    var canvasSize: CGSize? {
+        guard canvasWidth > 0 && canvasHeight > 0 else { return nil }
+        return CGSize(width: canvasWidth, height: canvasHeight)
+    }
+
+    /// Set the canvas size (typically done once when first opened or when placing content)
+    func setCanvasSize(_ size: CGSize) {
+        // Only set if not already set, to preserve original canvas dimensions
+        guard canvasWidth == 0 && canvasHeight == 0 else { return }
+        self.canvasWidth = size.width
+        self.canvasHeight = size.height
+        self.updatedAt = Date()
+    }
+
+    /// Force update the canvas size (for expanding canvas to fit content)
+    func expandCanvasIfNeeded(to size: CGSize) {
+        let newWidth = max(canvasWidth, size.width)
+        let newHeight = max(canvasHeight, size.height)
+        if newWidth != canvasWidth || newHeight != canvasHeight {
+            self.canvasWidth = newWidth
+            self.canvasHeight = newHeight
+            self.updatedAt = Date()
+        }
     }
 }
