@@ -11,41 +11,89 @@ struct NotesSectionView: View {
     @Binding var notes: String
     @Binding var isSaving: Bool
     let onSave: () -> Void
+
     @State private var originalNotes: String = ""
+    @State private var debounceTask: Task<Void, Never>?
+    @State private var lastSavedAt: Date?
 
     var body: some View {
         SectionCard(title: "Notes", systemImage: "note.text") {
-            VStack(alignment: .leading, spacing: 12) {
-                TextEditor(text: $notes)
-                    .frame(minHeight: 160)
-                    .onAppear { originalNotes = notes }
+            VStack(alignment: .leading, spacing: 10) {
 
-                let isDirty = notes.trimmingCharacters(in: .whitespacesAndNewlines) != originalNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+                ZStack(alignment: .topLeading) {
+                    TextEditor(text: $notes)
+                        .scrollContentBackground(.hidden)
+                        .frame(minHeight: 160)
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(.white.opacity(0.5))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(.white.opacity(0.08), lineWidth: 1)
+                        )
 
-                HStack {
-                    Spacer()
-
-                    Button {
-                        onSave()
-                    } label: {
-                        HStack(spacing: 8) {
-                            if isSaving {
-                                ProgressView()
-                            }
-                            Text("Save")
-                                .bold()
-                        }
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .frame(height: 34)
-                        .glassEffect(.clear.tint(.blue).interactive())
+                    if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("Add any notes for this color…")
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 20)
+                            .allowsHitTesting(false)
                     }
-                    .disabled(isSaving || !isDirty)
-                    .opacity((isSaving || !isDirty) ? 0.6 : 1.0)
                 }
             }
             .padding([.horizontal, .bottom])
+            .onAppear {
+                originalNotes = notes
+            }
+            .onDisappear {
+                debounceTask?.cancel()
+                debounceTask = nil
+            }
+            .onChange(of: notes) { _, _ in
+                scheduleAutosaveIfNeeded()
+            }
+            .onChange(of: isSaving) { _, newValue in
+                if newValue == false {
+                    // When a save finishes, treat the current value as the baseline.
+                    originalNotes = notes
+                    lastSavedAt = Date()
+                }
+            }
         }
+    }
+
+    private var isDirty: Bool {
+        notes.trimmingCharacters(in: .whitespacesAndNewlines) != originalNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    private func scheduleAutosaveIfNeeded() {
+        debounceTask?.cancel()
+
+        // Don't queue saves while a save is already in progress.
+        guard !isSaving else { return }
+
+        // If nothing changed relative to the last saved baseline, no need to save.
+        guard isDirty else { return }
+
+        debounceTask = Task { @MainActor in
+            // Debounce typing.
+            try? await Task.sleep(nanoseconds: 650_000_000)
+
+            // If user kept typing, or a save started, bail.
+            guard !Task.isCancelled else { return }
+            guard !isSaving else { return }
+            guard isDirty else { return }
+
+            onSave()
+        }
+    }
+
+    private func relativeTimeString(since date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

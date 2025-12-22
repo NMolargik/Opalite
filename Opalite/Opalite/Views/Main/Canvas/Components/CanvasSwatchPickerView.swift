@@ -56,8 +56,7 @@ struct CanvasSwatchPickerView: View {
         }
         .frame(height: swatchSize + 16)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal)
+        .clipShape(Rectangle())
     }
 
     @ViewBuilder
