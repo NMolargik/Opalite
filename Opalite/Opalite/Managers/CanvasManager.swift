@@ -25,6 +25,9 @@ final class CanvasManager {
     // MARK: - Cached data for views to consume
     var canvases: [CanvasFile] = []
 
+    /// Set this to request opening a specific canvas (used for cross-tab navigation)
+    var pendingCanvasToOpen: CanvasFile? = nil
+
     // MARK: - Sort
     private var canvasSort: [SortDescriptor<CanvasFile>] {
         [

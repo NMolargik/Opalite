@@ -237,9 +237,14 @@ struct PortfolioView: View {
                         Button(action: {
                             isShowingColorEditor.toggle()
                         }, label: {
-                            Label("New Color", systemImage: "paintpalette.fill")
+                            Label {
+                                Text("New Color")
+                            } icon: {
+                                Image(systemName: "paintpalette.fill")
+                                    .symbolRenderingMode(.monochrome)
+                                    .foregroundStyle(.blue)
+                            }
                         })
-                        .tint(.blue)
 
                         Button(action: {
                             do {
@@ -248,9 +253,14 @@ struct PortfolioView: View {
                                 // TODO: error handling
                             }
                         }, label: {
-                            Label("New Palette", systemImage: "swatchpalette.fill")
+                            Label {
+                                Text("New Palette")
+                            } icon: {
+                                Image(systemName: "swatchpalette.fill")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.purple, .orange, .red)
+                            }
                         })
-                        .tint(.purple)
 
                         Divider()
 

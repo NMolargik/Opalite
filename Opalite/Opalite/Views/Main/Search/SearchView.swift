@@ -11,9 +11,201 @@ import SwiftData
 struct SearchView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
-    
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    @Binding var selectedTab: Tabs
+
+    @State private var searchText: String = ""
+
+    // MARK: - Filtered Results
+
+    private var filteredColors: [OpaliteColor] {
+        guard !searchText.isEmpty else { return [] }
+        let query = searchText.lowercased()
+        return colorManager.colors.filter { color in
+            if let name = color.name, name.lowercased().contains(query) {
+                return true
+            }
+            if color.hexString.lowercased().contains(query) {
+                return true
+            }
+            return false
+        }
+    }
+
+    private var filteredPalettes: [OpalitePalette] {
+        guard !searchText.isEmpty else { return [] }
+        let query = searchText.lowercased()
+        return colorManager.palettes.filter { palette in
+            palette.name.lowercased().contains(query)
+        }
+    }
+
+    private var filteredCanvases: [CanvasFile] {
+        guard !searchText.isEmpty else { return [] }
+        let query = searchText.lowercased()
+        return canvasManager.canvases.filter { canvas in
+            canvas.title.lowercased().contains(query)
+        }
+    }
+
+    private var hasResults: Bool {
+        !filteredColors.isEmpty || !filteredPalettes.isEmpty || !filteredCanvases.isEmpty
+    }
+
+    // MARK: - Navigation
+
+    private func openCanvas(_ canvas: CanvasFile) {
+        if horizontalSizeClass == .compact {
+            // On iPhone, switch to canvas tab and request opening the canvas
+            canvasManager.pendingCanvasToOpen = canvas
+            selectedTab = .canvas
+        } else {
+            // On iPad, directly switch to the canvas body tab
+            selectedTab = .canvasBody(canvas)
+        }
+    }
+
     var body: some View {
-        Text("Search")
+        NavigationStack {
+            List {
+                if searchText.isEmpty {
+                    ContentUnavailableView(
+                        "Search Opalite",
+                        systemImage: "magnifyingglass",
+                        description: Text("Search for colors, palettes, or canvases")
+                    )
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                } else if !hasResults {
+                    ContentUnavailableView.search(text: searchText)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                } else {
+                    // MARK: - Colors Section
+                    if !filteredColors.isEmpty {
+                        Section {
+                            ForEach(filteredColors) { color in
+                                NavigationLink {
+                                    ColorDetailView(color: color)
+                                        .tint(.none)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color(
+                                                red: color.red,
+                                                green: color.green,
+                                                blue: color.blue,
+                                                opacity: color.alpha
+                                            ))
+                                            .frame(width: 32, height: 32)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .stroke(.secondary.opacity(0.3), lineWidth: 1)
+                                            )
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(color.name ?? "Unnamed Color")
+                                                .font(.body)
+                                            Text(color.hexString)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
+                        } header: {
+                            Label("Colors", systemImage: "paintpalette.fill")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+
+                    // MARK: - Palettes Section
+                    if !filteredPalettes.isEmpty {
+                        Section {
+                            ForEach(filteredPalettes) { palette in
+                                NavigationLink {
+                                    PaletteDetailView(palette: palette)
+                                        .tint(.none)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        // Mini palette preview
+                                        HStack(spacing: 0) {
+                                            ForEach(Array((palette.colors ?? []).prefix(4)), id: \.id) { color in
+                                                Rectangle()
+                                                    .fill(Color(
+                                                        red: color.red,
+                                                        green: color.green,
+                                                        blue: color.blue,
+                                                        opacity: color.alpha
+                                                    ))
+                                            }
+                                        }
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .stroke(.secondary.opacity(0.3), lineWidth: 1)
+                                        )
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(palette.name)
+                                                .font(.body)
+                                            Text("\(palette.colors?.count ?? 0) colors")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
+                        } header: {
+                            Label("Palettes", systemImage: "swatchpalette.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.purple, .orange, .red)
+                        }
+                    }
+
+                    // MARK: - Canvases Section
+                    if !filteredCanvases.isEmpty {
+                        Section {
+                            ForEach(filteredCanvases) { canvas in
+                                Button {
+                                    openCanvas(canvas)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "scribble.variable")
+                                            .font(.title2)
+                                            .foregroundStyle(.red)
+                                            .frame(width: 32, height: 32)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(canvas.title)
+                                                .font(.body)
+                                                .foregroundStyle(.primary)
+                                            Text(canvas.updatedAt, style: .relative)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+
+                                        Spacer()
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        } header: {
+                            Label("Canvases", systemImage: "pencil.and.scribble")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Search")
+            .searchable(text: $searchText, prompt: "Colors, palettes, canvases...")
+        }
     }
 }
 
@@ -28,9 +220,13 @@ struct SearchView: View {
     )
 
     let context = container.mainContext
+    let colorManager = ColorManager(context: context)
+    let canvasManager = CanvasManager(context: context)
+    try? colorManager.loadSamples()
+    try? canvasManager.loadSamples()
 
-    return SearchView()
+    return SearchView(selectedTab: .constant(.search))
         .modelContainer(container)
-        .environment(ColorManager(context: context))
-        .environment(CanvasManager(context: context))
+        .environment(colorManager)
+        .environment(canvasManager)
 }

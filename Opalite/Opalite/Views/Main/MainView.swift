@@ -39,7 +39,7 @@ struct MainView: View {
             
             // MARK: - Search Tab - All screens
             Tab(Tabs.search.name, systemImage: Tabs.search.symbol, value: .search, role: .search) {
-                SearchView()
+                SearchView(selectedTab: $selectedTab)
                     .tint(.none)
             }
             
