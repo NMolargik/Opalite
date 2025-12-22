@@ -89,12 +89,22 @@ struct SwatchRowView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .onDrop(of: [UTType.opaliteColorID], isTargeted: $isDropTargeted) { providers in
-            guard let provider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColorID.identifier) }) else {
+        .onDrop(of: [UTType.opaliteColor, UTType.opaliteColorID], isTargeted: $isDropTargeted) { providers in
+            // Try to handle full JSON color data first (cross-device drops)
+            if let jsonProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColor.identifier) }) {
+                jsonProvider.loadDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier) { data, _ in
+                    guard let data else { return }
+                    handleDroppedColorJSON(data)
+                }
+                return true
+            }
+
+            // Fall back to color ID (same-device drops)
+            guard let idProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColorID.identifier) }) else {
                 return false
             }
 
-            provider.loadItem(forTypeIdentifier: UTType.opaliteColorID.identifier, options: nil) { item, _ in
+            idProvider.loadItem(forTypeIdentifier: UTType.opaliteColorID.identifier, options: nil) { item, _ in
                 var idString: String?
                 if let data = item as? Data {
                     idString = String(data: data, encoding: .utf8)
@@ -107,26 +117,9 @@ struct SwatchRowView: View {
                 }
 
                 guard let idString, let uuid = UUID(uuidString: idString) else { return }
-
-                Task { @MainActor in
-                    var droppedColor = colorManager.colors.first(where: { $0.id == uuid })
-                    if droppedColor == nil {
-                        _ = try? colorManager.fetchColors()
-                        droppedColor = colorManager.colors.first(where: { $0.id == uuid })
-                    }
-                    guard let color = droppedColor else { return }
-
-                    withAnimation(.spring()) {
-                        if let palette {
-                            colorManager.attachColor(color, to: palette)
-                        } else {
-                            colorManager.detachColorFromPalette(color)
-                        }
-                    }
-                }
+                handleDroppedColorID(uuid)
             }
 
-            // Accept the drop; handling is async
             return true
         }
         .overlay(
@@ -175,6 +168,89 @@ struct SwatchRowView: View {
             menu: menuContent?(color),
             contextMenu: contextMenuContent?(color)
         )
+    }
+
+    // MARK: - Drop Handlers
+
+    /// Handle a dropped color by UUID (same-device drop - color exists locally)
+    private func handleDroppedColorID(_ uuid: UUID) {
+        Task { @MainActor in
+            var droppedColor = colorManager.colors.first(where: { $0.id == uuid })
+            if droppedColor == nil {
+                _ = try? colorManager.fetchColors()
+                droppedColor = colorManager.colors.first(where: { $0.id == uuid })
+            }
+            guard let color = droppedColor else { return }
+
+            withAnimation(.spring()) {
+                if let palette {
+                    colorManager.attachColor(color, to: palette)
+                } else {
+                    colorManager.detachColorFromPalette(color)
+                }
+            }
+        }
+    }
+
+    /// Handle a dropped color from JSON data (cross-device drop - need to import)
+    private func handleDroppedColorJSON(_ data: Data) {
+        Task { @MainActor in
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+
+            // Check if this color already exists by ID
+            if let idString = json["id"] as? String,
+               let uuid = UUID(uuidString: idString) {
+                // Try to find existing color first
+                var existingColor = colorManager.colors.first(where: { $0.id == uuid })
+                if existingColor == nil {
+                    _ = try? colorManager.fetchColors()
+                    existingColor = colorManager.colors.first(where: { $0.id == uuid })
+                }
+
+                if let color = existingColor {
+                    // Color exists locally, just attach/detach
+                    withAnimation(.spring()) {
+                        if let palette {
+                            colorManager.attachColor(color, to: palette)
+                        } else {
+                            colorManager.detachColorFromPalette(color)
+                        }
+                    }
+                    return
+                }
+            }
+
+            // Color doesn't exist locally - create it from the JSON data
+            guard let red = json["red"] as? Double,
+                  let green = json["green"] as? Double,
+                  let blue = json["blue"] as? Double else { return }
+
+            let alpha = json["alpha"] as? Double ?? 1.0
+            let name = json["name"] as? String
+            let notes = json["notes"] as? String
+            let createdByDisplayName = json["createdByDisplayName"] as? String
+
+            let newColor = OpaliteColor(
+                name: name,
+                notes: notes,
+                createdByDisplayName: createdByDisplayName,
+                red: red,
+                green: green,
+                blue: blue,
+                alpha: alpha
+            )
+
+            do {
+                let createdColor = try colorManager.createColor(existing: newColor)
+                withAnimation(.spring()) {
+                    if let palette {
+                        colorManager.attachColor(createdColor, to: palette)
+                    }
+                }
+            } catch {
+                // Import failed silently
+            }
+        }
     }
 }
 

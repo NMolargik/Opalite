@@ -29,6 +29,7 @@ struct OpaliteApp: App {
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
     let canvasManager: CanvasManager
+    let toastManager = ToastManager()
     let importCoordinator = ImportCoordinator()
 
     init() {
@@ -59,8 +60,9 @@ struct OpaliteApp: App {
     }
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             ContentView()
+                .toastContainer()
                 .onChange(of: scenePhase) { oldPhase, newPhase in
                     Task { @MainActor in
                         await colorManager.refreshAll()
@@ -120,20 +122,24 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(toastManager)
         .environment(importCoordinator)
 
 #if os(macOS)
         Window("SwatchBar", id: "swatchBar") {
             SwatchBarView()
+                .toastContainer()
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
-        .windowResizability(.contentMinSize)
-        .defaultSize(width: 56, height: 400)
+        .environment(toastManager)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 232, height: 500)
 #elseif os(iOS)
         WindowGroup(id: "swatchBar") {
             SwatchBarView()
+                .toastContainer()
                 .onAppear {
                     colorManager.isSwatchBarOpen = true
                 }
@@ -144,8 +150,9 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
-        .windowResizability(.contentMinSize)
-        .defaultSize(width: 56, height: 400)
+        .environment(toastManager)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 232, height: 500)
 #endif
     }
 }

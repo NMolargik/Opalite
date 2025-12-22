@@ -132,6 +132,12 @@ struct CanvasListView: View {
                     canvasToRename = nil
                 }
             }
+            .onChange(of: canvasManager.pendingCanvasToOpen) { _, newValue in
+                if let canvas = newValue {
+                    selectedCanvasFile = canvas
+                    canvasManager.pendingCanvasToOpen = nil
+                }
+            }
         }
     }
     

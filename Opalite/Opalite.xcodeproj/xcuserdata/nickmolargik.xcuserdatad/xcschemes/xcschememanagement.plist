@@ -7,22 +7,40 @@
 		<key>DeviceKitPlayground (Playground).xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>2</integer>
 		</dict>
 		<key>Opalite.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>3</integer>
 		</dict>
 		<key>OpaliteQuickLook.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</dict>
 		<key>OpaliteThumbnail.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>EB3BCAD32EF8B58F0059764A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EB3BCAED2EF8B7F40059764A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EBD4AD1B2EE48DF300012D16</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

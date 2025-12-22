@@ -10,12 +10,14 @@ import SwiftData
 
 struct SwatchBarView: View {
     @Environment(ColorManager.self) private var colorManager
-    
+    @Environment(\.openWindow) private var openWindow
+
     @State private var copiedColorID: UUID? = nil
     @State private var expandedPalettes: Set<UUID> = []
     @State private var showingSwatchBarInfo: Bool = false
-    
+
     private let swatchSize: CGFloat = 200
+    private let windowWidth: CGFloat = 232 // swatchSize + horizontal padding
 
     var body: some View {
         NavigationStack {
@@ -60,9 +62,19 @@ struct SwatchBarView: View {
                 }
             }
             .background(.ultraThinMaterial)
-            .navigationTitle("Opalite SwatchBar")
+            .frame(width: windowWidth)
+            .navigationTitle("SwatchBar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        openWindow(id: "main")
+                    } label: {
+                        Label("Open Opalite", systemImage: "macwindow")
+                    }
+                    .tint(.red)
+                }
+
                 ToolbarItem {
                     Button {
                         showingSwatchBarInfo = true

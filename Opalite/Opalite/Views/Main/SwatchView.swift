@@ -298,11 +298,25 @@ struct SwatchView: View {
 
         let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
 
-        // Additionally, when dragging a single color, include its ID so drops can attach/detach via ColorManager
-        if fill.count == 1, let first = fill.first, let idData = first.id.uuidString.data(using: .utf8) {
-            provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColorID.identifier, visibility: .all) { completion in
-                completion(idData, nil)
+        // For single colors, include full JSON data for cross-device drops and ID for same-device palette management
+        if fill.count == 1, let first = fill.first {
+            // Register full JSON color data (works cross-device via Universal Control)
+            provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier, visibility: .all) { completion in
+                do {
+                    let jsonData = try first.jsonRepresentation()
+                    completion(jsonData, nil)
+                } catch {
+                    completion(nil, error)
+                }
                 return nil
+            }
+
+            // Also include color ID for efficient same-device palette management
+            if let idData = first.id.uuidString.data(using: .utf8) {
+                provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColorID.identifier, visibility: .all) { completion in
+                    completion(idData, nil)
+                    return nil
+                }
             }
         }
 
