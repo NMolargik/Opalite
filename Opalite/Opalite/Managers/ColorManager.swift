@@ -34,6 +34,9 @@ class ColorManager {
 
     /// Tracks whether the SwatchBar window is currently open (iOS only, for single-instance enforcement).
     var isSwatchBarOpen: Bool = false
+
+    /// Tracks whether the main window is currently open (for single-instance enforcement from SwatchBar).
+    var isMainWindowOpen: Bool = false
     
     var author: String = "User"
     
@@ -68,8 +71,8 @@ class ColorManager {
     
     // MARK: - Private helpers: Relationship management
     /// Attaches a color to the given palette, keeping both sides of the relationship in sync
-    /// and updating timestamps/device metadata. Does not save the context.
-    func attachColor(_ color: OpaliteColor, to palette: OpalitePalette) {
+    /// and updating timestamps/device metadata. Optionally accepts an error handler.
+    func attachColor(_ color: OpaliteColor, to palette: OpalitePalette, onError: ((OpaliteError) -> Void)? = nil) {
         // If already attached to this palette, ensure it's present once in the palette list
         if color.palette?.id == palette.id {
             if palette.colors == nil { palette.colors = [] }
@@ -101,20 +104,20 @@ class ColorManager {
             palette.updatedAt = .now
             color.updatedAt = .now
         }
-        
+
         do {
             try saveContext()
             Task {
                 await refreshAll()
             }
         } catch {
-            // TODO: error handling
+            onError?(.colorAttachFailed)
         }
     }
 
     /// Detaches a color from its current palette (if any), keeping both sides of the relationship in sync.
-    /// Does not save the context.
-    func detachColorFromPalette(_ color: OpaliteColor) {
+    /// Optionally accepts an error handler.
+    func detachColorFromPalette(_ color: OpaliteColor, onError: ((OpaliteError) -> Void)? = nil) {
         if let palette = color.palette {
             if let idx = palette.colors?.firstIndex(where: { $0.id == color.id }) {
                 palette.colors?.remove(at: idx)
@@ -122,14 +125,14 @@ class ColorManager {
             palette.updatedAt = .now
         }
         color.palette = nil
-        
+
         do {
             try saveContext()
             Task {
                 await refreshAll()
             }
         } catch {
-            // TODO: error handling
+            onError?(.colorDetachFailed)
         }
 
         #if canImport(DeviceKit)

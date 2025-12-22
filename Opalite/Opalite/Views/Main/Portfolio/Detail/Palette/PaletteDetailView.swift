@@ -11,6 +11,7 @@ import SwiftData
 struct PaletteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var shareImage: UIImage?
@@ -43,7 +44,7 @@ struct PaletteDetailView: View {
                                 pal.name = newName.isEmpty ? palette.name : newName
                             }
                         } catch {
-                            // TODO: error handling
+                            toastManager.show(error: .paletteUpdateFailed)
                         }
                     },
                     allowBadgeTapToEdit: true
@@ -71,7 +72,7 @@ struct PaletteDetailView: View {
                                             pal.notes = trimmed.isEmpty ? nil : trimmed
                                         }
                                     } catch {
-                                        // TODO: error handling
+                                        toastManager.show(error: .paletteUpdateFailed)
                                     }
                                 }
                             )
@@ -99,7 +100,7 @@ struct PaletteDetailView: View {
                                         pal.notes = trimmed.isEmpty ? nil : trimmed
                                     }
                                 } catch {
-                                    // TODO: error handling
+                                    toastManager.show(error: .paletteUpdateFailed)
                                 }
                             }
                         )
@@ -119,11 +120,11 @@ struct PaletteDetailView: View {
 
             Button("Delete Palette", role: .destructive) {
                 dismiss()
-                
+
                 do {
                     try colorManager.deletePalette(palette, andColors: false)
                 } catch {
-                    // TODO: error handling
+                    toastManager.show(error: .paletteDeletionFailed)
                 }
             }
 
@@ -134,7 +135,7 @@ struct PaletteDetailView: View {
                     do {
                         try colorManager.deletePalette(palette, andColors: true)
                     } catch {
-                        // TODO: error handling
+                        toastManager.show(error: .paletteDeletionFailed)
                     }
                 }
             }

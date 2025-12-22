@@ -22,8 +22,7 @@ struct SettingsView: View {
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
     @State private var isShowingInsertSamplesAlert: Bool = false
 
-    @State private var exportPDFURL: URL? = nil
-    @State private var isShowingExportSheet: Bool = false
+    @State private var exportPDFURL: IdentifiableURL? = nil
     
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
@@ -163,10 +162,8 @@ struct SettingsView: View {
         } message: {
             Text("This will permanently delete all canvases. This action cannot be undone.")
         }
-        .sheet(isPresented: $isShowingExportSheet) {
-            if let url = exportPDFURL {
-                ShareSheet(items: [url])
-            }
+        .sheet(item: $exportPDFURL) { item in
+            ShareSheet(items: [item.url])
         }
     }
 
@@ -210,8 +207,7 @@ struct SettingsView: View {
                 looseColors: colorManager.looseColors,
                 userName: userName
             )
-            exportPDFURL = url
-            isShowingExportSheet = true
+            exportPDFURL = IdentifiableURL(url: url)
         } catch {
             print("Failed to export PDF: \(error)")
         }
@@ -219,6 +215,11 @@ struct SettingsView: View {
         // PDF export requires UIKit.
         #endif
     }
+}
+
+private struct IdentifiableURL: Identifiable {
+    let id = UUID()
+    let url: URL
 }
 
 private struct ShareSheet: UIViewControllerRepresentable {

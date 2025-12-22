@@ -12,6 +12,7 @@ import PencilKit
 struct CanvasView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(ColorManager.self) private var colorManager: ColorManager
+    @Environment(ToastManager.self) private var toastManager
     @Environment(\.dismiss) private var dismiss
 
     let canvasFile: CanvasFile
@@ -116,7 +117,7 @@ struct CanvasView: View {
             do {
                 try canvasManager.saveDrawing(newValue, to: canvasFile)
             } catch {
-                // TODO: error handling
+                toastManager.show(error: .canvasSaveFailed)
             }
         }
         .overlay(alignment: .top) {
@@ -198,7 +199,7 @@ struct CanvasView: View {
                 do {
                     try canvasManager.deleteCanvas(canvasFile)
                 } catch {
-                    // TODO: error handling
+                    toastManager.show(error: .canvasDeletionFailed)
                 }
             }
         } message: {
@@ -241,21 +242,22 @@ struct CanvasView: View {
                 canvas.title = trimmed
             }
         } catch {
-            // TODO: error handling
+            toastManager.show(error: .canvasUpdateFailed)
         }
         showRenameTitleAlert = false
     }
 
     // MARK: - Canvas Size Management
     private func initializeCanvasSize() {
-        // Use stored canvas size if available, otherwise use current screen size
+        // Use stored canvas size if available, otherwise use default iPad-sized canvas
         if let storedSize = canvasFile.canvasSize {
             effectiveCanvasSize = storedSize
         } else {
-            // First time opening - set the canvas size to current screen
-            let screenSize = UIScreen.main.bounds.size
-            canvasFile.setCanvasSize(screenSize)
-            effectiveCanvasSize = screenSize
+            // First time opening - set to default canvas size (iPad-ish)
+            // This ensures consistency across devices; smaller screens can pan/zoom
+            let defaultSize = CanvasFile.defaultCanvasSize
+            canvasFile.setCanvasSize(defaultSize)
+            effectiveCanvasSize = defaultSize
             do {
                 try canvasManager.saveContext()
             } catch {
@@ -265,7 +267,7 @@ struct CanvasView: View {
     }
 
     private func getEffectiveCanvasSize() -> CGSize {
-        effectiveCanvasSize ?? UIScreen.main.bounds.size
+        effectiveCanvasSize ?? CanvasFile.defaultCanvasSize
     }
 
     // MARK: - Color Sampling
@@ -381,7 +383,7 @@ struct CanvasView: View {
                 alpha: Double(a)
             )
         } catch {
-            // TODO: error handling
+            toastManager.show(error: .colorCreationFailed)
         }
     }
 

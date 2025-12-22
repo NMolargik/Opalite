@@ -173,9 +173,10 @@ struct ColorImagePickerView: View {
     }
 
     /// Sample a color from the image at normalized coordinates (0-1 range)
-    /// Uses a reliable method by rendering to a known pixel format
     private func sampleColor(from image: UIImage, atNormalized point: CGPoint, radius: Int = 2) -> UIColor? {
-        guard let cgImage = image.cgImage else { return nil }
+        // Normalize the image orientation first - this ensures pixel data matches displayed orientation
+        guard let normalizedImage = normalizeImageOrientation(image),
+              let cgImage = normalizedImage.cgImage else { return nil }
 
         let width = cgImage.width
         let height = cgImage.height
@@ -261,6 +262,21 @@ struct ColorImagePickerView: View {
             blue: min(1, totalB / count),
             alpha: totalA / count
         )
+    }
+
+    /// Renders the image to a new CGImage with orientation applied.
+    /// This ensures the pixel data matches the displayed orientation.
+    private func normalizeImageOrientation(_ image: UIImage) -> UIImage? {
+        // If already oriented correctly, return as-is
+        guard image.imageOrientation != .up else { return image }
+
+        // Render the image to a new context with the correct orientation
+        let size = image.size
+        UIGraphicsBeginImageContextWithOptions(size, false, image.scale)
+        defer { UIGraphicsEndImageContext() }
+
+        image.draw(in: CGRect(origin: .zero, size: size))
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
 

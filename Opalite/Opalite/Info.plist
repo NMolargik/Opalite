@@ -2,66 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-		<string>processing</string>
-		<string>fetch</string>
-	</array>
-	<key>UIApplicationShortcutItems</key>
-	<array>
-		<dict>
-			<key>UIApplicationShortcutItemType</key>
-			<string>OpenSwatchBarAction</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Open SwatchBar</string>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>square.stack</string>
-		</dict>
-	</array>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.molargiksoftware.opalite.color</string>
-			<key>UTTypeDescription</key>
-			<string>Opalite Color</string>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.json</string>
-				<string>public.data</string>
-			</array>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>opalitecolor</string>
-				</array>
-				<key>public.mime-type</key>
-				<string>application/x-opalite-color</string>
-			</dict>
-		</dict>
-		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.molargiksoftware.opalite.palette</string>
-			<key>UTTypeDescription</key>
-			<string>Opalite Palette</string>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.json</string>
-				<string>public.data</string>
-			</array>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>opalitepalette</string>
-				</array>
-				<key>public.mime-type</key>
-				<string>application/x-opalite-palette</string>
-			</dict>
-		</dict>
-	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -87,6 +27,95 @@
 			<array>
 				<string>com.molargiksoftware.opalite.palette</string>
 			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string></string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array/>
+		</dict>
+	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>square.stack</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Open SwatchBar</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>OpenSwatchBarAction</string>
+		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>processing</string>
+		<string>fetch</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Opalite Color</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.molargiksoftware.opalite.color</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>opalitecolor</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-opalite-color</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Opalite Palette</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.molargiksoftware.opalite.palette</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>opalitepalette</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-opalite-palette</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Opalite Color Identifier</string>
+			<key>UTTypeIcons</key>
+			<dict/>
+			<key>UTTypeIdentifier</key>
+			<string>com.molargiksoftware.opalite.color-id</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>opalitecolorid</string>
+				</array>
+			</dict>
 		</dict>
 	</array>
 </dict>

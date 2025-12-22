@@ -54,6 +54,12 @@ struct ContentView: View {
         .task {
             await prepareApp()
         }
+        .onAppear {
+            colorManager.isMainWindowOpen = true
+        }
+        .onDisappear {
+            colorManager.isMainWindowOpen = false
+        }
     }
     
     private func prepareApp() async {

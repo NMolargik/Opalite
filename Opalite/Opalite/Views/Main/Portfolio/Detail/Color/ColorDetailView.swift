@@ -17,7 +17,10 @@ import AppKit
 struct ColorDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    @State private var viewModel: ColorDetailView.ViewModel
 
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
@@ -25,8 +28,6 @@ struct ColorDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var isShowingColorEditor = false
     @State private var isEditingName: Bool? = false
-    @State private var notesDraft: String = ""
-    @State private var isSavingNotes: Bool = false
     @State private var isShowingPaletteSelection: Bool = false
     @State private var showDetachConfirmation: Bool = false
     @State private var didCopyHex: Bool = false
@@ -34,6 +35,11 @@ struct ColorDetailView: View {
     @State private var isShowingFileShareSheet = false
 
     let color: OpaliteColor
+    
+    init(color: OpaliteColor) {
+        self.color = color
+        _viewModel = State(wrappedValue: ColorDetailView.ViewModel.init(color: color))
+    }
 
     var body: some View {
         ScrollView {
@@ -41,16 +47,12 @@ struct ColorDetailView: View {
                 SwatchView(
                     fill: [color],
                     height: 260,
-                    badgeText: color.name ?? color.hexString,
+                    badgeText: viewModel.badgeText,
                     showOverlays: true,
                     isEditingBadge: $isEditingName,
                     saveBadge: { newName in
-                        do {
-                            try colorManager.updateColor(color) { c in
-                                c.name = newName.isEmpty ? nil : newName
-                            }
-                        } catch {
-                            // TODO: error handling
+                        viewModel.rename(to: newName, using: colorManager) { error in
+                            toastManager.show(error: error)
                         }
                     },
                     allowBadgeTapToEdit: true
@@ -80,7 +82,7 @@ struct ColorDetailView: View {
                                             colorManager.attachColor(createdColor, to: palette)
                                         }
                                     } catch {
-                                        // TODO: error handling
+                                        toastManager.show(error: .colorCreationFailed)
                                     }
                                 }
                             )
@@ -105,7 +107,7 @@ struct ColorDetailView: View {
                                         alpha: suggested.alpha
                                     )
                                 } catch {
-                                    // TODO: error handling
+                                    toastManager.show(error: .colorCreationFailed)
                                 }
                             }
                         )
@@ -118,19 +120,16 @@ struct ColorDetailView: View {
             }
             .padding()
         }
-        .onAppear {
-            notesDraft = color.notes ?? ""
-        }
         .navigationBarTitleDisplayMode(.inline)
         .background(shareSheet(image: shareImage))
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
                 do {
-                    try colorManager.deleteColor(color)
+                    try viewModel.deleteColor(using: colorManager)
                     dismiss()
                 } catch {
-                    // TODO: error handling
+                    toastManager.show(error: .colorDeletionFailed)
                 }
             }
         } message: {
@@ -139,7 +138,7 @@ struct ColorDetailView: View {
         .alert("Remove from Palette?", isPresented: $showDetachConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Remove", role: .destructive) {
-                colorManager.detachColorFromPalette(color)
+                viewModel.detachFromPalette(using: colorManager)
             }
         } message: {
             Text("This color will be removed from its palette.")
@@ -156,18 +155,9 @@ struct ColorDetailView: View {
                     isShowingColorEditor = false
                 },
                 onApprove: { updatedColor in
-                    do {
-                        try colorManager.updateColor(color) { c in
-                            c.name = updatedColor.name
-                            c.red = updatedColor.red
-                            c.green = updatedColor.green
-                            c.blue = updatedColor.blue
-                            c.alpha = updatedColor.alpha
-                        }
-                    } catch {
-                        // TODO: error handling
+                    viewModel.applyEditorUpdate(from: updatedColor, using: colorManager) { error in
+                        toastManager.show(error: error)
                     }
-                    
                     isShowingColorEditor.toggle()
                 }
             )
@@ -276,24 +266,14 @@ struct ColorDetailView: View {
     @ViewBuilder
     private var notesSection: some View {
         NotesSectionView(
-            notes: $notesDraft,
-            isSaving: $isSavingNotes,
-            onSave: saveNotes
-        )
-    }
-
-    private func saveNotes() {
-        isSavingNotes = true
-        defer { isSavingNotes = false }
-
-        do {
-            try colorManager.updateColor(color) { c in
-                let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                c.notes = trimmed.isEmpty ? nil : trimmed
+            notes: $viewModel.notesDraft,
+            isSaving: $viewModel.isSavingNotes,
+            onSave: {
+                viewModel.saveNotes(using: colorManager) { error in
+                    toastManager.show(error: error)
+                }
             }
-        } catch {
-            // TODO: error handling
-        }
+        )
     }
 }
 

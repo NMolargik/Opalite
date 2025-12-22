@@ -12,6 +12,7 @@ import PencilKit
 struct CanvasListView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(ToastManager.self) private var toastManager
 
     @State private var path = NavigationPath()
     @State private var searchText = ""
@@ -65,7 +66,7 @@ struct CanvasListView: View {
                                     selectedCanvasFile = nil
                                 }
                             } catch {
-                                // TODO: error handling
+                                toastManager.show(error: .canvasDeletionFailed)
                             }
                         } label: {
                             Label("Delete", systemImage: "trash")
@@ -104,7 +105,7 @@ struct CanvasListView: View {
                             let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
                             selectedCanvasFile = newCanvasFile
                         } catch {
-                            // TODO: error handling
+                            toastManager.show(error: .canvasCreationFailed)
                         }
                     }, label: {
                         Label("New Canvas", systemImage: "plus")
@@ -152,7 +153,7 @@ struct CanvasListView: View {
                     selectedCanvasFile = nil
                 }
             } catch {
-                // TODO: error handling
+                toastManager.show(error: .canvasDeletionFailed)
             }
         }
     }

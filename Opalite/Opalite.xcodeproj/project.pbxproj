@@ -92,6 +92,20 @@
 			);
 			target = EBD4AD1B2EE48DF300012D16 /* Opalite */;
 		};
+		EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Errors/ThumbnailError.swift,
+			);
+			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
+		};
+		EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Errors/PreviewError.swift,
+			);
+			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -115,6 +129,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
+				EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
+				EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";

@@ -66,11 +66,14 @@ struct SwatchBarView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        openWindow(id: "main")
+                        if !colorManager.isMainWindowOpen {
+                            openWindow(id: "main")
+                        }
                     } label: {
                         Label("Open Opalite", systemImage: "macwindow")
                     }
                     .tint(.red)
+                    .disabled(colorManager.isMainWindowOpen)
                 }
 
                 ToolbarItem {

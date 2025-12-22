@@ -17,6 +17,7 @@ struct PortfolioView: View {
     @Environment(\.horizontalSizeClass) private var hSizeClass
     @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
     
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var shareImage: UIImage?
@@ -107,7 +108,7 @@ struct PortfolioView: View {
                                 do {
                                     try colorManager.createPalette(name: "New Palette")
                                 } catch {
-                                    // TODO: error handling
+                                    toastManager.show(error: .paletteCreationFailed)
                                 }
                             } label: {
                                 HStack(spacing: 10) {
@@ -188,7 +189,7 @@ struct PortfolioView: View {
                         do {
                             _ = try colorManager.createColor(existing: newColor)
                         } catch {
-                            // TODO: error handling
+                            toastManager.show(error: .colorCreationFailed)
                         }
 
                         isShowingColorEditor.toggle()
@@ -250,7 +251,7 @@ struct PortfolioView: View {
                             do {
                                 try colorManager.createPalette(name: "New Palette")
                             } catch {
-                                // TODO: error handling
+                                toastManager.show(error: .paletteCreationFailed)
                             }
                         }, label: {
                             Label {
@@ -399,7 +400,7 @@ struct PortfolioView: View {
                         do {
                             try colorManager.deleteColor(color)
                         } catch {
-                            // TODO: error handling
+                            toastManager.show(error: .colorDeletionFailed)
                         }
                     } label: {
                         Label("Delete Color", systemImage: "trash.fill")
@@ -428,5 +429,6 @@ struct PortfolioView: View {
 
     return PortfolioView()
         .environment(manager)
+        .environment(ToastManager())
         .modelContainer(container)
 }

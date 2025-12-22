@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 struct SwatchRowView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
     
     let colors: [OpaliteColor]
     let palette: OpalitePalette?
@@ -143,9 +144,9 @@ struct SwatchRowView: View {
                             colorManager.attachColor(createdColor, to: palette)
                         }
                     } catch {
-                        // TODO: error handling
+                        toastManager.show(error: .colorCreationFailed)
                     }
-                    
+
                     showingColorEditor.toggle()
                 }
             )

@@ -17,4 +17,3 @@ extension UTType {
     /// Shareable file type for an OpalitePalette with colors (.opalitepalette)
     static let opalitePalette = UTType(exportedAs: "com.molargiksoftware.opalite.palette", conformingTo: .json)
 }
-

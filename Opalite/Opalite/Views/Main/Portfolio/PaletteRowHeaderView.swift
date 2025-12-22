@@ -10,6 +10,7 @@ import SwiftData
 
 struct PaletteRowHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
     @State private var showDeleteConfirmation = false
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
@@ -102,7 +103,7 @@ struct PaletteRowHeaderView: View {
                 do {
                     try colorManager.deletePalette(palette, andColors: false)
                 } catch {
-                    // TODO: error handling
+                    toastManager.show(error: .paletteDeletionFailed)
                 }
             }
 
@@ -111,7 +112,7 @@ struct PaletteRowHeaderView: View {
                     do {
                         try colorManager.deletePalette(palette, andColors: true)
                     } catch {
-                        // TODO: error handling
+                        toastManager.show(error: .paletteDeletionFailed)
                     }
                 }
             }
@@ -131,9 +132,9 @@ struct PaletteRowHeaderView: View {
                         let createdColor = try colorManager.createColor(existing: newColor)
                         colorManager.attachColor(createdColor, to: palette)
                     } catch {
-                        // TODO: error handling
+                        toastManager.show(error: .colorCreationFailed)
                     }
-                    
+
                     isShowingColorEditor.toggle()
                 }
             )
