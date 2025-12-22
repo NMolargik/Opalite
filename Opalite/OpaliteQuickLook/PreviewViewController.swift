@@ -207,10 +207,3 @@ private class GradientView: UIView {
         }
     }
 }
-
-// MARK: - Errors
-
-enum PreviewError: Error {
-    case invalidFormat
-    case decodingFailed
-}

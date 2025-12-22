@@ -135,7 +135,7 @@ struct OpaliteApp: App {
         .environment(canvasManager)
         .environment(toastManager)
         .windowResizability(.contentSize)
-        .defaultSize(width: 232, height: 500)
+        .defaultSize(width: 180, height: 500)
 #elseif os(iOS)
         WindowGroup(id: "swatchBar") {
             SwatchBarView()
@@ -152,7 +152,7 @@ struct OpaliteApp: App {
         .environment(canvasManager)
         .environment(toastManager)
         .windowResizability(.contentSize)
-        .defaultSize(width: 232, height: 500)
+        .defaultSize(width: 180, height: 500)
 #endif
     }
 }

@@ -16,8 +16,7 @@ struct SwatchBarView: View {
     @State private var expandedPalettes: Set<UUID> = []
     @State private var showingSwatchBarInfo: Bool = false
 
-    private let swatchSize: CGFloat = 200
-    private let windowWidth: CGFloat = 232 // swatchSize + horizontal padding
+    private let swatchHeight: CGFloat = 100
 
     var body: some View {
         NavigationStack {
@@ -62,9 +61,8 @@ struct SwatchBarView: View {
                 }
             }
             .background(.ultraThinMaterial)
-            .frame(width: windowWidth)
             .navigationTitle("SwatchBar")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.automatic)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -85,11 +83,38 @@ struct SwatchBarView: View {
                 }
             }
             .sheet(isPresented: $showingSwatchBarInfo) {
-                Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
-                    .font(.title3)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                    .presentationDetents([.fraction(0.2)])
+                VStack(spacing: 12) {
+                    Image(systemName: "swatchpalette")
+                        .font(.system(size: 36, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.tint)
+
+                    Text("SwatchBar")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+
+                    Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    HStack(spacing: 16) {
+                        Label("Tap/Click a swatch to copy its hex code", systemImage: "hand.tap")
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal)
+                .padding(.top, 24)
+                .padding(.bottom, 16)
+                .frame(maxWidth: 480)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .presentationDetents([.fraction(0.35)])
+                .presentationDragIndicator(.visible)
             }
         }
     }
@@ -139,38 +164,54 @@ struct SwatchBarView: View {
 
     @ViewBuilder
     private func swatchCell(for color: OpaliteColor) -> some View {
-        SwatchView(
-            fill: [color],
-            width: swatchSize,
-            height: swatchSize,
-            badgeText: color.name ?? color.hexString,
-            showOverlays: true
-        )
-        .overlay {
-            // Copy feedback overlay
-            if copiedColorID == color.id {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        Image(systemName: "number")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(color.idealTextColor())
-                    }
-                    .transition(.opacity)
-            }
-        }
-        .onTapGesture {
-            handleTap(for: color)
-        }
-        .contextMenu {
-            Text(color.name ?? color.hexString)
+        GeometryReader { proxy in
+            let availableWidth = proxy.size.width
 
-            Button {
-                copyHexWithFeedback(for: color)
-            } label: {
-                Label("Copy Hex", systemImage: "number")
+            let labelText: String = {
+                let hex = "\(color.hexString)"
+                if let name = color.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
+                    return "\(name) - \(hex)"
+                } else {
+                    return hex
+                }
+            }()
+
+            SwatchView(
+                fill: [color],
+                width: availableWidth,
+                height: swatchHeight,
+                badgeText: labelText,
+                showOverlays: true
+            )
+            .frame(width: availableWidth, height: swatchHeight)
+            .overlay {
+                // Copy feedback overlay
+                if copiedColorID == color.id {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.ultraThinMaterial)
+                        .overlay {
+                            Image(systemName: "number")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundStyle(color.idealTextColor())
+                        }
+                        .transition(.opacity)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                handleTap(for: color)
+            }
+            .contextMenu {
+                Text(labelText)
+
+                Button {
+                    copyHexWithFeedback(for: color)
+                } label: {
+                    Label("Copy Hex", systemImage: "number")
+                }
             }
         }
+        .frame(height: swatchHeight)
     }
 
     private func handleTap(for color: OpaliteColor) {

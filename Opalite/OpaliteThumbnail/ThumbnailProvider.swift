@@ -123,10 +123,3 @@ class ThumbnailProvider: QLThumbnailProvider {
         clipPath.stroke()
     }
 }
-
-// MARK: - Errors
-
-enum ThumbnailError: Error {
-    case invalidFormat
-    case decodingFailed
-}

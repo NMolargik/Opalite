@@ -324,6 +324,21 @@ struct SwatchView: View {
     }
 
     private func renderSwatchImage(size: CGSize) -> Data? {
+        let badgeOverlay = Group {
+            if showOverlays {
+                Text(badgeText)
+                    .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                    .bold()
+                    .frame(height: 20)
+                    .padding(8)
+                    .glassEffect(.clear)
+                    .padding(8)
+                    .mask(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    )
+            }
+        }
+
         let view = Rectangle()
             .fill(
                 LinearGradient(
@@ -333,6 +348,10 @@ struct SwatchView: View {
                 )
             )
             .frame(width: size.width, height: size.height)
+            .overlay(alignment: .topLeading) {
+                badgeOverlay
+                    .frame(maxWidth: 500, alignment: .leading)
+            }
 
         #if canImport(UIKit)
         // Prefer SwiftUI's ImageRenderer when available. This avoids UIKit hosting / safe-area / backing-store quirks
