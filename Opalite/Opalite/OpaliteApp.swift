@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @main
 @MainActor
@@ -32,6 +33,7 @@ struct OpaliteApp: App {
     let toastManager = ToastManager()
     let subscriptionManager = SubscriptionManager()
     let importCoordinator = ImportCoordinator()
+    let quickActionManager = QuickActionManager()
 
     init() {
         let schema = Schema([
@@ -77,6 +79,8 @@ struct OpaliteApp: App {
                             if !colorManager.isSwatchBarOpen {
                                 openWindow(id: "swatchBar")
                             }
+                        } else if shortcutType == "CreateNewColorAction" {
+                            quickActionManager.requestCreateNewColor()
                         }
                     }
                     #endif
@@ -120,6 +124,7 @@ struct OpaliteApp: App {
                 } message: {
                     Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
                 }
+                .environment(quickActionManager)
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
@@ -141,6 +146,7 @@ struct OpaliteApp: App {
         .environment(canvasManager)
         .environment(toastManager)
         .environment(subscriptionManager)
+        .environment(quickActionManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #elseif os(iOS)
@@ -162,6 +168,7 @@ struct OpaliteApp: App {
         .environment(canvasManager)
         .environment(toastManager)
         .environment(subscriptionManager)
+        .environment(quickActionManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #endif

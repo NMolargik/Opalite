@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 #if os(iOS)
 /// Handles quick actions when app is already running
@@ -21,3 +22,4 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
     }
 }
 #endif
+

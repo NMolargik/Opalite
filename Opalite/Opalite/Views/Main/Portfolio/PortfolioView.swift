@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
+import Observation
 
 #if canImport(UIKit)
 import UIKit
@@ -19,6 +20,7 @@ struct PortfolioView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(QuickActionManager.self) private var quickActionManager
 
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var isShowingPaywall: Bool = false
@@ -34,6 +36,7 @@ struct PortfolioView: View {
     @State private var isShowingFileImporter = false
     @State private var importError: String?
     @State private var isShowingImportError = false
+    @State private var quickActionTrigger: UUID? = nil
 
     @Namespace private var namespace
     @Namespace private var swatchNS
@@ -177,6 +180,12 @@ struct PortfolioView: View {
             .toolbarBackground(.hidden)
             .task {
                 swatchSize = isCompact ? .small : .medium
+            }
+            .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
+                guard let token = newValue else { return }
+                quickActionTrigger = token
+                pendingPaletteToAddTo = nil
+                isShowingColorEditor = true
             }
             .refreshable {
                 Task { await colorManager.refreshAll() }
