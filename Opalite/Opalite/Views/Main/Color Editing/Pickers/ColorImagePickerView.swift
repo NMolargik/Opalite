@@ -36,6 +36,7 @@ struct ColorImagePickerView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
                     Button {
+                        HapticsManager.shared.impact()
                         isShowingImagePicker = true
                     } label: {
                         Label("Choose Photo", systemImage: "photo.on.rectangle")
@@ -46,6 +47,7 @@ struct ColorImagePickerView: View {
                     Spacer()
 
                     Button {
+                        HapticsManager.shared.impact()
                         isShowingCamera = true
                     } label: {
                         Label("Camera", systemImage: "camera")

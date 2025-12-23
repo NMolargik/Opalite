@@ -41,7 +41,6 @@ struct OpaliteApp: App {
         ])
 
         let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"
-
         let config = ModelConfiguration(
             schema: schema,
             cloudKitDatabase: .private(cloudKitContainerID)
@@ -115,7 +114,9 @@ struct OpaliteApp: App {
                     get: { importCoordinator.showingImportError },
                     set: { importCoordinator.showingImportError = $0 }
                 )) {
-                    Button("OK", role: .cancel) {}
+                    Button("OK", role: .cancel) {
+                        HapticsManager.shared.selection()
+                    }
                 } message: {
                     Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
                 }

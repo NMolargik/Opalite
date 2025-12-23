@@ -32,6 +32,7 @@ struct PaletteRowHeaderView: View {
         HStack {
             Menu {
                 Button(role: .confirm) {
+                    HapticsManager.shared.selection()
                     isShowingColorEditor.toggle()
                 } label: {
                     Label("New Color", systemImage: "plus.square.dashed")
@@ -40,6 +41,7 @@ struct PaletteRowHeaderView: View {
                 Divider()
                 
                 Button {
+                    HapticsManager.shared.selection()
                     if let image = gradientImage(from: palette.colors ?? []) {
                         shareImage = image
                         shareImageTitle = palette.name
@@ -50,6 +52,7 @@ struct PaletteRowHeaderView: View {
                 }
                 
                 Button {
+                    HapticsManager.shared.selection()
                     if subscriptionManager.hasOnyxEntitlement {
                         do {
                             exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
@@ -75,6 +78,7 @@ struct PaletteRowHeaderView: View {
                 }
 
                 Button {
+                    HapticsManager.shared.selection()
                     if subscriptionManager.hasOnyxEntitlement {
                         do {
                             shareFileURL = try SharingService.exportPalette(palette)
@@ -102,6 +106,7 @@ struct PaletteRowHeaderView: View {
                 Divider()
 
                 Button(role: .destructive) {
+                    HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
                     Label("Delete Palette", systemImage: "trash")
@@ -143,9 +148,12 @@ struct PaletteRowHeaderView: View {
             .buttonStyle(.plain)
         }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
 
             Button("Delete Palette", role: .destructive) {
+                HapticsManager.shared.selection()
                 do {
                     try colorManager.deletePalette(palette, andColors: false)
                 } catch {
@@ -155,6 +163,7 @@ struct PaletteRowHeaderView: View {
 
             if (!(palette.colors?.isEmpty ?? false)) {
                 Button("Delete Palette and Colors", role: .destructive) {
+                    HapticsManager.shared.selection()
                     do {
                         try colorManager.deletePalette(palette, andColors: true)
                     } catch {

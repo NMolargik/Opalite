@@ -19,26 +19,34 @@ struct PaletteMembersView: View {
                 swatchWidth: 180,
                 swatchHeight: 150,
                 showOverlays: true,
-                showsNavigation: false,
-                menuContent: { color in
+                showsNavigation: true,
+                contextMenuContent: { color in
                     AnyView(
                         Group {
                             Button {
+                                HapticsManager.shared.selection()
                                 copyHex(for: color)
                             } label: {
                                 Label("Copy Hex", systemImage: "number")
                             }
 
                             Button(role: .destructive) {
+                                HapticsManager.shared.selection()
                                 onRemoveColor(color)
                             } label: {
-                                Label("Remove From Palette", systemImage: "swatchpalette")
+                                Label("Remove From Palette", systemImage: "xmark.circle")
                             }
                         }
                     )
                 }
             )
         }
+    }
+
+    private func copyHex(for color: OpaliteColor) {
+        #if canImport(UIKit)
+        UIPasteboard.general.string = color.hexString
+        #endif
     }
 }
 

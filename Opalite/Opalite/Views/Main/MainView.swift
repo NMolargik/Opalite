@@ -95,6 +95,7 @@ struct MainView: View {
                         }
                         .contextMenu {
                             Button {
+                                HapticsManager.shared.selection()
                                 renameText = canvasFile.title
                                 canvasToRename = canvasFile
                             } label: {
@@ -103,6 +104,7 @@ struct MainView: View {
                             .tint(.none)
 
                             Button(role: .destructive) {
+                                HapticsManager.shared.selection()
                                 try? canvasManager.deleteCanvas(canvasFile)
                             } label: {
                                 Label("Delete Canvas", systemImage: "trash")
@@ -117,6 +119,7 @@ struct MainView: View {
             }
             .sectionActions {
                 Button {
+                    HapticsManager.shared.selection()
                     if subscriptionManager.hasOnyxEntitlement {
                         let newCanvas = try? canvasManager.createCanvas()
                         if let newCanvas {
@@ -143,9 +146,11 @@ struct MainView: View {
         )) {
             TextField("Canvas name", text: $renameText)
             Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
                 canvasToRename = nil
             }
             Button("Rename") {
+                HapticsManager.shared.selection()
                 if let canvas = canvasToRename {
                     let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmed.isEmpty {

@@ -35,6 +35,7 @@ struct CanvasListView: View {
             List {
                 ForEach(filteredCanvases) { canvasFile in
                     Button {
+                        HapticsManager.shared.impact()
                         if subscriptionManager.hasOnyxEntitlement {
                             selectedCanvasFile = canvasFile
                         } else {
@@ -62,6 +63,7 @@ struct CanvasListView: View {
                     .buttonStyle(.plain)
                     .contextMenu {
                         Button {
+                            HapticsManager.shared.impact()
                             renameText = canvasFile.title
                             canvasToRename = canvasFile
                         } label: {
@@ -71,6 +73,7 @@ struct CanvasListView: View {
                         Divider()
 
                         Button(role: .destructive) {
+                            HapticsManager.shared.impact()
                             do {
                                 try canvasManager.deleteCanvas(canvasFile)
                                 if selectedCanvasFile?.id == canvasFile.id {
@@ -100,6 +103,7 @@ struct CanvasListView: View {
                         .toolbar {
                             ToolbarItem(placement: .topBarLeading) {
                                 Button {
+                                    HapticsManager.shared.impact()
                                     selectedCanvasFile = nil
                                 } label: {
                                     Label("Close", systemImage: "xmark")
@@ -112,6 +116,7 @@ struct CanvasListView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
+                        HapticsManager.shared.impact()
                         if subscriptionManager.hasOnyxEntitlement {
                             do {
                                 let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
@@ -137,9 +142,11 @@ struct CanvasListView: View {
             )) {
                 TextField("Canvas name", text: $renameText)
                 Button("Cancel", role: .cancel) {
+                    HapticsManager.shared.impact()
                     canvasToRename = nil
                 }
                 Button("Rename") {
+                    HapticsManager.shared.impact()
                     if let canvas = canvasToRename {
                         let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
                         if !trimmed.isEmpty {

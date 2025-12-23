@@ -105,6 +105,7 @@ struct ColorEditorView: View {
                 if canShowPaletteStripToggle {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
+                            HapticsManager.shared.impact()
                             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
                                 viewModel.isShowingPaletteStrip.toggle()
                             }
@@ -118,6 +119,7 @@ struct ColorEditorView: View {
                 #if os(iOS) || os(visionOS)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        HapticsManager.shared.impact()
                         let hex = viewModel.tempColor.hexString
                         #if os(iOS) || os(visionOS)
                         UIPasteboard.general.string = hex
@@ -146,6 +148,7 @@ struct ColorEditorView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        HapticsManager.shared.impact()
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
                             viewModel.isColorExpanded.toggle()
                         }
@@ -156,6 +159,7 @@ struct ColorEditorView: View {
                 
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
+                        HapticsManager.shared.impact()
                         withAnimation(.easeInOut) {
                             onCancel()
                         }
@@ -167,6 +171,7 @@ struct ColorEditorView: View {
                                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
+                        HapticsManager.shared.impact()
                         withAnimation(.easeInOut) {
                             onApprove(viewModel.tempColor)
                         }

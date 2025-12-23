@@ -38,6 +38,7 @@ struct SwatchRowView: View {
                         .bold()
                     
                     Button {
+                        HapticsManager.shared.selection()
                         showingColorEditor.toggle()
                     } label: {
                         HStack(spacing: 10) {
@@ -66,6 +67,7 @@ struct SwatchRowView: View {
                         ForEach(colors.sorted(by: { $0.updatedAt > $1.updatedAt }), id: \.self) { color in
                             if let onTap = onTap {
                                 Button {
+                                    HapticsManager.shared.selection()
                                     onTap(color)
                                 } label: {
                                     swatchCell(for: color)
@@ -283,8 +285,12 @@ struct SwatchRowView: View {
             menuContent: { _ in
                 AnyView(
                     Group {
-                        Button("Edit") {}
-                        Button("Duplicate") {}
+                        Button("Edit") {
+                            HapticsManager.shared.selection()
+                        }
+                        Button("Duplicate") {
+                            HapticsManager.shared.selection()
+                        }
                         Divider()
                         Button(role: .destructive) { } label: { Text("Delete") }
                     }

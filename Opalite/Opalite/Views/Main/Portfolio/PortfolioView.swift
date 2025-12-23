@@ -108,6 +108,7 @@ struct PortfolioView: View {
                                 .bold()
 
                             Button {
+                                HapticsManager.shared.selection()
                                 if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                     do {
                                         try colorManager.createPalette(name: "New Palette")
@@ -212,7 +213,9 @@ struct PortfolioView: View {
                 handleFileImport(result)
             }
             .alert("Import Error", isPresented: $isShowingImportError) {
-                Button("OK", role: .cancel) {}
+                Button("OK", role: .cancel) {
+                    HapticsManager.shared.selection()
+                }
             } message: {
                 Text(importError ?? "An unknown error occurred.")
             }
@@ -223,6 +226,7 @@ struct PortfolioView: View {
                 if isIPadOrMac && !colorManager.isSwatchBarOpen {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
+                            HapticsManager.shared.selection()
                             openWindow(id: "swatchBar")
                         } label: {
                             Label("Open SwatchBar", systemImage: "square.stack")
@@ -235,6 +239,7 @@ struct PortfolioView: View {
                 if !isCompact {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
+                            HapticsManager.shared.selection()
                             withAnimation(.bouncy) {
                                 swatchSize = swatchSize.next
                             }
@@ -247,6 +252,7 @@ struct PortfolioView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Menu {
                         Button(action: {
+                            HapticsManager.shared.selection()
                             isShowingColorEditor.toggle()
                         }, label: {
                             Label {
@@ -259,6 +265,7 @@ struct PortfolioView: View {
                         })
 
                         Button(action: {
+                            HapticsManager.shared.selection()
                             if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                 do {
                                     try colorManager.createPalette(name: "New Palette")
@@ -287,6 +294,7 @@ struct PortfolioView: View {
                         Divider()
 
                         Button(action: {
+                            HapticsManager.shared.selection()
                             if subscriptionManager.hasOnyxEntitlement {
                                 isShowingFileImporter = true
                             } else {
@@ -386,6 +394,7 @@ struct PortfolioView: View {
         AnyView(
             Group {
                 Button {
+                    HapticsManager.shared.selection()
                     copyHex(for: color)
                 } label: {
                     Label("Copy Hex", systemImage: "number")
@@ -393,6 +402,7 @@ struct PortfolioView: View {
                   
                 if palette == nil {
                     Button {
+                        HapticsManager.shared.selection()
                         paletteSelectionColor = color
                     } label: {
                         Label("Add To Palette", systemImage: "swatchpalette.fill")
@@ -402,6 +412,7 @@ struct PortfolioView: View {
                 Divider()
                 
                 Button {
+                    HapticsManager.shared.selection()
                     if let image = solidColorImage(from: color) {
                         shareImage = image
                         shareImageTitle = color.name ?? color.hexString
@@ -412,6 +423,7 @@ struct PortfolioView: View {
                 }
                 
                 Button {
+                    HapticsManager.shared.selection()
                     do {
                         shareFileURL = try SharingService.exportColor(color)
                         isShowingFileShareSheet = true
@@ -426,6 +438,7 @@ struct PortfolioView: View {
                 
                 if let _ = palette {
                     Button(role: .destructive) {
+                        HapticsManager.shared.selection()
                         withAnimation {
                             colorManager.detachColorFromPalette(color)
                         }
@@ -434,6 +447,7 @@ struct PortfolioView: View {
                     }
                 } else {
                     Button(role: .destructive) {
+                        HapticsManager.shared.selection()
                         withAnimation {
                             do {
                                 try colorManager.deleteColor(color)

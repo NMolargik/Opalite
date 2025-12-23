@@ -25,12 +25,14 @@ struct ColorRecommendedColorsView: View {
                     AnyView(
                         Group {
                             Button {
+                                HapticsManager.shared.selection()
                                 copyHex(for: color)
                             } label: {
                                 Label("Copy Hex", systemImage: "number")
                             }
                             
                             Button {
+                                HapticsManager.shared.selection()
                                 onCreateColor(color)
                             } label: {
                                 let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"

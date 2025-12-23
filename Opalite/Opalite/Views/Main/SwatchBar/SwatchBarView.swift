@@ -66,6 +66,7 @@ struct SwatchBarView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
+                        HapticsManager.shared.selection()
                         if !colorManager.isMainWindowOpen {
                             openWindow(id: "main")
                         }
@@ -78,6 +79,7 @@ struct SwatchBarView: View {
 
                 ToolbarItem {
                     Button {
+                        HapticsManager.shared.selection()
                         showingSwatchBarInfo = true
                     } label: {
                         Label("Info", systemImage: "info")
@@ -128,6 +130,7 @@ struct SwatchBarView: View {
     @ViewBuilder
     private func sectionHeader(for palette: OpalitePalette) -> some View {
         Button {
+            HapticsManager.shared.selection()
             withAnimation(.easeInOut(duration: 0.2)) {
                 if expandedPalettes.contains(palette.id) {
                     expandedPalettes.remove(palette.id)
@@ -211,6 +214,7 @@ struct SwatchBarView: View {
                 Text(labelText)
 
                 Button {
+                    HapticsManager.shared.selection()
                     copyHexWithFeedback(for: color)
                 } label: {
                     Label("Copy Hex", systemImage: "number")

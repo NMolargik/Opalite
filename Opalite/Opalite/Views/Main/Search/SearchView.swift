@@ -11,11 +11,13 @@ import SwiftData
 struct SearchView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @Binding var selectedTab: Tabs
 
     @State private var searchText: String = ""
+    @State private var isShowingPaywall: Bool = false
 
     // MARK: - Filtered Results
 
@@ -56,6 +58,11 @@ struct SearchView: View {
     // MARK: - Navigation
 
     private func openCanvas(_ canvas: CanvasFile) {
+        guard subscriptionManager.hasOnyxEntitlement else {
+            isShowingPaywall = true
+            return
+        }
+
         if horizontalSizeClass == .compact {
             // On iPhone, switch to canvas tab and request opening the canvas
             canvasManager.pendingCanvasToOpen = canvas
@@ -170,6 +177,7 @@ struct SearchView: View {
                         Section {
                             ForEach(filteredCanvases) { canvas in
                                 Button {
+                                    HapticsManager.shared.selection()
                                     openCanvas(canvas)
                                 } label: {
                                     HStack(spacing: 12) {
@@ -191,6 +199,12 @@ struct SearchView: View {
 
                                         Spacer()
 
+                                        if !subscriptionManager.hasOnyxEntitlement {
+                                            Image(systemName: "lock.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+
                                         Image(systemName: "chevron.right")
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
@@ -207,6 +221,9 @@ struct SearchView: View {
             .listStyle(.insetGrouped)
             .navigationTitle("Search")
             .searchable(text: $searchText, prompt: "Color, palette, or canvas")
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView(featureContext: "Canvas access requires Onyx")
+            }
         }
     }
 }
@@ -231,4 +248,5 @@ struct SearchView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(SubscriptionManager())
 }

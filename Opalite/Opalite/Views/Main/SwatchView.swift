@@ -211,6 +211,7 @@ struct SwatchView: View {
                         }
 
                         Button {
+                            HapticsManager.shared.selection()
                             let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
                             saveBadge?(finalText)
                             editedBadgeText = ""
@@ -449,8 +450,12 @@ private struct StatefulPreview: View {
                     showOverlays: true,
                     isEditingBadge: .constant(nil),
                     menu: {
-                        Button("Edit") {}
-                        Button("Duplicate") {}
+                        Button("Edit") {
+                            HapticsManager.shared.selection()
+                        }
+                        Button("Duplicate") {
+                            HapticsManager.shared.selection()
+                        }
                         Divider()
                         Button(role: .destructive) { } label: { Text("Delete") }
                     }

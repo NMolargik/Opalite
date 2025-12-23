@@ -13,41 +13,48 @@ struct ContentView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
     
-    @State private var viewModel: ContentView.ViewModel = .init()
+    @State private var appStage: AppStage = .splash
+    
+    var leadingTransition: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: .trailing).combined(with: .opacity),
+            removal: .move(edge: .leading).combined(with: .opacity)
+        )
+    }
     
     var body: some View {
         ZStack {
-            switch viewModel.appStage {
+            switch appStage {
             case .splash:
                 SplashView(
                     onContinue: {
                         withAnimation {
-                            viewModel.appStage = .onboarding
+                            appStage = .onboarding
                         }
                     }
                 )
                 .id("splash")
-                .transition(viewModel.leadingTransition)
+                .transition(leadingTransition)
                 .zIndex(1)
             case .onboarding:
                 OnboardingView(
                     onContinue: {
                         withAnimation {
-                            viewModel.appStage = .main
+                            appStage = .main
                         }
                     }
                 )
                 .environment(colorManager)
                 .environment(canvasManager)
                 .id("onboarding")
-                .transition(viewModel.leadingTransition)
+                .transition(leadingTransition)
                 .zIndex(1)
             case .main:
                 MainView()
                 .environment(colorManager)
                 .environment(canvasManager)
                 .id("main")
-                .transition(viewModel.leadingTransition)
+                .transition(leadingTransition)
                 .zIndex(0)
             }
         }
@@ -65,7 +72,7 @@ struct ContentView: View {
     private func prepareApp() async {
         await colorManager.refreshAll()
         await canvasManager.refreshAll()
-        viewModel.appStage = isOnboardingComplete ? .main : .splash
+        appStage = isOnboardingComplete ? .main : .splash
     }
 }
 

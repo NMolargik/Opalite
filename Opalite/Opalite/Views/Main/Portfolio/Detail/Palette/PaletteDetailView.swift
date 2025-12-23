@@ -129,9 +129,12 @@ struct PaletteDetailView: View {
             PaywallView(featureContext: "Data file export requires Onyx")
         }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
 
             Button("Delete Palette", role: .destructive) {
+                HapticsManager.shared.selection()
                 dismiss()
 
                 do {
@@ -143,6 +146,7 @@ struct PaletteDetailView: View {
 
             if (!(palette.colors?.isEmpty ?? false)) {
                 Button("Delete Palette and Colors", role: .destructive) {
+                    HapticsManager.shared.selection()
                     dismiss()
 
                     do {
@@ -158,6 +162,7 @@ struct PaletteDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .destructive){
+                    HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
                     Label("Delete", systemImage: "trash")
@@ -169,6 +174,7 @@ struct PaletteDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    HapticsManager.shared.selection()
                     withAnimation {
                         isEditingName = true
                     }
@@ -182,6 +188,7 @@ struct PaletteDetailView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Menu {
                     Button {
+                        HapticsManager.shared.selection()
                         if let image = gradientImage(from: palette.colors ?? []) {
                             shareImage = image
                             shareImageTitle = palette.name
@@ -192,6 +199,7 @@ struct PaletteDetailView: View {
                     }
                     
                     Button {
+                        HapticsManager.shared.selection()
                         if subscriptionManager.hasOnyxEntitlement {
                             do {
                                 exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
@@ -217,6 +225,7 @@ struct PaletteDetailView: View {
                     }
 
                     Button {
+                        HapticsManager.shared.selection()
                         if subscriptionManager.hasOnyxEntitlement {
                             do {
                                 shareFileURL = try SharingService.exportPalette(palette)

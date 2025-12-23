@@ -99,6 +99,7 @@ struct ToastView: View {
             Spacer(minLength: 0)
 
             Button {
+                HapticsManager.shared.impact()
                 onDismiss()
             } label: {
                 Image(systemName: "xmark")
@@ -154,14 +155,17 @@ extension View {
         var body: some View {
             VStack(spacing: 20) {
                 Button("Show Error") {
+                    HapticsManager.shared.impact()
                     toastManager.show(error: .colorCreationFailed)
                 }
 
                 Button("Show Success") {
+                    HapticsManager.shared.impact()
                     toastManager.showSuccess("Color saved successfully")
                 }
 
                 Button("Show Info") {
+                    HapticsManager.shared.impact()
                     toastManager.show(message: "Tip: Drag colors to organize", style: .info)
                 }
             }

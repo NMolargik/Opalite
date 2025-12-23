@@ -10,7 +10,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 // MARK: - Import Preview Types
-
 struct ColorImportPreview {
     let color: OpaliteColor
     let existingColor: OpaliteColor?

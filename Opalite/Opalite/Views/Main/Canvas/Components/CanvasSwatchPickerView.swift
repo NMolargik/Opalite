@@ -67,6 +67,7 @@ struct CanvasSwatchPickerView: View {
             isSelected: selectedColorID == color.id,
             idealTextColor: color.idealTextColor()
         ) {
+            HapticsManager.shared.selection()
             onColorSelected(color)
 
             // Show checkmark briefly

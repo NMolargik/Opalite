@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(CanvasManager.self) private var canvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(ToastManager.self) private var toastManager
 
     @AppStorage("userName") private var userName: String = "User"
     @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
@@ -23,6 +24,7 @@ struct SettingsView: View {
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
     @State private var isShowingInsertSamplesAlert: Bool = false
     @State private var isShowingPaywall: Bool = false
+    @State private var isRestoringPurchases: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL? = nil
     
@@ -86,6 +88,7 @@ struct SettingsView: View {
                         }
                     } else {
                         Button {
+                            HapticsManager.shared.selection()
                             isShowingPaywall = true
                         } label: {
                             HStack {
@@ -100,19 +103,41 @@ struct SettingsView: View {
                     }
 
                     Button {
+                        HapticsManager.shared.selection()
                         Task {
+                            isRestoringPurchases = true
+                            let hadOnyxBefore = subscriptionManager.hasOnyxEntitlement
                             await subscriptionManager.restorePurchases()
+                            isRestoringPurchases = false
+
+                            if let error = subscriptionManager.error {
+                                toastManager.show(error: error)
+                            } else if subscriptionManager.hasOnyxEntitlement && !hadOnyxBefore {
+                                toastManager.showSuccess("Onyx subscription restored!")
+                            } else if subscriptionManager.hasOnyxEntitlement {
+                                toastManager.showSuccess("Onyx is already active")
+                            } else {
+                                toastManager.show(message: "No purchases to restore", style: .info)
+                            }
                         }
                     } label: {
-                        Label("Restore Purchases", systemImage: "arrow.clockwise")
-                            .foregroundStyle(.blue)
+                        HStack {
+                            Label("Restore Purchases", systemImage: "arrow.clockwise")
+                                .foregroundStyle(.blue)
+                            if isRestoringPurchases {
+                                Spacer()
+                                ProgressView()
+                            }
+                        }
                     }
+                    .disabled(isRestoringPurchases)
                 } header: {
                     Text("Subscription")
                 }
 
                 Section {
                     Button {
+                        HapticsManager.shared.selection()
                         isShowingInsertSamplesAlert = true
                     } label: {
                         Label("Insert Sample Data", systemImage: "tray.and.arrow.down")
@@ -120,6 +145,7 @@ struct SettingsView: View {
                     }
 
                     Button {
+                        HapticsManager.shared.selection()
                         if subscriptionManager.hasOnyxEntitlement {
                             exportColorsToPDF()
                         } else {
@@ -145,6 +171,7 @@ struct SettingsView: View {
 
                 Section {
                     Button(role: .destructive) {
+                        HapticsManager.shared.selection()
                         isShowingDeleteAllCanvasesAlert = true
                     } label: {
                         Label("Delete All Canvases", systemImage: "document.on.trash")
@@ -152,6 +179,7 @@ struct SettingsView: View {
                     }
                     
                     Button(role: .destructive) {
+                        HapticsManager.shared.selection()
                         isShowingDeleteAllColorsAlert = true
                     } label: {
                         Label("Delete All Colors & Palettes", systemImage: "trash")
@@ -190,8 +218,11 @@ struct SettingsView: View {
             .navigationTitle("Settings")
         }
         .alert("Insert Sample Data?", isPresented: $isShowingInsertSamplesAlert) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
             Button("Continue", role: .confirm) {
+                HapticsManager.shared.selection()
                 do {
                     try colorManager.loadSamples()
                     try canvasManager.loadSamples()
@@ -203,16 +234,22 @@ struct SettingsView: View {
             Text("This will insert sample colors and palettes into your portfolio.")
         }
         .alert("Delete All Colors & Palettes?", isPresented: $isShowingDeleteAllColorsAlert) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
             Button("Delete", role: .destructive) {
+                HapticsManager.shared.selection()
                 deleteAllColorsAndPalettes()
             }
         } message: {
             Text("This will permanently delete all Opalite colors and palettes. This action cannot be undone.")
         }
         .alert("Delete All Canvases?", isPresented: $isShowingDeleteAllCanvasesAlert) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
             Button("Delete", role: .destructive) {
+                HapticsManager.shared.selection()
                 deleteAllCanvases()
             }
         } message: {

@@ -10,6 +10,7 @@ import SwiftUI
 struct ColorSpectrumPickerView: View {
     @Binding var color: OpaliteColor
     @State private var dragLocation: CGPoint = CGPoint(x: 0.5, y: 0.5)
+    @State private var hasInitialized: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -99,6 +100,35 @@ struct ColorSpectrumPickerView: View {
                     .strokeBorder(.white.opacity(0.12), lineWidth: 1)
             )
         }
+        .onAppear {
+            guard !hasInitialized else { return }
+            hasInitialized = true
+            syncDragLocationFromColor()
+        }
+        .onChange(of: color.id) { _, _ in
+            // Sync when the color binding changes to a different color
+            syncDragLocationFromColor()
+        }
+    }
+
+    /// Synchronize dragLocation from the current color's HSB values
+    private func syncDragLocationFromColor() {
+        let swiftUIColor = color.swiftUIColor
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        #if canImport(UIKit)
+        UIColor(swiftUIColor).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        #elseif canImport(AppKit)
+        NSColor(swiftUIColor).usingColorSpace(.deviceRGB)?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        #endif
+
+        // Map HSB to picker coordinates:
+        // x (hue): 0..1 maps to left..right
+        // y (brightness): 0..1 maps to top..bottom (1 - brightness because top is bright)
+        dragLocation = CGPoint(x: hue, y: 1.0 - brightness)
     }
     
     private func updateColor(with location: CGPoint, in size: CGSize) {

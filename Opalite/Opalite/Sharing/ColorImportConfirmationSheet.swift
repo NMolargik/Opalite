@@ -86,12 +86,14 @@ struct ColorImportConfirmationSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
+                        HapticsManager.shared.impact()
                         dismiss()
                     }
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Import") {
+                        HapticsManager.shared.impact()
                         performImport()
                     }
                     .disabled(isImporting || preview.willSkip)

@@ -131,8 +131,11 @@ struct ColorDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(shareSheet(image: shareImage))
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
             Button("Delete", role: .destructive) {
+                HapticsManager.shared.selection()
                 do {
                     try viewModel.deleteColor(using: colorManager)
                     dismiss()
@@ -144,8 +147,11 @@ struct ColorDetailView: View {
             Text("This action cannot be undone.")
         }
         .alert("Remove from Palette?", isPresented: $showDetachConfirmation) {
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
             Button("Remove", role: .destructive) {
+                HapticsManager.shared.selection()
                 viewModel.detachFromPalette(using: colorManager)
             }
         } message: {
@@ -176,6 +182,7 @@ struct ColorDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    HapticsManager.shared.selection()
                     isShowingColorEditor = true
                 } label: {
                     Text("Edit")
@@ -186,6 +193,7 @@ struct ColorDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    HapticsManager.shared.selection()
                     if color.palette != nil {
                         showDetachConfirmation = true
                     } else {
@@ -199,6 +207,7 @@ struct ColorDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    HapticsManager.shared.selection()
                     copyHex(for: color)
                     withAnimation(.easeIn(duration: 0.15)) {
                         didCopyHex = true
@@ -219,6 +228,7 @@ struct ColorDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    HapticsManager.shared.selection()
                     withAnimation {
                         isEditingName = true
                     }
@@ -229,6 +239,7 @@ struct ColorDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .destructive){
+                    HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
                     Label("Delete", systemImage: "trash")
@@ -239,6 +250,7 @@ struct ColorDetailView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Menu {
                     Button {
+                        HapticsManager.shared.selection()
                         if let image = solidColorImage(from: color) {
                             shareImage = image
                             shareImageTitle = color.name ?? color.hexString
@@ -249,6 +261,7 @@ struct ColorDetailView: View {
                     }
                     
                     Button {
+                        HapticsManager.shared.selection()
                         if subscriptionManager.hasOnyxEntitlement {
                             do {
                                 shareFileURL = try SharingService.exportColor(color)

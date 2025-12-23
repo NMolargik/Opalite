@@ -53,6 +53,7 @@ struct PaletteSelectionSheet: View {
                         .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 20))
 
                         Button {
+                            HapticsManager.shared.selection()
                             if canCreatePalette {
                                 createNewPaletteAndAttach()
                             } else {
@@ -100,6 +101,7 @@ struct PaletteSelectionSheet: View {
                     } else {
                         ForEach(colorManager.palettes) { palette in
                             Button {
+                                HapticsManager.shared.selection()
                                 attach(color, to: palette)
                             } label: {
                                 HStack {
@@ -131,6 +133,7 @@ struct PaletteSelectionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
+                        HapticsManager.shared.selection()
                         dismiss()
                     }
                 }

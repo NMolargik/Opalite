@@ -12,6 +12,7 @@ struct SplashView: View {
 
     var body: some View {
         Button("Splash") {
+            HapticsManager.shared.selection()
             onContinue()
         }
     }

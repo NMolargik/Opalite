@@ -74,6 +74,7 @@ struct ColorCodesPickerView: View {
                         Spacer()
 
                         Button {
+                            HapticsManager.shared.impact()
                             let hex = color.hexString
                             #if os(iOS) || os(visionOS)
                             UIPasteboard.general.string = hex
@@ -100,6 +101,7 @@ struct ColorCodesPickerView: View {
 
                             }
                         }
+                        .bold()
                         .tint(didCopyHex ? .green : .primary)
                         .buttonStyle(.bordered)
                         #if os(iOS) || os(visionOS)
@@ -108,8 +110,10 @@ struct ColorCodesPickerView: View {
 
 
                         Button("Apply") {
+                            HapticsManager.shared.impact()
                             applyHexInput()
                         }
+                        .bold()
                         
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
@@ -170,8 +174,10 @@ struct ColorCodesPickerView: View {
                         Spacer()
                         
                         Button("Apply") {
+                            HapticsManager.shared.impact()
                             applyRGBInput()
                         }
+                        .bold()
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)
@@ -210,8 +216,10 @@ struct ColorCodesPickerView: View {
                         Spacer()
 
                         Button("Apply") {
+                            HapticsManager.shared.impact()
                             applyAlphaInput()
                         }
+                        .bold()
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)

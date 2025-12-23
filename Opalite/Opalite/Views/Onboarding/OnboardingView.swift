@@ -13,6 +13,7 @@ struct OnboardingView: View {
 
     var body: some View {
         Button("Onboarding") {
+            HapticsManager.shared.selection()
             onContinue()
             isOnboardingComplete = true
         }
