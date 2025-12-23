@@ -49,7 +49,7 @@ struct SwatchRowView: View {
                         .bold()
                         .foregroundStyle(.white)
                         .padding(.horizontal, 10)
-                        .frame(height: isCompact ? 20 : 40)
+                        .frame(height: 20)
                         .padding(8)
                         .multilineTextAlignment(.center)
                         .glassEffect(.clear.tint(.blue).interactive())

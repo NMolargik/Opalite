@@ -12,7 +12,10 @@ struct PaletteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    @AppStorage("userName") private var userName: String = "User"
 
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
@@ -26,6 +29,9 @@ struct PaletteDetailView: View {
     @State private var showDetachConfirmation: Bool = false
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
+    @State private var isShowingPaywall: Bool = false
+    @State private var exportPDFURL: URL?
+    @State private var isShowingPDFShareSheet = false
     
     let palette: OpalitePalette
 
@@ -115,6 +121,9 @@ struct PaletteDetailView: View {
         .navigationTitle("Palette")
         .navigationBarTitleDisplayMode(.inline)
         .background(shareSheet(image: shareImage))
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "Data file export requires Onyx")
+        }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
 
@@ -177,14 +186,53 @@ struct PaletteDetailView: View {
                     }
                     
                     Button {
-                        do {
-                            shareFileURL = try SharingService.exportPalette(palette)
-                            isShowingFileShareSheet = true
-                        } catch {
-                            // Export failed silently
+                        if subscriptionManager.hasOnyxEntitlement {
+                            do {
+                                exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
+                                isShowingPDFShareSheet = true
+                            } catch {
+                                toastManager.show(error: .pdfExportFailed)
+                            }
+                        } else {
+                            isShowingPaywall = true
                         }
                     } label: {
-                        Label("Share Palette", systemImage: "swatchpalette.fill")
+                        Label {
+                            HStack {
+                                Text("Share As PDF")
+                                if !subscriptionManager.hasOnyxEntitlement {
+                                    Image(systemName: "lock.fill")
+                                        .font(.footnote)
+                                }
+                            }
+                        } icon: {
+                            Image(systemName: "doc.richtext")
+                        }
+                    }
+
+                    Button {
+                        if subscriptionManager.hasOnyxEntitlement {
+                            do {
+                                shareFileURL = try SharingService.exportPalette(palette)
+                                isShowingFileShareSheet = true
+                            } catch {
+                                // Export failed silently
+                            }
+                        } else {
+                            isShowingPaywall = true
+                        }
+                    } label: {
+                        Label {
+                            HStack {
+                                Text("Share Palette")
+                                if !subscriptionManager.hasOnyxEntitlement {
+                                    Image(systemName: "lock.fill")
+                                        .font(.footnote)
+                                }
+                            }
+                        } icon: {
+                            Image(systemName: "swatchpalette.fill")
+                        }
                     }
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
@@ -201,6 +249,9 @@ struct PaletteDetailView: View {
             )
             .background(
                 FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
+            )
+            .background(
+                FileShareSheetPresenter(fileURL: exportPDFURL, isPresented: $isShowingPDFShareSheet)
             )
     }
 }
@@ -224,5 +275,7 @@ struct PaletteDetailView: View {
     return NavigationStack {
         PaletteDetailView(palette: OpalitePalette.sample)
             .environment(manager)
+            .environment(ToastManager())
+            .environment(SubscriptionManager())
     }
 }

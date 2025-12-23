@@ -14,6 +14,8 @@ struct PencilKitCanvas: View {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var canvasSize: CGSize?
+    @Binding var contentOffset: CGPoint
+    @Binding var zoomScale: CGFloat
 
     var body: some View {
         CanvasDetail_PencilKitRepresentable(
@@ -21,7 +23,9 @@ struct PencilKitCanvas: View {
             inkColor: $inkColor,
             forceColorUpdate: forceColorUpdate,
             appearTrigger: appearTrigger,
-            canvasSize: canvasSize
+            canvasSize: canvasSize,
+            contentOffset: $contentOffset,
+            zoomScale: $zoomScale
         )
         .ignoresSafeArea(edges: .bottom)
     }
@@ -34,26 +38,32 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var canvasSize: CGSize?
+    @Binding var contentOffset: CGPoint
+    @Binding var zoomScale: CGFloat
 
     func makeUIView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
         view.drawing = drawing
         view.backgroundColor = .clear
         view.isOpaque = false
-        view.alwaysBounceVertical = true
-        view.alwaysBounceHorizontal = true
         view.drawingPolicy = .default
         view.delegate = context.coordinator
 
+        // Disable bouncing to prevent showing hard edges
+        view.alwaysBounceVertical = false
+        view.alwaysBounceHorizontal = false
+        view.bounces = false
+        view.bouncesZoom = false
+
         // Enable zooming
-        view.minimumZoomScale = 0.5
+        view.minimumZoomScale = 0.25
         view.maximumZoomScale = 4.0
-        view.bouncesZoom = true
 
         // Set content size if we have a stored canvas size
         if let size = canvasSize {
             view.contentSize = size
             context.coordinator.storedCanvasSize = size
+            context.coordinator.viewSize = view.bounds.size
         }
 
         // Attach tool picker
@@ -82,6 +92,9 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             context.coordinator.storedCanvasSize = size
             uiView.contentSize = size
         }
+
+        // Track view size for scroll bounds calculation
+        context.coordinator.viewSize = uiView.bounds.size
 
         // Re-attach tool picker when view reappears
         if context.coordinator.lastAppearTrigger != appearTrigger {
@@ -117,11 +130,13 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(drawing: $drawing)
+        Coordinator(drawing: $drawing, contentOffset: $contentOffset, zoomScale: $zoomScale)
     }
 
-    final class Coordinator: NSObject, PKCanvasViewDelegate, PKToolPickerObserver {
+    final class Coordinator: NSObject, PKCanvasViewDelegate, PKToolPickerObserver, UIScrollViewDelegate {
         @Binding var drawing: PKDrawing
+        @Binding var contentOffset: CGPoint
+        @Binding var zoomScale: CGFloat
         weak var canvasView: PKCanvasView?
         var toolPicker: PKToolPicker?
         var userChangedTool = false
@@ -129,9 +144,66 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         var lastForceColorUpdate: UUID?
         var lastAppearTrigger: UUID?
         var storedCanvasSize: CGSize?
+        var viewSize: CGSize = .zero
 
-        init(drawing: Binding<PKDrawing>) {
+        init(drawing: Binding<PKDrawing>, contentOffset: Binding<CGPoint>, zoomScale: Binding<CGFloat>) {
             _drawing = drawing
+            _contentOffset = contentOffset
+            _zoomScale = zoomScale
+        }
+
+        // MARK: - UIScrollViewDelegate
+
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            constrainContentOffset(scrollView)
+            updateScrollState(scrollView)
+        }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            constrainContentOffset(scrollView)
+            updateScrollState(scrollView)
+        }
+
+        private func updateScrollState(_ scrollView: UIScrollView) {
+            DispatchQueue.main.async { [weak self] in
+                self?.contentOffset = scrollView.contentOffset
+                self?.zoomScale = scrollView.zoomScale
+            }
+        }
+
+        private func constrainContentOffset(_ scrollView: UIScrollView) {
+            guard let canvasSize = storedCanvasSize else { return }
+
+            let zoomScale = scrollView.zoomScale
+            let scaledContentWidth = canvasSize.width * zoomScale
+            let scaledContentHeight = canvasSize.height * zoomScale
+            let viewWidth = scrollView.bounds.width
+            let viewHeight = scrollView.bounds.height
+
+            var offset = scrollView.contentOffset
+
+            // Calculate the maximum allowed offset
+            let maxOffsetX = max(0, scaledContentWidth - viewWidth)
+            let maxOffsetY = max(0, scaledContentHeight - viewHeight)
+
+            // Constrain X offset
+            if offset.x < 0 {
+                offset.x = 0
+            } else if offset.x > maxOffsetX {
+                offset.x = maxOffsetX
+            }
+
+            // Constrain Y offset
+            if offset.y < 0 {
+                offset.y = 0
+            } else if offset.y > maxOffsetY {
+                offset.y = maxOffsetY
+            }
+
+            // Only update if changed to avoid recursion
+            if offset != scrollView.contentOffset {
+                scrollView.contentOffset = offset
+            }
         }
 
         func reattachToolPicker() {
@@ -185,6 +257,8 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
     var forceColorUpdate: UUID
     var appearTrigger: UUID
     var canvasSize: CGSize?
+    @Binding var contentOffset: CGPoint
+    @Binding var zoomScale: CGFloat
 
     func makeNSView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()

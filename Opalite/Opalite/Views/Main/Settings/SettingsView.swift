@@ -14,6 +14,7 @@ import UIKit
 struct SettingsView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(CanvasManager.self) private var canvasManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     @AppStorage("userName") private var userName: String = "User"
     @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
@@ -21,6 +22,7 @@ struct SettingsView: View {
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
     @State private var isShowingInsertSamplesAlert: Bool = false
+    @State private var isShowingPaywall: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL? = nil
     
@@ -68,6 +70,46 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    if subscriptionManager.hasOnyxEntitlement {
+                        HStack {
+                            Label("Onyx", systemImage: "sparkles")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let subscription = subscriptionManager.currentSubscription {
+                                Text(subscription.displayName)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("Active")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    } else {
+                        Button {
+                            isShowingPaywall = true
+                        } label: {
+                            HStack {
+                                Label("Upgrade to Onyx", systemImage: "sparkles")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    Button {
+                        Task {
+                            await subscriptionManager.restorePurchases()
+                        }
+                    } label: {
+                        Label("Restore Purchases", systemImage: "arrow.clockwise")
+                            .foregroundStyle(.blue)
+                    }
+                } header: {
+                    Text("Subscription")
+                }
+
+                Section {
                     Button {
                         isShowingInsertSamplesAlert = true
                     } label: {
@@ -76,10 +118,22 @@ struct SettingsView: View {
                     }
 
                     Button {
-                        exportColorsToPDF()
+                        if subscriptionManager.hasOnyxEntitlement {
+                            exportColorsToPDF()
+                        } else {
+                            isShowingPaywall = true
+                        }
                     } label: {
-                        Label("Export Portfolio to PDF", systemImage: "doc.richtext")
-                            .foregroundStyle(.blue)
+                        HStack {
+                            Label("Export Portfolio to PDF", systemImage: "doc.richtext")
+                                .foregroundStyle(.blue)
+                            if !subscriptionManager.hasOnyxEntitlement {
+                                Spacer()
+                                Image(systemName: "lock.fill")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 } header: {
                     Text("Data")
@@ -165,6 +219,9 @@ struct SettingsView: View {
         .sheet(item: $exportPDFURL) { item in
             ShareSheet(items: [item.url])
         }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "PDF export requires Onyx")
+        }
     }
 
     // MARK: - Actions
@@ -248,4 +305,5 @@ private struct ShareSheet: UIViewControllerRepresentable {
         .modelContainer(container)
         .environment(ColorManager(context: context))
         .environment(CanvasManager(context: context))
+        .environment(SubscriptionManager())
 }

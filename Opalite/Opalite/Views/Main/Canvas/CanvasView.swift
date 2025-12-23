@@ -34,8 +34,10 @@ struct CanvasView: View {
     @State private var sampledColor: UIColor? = nil
     @State private var samplingLocation: CGPoint? = nil
 
-    // MARK: - Canvas Size
+    // MARK: - Canvas Size & Scroll State
     @State private var effectiveCanvasSize: CGSize? = nil
+    @State private var canvasContentOffset: CGPoint = .zero
+    @State private var canvasZoomScale: CGFloat = 1.0
 
     var body: some View {
         ZStack {
@@ -49,7 +51,9 @@ struct CanvasView: View {
                 inkColor: $selectedInkColor,
                 forceColorUpdate: forceColorUpdate,
                 appearTrigger: appearTrigger,
-                canvasSize: effectiveCanvasSize
+                canvasSize: effectiveCanvasSize,
+                contentOffset: $canvasContentOffset,
+                zoomScale: $canvasZoomScale
             )
 
             // Shape placement overlay
@@ -307,7 +311,7 @@ struct CanvasView: View {
                         .font(.headline)
 
                     if sampledColor != nil {
-                        Text("Tap again to save, or drag to adjust")
+                        Text("Color will be added to your portfolio")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -360,10 +364,19 @@ struct CanvasView: View {
 
         guard let snapshot = UIGraphicsGetImageFromCurrentImageContext() else { return .white }
 
-        // Convert view point to snapshot coordinates
-        let scaleX = canvasSize.width / viewSize.width
-        let scaleY = canvasSize.height / viewSize.height
-        let snapshotPoint = CGPoint(x: point.x * scaleX, y: point.y * scaleY)
+        // Convert view point to canvas coordinates accounting for scroll offset and zoom
+        // The tap point in the overlay corresponds to a position in the visible viewport
+        // We need to convert this to the actual canvas coordinate
+        let canvasX = (point.x / canvasZoomScale) + canvasContentOffset.x / canvasZoomScale
+        let canvasY = (point.y / canvasZoomScale) + canvasContentOffset.y / canvasZoomScale
+
+        let snapshotPoint = CGPoint(x: canvasX, y: canvasY)
+
+        // Ensure point is within canvas bounds
+        guard snapshotPoint.x >= 0 && snapshotPoint.x < canvasSize.width &&
+              snapshotPoint.y >= 0 && snapshotPoint.y < canvasSize.height else {
+            return .white
+        }
 
         return snapshot.pixelColor(at: snapshotPoint) ?? .white
     }

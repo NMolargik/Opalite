@@ -126,7 +126,6 @@ func gradientImage(from colors: [OpaliteColor], size: CGSize = CGSize(width: 512
 
     // Render SwiftUI view to UIImage
     let renderer = ImageRenderer(content: view)
-    renderer.scale = UIScreen.main.scale
     renderer.proposedSize = .init(size)
     renderer.isOpaque = contentIsOpaque
     return renderer.uiImage
@@ -139,7 +138,6 @@ func solidColorImage(from color: OpaliteColor, size: CGSize = CGSize(width: 512,
         .clipped()
 
     let renderer = ImageRenderer(content: view)
-    renderer.scale = UIScreen.main.scale
     renderer.proposedSize = .init(size)
     renderer.isOpaque = color.alpha >= 1.0
     return renderer.uiImage

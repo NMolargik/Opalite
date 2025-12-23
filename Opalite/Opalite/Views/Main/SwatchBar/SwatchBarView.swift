@@ -90,7 +90,7 @@ struct SwatchBarView: View {
                     Image(systemName: "swatchpalette")
                         .font(.system(size: 36, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.tint)
+                        .foregroundStyle(.purple, .orange, .red)
 
                     Text("SwatchBar")
                         .font(.title2)
@@ -116,7 +116,7 @@ struct SwatchBarView: View {
                 .padding(.bottom, 16)
                 .frame(maxWidth: 480)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .presentationDetents([.fraction(0.35)])
+                .presentationDetents([.fraction(0.5)])
                 .presentationDragIndicator(.visible)
             }
         }

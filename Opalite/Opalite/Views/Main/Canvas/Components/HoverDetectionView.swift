@@ -1,10 +1,4 @@
-//
-//  HoverDetectionView.swift
-//  Opalite
-//
-//  Created by Nick Molargik on 12/21/25.
-//
-
+#if canImport(UIKit)
 import UIKit
 
 class HoverDetectionView: UIView {
@@ -15,7 +9,7 @@ class HoverDetectionView: UIView {
     // Baseline roll angle captured on first touch - rotation is relative to this
     private(set) var baselineRollAngle: CGFloat?
 
-    // Haptic feedback for Apple Pencil Pro rotation
+    // Haptic feedback for Apple Pencil Pro rotation (iOS only)
     private lazy var canvasFeedbackGenerator: UICanvasFeedbackGenerator = {
         UICanvasFeedbackGenerator(view: self)
     }()
@@ -39,7 +33,7 @@ class HoverDetectionView: UIView {
     }
 
     private func setupGestures() {
-        // Hover gesture for Apple Pencil
+        // Hover gesture for Apple Pencil / Pointer
         let hoverGesture = UIHoverGestureRecognizer(target: self, action: #selector(handleHover(_:)))
         addGestureRecognizer(hoverGesture)
 
@@ -53,7 +47,6 @@ class HoverDetectionView: UIView {
         case .began, .changed:
             let location = gesture.location(in: self)
             // Hover only provides location - roll angle comes from touch events
-            // During hover, we don't update rotation (API limitation: rollAngle requires touch)
             onHoverUpdate?(location, nil)
         case .ended, .cancelled:
             onHoverEnd?()
@@ -126,3 +119,74 @@ class HoverDetectionView: UIView {
         onTap?(location)
     }
 }
+#elseif canImport(AppKit)
+import AppKit
+
+class HoverDetectionView: NSView {
+    var onHoverUpdate: ((CGPoint, CGFloat?) -> Void)?
+    var onHoverEnd: (() -> Void)?
+    var onTap: ((CGPoint) -> Void)?
+
+    // macOS does not have Pencil roll; keep API surface but unused
+    private(set) var baselineRollAngle: CGFloat?
+
+    // Tracking area for mouse hover
+    private var trackingArea: NSTrackingArea?
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setupTracking()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupTracking()
+    }
+
+    override var acceptsFirstResponder: Bool { true }
+
+    func resetBaseline() {
+        baselineRollAngle = nil
+    }
+
+    private func setupTracking() {
+        updateTrackingAreas()
+        // Enable mouse moved events
+        window?.acceptsMouseMovedEvents = true
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let trackingArea {
+            removeTrackingArea(trackingArea)
+        }
+        let options: NSTrackingArea.Options = [.mouseEnteredAndExited, .mouseMoved, .activeInActiveApp, .inVisibleRect]
+        let area = NSTrackingArea(rect: bounds, options: options, owner: self, userInfo: nil)
+        addTrackingArea(area)
+        trackingArea = area
+    }
+
+    // Hover/move
+    override func mouseEntered(with event: NSEvent) {
+        let location = convert(event.locationInWindow, from: nil)
+        onHoverUpdate?(location, nil)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        let location = convert(event.locationInWindow, from: nil)
+        onHoverUpdate?(location, nil)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        onHoverEnd?()
+    }
+
+    // Click/tap
+    override func mouseUp(with event: NSEvent) {
+        let location = convert(event.locationInWindow, from: nil)
+        onTap?(location)
+    }
+}
+
+#endif
+

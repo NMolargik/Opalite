@@ -42,6 +42,12 @@ enum OpaliteError: LocalizedError, Equatable {
     case loadFailed
     case sampleDataFailed
 
+    // MARK: - Subscription Operations
+    case subscriptionLoadFailed
+    case subscriptionPurchaseFailed
+    case subscriptionRestoreFailed
+    case subscriptionVerificationFailed
+
     // MARK: - Generic
     case unknownError(String)
 
@@ -101,6 +107,16 @@ enum OpaliteError: LocalizedError, Equatable {
         case .sampleDataFailed:
             return "Unable to load sample data"
 
+        // Subscription
+        case .subscriptionLoadFailed:
+            return "Unable to load subscription options"
+        case .subscriptionPurchaseFailed:
+            return "Purchase could not be completed"
+        case .subscriptionRestoreFailed:
+            return "Unable to restore purchases"
+        case .subscriptionVerificationFailed:
+            return "Purchase verification failed"
+
         // Generic
         case .unknownError(let message):
             return message
@@ -127,6 +143,9 @@ enum OpaliteError: LocalizedError, Equatable {
             return "square.and.arrow.up.fill"
         case .sampleDataFailed:
             return "doc.fill.badge.plus"
+        case .subscriptionLoadFailed, .subscriptionPurchaseFailed,
+             .subscriptionRestoreFailed, .subscriptionVerificationFailed:
+            return "creditcard.fill"
         case .unknownError:
             return "exclamationmark.triangle.fill"
         }

@@ -365,8 +365,7 @@ extension OpaliteColor {
         return try JSONSerialization.data(withJSONObject: exportStruct, options: .prettyPrinted)
     }
 }
-#if DEBUG
-// MARK: - Preview Samples
+
 extension OpaliteColor {
     /// A convenient sample color for SwiftUI previews
     static let sample: OpaliteColor = OpaliteColor(
@@ -399,4 +398,3 @@ extension OpaliteColor {
         alpha: 1.0
     )
 }
-#endif

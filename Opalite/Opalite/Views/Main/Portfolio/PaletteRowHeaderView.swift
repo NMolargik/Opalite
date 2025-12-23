@@ -11,6 +11,10 @@ import SwiftData
 struct PaletteRowHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+
+    @AppStorage("userName") private var userName: String = "User"
+
     @State private var showDeleteConfirmation = false
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
@@ -18,6 +22,9 @@ struct PaletteRowHeaderView: View {
     @State private var isShowingColorEditor = false
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
+    @State private var isShowingPaywall: Bool = false
+    @State private var exportPDFURL: URL?
+    @State private var isShowingPDFShareSheet = false
     
     let palette: OpalitePalette
     
@@ -41,16 +48,55 @@ struct PaletteRowHeaderView: View {
                 } label: {
                     Label("Share As Image", systemImage: "photo.on.rectangle")
                 }
-
+                
                 Button {
-                    do {
-                        shareFileURL = try SharingService.exportPalette(palette)
-                        isShowingFileShareSheet = true
-                    } catch {
-                        // Export failed silently
+                    if subscriptionManager.hasOnyxEntitlement {
+                        do {
+                            exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
+                            isShowingPDFShareSheet = true
+                        } catch {
+                            toastManager.show(error: .pdfExportFailed)
+                        }
+                    } else {
+                        isShowingPaywall = true
                     }
                 } label: {
-                    Label("Share Palette", systemImage: "square.and.arrow.up")
+                    Label {
+                        HStack {
+                            Text("Share As PDF")
+                            if !subscriptionManager.hasOnyxEntitlement {
+                                Image(systemName: "lock.fill")
+                                    .font(.footnote)
+                            }
+                        }
+                    } icon: {
+                        Image(systemName: "doc.richtext")
+                    }
+                }
+
+                Button {
+                    if subscriptionManager.hasOnyxEntitlement {
+                        do {
+                            shareFileURL = try SharingService.exportPalette(palette)
+                            isShowingFileShareSheet = true
+                        } catch {
+                            // Export failed silently
+                        }
+                    } else {
+                        isShowingPaywall = true
+                    }
+                } label: {
+                    Label {
+                        HStack {
+                            Text("Share Palette")
+                            if !subscriptionManager.hasOnyxEntitlement {
+                                Image(systemName: "lock.fill")
+                                    .font(.footnote)
+                            }
+                        }
+                    } icon: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                 }
 
                 Divider()
@@ -120,6 +166,9 @@ struct PaletteRowHeaderView: View {
             Text("This action cannot be undone.")
         }
         .background(shareSheet(image: shareImage))
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "Data file export requires Onyx")
+        }
         .fullScreenCover(isPresented: $isShowingColorEditor) {
             ColorEditorView(
                 color: nil,
@@ -150,6 +199,9 @@ struct PaletteRowHeaderView: View {
             .background(
                 FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
             )
+            .background(
+                FileShareSheetPresenter(fileURL: exportPDFURL, isPresented: $isShowingPDFShareSheet)
+            )
     }
 }
 
@@ -166,5 +218,7 @@ struct PaletteRowHeaderView: View {
         palette: OpalitePalette.sample
     )
     .environment(manager)
+    .environment(ToastManager())
+    .environment(SubscriptionManager())
     .modelContainer(container)
 }

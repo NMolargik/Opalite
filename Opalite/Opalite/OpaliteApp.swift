@@ -30,6 +30,7 @@ struct OpaliteApp: App {
     let colorManager: ColorManager
     let canvasManager: CanvasManager
     let toastManager = ToastManager()
+    let subscriptionManager = SubscriptionManager()
     let importCoordinator = ImportCoordinator()
 
     init() {
@@ -123,23 +124,31 @@ struct OpaliteApp: App {
         .environment(colorManager)
         .environment(canvasManager)
         .environment(toastManager)
+        .environment(subscriptionManager)
         .environment(importCoordinator)
 
 #if os(macOS)
         Window("SwatchBar", id: "swatchBar") {
             SwatchBarView()
                 .toastContainer()
+                .task {
+                    await colorManager.refreshAll()
+                }
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
         .environment(toastManager)
+        .environment(subscriptionManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #elseif os(iOS)
         WindowGroup(id: "swatchBar") {
             SwatchBarView()
                 .toastContainer()
+                .task {
+                    await colorManager.refreshAll()
+                }
                 .onAppear {
                     colorManager.isSwatchBarOpen = true
                 }
@@ -151,6 +160,7 @@ struct OpaliteApp: App {
         .environment(colorManager)
         .environment(canvasManager)
         .environment(toastManager)
+        .environment(subscriptionManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #endif

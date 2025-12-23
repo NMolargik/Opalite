@@ -26,6 +26,53 @@ enum PortfolioPDFExporter {
     private static let colorNameFont = UIFont.systemFont(ofSize: 11, weight: .medium)
     private static let colorDetailFont = UIFont.systemFont(ofSize: 9, weight: .regular)
 
+    /// Exports a single palette to PDF
+    static func exportPalette(_ palette: OpalitePalette, userName: String) throws -> URL {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+
+        let sanitizedName = palette.name.replacingOccurrences(of: "/", with: "-")
+        let filename = "\(sanitizedName) Palette \(Int(Date().timeIntervalSince1970)).pdf"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+
+        let data = renderer.pdfData { ctx in
+            var y: CGFloat = 0
+
+            // Title Page
+            ctx.beginPage()
+            y = drawPaletteTitlePage(
+                palette: palette,
+                dateString: dateFormatter.string(from: Date()),
+                userName: userName
+            )
+
+            let paletteColors = (palette.colors ?? []).sorted {
+                ($0.name ?? "").localizedCaseInsensitiveCompare($1.name ?? "") == .orderedAscending
+            }
+
+            for color in paletteColors {
+                y = ensureSpace(y: y, needed: 55, ctx: ctx)
+                y = drawColorRow(color, at: y, indented: false)
+            }
+
+            if paletteColors.isEmpty {
+                y = ensureSpace(y: y, needed: 40, ctx: ctx)
+                let emptyAttrs: [NSAttributedString.Key: Any] = [
+                    .font: subtitleFont,
+                    .foregroundColor: UIColor.secondaryLabel
+                ]
+                "No colors in this palette.".draw(at: CGPoint(x: margin, y: y), withAttributes: emptyAttrs)
+            }
+        }
+
+        try data.write(to: url)
+        return url
+    }
+
+    /// Exports all palettes and loose colors to PDF
     static func export(palettes: [OpalitePalette], looseColors: [OpaliteColor], userName: String) throws -> URL {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -127,6 +174,55 @@ enum PortfolioPDFExporter {
         let summary = "\(paletteCount) palette\(paletteCount == 1 ? "" : "s"), \(colorCount) total color\(colorCount == 1 ? "" : "s")"
         summary.draw(at: CGPoint(x: margin, y: y), withAttributes: subtitleAttrs)
         y += 30
+
+        // Divider line
+        let dividerPath = UIBezierPath()
+        dividerPath.move(to: CGPoint(x: margin, y: y))
+        dividerPath.addLine(to: CGPoint(x: pageRect.width - margin, y: y))
+        UIColor.separator.setStroke()
+        dividerPath.lineWidth = 0.5
+        dividerPath.stroke()
+
+        return y + 20
+    }
+
+    private static func drawPaletteTitlePage(palette: OpalitePalette, dateString: String, userName: String) -> CGFloat {
+        var y: CGFloat = 60
+        let colorCount = palette.colors?.count ?? 0
+
+        // Palette name as title
+        let titleAttrs: [NSAttributedString.Key: Any] = [
+            .font: titleFont,
+            .foregroundColor: UIColor.label
+        ]
+        palette.name.draw(at: CGPoint(x: margin, y: y), withAttributes: titleAttrs)
+        y += 36
+
+        // Subtitle with date
+        let subtitleAttrs: [NSAttributedString.Key: Any] = [
+            .font: subtitleFont,
+            .foregroundColor: UIColor.secondaryLabel
+        ]
+        "Exported on \(dateString) by \(userName)".draw(at: CGPoint(x: margin, y: y), withAttributes: subtitleAttrs)
+        y += 18
+
+        // Color count
+        let summary = "\(colorCount) color\(colorCount == 1 ? "" : "s")"
+        summary.draw(at: CGPoint(x: margin, y: y), withAttributes: subtitleAttrs)
+        y += 18
+
+        // Notes if available
+        if let notes = palette.notes, !notes.isEmpty {
+            let notesAttrs: [NSAttributedString.Key: Any] = [
+                .font: subtitleFont,
+                .foregroundColor: UIColor.secondaryLabel
+            ]
+            let truncatedNotes = truncateText(notes, toWidth: contentWidth, font: subtitleFont)
+            truncatedNotes.draw(at: CGPoint(x: margin, y: y), withAttributes: notesAttrs)
+            y += 18
+        }
+
+        y += 12
 
         // Divider line
         let dividerPath = UIBezierPath()

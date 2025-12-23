@@ -48,9 +48,10 @@ final class CanvasFile {
 
 // MARK: - Constants
 extension CanvasFile {
-    /// Default canvas size for new canvases - iPad-sized for consistency across devices.
-    /// Smaller devices (iPhone) can pan/zoom within this canvas area.
-    static let defaultCanvasSize = CGSize(width: 1194, height: 1600)
+    /// Default canvas size for new canvases - large canvas for extensive drawing.
+    /// This provides ample space for complex illustrations and diagrams.
+    /// Devices can pan/zoom within this canvas area.
+    static let defaultCanvasSize = CGSize(width: 4096, height: 4096)
 }
 
 // MARK: - Convenience Helpers

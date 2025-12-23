@@ -186,6 +186,8 @@ struct SearchView: View {
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
                                         }
+                                        .foregroundStyle(.inverseTheme)
+
 
                                         Spacer()
 

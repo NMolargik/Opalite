@@ -13,10 +13,12 @@ struct CanvasListView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     @State private var path = NavigationPath()
     @State private var searchText = ""
     @State private var selectedCanvasFile: CanvasFile? = nil
+    @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
     @State private var canvasToRename: CanvasFile? = nil
@@ -33,7 +35,11 @@ struct CanvasListView: View {
             List {
                 ForEach(filteredCanvases) { canvasFile in
                     Button {
-                        selectedCanvasFile = canvasFile
+                        if subscriptionManager.hasOnyxEntitlement {
+                            selectedCanvasFile = canvasFile
+                        } else {
+                            isShowingPaywall = true
+                        }
                     } label: {
                         HStack {
                             Label {
@@ -43,6 +49,11 @@ struct CanvasListView: View {
                                     .foregroundStyle(.red)
                             }
                             Spacer()
+                            if !subscriptionManager.hasOnyxEntitlement {
+                                Image(systemName: "lock.fill")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         .bold()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -101,17 +112,24 @@ struct CanvasListView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
-                        do {
-                            let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
-                            selectedCanvasFile = newCanvasFile
-                        } catch {
-                            toastManager.show(error: .canvasCreationFailed)
+                        if subscriptionManager.hasOnyxEntitlement {
+                            do {
+                                let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
+                                selectedCanvasFile = newCanvasFile
+                            } catch {
+                                toastManager.show(error: .canvasCreationFailed)
+                            }
+                        } else {
+                            isShowingPaywall = true
                         }
                     }, label: {
                         Label("New Canvas", systemImage: "plus")
                     })
                     .tint(.red)
                 }
+            }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView(featureContext: "Canvas access requires Onyx")
             }
             .alert("Rename Canvas", isPresented: Binding(
                 get: { canvasToRename != nil },
@@ -179,4 +197,6 @@ struct CanvasListView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(SubscriptionManager())
+        .environment(ToastManager())
 }

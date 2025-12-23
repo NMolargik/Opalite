@@ -28,32 +28,10 @@
 				<string>com.molargiksoftware.opalite.palette</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string></string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-			<key>LSItemContentTypes</key>
-			<array/>
-		</dict>
-	</array>
-	<key>UIApplicationShortcutItems</key>
-	<array>
-		<dict>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>square.stack</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Open SwatchBar</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>OpenSwatchBarAction</string>
-		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
-		<string>processing</string>
 		<string>fetch</string>
 	</array>
 	<key>UTExportedTypeDeclarations</key>

@@ -13,9 +13,11 @@ struct MainView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     @Namespace private var namespace
     @State private var selectedTab: Tabs = .portfolio
+    @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
     @State private var canvasToRename: CanvasFile? = nil
@@ -115,9 +117,16 @@ struct MainView: View {
             }
             .sectionActions {
                 Button {
-                    let newCanvas = try? canvasManager.createCanvas()
-                    if let newCanvas {
-                        selectedTab = .canvasBody(newCanvas)
+                    if subscriptionManager.hasOnyxEntitlement {
+                        let newCanvas = try? canvasManager.createCanvas()
+                        if let newCanvas {
+                            // Defer tab selection to allow view hierarchy to update first
+                            DispatchQueue.main.async {
+                                selectedTab = .canvasBody(newCanvas)
+                            }
+                        }
+                    } else {
+                        isShowingPaywall = true
                     }
                 } label: {
                     Label("New Canvas", systemImage: "plus")
@@ -157,6 +166,9 @@ struct MainView: View {
                 selectedTab = .portfolio
             }
         }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "Canvas access requires Onyx")
+        }
     }
 }
 
@@ -180,4 +192,6 @@ struct MainView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(SubscriptionManager())
+        .environment(ToastManager())
 }

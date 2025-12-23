@@ -18,8 +18,10 @@ struct PortfolioView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
-    
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+
     @State private var paletteSelectionColor: OpaliteColor?
+    @State private var isShowingPaywall: Bool = false
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
     @State private var isShowingShareSheet = false
@@ -87,6 +89,7 @@ struct PortfolioView: View {
                         matchedNamespace: swatchNS
                     )
                     .zIndex(1)
+                    .padding(.bottom, 5)
                     
                     // MARK: - Palette Rows
                     HStack {
@@ -103,12 +106,16 @@ struct PortfolioView: View {
                         HStack(spacing: 10) {
                             Image(systemName: "arrow.turn.down.right")
                                 .bold()
-                            
+
                             Button {
-                                do {
-                                    try colorManager.createPalette(name: "New Palette")
-                                } catch {
-                                    toastManager.show(error: .paletteCreationFailed)
+                                if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                                    do {
+                                        try colorManager.createPalette(name: "New Palette")
+                                    } catch {
+                                        toastManager.show(error: .paletteCreationFailed)
+                                    }
+                                } else {
+                                    isShowingPaywall = true
                                 }
                             } label: {
                                 HStack(spacing: 10) {
@@ -120,7 +127,7 @@ struct PortfolioView: View {
                                 .bold()
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
-                                .frame(height: isCompact ? 20 : 40)
+                                .frame(height: 20)
                                 .padding(8)
                                 .multilineTextAlignment(.center)
                                 .glassEffect(.clear.tint(.blue).interactive())
@@ -165,6 +172,7 @@ struct PortfolioView: View {
                     }
                 }
             }
+            .navigationTitle("Opalite")
             .toolbarBackground(.hidden)
             .task {
                 swatchSize = isCompact ? .small : .medium
@@ -208,6 +216,9 @@ struct PortfolioView: View {
             } message: {
                 Text(importError ?? "An unknown error occurred.")
             }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView(featureContext: "This feature requires Onyx")
+            }
             .toolbar {
                 if isIPadOrMac && !colorManager.isSwatchBarOpen {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -248,14 +259,24 @@ struct PortfolioView: View {
                         })
 
                         Button(action: {
-                            do {
-                                try colorManager.createPalette(name: "New Palette")
-                            } catch {
-                                toastManager.show(error: .paletteCreationFailed)
+                            if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                                do {
+                                    try colorManager.createPalette(name: "New Palette")
+                                } catch {
+                                    toastManager.show(error: .paletteCreationFailed)
+                                }
+                            } else {
+                                isShowingPaywall = true
                             }
                         }, label: {
                             Label {
-                                Text("New Palette")
+                                HStack {
+                                    Text("New Palette")
+                                    if !subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                                        Image(systemName: "lock.fill")
+                                            .font(.footnote)
+                                    }
+                                }
                             } icon: {
                                 Image(systemName: "swatchpalette.fill")
                                     .symbolRenderingMode(.palette)
@@ -266,9 +287,23 @@ struct PortfolioView: View {
                         Divider()
 
                         Button(action: {
-                            isShowingFileImporter = true
+                            if subscriptionManager.hasOnyxEntitlement {
+                                isShowingFileImporter = true
+                            } else {
+                                isShowingPaywall = true
+                            }
                         }, label: {
-                            Label("Import From File", systemImage: "square.and.arrow.down")
+                            Label {
+                                HStack {
+                                    Text("Import From File")
+                                    if !subscriptionManager.hasOnyxEntitlement {
+                                        Image(systemName: "lock.fill")
+                                            .font(.footnote)
+                                    }
+                                }
+                            } icon: {
+                                Image(systemName: "square.and.arrow.down")
+                            }
                         })
                     } label: {
                         Label("Create", systemImage: "plus")
@@ -430,5 +465,6 @@ struct PortfolioView: View {
     return PortfolioView()
         .environment(manager)
         .environment(ToastManager())
+        .environment(SubscriptionManager())
         .modelContainer(container)
 }

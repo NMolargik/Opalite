@@ -11,14 +11,20 @@ import SwiftData
 struct PaletteSelectionSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ColorManager.self) private var colorManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     let color: OpaliteColor
 
     @State private var newPaletteName: String = ""
     @State private var isCreating: Bool = false
+    @State private var isShowingPaywall: Bool = false
 
     private var canCreate: Bool {
         !newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isCreating
+    }
+
+    private var canCreatePalette: Bool {
+        subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count)
     }
 
     var body: some View {
@@ -35,8 +41,10 @@ struct PaletteSelectionSheet: View {
                                 .textInputAutocapitalization(.words)
                                 .submitLabel(.done)
                                 .onSubmit {
-                                    if canCreate {
+                                    if canCreate && canCreatePalette {
                                         createNewPaletteAndAttach()
+                                    } else if canCreate && !canCreatePalette {
+                                        isShowingPaywall = true
                                     }
                                 }
                         }
@@ -45,12 +53,21 @@ struct PaletteSelectionSheet: View {
                         .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 10))
 
                         Button {
-                            createNewPaletteAndAttach()
+                            if canCreatePalette {
+                                createNewPaletteAndAttach()
+                            } else {
+                                isShowingPaywall = true
+                            }
                         } label: {
                             HStack {
                                 Spacer()
-                                Label("Create New Palette", systemImage: "plus")
-                                    .font(.headline)
+                                if canCreatePalette {
+                                    Label("Create New Palette", systemImage: "plus")
+                                        .font(.headline)
+                                } else {
+                                    Label("Create New Palette", systemImage: "lock.fill")
+                                        .font(.headline)
+                                }
                                 Spacer()
                             }
                             .padding(.vertical, 10)
@@ -62,7 +79,13 @@ struct PaletteSelectionSheet: View {
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                 } header: {
-                    Text("Create")
+                    HStack {
+                        Text("Create")
+                        if !canCreatePalette {
+                            Text("(Onyx Required)")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
 
                 Section {
@@ -112,6 +135,9 @@ struct PaletteSelectionSheet: View {
                     }
                 }
             }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView(featureContext: "Unlimited palettes require Onyx")
+            }
         }
     }
 
@@ -160,6 +186,8 @@ struct PaletteSelectionSheet: View {
 
     let manager = ColorManager(context: container.mainContext)
     return PaletteSelectionSheet(color: OpaliteColor.sample)
-    .environment(manager)
-    .modelContainer(container)
+        .environment(manager)
+        .environment(SubscriptionManager())
+        .environment(ToastManager())
+        .modelContainer(container)
 }

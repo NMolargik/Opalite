@@ -14,15 +14,22 @@ import UIKit
 import AppKit
 #endif
 
+#if canImport(UIKit)
+private typealias PlatformImage = UIImage
+#elseif canImport(AppKit)
+private typealias PlatformImage = NSImage
+#endif
+
 struct ColorDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    
+
     @State private var viewModel: ColorDetailView.ViewModel
 
-    @State private var shareImage: UIImage?
+    @State private var shareImage: PlatformImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
     @State private var isShowingShareSheet = false
     @State private var showDeleteConfirmation = false
@@ -33,6 +40,7 @@ struct ColorDetailView: View {
     @State private var didCopyHex: Bool = false
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
+    @State private var isShowingPaywall: Bool = false
 
     let color: OpaliteColor
     
@@ -162,6 +170,9 @@ struct ColorDetailView: View {
                 }
             )
         }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "Data file export requires Onyx")
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -236,14 +247,28 @@ struct ColorDetailView: View {
                     }
                     
                     Button {
-                        do {
-                            shareFileURL = try SharingService.exportColor(color)
-                            isShowingFileShareSheet = true
-                        } catch {
-                            // Export failed silently
+                        if subscriptionManager.hasOnyxEntitlement {
+                            do {
+                                shareFileURL = try SharingService.exportColor(color)
+                                isShowingFileShareSheet = true
+                            } catch {
+                                // Export failed silently
+                            }
+                        } else {
+                            isShowingPaywall = true
                         }
                     } label: {
-                        Label("Share Color", systemImage: "paintpalette.fill")
+                        Label {
+                            HStack {
+                                Text("Share Color")
+                                if !subscriptionManager.hasOnyxEntitlement {
+                                    Image(systemName: "lock.fill")
+                                        .font(.footnote)
+                                }
+                            }
+                        } icon: {
+                            Image(systemName: "paintpalette.fill")
+                        }
                     }
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
@@ -253,7 +278,7 @@ struct ColorDetailView: View {
     }
     
     @ViewBuilder
-    private func shareSheet(image: UIImage?) -> some View {
+    private func shareSheet(image: PlatformImage?) -> some View {
         EmptyView()
             .background(
                 ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
@@ -297,5 +322,7 @@ struct ColorDetailView: View {
         ColorDetailView(color: OpaliteColor.sample)
     }
     .environment(manager)
+    .environment(ToastManager())
+    .environment(SubscriptionManager())
     .modelContainer(container)
 }
