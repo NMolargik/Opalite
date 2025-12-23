@@ -642,6 +642,7 @@
 				INFOPLIST_FILE = Opalite/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Opalite uses your Camera to let you take images to sample for colors.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Opalite uses your photo library to let you sample images for colors.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -693,6 +694,7 @@
 				INFOPLIST_FILE = Opalite/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Opalite uses your Camera to let you take images to sample for colors.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Opalite uses your photo library to let you sample images for colors.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
