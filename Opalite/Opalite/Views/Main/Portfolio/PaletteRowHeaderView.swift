@@ -153,21 +153,25 @@ struct PaletteRowHeaderView: View {
             }
 
             Button("Delete Palette", role: .destructive) {
-                HapticsManager.shared.selection()
-                do {
-                    try colorManager.deletePalette(palette, andColors: false)
-                } catch {
-                    toastManager.show(error: .paletteDeletionFailed)
+                withAnimation {
+                    HapticsManager.shared.selection()
+                    do {
+                        try colorManager.deletePalette(palette, andColors: false)
+                    } catch {
+                        toastManager.show(error: .paletteDeletionFailed)
+                    }
                 }
             }
 
             if (!(palette.colors?.isEmpty ?? false)) {
                 Button("Delete Palette and Colors", role: .destructive) {
                     HapticsManager.shared.selection()
-                    do {
-                        try colorManager.deletePalette(palette, andColors: true)
-                    } catch {
-                        toastManager.show(error: .paletteDeletionFailed)
+                    withAnimation {
+                        do {
+                            try colorManager.deletePalette(palette, andColors: true)
+                        } catch {
+                            toastManager.show(error: .paletteDeletionFailed)
+                        }
                     }
                 }
             }

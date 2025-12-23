@@ -111,15 +111,17 @@ struct PortfolioView: View {
                                 .bold()
 
                             Button {
-                                HapticsManager.shared.selection()
-                                if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-                                    do {
-                                        try colorManager.createPalette(name: "New Palette")
-                                    } catch {
-                                        toastManager.show(error: .paletteCreationFailed)
+                                withAnimation {
+                                    HapticsManager.shared.selection()
+                                    if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                                        do {
+                                            try colorManager.createPalette(name: "New Palette")
+                                        } catch {
+                                            toastManager.show(error: .paletteCreationFailed)
+                                        }
+                                    } else {
+                                        isShowingPaywall = true
                                     }
-                                } else {
-                                    isShowingPaywall = true
                                 }
                             } label: {
                                 HStack(spacing: 10) {
@@ -274,15 +276,17 @@ struct PortfolioView: View {
                         })
 
                         Button(action: {
-                            HapticsManager.shared.selection()
-                            if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-                                do {
-                                    try colorManager.createPalette(name: "New Palette")
-                                } catch {
-                                    toastManager.show(error: .paletteCreationFailed)
+                            withAnimation {
+                                HapticsManager.shared.selection()
+                                if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                                    do {
+                                        try colorManager.createPalette(name: "New Palette")
+                                    } catch {
+                                        toastManager.show(error: .paletteCreationFailed)
+                                    }
+                                } else {
+                                    isShowingPaywall = true
                                 }
-                            } else {
-                                isShowingPaywall = true
                             }
                         }, label: {
                             Label {
