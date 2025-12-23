@@ -206,7 +206,7 @@ struct SearchView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Search")
-            .searchable(text: $searchText, prompt: "Colors, palettes, canvases...")
+            .searchable(text: $searchText, prompt: "Color, palette, or canvas")
         }
     }
 }

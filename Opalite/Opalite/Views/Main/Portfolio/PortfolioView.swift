@@ -426,16 +426,20 @@ struct PortfolioView: View {
                 
                 if let _ = palette {
                     Button(role: .destructive) {
-                        colorManager.detachColorFromPalette(color)
+                        withAnimation {
+                            colorManager.detachColorFromPalette(color)
+                        }
                     } label: {
                         Label("Remove From Palette", systemImage: "swatchpalette")
                     }
                 } else {
                     Button(role: .destructive) {
-                        do {
-                            try colorManager.deleteColor(color)
-                        } catch {
-                            toastManager.show(error: .colorDeletionFailed)
+                        withAnimation {
+                            do {
+                                try colorManager.deleteColor(color)
+                            } catch {
+                                toastManager.show(error: .colorDeletionFailed)
+                            }
                         }
                     } label: {
                         Label("Delete Color", systemImage: "trash.fill")

@@ -62,7 +62,9 @@ struct PaletteDetailView: View {
 
                         VStack(alignment: .leading, spacing: 16) {
                             PaletteMembersView(palette: palette, onRemoveColor: { color in
-                                colorManager.detachColorFromPalette(color)
+                                withAnimation {
+                                    colorManager.detachColorFromPalette(color)
+                                }
                             })
 
                             NotesSectionView(
@@ -88,7 +90,9 @@ struct PaletteDetailView: View {
                 } else {
                     VStack(alignment: .leading, spacing: 16) {
                         PaletteMembersView(palette: palette, onRemoveColor: { color in
-                            colorManager.detachColorFromPalette(color)
+                            withAnimation {
+                                colorManager.detachColorFromPalette(color)
+                            }
                         })
                         
                         PaletteDetailsSectionView(palette: palette)
@@ -165,7 +169,9 @@ struct PaletteDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isEditingName = true
+                    withAnimation {
+                        isEditingName = true
+                    }
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
                 }

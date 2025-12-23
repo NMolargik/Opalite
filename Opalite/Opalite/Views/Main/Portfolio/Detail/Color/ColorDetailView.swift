@@ -219,7 +219,9 @@ struct ColorDetailView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isEditingName = true
+                    withAnimation {
+                        isEditingName = true
+                    }
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
                 }

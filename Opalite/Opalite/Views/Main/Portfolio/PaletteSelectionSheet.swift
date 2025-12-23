@@ -50,7 +50,7 @@ struct PaletteSelectionSheet: View {
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
-                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 10))
+                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 20))
 
                         Button {
                             if canCreatePalette {
@@ -93,7 +93,7 @@ struct PaletteSelectionSheet: View {
                         ContentUnavailableView(
                             "No Palettes",
                             systemImage: "swatchpalette",
-                            description: Text("Create a palette above, or add more palettes to your portfolio.")
+                            description: Text("Create a palette above, or add more palettes to your Portfolio.")
                         )
                         .frame(maxWidth: .infinity)
                         .listRowBackground(Color.clear)
@@ -142,36 +142,40 @@ struct PaletteSelectionSheet: View {
     }
 
     private func createNewPaletteAndAttach() {
-        let name = newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { return }
-
-        isCreating = true
-        defer { isCreating = false }
-
-        do {
-            let palette = try colorManager.createPalette(name: name)
-            colorManager.attachColor(color, to: palette)
-            dismiss()
-        } catch {
-            #if DEBUG
-            print("[PaletteSelectionSheet] createNewPaletteAndAttach error: \(error)")
-            #endif
+        withAnimation {
+            let name = newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !name.isEmpty else { return }
+            
+            isCreating = true
+            defer { isCreating = false }
+            
+            do {
+                let palette = try colorManager.createPalette(name: name)
+                colorManager.attachColor(color, to: palette)
+                dismiss()
+            } catch {
+#if DEBUG
+                print("[PaletteSelectionSheet] createNewPaletteAndAttach error: \(error)")
+#endif
+            }
         }
     }
 
     private func attach(_ color: OpaliteColor, to palette: OpalitePalette) {
-        isCreating = true
-        defer { isCreating = false }
-
-        do {
-            colorManager.attachColor(color, to: palette)
-            try colorManager.saveContext()
-            Task { await colorManager.refreshAll() }
-            dismiss()
-        } catch {
-            #if DEBUG
-            print("[PaletteSelectionSheet] attach error: \(error)")
-            #endif
+        withAnimation {
+            isCreating = true
+            defer { isCreating = false }
+            
+            do {
+                colorManager.attachColor(color, to: palette)
+                try colorManager.saveContext()
+                Task { await colorManager.refreshAll() }
+                dismiss()
+            } catch {
+#if DEBUG
+                print("[PaletteSelectionSheet] attach error: \(error)")
+#endif
+            }
         }
     }
 }

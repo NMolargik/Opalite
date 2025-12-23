@@ -33,7 +33,7 @@ struct ColorRecommendedColorsView: View {
                             Button {
                                 onCreateColor(color)
                             } label: {
-                                let addSuffix: String = (baseColor.palette != nil) ? "to Palette" : "New Color"
+                                let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"
                                 Label("Add \(addSuffix)", systemImage: "plus")
                             }
                         }

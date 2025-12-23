@@ -72,8 +72,9 @@ struct SettingsView: View {
                 Section {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
-                            Label("Onyx", systemImage: "sparkles")
+                            Label("Onyx", systemImage: "inset.filled.oval")
                                 .foregroundStyle(.primary)
+                            
                             Spacer()
                             if let subscription = subscriptionManager.currentSubscription {
                                 Text(subscription.displayName)
@@ -88,11 +89,12 @@ struct SettingsView: View {
                             isShowingPaywall = true
                         } label: {
                             HStack {
-                                Label("Upgrade to Onyx", systemImage: "sparkles")
+                                Label("Upgrade to Onyx", systemImage: "inset.filled.oval")
+                                    .foregroundStyle(.inverseTheme)
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.footnote)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.inverseTheme)
                             }
                         }
                     }
@@ -220,7 +222,7 @@ struct SettingsView: View {
             ShareSheet(items: [item.url])
         }
         .sheet(isPresented: $isShowingPaywall) {
-            PaywallView(featureContext: "PDF export requires Onyx")
+            PaywallView(featureContext: "Loads of additional features!")
         }
     }
 
@@ -306,4 +308,5 @@ private struct ShareSheet: UIViewControllerRepresentable {
         .environment(ColorManager(context: context))
         .environment(CanvasManager(context: context))
         .environment(SubscriptionManager())
+        .environment(ToastManager())
 }

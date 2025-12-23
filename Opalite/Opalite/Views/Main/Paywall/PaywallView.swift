@@ -103,11 +103,11 @@ struct PaywallView: View {
     @ViewBuilder
     private var featuresSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            FeatureRow(icon: "scribble", text: "Unlimited Canvas Access")
-            FeatureRow(icon: "square.and.arrow.down", text: "Import Colors & Palettes")
-            FeatureRow(icon: "square.and.arrow.up", text: "Export to Data Files")
             FeatureRow(icon: "swatchpalette.fill", text: "Unlimited Palettes")
-            FeatureRow(icon: "doc.richtext", text: "Export Portfolio to PDF")
+            FeatureRow(icon: "scribble", text: "Unlimited Canvas Access")
+            FeatureRow(icon: "square.and.arrow.up", text: "Export Colors and Palettes to Data Files")
+            FeatureRow(icon: "square.and.arrow.down", text: "Import Colors & Palettes from Files")
+            FeatureRow(icon: "doc.richtext", text: "Export Your Entire Portfolio to PDF")
         }
         .padding()
         .background(
@@ -248,17 +248,17 @@ private struct FeatureRow: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .frame(width: 24)
-                .foregroundStyle(.black)
+                .foregroundStyle(.inverseTheme)
 
 
             Text(text)
                 .font(.subheadline)
-                .foregroundStyle(.black)
+                .foregroundStyle(.inverseTheme)
 
             Spacer()
 
             Image(systemName: "checkmark")
-                .foregroundStyle(.blue)
+                .foregroundStyle(.inverseTheme)
         }
     }
 }
@@ -283,7 +283,7 @@ private struct ProductOptionView: View {
                                 .fontWeight(.semibold)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
-                                .background(Capsule().fill(.green))
+                                .background(Capsule().fill(.blue))
                                 .foregroundStyle(.white)
                         }
                     }
