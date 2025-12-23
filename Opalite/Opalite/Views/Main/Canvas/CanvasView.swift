@@ -121,12 +121,12 @@ struct CanvasView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
+            ToolbarItem(placement: .topBarLeading) {
                 Text(canvasFile.title)
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                    .truncationMode(.tail)
+                    .frame(width: 180)
             }
 
             ToolbarItem(placement: .topBarTrailing) {
