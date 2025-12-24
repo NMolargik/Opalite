@@ -12,10 +12,15 @@ struct OnboardingView: View {
     var onContinue: () -> Void
 
     var body: some View {
-        Button("Onboarding") {
-            HapticsManager.shared.selection()
-            onContinue()
-            isOnboardingComplete = true
+        VStack {
+            Text("Onboarding Not Ready")
+            
+            Button("Skip") {
+                HapticsManager.shared.selection()
+                onContinue()
+                isOnboardingComplete = true
+            }
+            .buttonStyle(.borderedProminent)
         }
     }
 }

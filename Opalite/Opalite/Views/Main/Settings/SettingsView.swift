@@ -16,6 +16,7 @@ struct SettingsView: View {
     @Environment(CanvasManager.self) private var canvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(\.colorScheme) private var colorScheme
 
     @AppStorage("userName") private var userName: String = "User"
     @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
@@ -75,7 +76,7 @@ struct SettingsView: View {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
                             Label("Onyx", systemImage: "inset.filled.oval")
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(colorScheme == .dark ? .gray : .black)
                             
                             Spacer()
                             if let subscription = subscriptionManager.currentSubscription {
@@ -92,7 +93,11 @@ struct SettingsView: View {
                             isShowingPaywall = true
                         } label: {
                             HStack {
-                                Label("Upgrade to Onyx", systemImage: "inset.filled.oval")
+                                Image(systemName: "inset.filled.oval")
+                                    .foregroundStyle(.black, colorScheme == .dark ? .white : .black)
+                                    .padding(.trailing, 8)
+
+                                Text("Upgrade to Onyx")
                                     .foregroundStyle(.inverseTheme)
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -192,7 +197,7 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode")
+                    Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } header: {

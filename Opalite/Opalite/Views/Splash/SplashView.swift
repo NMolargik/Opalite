@@ -11,9 +11,17 @@ struct SplashView: View {
     var onContinue: () -> Void
 
     var body: some View {
-        Button("Splash") {
-            HapticsManager.shared.selection()
-            onContinue()
+        VStack {
+            Text("Splash Not Ready")
+            
+            Button("Skip") {
+                HapticsManager.shared.selection()
+                onContinue()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .background {
+            SwatchStarfieldView(starCount: 15, totalDuration: 200)
         }
     }
 }
