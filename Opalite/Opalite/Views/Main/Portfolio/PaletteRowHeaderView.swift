@@ -31,11 +31,20 @@ struct PaletteRowHeaderView: View {
     var body: some View {
         HStack {
             Menu {
-                Button(role: .confirm) {
-                    HapticsManager.shared.selection()
-                    isShowingColorEditor.toggle()
-                } label: {
-                    Label("New Color", systemImage: "plus.square.dashed")
+                if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                    Button(role: .confirm) {
+                        HapticsManager.shared.selection()
+                        isShowingColorEditor.toggle()
+                    } label: {
+                        Label("New Color", systemImage: "plus.square.dashed")
+                    }
+                } else {
+                    Button() {
+                        HapticsManager.shared.selection()
+                        isShowingColorEditor.toggle()
+                    } label: {
+                        Label("New Color", systemImage: "plus.square.dashed")
+                    }
                 }
                 
                 Divider()
@@ -120,7 +129,9 @@ struct PaletteRowHeaderView: View {
                     .background(
                         Circle().fill(.clear)
                     )
-                    .glassEffect(.regular)
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .regular)
+                    )
                     .contentShape(Circle())
                     .hoverEffect(.lift)
             }
@@ -141,7 +152,9 @@ struct PaletteRowHeaderView: View {
                 }
                 .frame(height: 20)
                 .padding(8)
-                .glassEffect(.regular)
+                .glassIfAvailable(
+                    GlassConfiguration(style: .regular)
+                )
                 .contentShape(RoundedRectangle(cornerRadius: 16))
                 .hoverEffect(.lift)
             }

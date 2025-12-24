@@ -243,7 +243,9 @@ struct SwatchView: View {
             }
             .frame(height: 20)
             .padding(8)
-            .glassEffect(.clear)
+            .glassIfAvailable(
+                GlassConfiguration(style: .clear)
+            )
             .padding(8)
             .mask(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -269,7 +271,9 @@ struct SwatchView: View {
                         .background(
                             Circle().fill(.clear)
                         )
-                        .glassEffect(.clear)
+                        .glassIfAvailable(
+                            GlassConfiguration(style: .clear)
+                        )
                         .contentShape(Circle())
                         .hoverEffect(.lift)
                 }
@@ -332,7 +336,9 @@ struct SwatchView: View {
                     .bold()
                     .frame(height: 20)
                     .padding(8)
-                    .glassEffect(.clear)
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .clear)
+                    )
                     .padding(8)
                     .mask(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -511,3 +517,4 @@ private struct StatefulPreview: View {
         .padding()
     }
 }
+

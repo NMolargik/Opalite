@@ -10,6 +10,12 @@ import SwiftData
 #if canImport(DeviceKit)
 import DeviceKit
 #endif
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
 @MainActor
 @Observable
@@ -232,6 +238,7 @@ class ColorManager {
         green: Double,
         blue: Double,
         alpha: Double = 1.0,
+        palette: OpalitePalette? = nil,
     ) throws -> OpaliteColor {
         #if canImport(DeviceKit)
         let resolvedDeviceName = device ?? Device.current.safeDescription
@@ -250,7 +257,7 @@ class ColorManager {
             green: green,
             blue: blue,
             alpha: alpha,
-            palette: nil
+            palette: palette
         )
 
         context.insert(color)
@@ -321,18 +328,46 @@ class ColorManager {
         self.palettes = []
         self.colors = []
 
+        let sampleAuthor = "Sample Sam"
+        let deviceName: String = {
+            #if canImport(DeviceKit)
+            return Device.current.safeDescription
+            #elseif canImport(UIKit)
+            return UIDevice.current.name
+            #elseif canImport(AppKit)
+            return Host.current().localizedName ?? "This Mac"
+            #else
+            return "Unknown Device"
+            #endif
+        }()
+
+        let makeColor: (String, Double, Double, Double) -> OpaliteColor = { name, r, g, b in
+            OpaliteColor(
+                name: name,
+                createdByDisplayName: sampleAuthor,
+                createdOnDeviceName: deviceName,
+                updatedOnDeviceName: deviceName,
+                createdAt: .now,
+                updatedAt: .now,
+                red: r,
+                green: g,
+                blue: b,
+                alpha: 1.0
+            )
+        }
+
         // Build several themed palettes
         let sunrise = OpalitePalette(
             name: "Sunrise",
             createdAt: .now,
             updatedAt: .now,
-            createdByDisplayName: "Samples",
+            createdByDisplayName: sampleAuthor,
             notes: "Warm hues inspired by a sunrise.",
             tags: ["sample", "warm"],
             colors: [
-                OpaliteColor(name: "Dawn", red: 0.98, green: 0.77, blue: 0.36),
-                OpaliteColor(name: "Amber", red: 0.95, green: 0.60, blue: 0.18),
-                OpaliteColor(name: "Coral", red: 0.95, green: 0.45, blue: 0.30)
+                makeColor("Dawn", 0.98, 0.77, 0.36),
+                makeColor("Amber", 0.95, 0.60, 0.18),
+                makeColor("Coral", 0.95, 0.45, 0.30)
             ]
         )
 
@@ -340,14 +375,14 @@ class ColorManager {
             name: "Ocean",
             createdAt: .now,
             updatedAt: .now,
-            createdByDisplayName: "Samples",
+            createdByDisplayName: sampleAuthor,
             notes: "Cool blues and teals.",
             tags: ["sample", "cool"],
             colors: [
-                OpaliteColor(name: "Deep Blue", red: 0.05, green: 0.20, blue: 0.45),
-                OpaliteColor(name: "Sea", red: 0.00, green: 0.55, blue: 0.65),
-                OpaliteColor(name: "Foam", red: 0.80, green: 0.95, blue: 0.95),
-                OpaliteColor(name: "Lagoon", red: 0.00, green: 0.70, blue: 0.55)
+                makeColor("Deep Blue", 0.05, 0.20, 0.45),
+                makeColor("Sea", 0.00, 0.55, 0.65),
+                makeColor("Foam", 0.80, 0.95, 0.95),
+                makeColor("Lagoon", 0.00, 0.70, 0.55)
             ]
         )
 
@@ -355,14 +390,14 @@ class ColorManager {
             name: "Neon",
             createdAt: .now,
             updatedAt: .now,
-            createdByDisplayName: "Samples",
+            createdByDisplayName: sampleAuthor,
             notes: "High-contrast neon accents.",
             tags: ["sample", "neon"],
             colors: [
-                OpaliteColor(name: "Neon Pink", red: 1.00, green: 0.20, blue: 0.65),
-                OpaliteColor(name: "Electric Blue", red: 0.10, green: 0.45, blue: 1.00),
-                OpaliteColor(name: "Lime", red: 0.70, green: 1.00, blue: 0.20),
-                OpaliteColor(name: "Laser", red: 0.95, green: 1.00, blue: 0.30)
+                makeColor("Neon Pink", 1.00, 0.20, 0.65),
+                makeColor("Electric Blue", 0.10, 0.45, 1.00),
+                makeColor("Lime", 0.70, 1.00, 0.20),
+                makeColor("Laser", 0.95, 1.00, 0.30)
             ]
         )
 
@@ -370,35 +405,41 @@ class ColorManager {
             name: "Grayscale",
             createdAt: .now,
             updatedAt: .now,
-            createdByDisplayName: "Samples",
+            createdByDisplayName: sampleAuthor,
             notes: "Neutral grays for UI.",
             tags: ["sample", "neutral"],
             colors: [
-                OpaliteColor(name: "Almost Black", red: 0.05, green: 0.05, blue: 0.06),
-                OpaliteColor(name: "Charcoal", red: 0.10, green: 0.10, blue: 0.11),
-                OpaliteColor(name: "Graphite", red: 0.16, green: 0.17, blue: 0.19),
-                OpaliteColor(name: "Slate", red: 0.20, green: 0.22, blue: 0.25),
-                OpaliteColor(name: "Steel", red: 0.40, green: 0.43, blue: 0.47),
-                OpaliteColor(name: "Pewter", red: 0.52, green: 0.54, blue: 0.57),
-                OpaliteColor(name: "Ash", red: 0.58, green: 0.59, blue: 0.61),
-                OpaliteColor(name: "Smoke", red: 0.66, green: 0.67, blue: 0.69),
-                OpaliteColor(name: "Silver", red: 0.70, green: 0.73, blue: 0.76),
-                OpaliteColor(name: "Cloud", red: 0.82, green: 0.84, blue: 0.86),
-                OpaliteColor(name: "Platinum", red: 0.90, green: 0.91, blue: 0.92),
-                OpaliteColor(name: "Off White", red: 0.93, green: 0.94, blue: 0.95),
-                OpaliteColor(name: "Snow", red: 0.97, green: 0.98, blue: 0.99)
+                makeColor("Almost Black", 0.05, 0.05, 0.06),
+                makeColor("Charcoal", 0.10, 0.10, 0.11),
+                makeColor("Graphite", 0.16, 0.17, 0.19),
+                makeColor("Slate", 0.20, 0.22, 0.25),
+                makeColor("Steel", 0.40, 0.43, 0.47),
+                makeColor("Pewter", 0.52, 0.54, 0.57),
+                makeColor("Ash", 0.58, 0.59, 0.61),
+                makeColor("Smoke", 0.66, 0.67, 0.69),
+                makeColor("Silver", 0.70, 0.73, 0.76),
+                makeColor("Cloud", 0.82, 0.84, 0.86),
+                makeColor("Platinum", 0.90, 0.91, 0.92),
+                makeColor("Off White", 0.93, 0.94, 0.95),
+                makeColor("Snow", 0.97, 0.98, 0.99)
             ]
         )
         
         let looseColors = [
-            OpaliteColor(name: "Moss", red: 0.35, green: 0.55, blue: 0.30),
-            OpaliteColor(name: "Pine", red: 0.10, green: 0.35, blue: 0.20),
-            OpaliteColor(name: "Bark", red: 0.45, green: 0.30, blue: 0.20),
-            OpaliteColor(name: "Fern", red: 0.30, green: 0.70, blue: 0.35)
+            makeColor("Moss", 0.35, 0.55, 0.30),
+            makeColor("Pine", 0.10, 0.35, 0.20),
+            makeColor("Bark", 0.45, 0.30, 0.20),
+            makeColor("Fern", 0.30, 0.70, 0.35)
         ]
 
         // Ensure relationships are consistent (colors' palette back-references)
-        let palettesToInsert: [OpalitePalette] = [sunrise, ocean, neon, grayscale, OpalitePalette(name: "New Palette")]
+        let palettesToInsert: [OpalitePalette] = [
+            sunrise,
+            ocean,
+            neon,
+            grayscale,
+            OpalitePalette(name: "New Palette", createdAt: .now, updatedAt: .now, createdByDisplayName: sampleAuthor, notes: nil, tags: [], colors: [])
+        ]
         for p in palettesToInsert {
             p.colors = p.colors ?? []
             for c in p.colors ?? [] {
@@ -422,3 +463,4 @@ class ColorManager {
         reloadCache()
     }
 }
+

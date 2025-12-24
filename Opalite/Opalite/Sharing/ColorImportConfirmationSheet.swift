@@ -106,6 +106,7 @@ struct ColorImportConfirmationSheet: View {
 
     private func performImport() {
         isImporting = true
+        preview.color.updatedAt = Date()
 
         do {
             _ = try colorManager.createColor(existing: preview.color)

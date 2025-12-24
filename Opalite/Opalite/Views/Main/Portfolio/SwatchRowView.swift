@@ -53,7 +53,11 @@ struct SwatchRowView: View {
                         .frame(height: 20)
                         .padding(8)
                         .multilineTextAlignment(.center)
-                        .glassEffect(.clear.tint(.blue).interactive())
+                        .glassIfAvailable(
+                            GlassConfiguration(style: .clear)
+                                .tint(.blue)
+                                .interactive()
+                        )
                         .contentShape(RoundedRectangle(cornerRadius: 8))
                         .hoverEffect(.lift)
                     }

@@ -136,7 +136,11 @@ struct PortfolioView: View {
                                 .frame(height: 20)
                                 .padding(8)
                                 .multilineTextAlignment(.center)
-                                .glassEffect(.clear.tint(.blue).interactive())
+                                .glassIfAvailable(
+                                    GlassConfiguration(style: .clear)
+                                        .tint(.blue)
+                                        .interactive()
+                                )
                                 .contentShape(RoundedRectangle(cornerRadius: 16))
                                 .hoverEffect(.lift)
                             }
@@ -244,7 +248,9 @@ struct PortfolioView: View {
                         }
                     }
 
-                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
                 }
                 
                 if !isCompact {
@@ -458,19 +464,19 @@ struct PortfolioView: View {
                     } label: {
                         Label("Remove From Palette", systemImage: "swatchpalette")
                     }
-                } else {
-                    Button(role: .destructive) {
-                        HapticsManager.shared.selection()
-                        withAnimation {
-                            do {
-                                try colorManager.deleteColor(color)
-                            } catch {
-                                toastManager.show(error: .colorDeletionFailed)
-                            }
+                }
+                
+                Button(role: .destructive) {
+                    HapticsManager.shared.selection()
+                    withAnimation {
+                        do {
+                            try colorManager.deleteColor(color)
+                        } catch {
+                            toastManager.show(error: .colorDeletionFailed)
                         }
-                    } label: {
-                        Label("Delete Color", systemImage: "trash.fill")
                     }
+                } label: {
+                    Label("Delete Color", systemImage: "trash.fill")
                 }
             }
         )

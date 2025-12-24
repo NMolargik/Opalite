@@ -76,19 +76,16 @@ struct ColorDetailView: View {
                                 baseColor: color,
                                 onCreateColor: { suggested in
                                     do {
-                                        let createdColor = try colorManager.createColor(
+                                        let _ = try colorManager.createColor(
                                             name: nil,
                                             notes: suggested.notes,
                                             device: nil,
                                             red: suggested.red,
                                             green: suggested.green,
                                             blue: suggested.blue,
-                                            alpha: suggested.alpha
+                                            alpha: suggested.alpha,
+                                            palette: color.palette
                                         )
-                                        
-                                        if let palette = color.palette {
-                                            colorManager.attachColor(createdColor, to: palette)
-                                        }
                                     } catch {
                                         toastManager.show(error: .colorCreationFailed)
                                     }
@@ -112,7 +109,8 @@ struct ColorDetailView: View {
                                         red: suggested.red,
                                         green: suggested.green,
                                         blue: suggested.blue,
-                                        alpha: suggested.alpha
+                                        alpha: suggested.alpha,
+                                        palette: color.palette
                                     )
                                 } catch {
                                     toastManager.show(error: .colorCreationFailed)
@@ -189,7 +187,9 @@ struct ColorDetailView: View {
                 }
             }
             
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

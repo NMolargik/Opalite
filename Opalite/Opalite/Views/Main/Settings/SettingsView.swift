@@ -226,13 +226,25 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {
                 HapticsManager.shared.selection()
             }
-            Button("Continue", role: .confirm) {
-                HapticsManager.shared.selection()
-                do {
-                    try colorManager.loadSamples()
-                    try canvasManager.loadSamples()
-                } catch {
-                    print("Failed to load samples: \(error)")
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                Button("Continue", role: .confirm) {
+                    HapticsManager.shared.selection()
+                    do {
+                        try colorManager.loadSamples()
+                        try canvasManager.loadSamples()
+                    } catch {
+                        print("Failed to load samples: \(error)")
+                    }
+                }
+            } else {
+                Button("Continue") {
+                    HapticsManager.shared.selection()
+                    do {
+                        try colorManager.loadSamples()
+                        try canvasManager.loadSamples()
+                    } catch {
+                        print("Failed to load samples: \(error)")
+                    }
                 }
             }
         } message: {

@@ -170,7 +170,9 @@ struct PaletteDetailView: View {
                 .tint(.red)
             }
             
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -183,7 +185,9 @@ struct PaletteDetailView: View {
                 }
             }
             
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
             
             ToolbarItem(placement: .confirmationAction) {
                 Menu {
