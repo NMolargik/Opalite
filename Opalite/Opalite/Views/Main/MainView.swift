@@ -175,6 +175,15 @@ struct MainView: View {
                 selectedTab = .portfolio
             }
         }
+        .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
+            if let canvas = newCanvas {
+                canvasManager.pendingCanvasToOpen = nil
+                // Switch to the canvas tab
+                DispatchQueue.main.async {
+                    selectedTab = .canvasBody(canvas)
+                }
+            }
+        }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Canvas access requires Onyx")
         }
