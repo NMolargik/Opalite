@@ -275,7 +275,7 @@ struct ColorDetailView: View {
                     } label: {
                         Label {
                             HStack {
-                                Text("Share Color")
+                                Text("Export Color")
                                 if !subscriptionManager.hasOnyxEntitlement {
                                     Image(systemName: "lock.fill")
                                         .font(.footnote)

@@ -12,7 +12,7 @@ struct PaletteMembersView: View {
     let onRemoveColor: (OpaliteColor) -> Void
 
     var body: some View {
-        SectionCard(title: "Palette Members", systemImage: "swatchpalette") {
+        SectionCard(title: "Components", systemImage: "swatchpalette") {
             SwatchRowView(
                 colors: palette.colors ?? [],
                 palette: palette,
@@ -50,7 +50,7 @@ struct PaletteMembersView: View {
     }
 }
 
-#Preview("Palette Members") {
+#Preview("Palette Components") {
     PaletteMembersView(
         palette: OpalitePalette.sample,
         onRemoveColor: { _ in }

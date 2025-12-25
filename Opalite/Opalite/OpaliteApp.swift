@@ -13,19 +13,6 @@ struct OpaliteApp: App {
     @Environment(\.openWindow) private var openWindow
 
     @AppStorage("userName") private var userName: String = "User"
-    @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
-
-    private var preferredColorScheme: ColorScheme? {
-        let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
-        switch option {
-        case .system:
-            return nil
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        }
-    }
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -88,7 +75,6 @@ struct OpaliteApp: App {
                 .onChange(of: userName) { _, newName in
                     colorManager.author = userName
                 }
-                .preferredColorScheme(preferredColorScheme)
                 .onOpenURL { url in
                     importCoordinator.handleIncomingURL(url, colorManager: colorManager)
                 }

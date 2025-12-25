@@ -450,7 +450,7 @@ struct PortfolioView: View {
                         // Export failed silently
                     }
                 } label: {
-                    Label("Share Color", systemImage: "square.and.arrow.up")
+                    Label("Export Color", systemImage: "square.and.arrow.up")
                 }
                 
                 Divider()

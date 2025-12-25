@@ -62,28 +62,14 @@ struct PaletteRowHeaderView: View {
                 
                 Button {
                     HapticsManager.shared.selection()
-                    if subscriptionManager.hasOnyxEntitlement {
-                        do {
-                            exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
-                            isShowingPDFShareSheet = true
-                        } catch {
-                            toastManager.show(error: .pdfExportFailed)
-                        }
-                    } else {
-                        isShowingPaywall = true
+                    do {
+                        exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
+                        isShowingPDFShareSheet = true
+                    } catch {
+                        toastManager.show(error: .pdfExportFailed)
                     }
                 } label: {
-                    Label {
-                        HStack {
-                            Text("Share As PDF")
-                            if !subscriptionManager.hasOnyxEntitlement {
-                                Image(systemName: "lock.fill")
-                                    .font(.footnote)
-                            }
-                        }
-                    } icon: {
-                        Image(systemName: "doc.richtext")
-                    }
+                    Label("Share As PDF", systemImage: "doc.richtext")
                 }
 
                 Button {
@@ -101,7 +87,7 @@ struct PaletteRowHeaderView: View {
                 } label: {
                     Label {
                         HStack {
-                            Text("Share Palette")
+                            Text("Export Palette")
                             if !subscriptionManager.hasOnyxEntitlement {
                                 Image(systemName: "lock.fill")
                                     .font(.footnote)

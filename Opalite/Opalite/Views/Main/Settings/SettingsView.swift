@@ -151,22 +151,10 @@ struct SettingsView: View {
 
                     Button {
                         HapticsManager.shared.selection()
-                        if subscriptionManager.hasOnyxEntitlement {
-                            exportColorsToPDF()
-                        } else {
-                            isShowingPaywall = true
-                        }
+                        exportColorsToPDF()
                     } label: {
-                        HStack {
-                            Label("Export Portfolio to PDF", systemImage: "doc.richtext")
-                                .foregroundStyle(.blue)
-                            if !subscriptionManager.hasOnyxEntitlement {
-                                Spacer()
-                                Image(systemName: "lock.fill")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
+                        Label("Export Portfolio to PDF", systemImage: "doc.richtext")
+                            .foregroundStyle(.blue)
                     }
                 } header: {
                     Text("Data")

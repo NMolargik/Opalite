@@ -15,6 +15,20 @@ struct ContentView: View {
     
     @State private var appStage: AppStage = .splash
     
+    @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
+
+    private var preferredColorScheme: ColorScheme? {
+        let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
+        switch option {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
+    
     var leadingTransition: AnyTransition {
         .asymmetric(
             insertion: .move(edge: .trailing).combined(with: .opacity),
@@ -36,6 +50,7 @@ struct ContentView: View {
                 .id("splash")
                 .transition(leadingTransition)
                 .zIndex(1)
+                .preferredColorScheme(.dark)
             case .onboarding:
                 OnboardingView(
                     onContinue: {
@@ -49,6 +64,7 @@ struct ContentView: View {
                 .id("onboarding")
                 .transition(leadingTransition)
                 .zIndex(1)
+                .preferredColorScheme(preferredColorScheme)
             case .main:
                 MainView()
                 .environment(colorManager)
@@ -56,6 +72,7 @@ struct ContentView: View {
                 .id("main")
                 .transition(leadingTransition)
                 .zIndex(0)
+                .preferredColorScheme(preferredColorScheme)
             }
         }
         .task {
@@ -89,4 +106,7 @@ struct ContentView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(SubscriptionManager())
+        .environment(ToastManager())
+        .environment(QuickActionManager())
 }

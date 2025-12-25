@@ -107,7 +107,6 @@ struct PaywallView: View {
             FeatureRow(icon: "scribble", text: "Unlimited Canvas Access")
             FeatureRow(icon: "square.and.arrow.up", text: "Export Colors and Palettes to Data Files")
             FeatureRow(icon: "square.and.arrow.down", text: "Import Colors & Palettes from Files")
-            FeatureRow(icon: "doc.richtext", text: "Export Your Entire Portfolio to PDF")
         }
         .padding()
         .background(
