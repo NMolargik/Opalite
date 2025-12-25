@@ -53,9 +53,31 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             AppDelegate.pendingShortcutType = shortcutItem.type
         }
 
+        // Check for SwatchBar scene request
+        if let targetContentIdentifier = options.userActivities.first?.targetContentIdentifier,
+           targetContentIdentifier == "swatchBar" {
+            let config = UISceneConfiguration(name: "SwatchBar", sessionRole: connectingSceneSession.role)
+            config.delegateClass = SceneDelegate.self
+            return config
+        }
+
         let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         config.delegateClass = SceneDelegate.self
         return config
+    }
+
+    /// Opens a new window scene on Mac Catalyst
+    @MainActor
+    static func openSwatchBarWindow() {
+        #if targetEnvironment(macCatalyst)
+        if let url = URL(string: "opalite://swatchBar") {
+            UIApplication.shared.open(url, options: [:]) { success in
+                if !success {
+                    print("Failed to open SwatchBar window via URL")
+                }
+            }
+        }
+        #endif
     }
 }
 #endif

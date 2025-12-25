@@ -62,7 +62,9 @@ struct SwatchBarView: View {
             }
             .background(.ultraThinMaterial)
             .navigationTitle("SwatchBar")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.automatic)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -88,37 +90,45 @@ struct SwatchBarView: View {
                 }
             }
             .sheet(isPresented: $showingSwatchBarInfo) {
-                ScrollView {
-                    VStack(spacing: 12) {
-                        Image(systemName: "swatchpalette")
-                            .font(.system(size: 36, weight: .semibold))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(.purple, .orange, .red)
-                        
-                        Text("SwatchBar")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
-                            .font(.body)
-                            .multilineTextAlignment(.center)
+                NavigationStack {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            Image(systemName: "swatchpalette")
+                                .font(.system(size: 36, weight: .semibold))
+                                .symbolRenderingMode(.hierarchical)
+                                .foregroundStyle(.purple, .orange, .red)
+
+                            Text("SwatchBar")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+
+                            Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
+                                .font(.body)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Divider()
+                                .padding(.vertical, 4)
+
+                            HStack(spacing: 16) {
+                                Label("Tap/Click a swatch to copy its hex code", systemImage: "hand.tap")
+                            }
+                            .font(.footnote)
                             .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        Divider()
-                            .padding(.vertical, 4)
-                        
-                        HStack(spacing: 16) {
-                            Label("Tap/Click a swatch to copy its hex code", systemImage: "hand.tap")
                         }
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                        .padding(.top, 24)
+                        .padding(.bottom, 16)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 24)
-                    .padding(.bottom, 16)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                showingSwatchBarInfo = false
+                            }
+                        }
+                    }
                 }
-                
                 .frame(maxWidth: 480)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .presentationDetents([.fraction(0.5)])

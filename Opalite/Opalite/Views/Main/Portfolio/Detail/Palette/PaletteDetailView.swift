@@ -55,6 +55,11 @@ struct PaletteDetailView: View {
                     },
                     allowBadgeTapToEdit: true
                 )
+                .overlay {
+                    if palette.colors?.isEmpty == true {
+                        Text("No Colors Added To This Palette")
+                    }
+                }
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
                         PaletteDetailsSectionView(palette: palette)

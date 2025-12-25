@@ -251,7 +251,11 @@ struct PortfolioView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             HapticsManager.shared.selection()
+                            #if targetEnvironment(macCatalyst)
+                            AppDelegate.openSwatchBarWindow()
+                            #else
                             openWindow(id: "swatchBar")
+                            #endif
                         } label: {
                             Label("Open SwatchBar", systemImage: "square.stack")
                         }

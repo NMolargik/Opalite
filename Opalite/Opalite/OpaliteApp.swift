@@ -76,6 +76,11 @@ struct OpaliteApp: App {
                     colorManager.author = userName
                 }
                 .onOpenURL { url in
+                    // Handle swatchBar URL scheme
+                    if url.scheme == "opalite" && url.host == "swatchBar" {
+                        openWindow(id: "swatchBar")
+                        return
+                    }
                     importCoordinator.handleIncomingURL(url, colorManager: colorManager)
                 }
                 .sheet(isPresented: Binding(
@@ -149,6 +154,7 @@ struct OpaliteApp: App {
                     colorManager.isSwatchBarOpen = false
                 }
         }
+        .handlesExternalEvents(matching: Set(arrayLiteral: "swatchBar"))
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
