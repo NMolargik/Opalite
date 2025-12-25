@@ -17,6 +17,7 @@ struct MainView: View {
 
     @Namespace private var namespace
     @State private var selectedTab: Tabs = .portfolio
+    @State private var previousTab: Tabs = .portfolio
     @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
@@ -167,20 +168,38 @@ struct MainView: View {
             }
         }
         .onChange(of: selectedTab) { oldTab, newTab in
+            // Check if user is trying to open a canvas without entitlement
+            if case .canvasBody(_) = newTab {
+                if !subscriptionManager.hasOnyxEntitlement {
+                    // Block access and show paywall
+                    HapticsManager.shared.selection()
+                    selectedTab = oldTab
+                    isShowingPaywall = true
+                    return
+                }
+            }
+
             if newTab == .swatchBar {
                 // Only open if not already open (iOS check; macOS Window handles this automatically)
                 if !colorManager.isSwatchBarOpen {
                     openWindow(id: "swatchBar")
                 }
-                selectedTab = .portfolio
+                selectedTab = oldTab
+                return
             }
+
+            previousTab = oldTab
         }
         .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
             if let canvas = newCanvas {
                 canvasManager.pendingCanvasToOpen = nil
-                // Switch to the canvas tab
-                DispatchQueue.main.async {
-                    selectedTab = .canvasBody(canvas)
+                // Check entitlement before switching to canvas tab
+                if subscriptionManager.hasOnyxEntitlement {
+                    DispatchQueue.main.async {
+                        selectedTab = .canvasBody(canvas)
+                    }
+                } else {
+                    isShowingPaywall = true
                 }
             }
         }

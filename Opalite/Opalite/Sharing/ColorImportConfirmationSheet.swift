@@ -94,7 +94,9 @@ struct ColorImportConfirmationSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Import") {
                         HapticsManager.shared.impact()
-                        performImport()
+                        withAnimation {
+                            performImport()
+                        }
                     }
                     .disabled(isImporting || preview.willSkip)
                 }

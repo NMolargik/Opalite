@@ -32,7 +32,8 @@ struct SwatchView: View {
     private var allowBadgeTapToEdit: Bool
     private var menu: AnyView?
     private var contextMenu: AnyView?
-    
+    @Binding var showCopiedFeedback: Bool
+
     @State private var editedBadgeText: String = ""
     @State private var isMenuPresented: Bool = false
     @FocusState private var badgeFocused: Bool
@@ -50,7 +51,8 @@ struct SwatchView: View {
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
         menu: AnyView? = nil,
-        contextMenu: AnyView? = nil
+        contextMenu: AnyView? = nil,
+        showCopiedFeedback: Binding<Bool> = .constant(false)
     ) {
         self.fill = fill
         self.width = width
@@ -65,6 +67,7 @@ struct SwatchView: View {
         self.matchedID = matchedID
         self.menu = menu
         self.contextMenu = contextMenu
+        self._showCopiedFeedback = showCopiedFeedback
     }
 
     init<MenuContent: View>(
@@ -79,6 +82,7 @@ struct SwatchView: View {
         palette: OpalitePalette? = nil,
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
+        showCopiedFeedback: Binding<Bool> = .constant(false),
         @ViewBuilder menu: @escaping () -> MenuContent
     ) {
         self.init(
@@ -93,7 +97,8 @@ struct SwatchView: View {
             palette: palette,
             matchedNamespace: matchedNamespace,
             matchedID: matchedID,
-            menu: AnyView(menu())
+            menu: AnyView(menu()),
+            showCopiedFeedback: showCopiedFeedback
         )
     }
     
@@ -109,6 +114,7 @@ struct SwatchView: View {
         palette: OpalitePalette? = nil,
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
+        showCopiedFeedback: Binding<Bool> = .constant(false),
         @ViewBuilder contextMenu: @escaping () -> ContextMenuContent
     ) {
         self.init(
@@ -124,7 +130,8 @@ struct SwatchView: View {
             matchedNamespace: matchedNamespace,
             matchedID: matchedID,
             menu: nil,
-            contextMenu: AnyView(contextMenu())
+            contextMenu: AnyView(contextMenu()),
+            showCopiedFeedback: showCopiedFeedback
         )
     }
     
@@ -277,7 +284,7 @@ struct SwatchView: View {
                 Menu {
                     menu
                 } label: {
-                    Image(systemName: "ellipsis")
+                    Image(systemName: showCopiedFeedback ? "checkmark" : "ellipsis")
                         .imageScale(.large)
                         .foregroundStyle(fill.first?.idealTextColor() ?? .black)
                         .frame(width: 8, height: 8)
@@ -290,9 +297,19 @@ struct SwatchView: View {
                         )
                         .contentShape(Circle())
                         .hoverEffect(.lift)
+                        .contentTransition(.symbolEffect(.replace))
                 }
                 .menuStyle(.automatic)
                 .padding(8)
+                .onChange(of: showCopiedFeedback) { _, newValue in
+                    if newValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation {
+                                showCopiedFeedback = false
+                            }
+                        }
+                    }
+                }
             }
         }
     }

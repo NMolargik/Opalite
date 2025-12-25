@@ -24,11 +24,38 @@ struct SwatchRowView: View {
     var menuContent: ((OpaliteColor) -> AnyView)? = nil
     var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
     var matchedNamespace: Namespace.ID? = nil
-    
+    @Binding var copiedColorID: UUID?
+
     var isCompact: Bool { horizontalSizeClass == .compact }
-    
+
     @State private var isDropTargeted: Bool = false
     @State private var showingColorEditor: Bool = false
+
+    init(
+        colors: [OpaliteColor],
+        palette: OpalitePalette?,
+        swatchWidth: CGFloat,
+        swatchHeight: CGFloat,
+        showOverlays: Bool = false,
+        showsNavigation: Bool = true,
+        onTap: ((OpaliteColor) -> Void)? = nil,
+        menuContent: ((OpaliteColor) -> AnyView)? = nil,
+        contextMenuContent: ((OpaliteColor) -> AnyView)? = nil,
+        matchedNamespace: Namespace.ID? = nil,
+        copiedColorID: Binding<UUID?> = .constant(nil)
+    ) {
+        self.colors = colors
+        self.palette = palette
+        self.swatchWidth = swatchWidth
+        self.swatchHeight = swatchHeight
+        self.showOverlays = showOverlays
+        self.showsNavigation = showsNavigation
+        self.onTap = onTap
+        self.menuContent = menuContent
+        self.contextMenuContent = contextMenuContent
+        self.matchedNamespace = matchedNamespace
+        self._copiedColorID = copiedColorID
+    }
     
     var body: some View {
         HStack {
@@ -176,7 +203,11 @@ struct SwatchRowView: View {
             matchedNamespace: matchedNamespace,
             matchedID: color.id,
             menu: menuContent?(color),
-            contextMenu: contextMenuContent?(color)
+            contextMenu: contextMenuContent?(color),
+            showCopiedFeedback: Binding(
+                get: { copiedColorID == color.id },
+                set: { if !$0 { copiedColorID = nil } }
+            )
         )
     }
 

@@ -132,7 +132,9 @@ struct PaletteImportConfirmationSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Import") {
                         HapticsManager.shared.impact()
-                        performImport()
+                        withAnimation {
+                            performImport()
+                        }
                     }
                     .disabled(isImporting || !canImport)
                 }

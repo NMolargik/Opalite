@@ -128,29 +128,44 @@ struct OpaliteApp: App {
             CommandGroup(replacing: .newItem) {
                 Button("New Color") {
                     HapticsManager.shared.selection()
+                    if !colorManager.isMainWindowOpen {
+                        openWindow(id: "main")
+                    }
                     quickActionManager.requestCreateNewColor()
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
                 Button("New Palette") {
                     HapticsManager.shared.selection()
+                    if !colorManager.isMainWindowOpen {
+                        openWindow(id: "main")
+                    }
                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                         do {
                             try colorManager.createPalette(name: "New Palette")
                         } catch {
                             toastManager.show(error: .paletteCreationFailed)
                         }
+                    } else {
+                        quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
                     }
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
 
                 Button("New Canvas") {
                     HapticsManager.shared.selection()
-                    do {
-                        let newCanvas = try canvasManager.createCanvas()
-                        canvasManager.pendingCanvasToOpen = newCanvas
-                    } catch {
-                        toastManager.show(error: .canvasCreationFailed)
+                    if !colorManager.isMainWindowOpen {
+                        openWindow(id: "main")
+                    }
+                    if subscriptionManager.hasOnyxEntitlement {
+                        do {
+                            let newCanvas = try canvasManager.createCanvas()
+                            canvasManager.pendingCanvasToOpen = newCanvas
+                        } catch {
+                            toastManager.show(error: .canvasCreationFailed)
+                        }
+                    } else {
+                        quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
                     }
                 }
                 .keyboardShortcut("n", modifiers: [.command, .option])
@@ -187,6 +202,9 @@ struct OpaliteApp: App {
                 Section("Colors") {
                     Button("Create New Color") {
                         HapticsManager.shared.selection()
+                        if !colorManager.isMainWindowOpen {
+                            openWindow(id: "main")
+                        }
                         quickActionManager.requestCreateNewColor()
                     }
 
@@ -200,12 +218,17 @@ struct OpaliteApp: App {
                 Section("Palettes") {
                     Button("Create New Palette") {
                         HapticsManager.shared.selection()
+                        if !colorManager.isMainWindowOpen {
+                            openWindow(id: "main")
+                        }
                         if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                             do {
                                 try colorManager.createPalette(name: "New Palette")
                             } catch {
                                 toastManager.show(error: .paletteCreationFailed)
                             }
+                        } else {
+                            quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
                         }
                     }
                 }
@@ -215,11 +238,18 @@ struct OpaliteApp: App {
             CommandMenu("Canvas") {
                 Button("New Canvas") {
                     HapticsManager.shared.selection()
-                    do {
-                        let newCanvas = try canvasManager.createCanvas()
-                        canvasManager.pendingCanvasToOpen = newCanvas
-                    } catch {
-                        toastManager.show(error: .canvasCreationFailed)
+                    if !colorManager.isMainWindowOpen {
+                        openWindow(id: "main")
+                    }
+                    if subscriptionManager.hasOnyxEntitlement {
+                        do {
+                            let newCanvas = try canvasManager.createCanvas()
+                            canvasManager.pendingCanvasToOpen = newCanvas
+                        } catch {
+                            toastManager.show(error: .canvasCreationFailed)
+                        }
+                    } else {
+                        quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
                     }
                 }
 

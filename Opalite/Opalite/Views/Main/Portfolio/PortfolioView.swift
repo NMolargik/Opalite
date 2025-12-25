@@ -37,6 +37,7 @@ struct PortfolioView: View {
     @State private var importError: String?
     @State private var isShowingImportError = false
     @State private var quickActionTrigger: UUID? = nil
+    @State private var copiedColorID: UUID? = nil
 
     @Namespace private var namespace
     @Namespace private var swatchNS
@@ -92,7 +93,8 @@ struct PortfolioView: View {
                                 return AnyView(EmptyView())
                             }
                         },
-                        matchedNamespace: swatchNS
+                        matchedNamespace: swatchNS,
+                        copiedColorID: $copiedColorID
                     )
                     .zIndex(1)
                     .padding(.bottom, 5)
@@ -183,7 +185,8 @@ struct PortfolioView: View {
                                             return AnyView(EmptyView())
                                         }
                                     },
-                                    matchedNamespace: swatchNS
+                                    matchedNamespace: swatchNS,
+                                    copiedColorID: $copiedColorID
                                 )
                                 .zIndex(1)
                             }
@@ -431,6 +434,7 @@ struct PortfolioView: View {
                 Button {
                     HapticsManager.shared.selection()
                     copyHex(for: color)
+                    copiedColorID = color.id
                 } label: {
                     Label("Copy Hex", systemImage: "number")
                 }

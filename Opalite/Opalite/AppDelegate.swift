@@ -79,6 +79,21 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
         #endif
     }
+
+    // MARK: - Menu Builder (Mac Catalyst)
+    func application(_ application: UIApplication, buildMenusUsing builder: UIMenuBuilder) {
+
+        // Only modify the main menu bar
+        guard builder.system == .main else { return }
+
+        #if targetEnvironment(macCatalyst)
+        // Remove "Open Recent" submenu from File menu
+        builder.remove(menu: .openRecent)
+
+        // Remove "New Window" from File menu to prevent opening duplicate main windows
+        builder.remove(menu: .newScene)
+        #endif
+    }
 }
 #endif
 

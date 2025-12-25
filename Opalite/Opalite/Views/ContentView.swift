@@ -11,10 +11,13 @@ import SwiftData
 struct ContentView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(QuickActionManager.self) private var quickActionManager: QuickActionManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
-    
+
     @State private var appStage: AppStage = .splash
-    
+    @State private var isShowingPaywall: Bool = false
+    @State private var paywallContext: String = ""
+
     @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {
@@ -86,6 +89,16 @@ struct ContentView: View {
         }
         .onDisappear {
             colorManager.isMainWindowOpen = false
+        }
+        .onChange(of: quickActionManager.paywallTrigger?.id) { _, _ in
+            if let trigger = quickActionManager.paywallTrigger {
+                paywallContext = trigger.context
+                isShowingPaywall = true
+                quickActionManager.paywallTrigger = nil
+            }
+        }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: paywallContext)
         }
     }
     
