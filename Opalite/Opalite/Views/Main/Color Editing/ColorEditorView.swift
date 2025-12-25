@@ -113,6 +113,7 @@ struct ColorEditorView: View {
                             Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
                                 .foregroundStyle(.purple, .orange, .red)
                         }
+                        .accessibilityLabel(viewModel.isShowingPaletteStrip ? "Hide palette colors" : "Show palette colors")
                     }
                 }
                 
@@ -127,7 +128,7 @@ struct ColorEditorView: View {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(hex, forType: .string)
                         #endif
-                        
+
                         withAnimation(.easeInOut(duration: 0.2)) {
                             viewModel.didCopyHex = true
                         }
@@ -144,6 +145,8 @@ struct ColorEditorView: View {
                         }
                     }
                     .tint(viewModel.didCopyHex ? .green : nil)
+                    .accessibilityLabel(viewModel.didCopyHex ? "Hex code copied" : "Copy hex code")
+                    .accessibilityValue(viewModel.tempColor.hexString)
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -155,6 +158,7 @@ struct ColorEditorView: View {
                     } label: {
                         Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
+                    .accessibilityLabel(viewModel.isColorExpanded ? "Show editor" : "Expand color preview")
                 }
                 
                 ToolbarItem(placement: .cancellationAction) {
@@ -256,9 +260,11 @@ struct ColorEditorView: View {
             ForEach(ColorPickerTab.allCases) { option in
                 option.symbol
                     .tag(option)
+                    .accessibilityLabel(option.accessibilityLabel)
             }
         }
         .pickerStyle(.segmented)
+        .accessibilityLabel("Color picker mode")
     }
     
     @ViewBuilder

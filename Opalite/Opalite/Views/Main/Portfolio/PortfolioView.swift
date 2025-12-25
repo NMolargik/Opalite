@@ -62,12 +62,15 @@ struct PortfolioView: View {
                     HStack {
                         Image(systemName: "paintpalette.fill")
                             .foregroundStyle(.blue.gradient)
-                        
+                            .accessibilityHidden(true)
+
                         Text("Colors")
                     }
                     .font(.title)
                     .bold()
                     .padding(.leading, 20)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityLabel("Colors, \(colorManager.looseColors.count) items")
                     
                     SwatchRowView(
                         colors: colorManager.looseColors,
@@ -98,17 +101,21 @@ struct PortfolioView: View {
                     HStack {
                         Image(systemName: "swatchpalette.fill")
                             .foregroundStyle(.purple.gradient, .orange.gradient, .red.gradient)
-                        
+                            .accessibilityHidden(true)
+
                         Text("Palettes")
                     }
                     .font(.title)
                     .bold()
                     .padding(.leading, 20)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityLabel("Palettes, \(colorManager.palettes.count) items")
                     
                     if (colorManager.palettes.isEmpty) {
                         HStack(spacing: 10) {
                             Image(systemName: "arrow.turn.down.right")
                                 .bold()
+                                .accessibilityHidden(true)
 
                             Button {
                                 withAnimation {
@@ -127,7 +134,7 @@ struct PortfolioView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: "swatchpalette")
                                         .font(.title2)
-                                    
+
                                     Text("Create A New Palette")
                                 }
                                 .bold()
@@ -144,7 +151,9 @@ struct PortfolioView: View {
                                 .contentShape(RoundedRectangle(cornerRadius: 16))
                                 .hoverEffect(.lift)
                             }
-                            
+                            .accessibilityLabel("Create A New Palette")
+                            .accessibilityHint("Creates a new empty palette to organize your colors")
+
                             Spacer()
                         }
                         .padding(.leading, 35)
@@ -263,6 +272,9 @@ struct PortfolioView: View {
                         }) {
                             Image(systemName: "square.arrowtriangle.4.outward")
                         }
+                        .accessibilityLabel("Change swatch size")
+                        .accessibilityHint("Cycles through small, medium, and large swatch sizes")
+                        .accessibilityValue(swatchSize.accessibilityName)
                     }
                 }
                 

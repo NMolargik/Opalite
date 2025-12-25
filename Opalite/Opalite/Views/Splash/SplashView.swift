@@ -47,12 +47,14 @@ struct SplashView: View {
                 }
                 .blur(radius: 2)
                 .opacity(hasAppeared ? 1 : 0)
+                .accessibilityHidden(true)
 
                 // Material overlay
                 Rectangle()
                     .fill(.ultraThickMaterial)
                     .ignoresSafeArea()
                     .opacity(showContent ? 0.85 : 0)
+                    .accessibilityHidden(true)
 
                 // Content
                 VStack(spacing: 32) {
@@ -72,12 +74,14 @@ struct SplashView: View {
                             .frame(width: 200, height: 200)
                             .blur(radius: 40)
                             .opacity(showContent ? 0.8 : 0)
+                            .accessibilityHidden(true)
 
                         // Gem icon
                         Image("opalitegem")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 200, height: 200)
+                            .accessibilityLabel("Opalite app icon")
                     }
                     .scaleEffect(showContent ? 1 : 0.5)
                     .opacity(showContent ? 1 : 0)
@@ -93,6 +97,7 @@ struct SplashView: View {
                                     endPoint: .bottom
                                 )
                             )
+                            .accessibilityAddTraits(.isHeader)
 
                         Text("Color management for creators")
                             .font(.title3)
@@ -100,6 +105,7 @@ struct SplashView: View {
                     }
                     .offset(y: showContent ? 0 : 30)
                     .opacity(showContent ? 1 : 0)
+                    .accessibilityElement(children: .combine)
 
                     Spacer()
 
@@ -130,6 +136,8 @@ struct SplashView: View {
                         )
                         .shadow(color: .white.opacity(0.3), radius: 20, y: 5)
                     }
+                    .accessibilityLabel("Continue")
+                    .accessibilityHint("Proceeds to app introduction")
                     .scaleEffect(showButton ? 1 : 0.8)
                     .opacity(showButton ? 1 : 0)
 

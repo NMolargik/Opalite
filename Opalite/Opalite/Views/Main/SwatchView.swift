@@ -168,6 +168,20 @@ struct SwatchView: View {
                     provideDragItem()
                 }
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityDescription)
+            .accessibilityAddTraits(.isButton)
+    }
+
+    private var accessibilityDescription: String {
+        if fill.isEmpty {
+            return "Empty swatch"
+        } else if fill.count == 1, let first = fill.first {
+            let name = first.name ?? "Unnamed color"
+            return "\(name), \(first.hexString)"
+        } else {
+            return "\(badgeText.isEmpty ? "Color palette" : badgeText), \(fill.count) colors"
+        }
     }
     
     // MARK: - Badge Content

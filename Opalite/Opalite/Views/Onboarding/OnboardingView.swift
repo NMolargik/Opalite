@@ -118,7 +118,10 @@ struct OnboardingView: View {
                                 .padding(.vertical, 8)
                                 .background(.ultraThinMaterial, in: Capsule())
                         }
+                        .accessibilityLabel("Skip introduction")
+                        .accessibilityHint("Skips remaining pages and enters the app")
                         .opacity(currentPage < pages.count - 1 ? 1 : 0)
+                        .accessibilityHidden(currentPage >= pages.count - 1)
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
@@ -149,6 +152,8 @@ struct OnboardingView: View {
                             }
                         }
                         .padding(.bottom, 8)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Page \(currentPage + 1) of \(pages.count)")
 
                         // Navigation buttons
                         HStack(spacing: 16) {
@@ -170,6 +175,8 @@ struct OnboardingView: View {
                                     .padding(.vertical, 14)
                                     .background(.ultraThinMaterial, in: Capsule())
                                 }
+                                .accessibilityLabel("Back")
+                                .accessibilityHint("Goes to the previous page")
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                             }
 
@@ -200,6 +207,8 @@ struct OnboardingView: View {
                                         .interactive()
                                 )
                             }
+                            .accessibilityLabel(currentPage < pages.count - 1 ? "Next" : "Get Started")
+                            .accessibilityHint(currentPage < pages.count - 1 ? "Goes to the next page" : "Completes introduction and enters the app")
                             .animation(.spring(response: 0.35, dampingFraction: 0.85), value: currentPage)
                         }
                         .padding(.horizontal, 20)

@@ -203,6 +203,8 @@ struct ColorDetailView: View {
                     Label("Palette", systemImage: (color.palette != nil) ? "swatchpalette.fill" : "swatchpalette")
                         .foregroundStyle(.purple, .orange, .red)
                 }
+                .accessibilityLabel(color.palette != nil ? "Remove from palette" : "Add to palette")
+                .accessibilityHint(color.palette != nil ? "Removes this color from its current palette" : "Opens palette selection to add this color")
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -224,6 +226,8 @@ struct ColorDetailView: View {
                     )
                 }
                 .tint(didCopyHex ? .green : nil)
+                .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")
+                .accessibilityValue(color.hexString)
             }
             
             ToolbarItem(placement: .topBarTrailing) {

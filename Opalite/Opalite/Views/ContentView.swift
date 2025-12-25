@@ -51,6 +51,7 @@ struct ContentView: View {
                 .transition(leadingTransition)
                 .zIndex(1)
                 .preferredColorScheme(.dark)
+                .accessibilityIdentifier("splashView")
             case .onboarding:
                 OnboardingView(
                     onContinue: {
@@ -65,6 +66,7 @@ struct ContentView: View {
                 .transition(leadingTransition)
                 .zIndex(1)
                 .preferredColorScheme(preferredColorScheme)
+                .accessibilityIdentifier("onboardingView")
             case .main:
                 MainView()
                 .environment(colorManager)
@@ -73,6 +75,7 @@ struct ContentView: View {
                 .transition(leadingTransition)
                 .zIndex(0)
                 .preferredColorScheme(preferredColorScheme)
+                .accessibilityIdentifier("mainView")
             }
         }
         .task {

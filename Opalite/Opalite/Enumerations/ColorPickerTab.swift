@@ -31,4 +31,19 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
             return Image(systemName: "eyedropper.halffull")
         }
     }
+
+    var accessibilityLabel: String {
+        switch self {
+        case .grid:
+            return "Color grid"
+        case .spectrum:
+            return "Color spectrum"
+        case .sliders:
+            return "Channel sliders"
+        case .codes:
+            return "Color codes"
+        case .image:
+            return "Pick from image"
+        }
+    }
 }

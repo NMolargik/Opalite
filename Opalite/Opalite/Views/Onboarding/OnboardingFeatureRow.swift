@@ -21,6 +21,7 @@ struct OnboardingFeatureRow: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(feature.iconColor.opacity(0.15))
                 )
+                .accessibilityHidden(true)
 
             // Text
             Text(feature.text)
@@ -45,6 +46,7 @@ struct OnboardingFeatureRow: View {
                         ),
                         in: Capsule()
                     )
+                    .accessibilityHidden(true)
             }
         }
         .padding(.horizontal, 16)
@@ -53,6 +55,8 @@ struct OnboardingFeatureRow: View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(.ultraThinMaterial)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(feature.text + (feature.requiresOnyx ? ", requires Onyx subscription" : ""))
     }
 }
 

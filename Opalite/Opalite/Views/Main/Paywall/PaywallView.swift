@@ -81,10 +81,12 @@ struct PaywallView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
+                .accessibilityHidden(true)
 
             Text("Unlock Onyx")
                 .font(.largeTitle)
                 .bold()
+                .accessibilityAddTraits(.isHeader)
 
             if let context = featureContext {
                 Text(context)
@@ -186,6 +188,8 @@ struct PaywallView: View {
             )
         }
         .disabled(selectedProduct == nil || isPurchasing)
+        .accessibilityLabel(isPurchasing ? "Subscribing" : "Subscribe")
+        .accessibilityHint(selectedProduct != nil ? "Subscribes to \(selectedProduct?.displayName ?? "Onyx")" : "Select a subscription plan first")
     }
 
     @ViewBuilder
@@ -202,6 +206,7 @@ struct PaywallView: View {
                 .font(.subheadline)
         }
         .disabled(subscriptionManager.isLoading)
+        .accessibilityHint("Restores previously purchased subscriptions")
     }
 
     @ViewBuilder
@@ -248,7 +253,7 @@ private struct FeatureRow: View {
             Image(systemName: icon)
                 .frame(width: 24)
                 .foregroundStyle(.inverseTheme)
-
+                .accessibilityHidden(true)
 
             Text(text)
                 .font(.subheadline)
@@ -258,7 +263,10 @@ private struct FeatureRow: View {
 
             Image(systemName: "checkmark")
                 .foregroundStyle(.inverseTheme)
+                .accessibilityHidden(true)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(text)
     }
 }
 
@@ -297,6 +305,7 @@ private struct ProductOptionView: View {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
                     .foregroundStyle(isSelected ? .blue : .secondary)
+                    .accessibilityHidden(true)
             }
             .padding()
             .background(
@@ -305,6 +314,10 @@ private struct ProductOptionView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(subscription.displayName), \(product.displayPrice) per \(subscription.period)")
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

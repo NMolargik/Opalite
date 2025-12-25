@@ -81,6 +81,7 @@ struct SwatchStarfieldView: View {
                 }
                 startDate = .now
             }
+            .accessibilityHidden(true)
         }
     }
 

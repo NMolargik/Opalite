@@ -35,10 +35,12 @@ struct OnboardingPageView: View {
                 iconImage(size: 80)
                     .blur(radius: 5)
                     .opacity(iconAnimated ? 0.6 : 0)
+                    .accessibilityHidden(true)
 
                 // Main icon
                 iconImage(size: 72)
                     .symbolEffect(.bounce, options: .nonRepeating, value: isActive)
+                    .accessibilityHidden(true)
             }
             .scaleEffect(iconAnimated ? 1 : 0.5)
             .opacity(iconAnimated ? 1 : 0)
@@ -49,6 +51,7 @@ struct OnboardingPageView: View {
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text(page.subtitle)
                     .font(.subheadline)
@@ -59,6 +62,7 @@ struct OnboardingPageView: View {
             }
             .offset(y: titleAnimated ? 0 : 20)
             .opacity(titleAnimated ? 1 : 0)
+            .accessibilityElement(children: .combine)
 
             Spacer()
 

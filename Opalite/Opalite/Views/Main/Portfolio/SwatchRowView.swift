@@ -36,7 +36,8 @@ struct SwatchRowView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "arrow.turn.down.right")
                         .bold()
-                    
+                        .accessibilityHidden(true)
+
                     Button {
                         HapticsManager.shared.selection()
                         showingColorEditor.toggle()
@@ -44,7 +45,7 @@ struct SwatchRowView: View {
                         HStack(spacing: 10) {
                             Image(systemName: "questionmark.square.dashed")
                                 .font(.title2)
-                            
+
                             Text("Create A New Color")
                         }
                         .bold()
@@ -61,7 +62,9 @@ struct SwatchRowView: View {
                         .contentShape(RoundedRectangle(cornerRadius: 8))
                         .hoverEffect(.lift)
                     }
-                    
+                    .accessibilityLabel("Create A New Color")
+                    .accessibilityHint("Opens the color editor to create a new color")
+
                     Spacer()
                 }
                 .padding(.leading, 35)

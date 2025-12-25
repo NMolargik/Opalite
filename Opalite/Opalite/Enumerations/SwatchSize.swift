@@ -34,4 +34,12 @@ enum SwatchSize: CaseIterable, Equatable {
         let nextIndex = all.index(after: idx)
         return nextIndex == all.endIndex ? all.first! : all[nextIndex]
     }
+
+    var accessibilityName: String {
+        switch self {
+        case .small: return "Small"
+        case .medium: return "Medium"
+        case .large: return "Large"
+        }
+    }
 }

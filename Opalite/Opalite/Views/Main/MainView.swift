@@ -69,9 +69,11 @@ struct MainView: View {
                                 Image(systemName: "scribble")
                                     .font(.system(size: 44))
                                     .foregroundStyle(.secondary)
+                                    .accessibilityHidden(true)
 
                                 Text("No canvases yet")
                                     .font(.headline)
+                                    .accessibilityAddTraits(.isHeader)
 
                                 Text("Use the \"New Canvas\" button in the sidebar section to create one.")
                                     .font(.subheadline)
@@ -134,6 +136,8 @@ struct MainView: View {
                 } label: {
                     Label("New Canvas", systemImage: "plus")
                 }
+                .accessibilityLabel("New Canvas")
+                .accessibilityHint(subscriptionManager.hasOnyxEntitlement ? "Creates a new drawing canvas" : "Opens Onyx subscription options")
             }
             .defaultVisibility(.hidden, for: .tabBar)
             .hidden(horizontalSizeClass == .compact)

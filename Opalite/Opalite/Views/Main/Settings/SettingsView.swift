@@ -148,6 +148,7 @@ struct SettingsView: View {
                         Label("Insert Sample Data", systemImage: "tray.and.arrow.down")
                             .foregroundStyle(.blue)
                     }
+                    .accessibilityHint("Adds example colors and palettes to your portfolio")
 
                     Button {
                         HapticsManager.shared.selection()
@@ -156,6 +157,7 @@ struct SettingsView: View {
                         Label("Export Portfolio to PDF", systemImage: "doc.richtext")
                             .foregroundStyle(.blue)
                     }
+                    .accessibilityHint("Creates a PDF document of all your colors and palettes")
                 } header: {
                     Text("Data")
                 } footer: {
@@ -170,7 +172,8 @@ struct SettingsView: View {
                         Label("Delete All Canvases", systemImage: "document.on.trash")
                             .foregroundStyle(.red)
                     }
-                    
+                    .accessibilityHint("Permanently removes all drawing canvases")
+
                     Button(role: .destructive) {
                         HapticsManager.shared.selection()
                         isShowingDeleteAllColorsAlert = true
@@ -178,6 +181,7 @@ struct SettingsView: View {
                         Label("Delete All Colors & Palettes", systemImage: "trash")
                             .foregroundStyle(.red)
                     }
+                    .accessibilityHint("Permanently removes all colors and palettes from your portfolio")
                 } header: {
                     Text("Danger Zone")
                 } footer: {
