@@ -123,6 +123,111 @@ struct OpaliteApp: App {
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(importCoordinator)
+        .commands {
+            // Replace the New Item command group (Cmd+N)
+            CommandGroup(replacing: .newItem) {
+                Button("New Color") {
+                    HapticsManager.shared.selection()
+                    quickActionManager.requestCreateNewColor()
+                }
+                .keyboardShortcut("n", modifiers: .command)
+
+                Button("New Palette") {
+                    HapticsManager.shared.selection()
+                    if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                        do {
+                            try colorManager.createPalette(name: "New Palette")
+                        } catch {
+                            toastManager.show(error: .paletteCreationFailed)
+                        }
+                    }
+                }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+
+                Button("New Canvas") {
+                    HapticsManager.shared.selection()
+                    do {
+                        let newCanvas = try canvasManager.createCanvas()
+                        canvasManager.pendingCanvasToOpen = newCanvas
+                    } catch {
+                        toastManager.show(error: .canvasCreationFailed)
+                    }
+                }
+                .keyboardShortcut("n", modifiers: [.command, .option])
+
+                Divider()
+            }
+
+            // View Menu
+            CommandMenu("View") {
+                Button("Open SwatchBar") {
+                    HapticsManager.shared.selection()
+                    #if targetEnvironment(macCatalyst)
+                    AppDelegate.openSwatchBarWindow()
+                    #else
+                    openWindow(id: "swatchBar")
+                    #endif
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
+
+                Divider()
+
+                Button("Refresh") {
+                    HapticsManager.shared.selection()
+                    Task {
+                        await colorManager.refreshAll()
+                        await canvasManager.refreshAll()
+                    }
+                }
+                .keyboardShortcut("r", modifiers: .command)
+            }
+
+            // Portfolio Menu
+            CommandMenu("Portfolio") {
+                Section("Colors") {
+                    Button("Create New Color") {
+                        HapticsManager.shared.selection()
+                        quickActionManager.requestCreateNewColor()
+                    }
+
+                    Button("Refresh Colors") {
+                        Task { await colorManager.refreshAll() }
+                    }
+                }
+
+                Divider()
+
+                Section("Palettes") {
+                    Button("Create New Palette") {
+                        HapticsManager.shared.selection()
+                        if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
+                            do {
+                                try colorManager.createPalette(name: "New Palette")
+                            } catch {
+                                toastManager.show(error: .paletteCreationFailed)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Canvas Menu
+            CommandMenu("Canvas") {
+                Button("New Canvas") {
+                    HapticsManager.shared.selection()
+                    do {
+                        let newCanvas = try canvasManager.createCanvas()
+                        canvasManager.pendingCanvasToOpen = newCanvas
+                    } catch {
+                        toastManager.show(error: .canvasCreationFailed)
+                    }
+                }
+
+                Button("Refresh Canvases") {
+                    Task { await canvasManager.refreshAll() }
+                }
+            }
+        }
 
 #if os(macOS)
         Window("SwatchBar", id: "swatchBar") {
