@@ -110,35 +110,28 @@ struct FileShareSheetPresenter: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Helpers
-func gradientImage(from colors: [OpaliteColor], size: CGSize = CGSize(width: 512, height: 512)) -> UIImage? {
-    // Convert palette colors to SwiftUI Color; fallback to clear if empty
-    let uiColors: [Color] = colors.map { $0.swiftUIColor }
-    let contentIsOpaque = !colors.isEmpty && colors.allSatisfy { $0.alpha >= 1.0 }
-    let gradientColors = uiColors.isEmpty ? [Color.clear, Color.clear] : uiColors
-    let view = LinearGradient(
-        colors: gradientColors,
-        startPoint: .leading,
-        endPoint: .trailing
-    )
-    .frame(width: size.width, height: size.height)
-    .clipped()
+// MARK: - Image Rendering Helpers
 
-    // Render SwiftUI view to UIImage
-    let renderer = ImageRenderer(content: view)
-    renderer.proposedSize = .init(size)
-    renderer.isOpaque = contentIsOpaque
-    return renderer.uiImage
+/// Renders a gradient image from an array of colors.
+///
+/// This is a convenience wrapper around `ColorImageRenderer.renderGradient`.
+///
+/// - Parameters:
+///   - colors: The colors to use in the gradient
+///   - size: The size of the output image
+/// - Returns: A UIImage of the gradient, or nil if rendering fails
+func gradientImage(from colors: [OpaliteColor], size: CGSize = ColorImageRenderer.defaultSize) -> UIImage? {
+    ColorImageRenderer.renderGradient(colors: colors, size: size)
 }
 
-func solidColorImage(from color: OpaliteColor, size: CGSize = CGSize(width: 512, height: 512)) -> UIImage? {
-    let view = Rectangle()
-        .fill(color.swiftUIColor)
-        .frame(width: size.width, height: size.height)
-        .clipped()
-
-    let renderer = ImageRenderer(content: view)
-    renderer.proposedSize = .init(size)
-    renderer.isOpaque = color.alpha >= 1.0
-    return renderer.uiImage
+/// Renders a solid color image.
+///
+/// This is a convenience wrapper around `ColorImageRenderer.renderSolidColor`.
+///
+/// - Parameters:
+///   - color: The color to render
+///   - size: The size of the output image
+/// - Returns: A UIImage of the solid color, or nil if rendering fails
+func solidColorImage(from color: OpaliteColor, size: CGSize = ColorImageRenderer.defaultSize) -> UIImage? {
+    ColorImageRenderer.renderSolidColor(color, size: size)
 }

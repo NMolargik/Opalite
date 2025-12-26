@@ -15,7 +15,7 @@ struct PaletteDetailView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    @AppStorage("userName") private var userName: String = "User"
+    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
 
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"

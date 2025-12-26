@@ -66,10 +66,43 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         return config
     }
 
-    /// Opens a new window scene on Mac Catalyst
+    /// Opens the SwatchBar window or brings an existing one to the foreground.
+    ///
+    /// This checks for an existing SwatchBar scene and activates it.
+    /// If no SwatchBar window exists, it opens a new one via URL scheme.
     @MainActor
     static func openSwatchBarWindow() {
-        #if targetEnvironment(macCatalyst)
+        // Check if SwatchBar scene already exists and bring it to front
+        for scene in UIApplication.shared.connectedScenes {
+            if let windowScene = scene as? UIWindowScene,
+               scene.session.configuration.name == "SwatchBar" ||
+               windowScene.windows.first?.rootViewController?.title == "SwatchBar" {
+                // Activate the existing SwatchBar window
+                UIApplication.shared.requestSceneSessionActivation(
+                    scene.session,
+                    userActivity: nil,
+                    options: nil,
+                    errorHandler: nil
+                )
+                return
+            }
+        }
+
+        // Also check by activity identifier
+        for scene in UIApplication.shared.connectedScenes {
+            if let activity = scene.session.stateRestorationActivity,
+               activity.targetContentIdentifier == "swatchBar" {
+                UIApplication.shared.requestSceneSessionActivation(
+                    scene.session,
+                    userActivity: nil,
+                    options: nil,
+                    errorHandler: nil
+                )
+                return
+            }
+        }
+
+        // No existing SwatchBar window, open a new one
         if let url = URL(string: "opalite://swatchBar") {
             UIApplication.shared.open(url, options: [:]) { success in
                 if !success {
@@ -77,7 +110,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 }
             }
         }
-        #endif
     }
 
     // MARK: - Menu Builder (Mac Catalyst)

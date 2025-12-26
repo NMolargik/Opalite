@@ -4,7 +4,9 @@
       "Bash(git -C \"/Users/nickmolargik/Developer/Molargik Software LLC/Opalite\" remote -v)",
       "Bash(cat:*)",
       "WebSearch",
-      "Bash(xcodebuild:*)"
+      "Bash(xcodebuild:*)",
+      "Bash(find:*)",
+      "Bash(cd:*)"
     ]
   }
 }

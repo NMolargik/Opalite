@@ -7,13 +7,16 @@
 
 import SwiftUI
 import SwiftData
+import TipKit
 
 struct PaletteRowHeaderView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    @AppStorage("userName") private var userName: String = "User"
+    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
+
+    private let paletteMenuTip = PaletteMenuTip()
 
     @State private var showDeleteConfirmation = false
     @State private var shareImage: UIImage?
@@ -121,6 +124,7 @@ struct PaletteRowHeaderView: View {
                     .contentShape(Circle())
                     .hoverEffect(.lift)
             }
+            .popoverTip(paletteMenuTip, arrowEdge: .leading)
             .padding(.leading)
 
             NavigationLink {

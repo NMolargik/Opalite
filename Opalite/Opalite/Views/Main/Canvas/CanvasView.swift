@@ -267,6 +267,16 @@ struct CanvasView: View {
     }
 
     // MARK: - Shape Placement
+
+    /// Places a geometric shape on the canvas at the specified location.
+    ///
+    /// Transforms view coordinates to canvas content coordinates accounting for
+    /// scroll offset and zoom scale, then generates PencilKit strokes for the shape.
+    ///
+    /// - Parameters:
+    ///   - shape: The type of shape to place
+    ///   - center: The tap location in view coordinates
+    ///   - rotation: Optional rotation angle from Apple Pencil roll
     private func placeShape(_ shape: CanvasShape, at center: CGPoint, rotation: Angle = .zero) {
         // Transform from view coordinates to canvas content coordinates:
         // contentOffset is where the visible area starts in content space
@@ -278,18 +288,15 @@ struct CanvasView: View {
 
         let shapeSize: CGFloat = 100
         let ink = PKInk(.pen, color: .black)
-        var newStrokes: [PKStroke] = []
+        let shapeGenerator = CanvasShapeGenerator()
 
-        // For shapes that need multiple strokes (like arrow), we handle them separately
-        switch shape {
-        case .arrow:
-            newStrokes = createArrowStrokes(center: canvasCenter, size: shapeSize, ink: ink, rotation: rotation)
-        default:
-            let strokePoints = generateShapePoints(for: shape, center: canvasCenter, size: shapeSize, rotation: rotation)
-            if let stroke = createStroke(from: strokePoints, ink: ink) {
-                newStrokes.append(stroke)
-            }
-        }
+        let newStrokes = shapeGenerator.generateStrokes(
+            for: shape,
+            center: canvasCenter,
+            size: shapeSize,
+            ink: ink,
+            rotation: rotation
+        )
 
         guard !newStrokes.isEmpty else { return }
 
@@ -299,174 +306,6 @@ struct CanvasView: View {
             updatedDrawing.strokes.append(stroke)
         }
         drawing = updatedDrawing
-    }
-
-    private func rotatePoint(_ point: CGPoint, around center: CGPoint, by angle: Angle) -> CGPoint {
-        let radians = CGFloat(angle.radians)
-        let dx = point.x - center.x
-        let dy = point.y - center.y
-        let cosAngle = CoreGraphics.cos(radians)
-        let sinAngle = CoreGraphics.sin(radians)
-        let rotatedX = dx * cosAngle - dy * sinAngle
-        let rotatedY = dx * sinAngle + dy * cosAngle
-        return CGPoint(x: center.x + rotatedX, y: center.y + rotatedY)
-    }
-
-    private func generateShapePoints(for shape: CanvasShape, center: CGPoint, size: CGFloat, rotation: Angle = .zero) -> [CGPoint] {
-        let halfSize = size / 2
-
-        var points: [CGPoint]
-
-        switch shape {
-        case .square:
-            let topLeft = CGPoint(x: center.x - halfSize, y: center.y - halfSize)
-            let topRight = CGPoint(x: center.x + halfSize, y: center.y - halfSize)
-            let bottomRight = CGPoint(x: center.x + halfSize, y: center.y + halfSize)
-            let bottomLeft = CGPoint(x: center.x - halfSize, y: center.y + halfSize)
-            // Triple duplicate corner points for truly sharp edges
-            points = [
-                topLeft, topLeft, topLeft,
-                topRight, topRight, topRight,
-                bottomRight, bottomRight, bottomRight,
-                bottomLeft, bottomLeft, bottomLeft,
-                topLeft, topLeft, topLeft
-            ]
-
-        case .circle:
-            points = []
-            let segments = 36
-            for i in 0...segments {
-                let angle = (CGFloat(i) / CGFloat(segments)) * 2 * .pi
-                let x = center.x + cos(angle) * halfSize
-                let y = center.y + sin(angle) * halfSize
-                points.append(CGPoint(x: x, y: y))
-            }
-
-        case .triangle:
-            let height = size * 0.866 // Equilateral triangle height
-            let top = CGPoint(x: center.x, y: center.y - height / 2)
-            let bottomRight = CGPoint(x: center.x + halfSize, y: center.y + height / 2)
-            let bottomLeft = CGPoint(x: center.x - halfSize, y: center.y + height / 2)
-            // Triple duplicate corner points for truly sharp edges
-            points = [
-                top, top, top,
-                bottomRight, bottomRight, bottomRight,
-                bottomLeft, bottomLeft, bottomLeft,
-                top, top, top
-            ]
-
-        case .line:
-            points = [
-                CGPoint(x: center.x - halfSize, y: center.y),
-                CGPoint(x: center.x + halfSize, y: center.y)
-            ]
-
-        case .arrow:
-            // Handled separately with multiple strokes
-            return []
-        }
-
-        // Apply rotation if needed
-        if rotation != .zero {
-            points = points.map { rotatePoint($0, around: center, by: rotation) }
-        }
-
-        return points
-    }
-
-    private func createStroke(from points: [CGPoint], ink: PKInk) -> PKStroke? {
-        guard points.count >= 2 else { return nil }
-
-        var strokePoints: [PKStrokePoint] = []
-        for (index, point) in points.enumerated() {
-            let timeOffset = TimeInterval(index) * 0.01
-            let strokePoint = PKStrokePoint(
-                location: point,
-                timeOffset: timeOffset,
-                size: CGSize(width: 3, height: 3),
-                opacity: 1.0,
-                force: 1.0,
-                azimuth: 0,
-                altitude: .pi / 2
-            )
-            strokePoints.append(strokePoint)
-        }
-
-        let path = PKStrokePath(controlPoints: strokePoints, creationDate: Date())
-        return PKStroke(ink: ink, path: path)
-    }
-
-    private func createArrowStrokes(center: CGPoint, size: CGFloat, ink: PKInk, rotation: Angle = .zero) -> [PKStroke] {
-        let halfSize = size / 2
-        let arrowHeadSize = size * 0.25
-
-        var strokes: [PKStroke] = []
-
-        // Main line
-        var linePoints = [
-            CGPoint(x: center.x - halfSize, y: center.y),
-            CGPoint(x: center.x + halfSize, y: center.y)
-        ]
-        if rotation != .zero {
-            linePoints = linePoints.map { rotatePoint($0, around: center, by: rotation) }
-        }
-        if let lineStroke = createStroke(from: linePoints, ink: ink) {
-            strokes.append(lineStroke)
-        }
-
-        // Arrow head top
-        var headTop = [
-            CGPoint(x: center.x + halfSize, y: center.y),
-            CGPoint(x: center.x + halfSize - arrowHeadSize, y: center.y - arrowHeadSize)
-        ]
-        if rotation != .zero {
-            headTop = headTop.map { rotatePoint($0, around: center, by: rotation) }
-        }
-        if let topStroke = createStroke(from: headTop, ink: ink) {
-            strokes.append(topStroke)
-        }
-
-        // Arrow head bottom
-        var headBottom = [
-            CGPoint(x: center.x + halfSize, y: center.y),
-            CGPoint(x: center.x + halfSize - arrowHeadSize, y: center.y + arrowHeadSize)
-        ]
-        if rotation != .zero {
-            headBottom = headBottom.map { rotatePoint($0, around: center, by: rotation) }
-        }
-        if let bottomStroke = createStroke(from: headBottom, ink: ink) {
-            strokes.append(bottomStroke)
-        }
-
-        return strokes
-    }
-
-    private func createStarStrokes(center: CGPoint, size: CGFloat, ink: PKInk, rotation: Angle = .zero) -> [PKStroke] {
-        let outerRadius = size / 2
-        let innerRadius = size / 4
-        let pointCount = 5
-
-        var starPoints: [CGPoint] = []
-        for i in 0..<(pointCount * 2 + 1) {
-            let angle = (CGFloat(i) * .pi / CGFloat(pointCount)) - .pi / 2
-            let radius = i % 2 == 0 ? outerRadius : innerRadius
-            let x = center.x + cos(angle) * radius
-            let y = center.y + sin(angle) * radius
-            var point = CGPoint(x: x, y: y)
-            // Apply rotation if needed
-            if rotation != .zero {
-                point = rotatePoint(point, around: center, by: rotation)
-            }
-            // Triple duplicate each point for truly sharp edges
-            starPoints.append(point)
-            starPoints.append(point)
-            starPoints.append(point)
-        }
-
-        if let stroke = createStroke(from: starPoints, ink: ink) {
-            return [stroke]
-        }
-        return []
     }
 }
 

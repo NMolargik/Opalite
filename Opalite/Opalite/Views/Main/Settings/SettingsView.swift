@@ -18,8 +18,8 @@ struct SettingsView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.colorScheme) private var colorScheme
 
-    @AppStorage("userName") private var userName: String = "User"
-    @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
+    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
+    @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
 
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false

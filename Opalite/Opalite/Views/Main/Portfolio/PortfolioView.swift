@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
 import Observation
+import TipKit
 
 #if canImport(UIKit)
 import UIKit
@@ -21,6 +22,11 @@ struct PortfolioView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(QuickActionManager.self) private var quickActionManager
+
+    // MARK: - Tips
+    private let createContentTip = CreateContentTip()
+    private let dragAndDropTip = DragAndDropTip()
+    private let colorDetailsTip = ColorDetailsTip()
 
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var isShowingPaywall: Bool = false
@@ -58,7 +64,15 @@ struct PortfolioView: View {
         NavigationStack() {
             ScrollView {
                 VStack(alignment: .leading, spacing: isCompact ? 16 : 20) {
-                    
+
+                    // MARK: - Create Content Tip (shown first to new users)
+                    TipView(createContentTip) { action in
+                        // When user dismisses tip, enable the next tip
+                        ColorDetailsTip.hasSeenCreateTip = true
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+
                     // MARK: - Colors Row
                     HStack {
                         Image(systemName: "paintpalette.fill")
@@ -72,7 +86,11 @@ struct PortfolioView: View {
                     .padding(.leading, 20)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Colors, \(colorManager.looseColors.count) items")
-                    
+
+                    // Color details tip - shown after create content tip is dismissed
+                    TipView(colorDetailsTip)
+                        .padding(.horizontal, 20)
+
                     SwatchRowView(
                         colors: colorManager.looseColors,
                         palette: pendingPaletteToAddTo,
@@ -125,6 +143,11 @@ struct PortfolioView: View {
                                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                         do {
                                             try colorManager.createPalette(name: "New Palette")
+                                            // User created content, advance tips
+                                            createContentTip.invalidate(reason: .actionPerformed)
+                                            ColorDetailsTip.hasSeenCreateTip = true
+                                            DragAndDropTip.hasCreatedPalette = true
+                                            PaletteMenuTip.hasCreatedPalette = true
                                         } catch {
                                             toastManager.show(error: .paletteCreationFailed)
                                         }
@@ -160,11 +183,15 @@ struct PortfolioView: View {
                         }
                         .padding(.leading, 35)
                     } else {
+                        // Drag and drop tip - shown after first palette
+                        TipView(dragAndDropTip)
+                            .padding(.horizontal, 20)
+
                         ForEach(colorManager.palettes.sorted(by: { $0.createdAt > $1.createdAt } )) { palette in
                             VStack(alignment: .leading, spacing: 5) {
                                 PaletteRowHeaderView(palette: palette)
                                     .zIndex(0)
-                                
+
                                 SwatchRowView(
                                     colors: palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? [],
                                     palette: palette,
@@ -224,6 +251,9 @@ struct PortfolioView: View {
                     onApprove: { newColor in
                         do {
                             _ = try colorManager.createColor(existing: newColor)
+                            // User created content, advance tips
+                            createContentTip.invalidate(reason: .actionPerformed)
+                            ColorDetailsTip.hasSeenCreateTip = true
                         } catch {
                             toastManager.show(error: .colorCreationFailed)
                         }
@@ -250,17 +280,17 @@ struct PortfolioView: View {
                 PaywallView(featureContext: "This feature requires Onyx")
             }
             .toolbar {
-                if isIPadOrMac && !colorManager.isSwatchBarOpen {
+                if isIPadOrMac {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             HapticsManager.shared.selection()
-                            #if targetEnvironment(macCatalyst)
+                            // Open SwatchBar or bring existing one to front
                             AppDelegate.openSwatchBarWindow()
-                            #else
-                            openWindow(id: "swatchBar")
-                            #endif
                         } label: {
-                            Label("Open SwatchBar", systemImage: "square.stack")
+                            Label(
+                                colorManager.isSwatchBarOpen ? "Show SwatchBar" : "Open SwatchBar",
+                                systemImage: "square.stack"
+                            )
                         }
                     }
 
@@ -306,6 +336,11 @@ struct PortfolioView: View {
                                 if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                     do {
                                         try colorManager.createPalette(name: "New Palette")
+                                        // User created content, advance tips
+                                        createContentTip.invalidate(reason: .actionPerformed)
+                                        ColorDetailsTip.hasSeenCreateTip = true
+                                        DragAndDropTip.hasCreatedPalette = true
+                                        PaletteMenuTip.hasCreatedPalette = true
                                     } catch {
                                         toastManager.show(error: .paletteCreationFailed)
                                     }

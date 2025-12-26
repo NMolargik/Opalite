@@ -12,23 +12,66 @@ import PencilKit
 import DeviceKit
 #endif
 
+// MARK: - CanvasManager
+
+/// Manages PencilKit canvas files with SwiftData persistence.
+///
+/// `CanvasManager` provides the business logic layer for canvas CRUD operations,
+/// maintaining an in-memory cache of canvases for efficient view consumption.
+/// It handles drawing serialization/deserialization and integrates with CloudKit
+/// for cross-device sync.
+///
+/// ## Usage
+/// ```swift
+/// @Environment(CanvasManager.self) private var canvasManager
+///
+/// // Create a new canvas
+/// let canvas = try canvasManager.createCanvas(title: "My Sketch")
+///
+/// // Save drawing changes
+/// try canvasManager.saveDrawing(drawing, to: canvas)
+///
+/// // Load a drawing
+/// let drawing = canvasManager.loadDrawing(from: canvas)
+/// ```
+///
+/// ## Threading
+/// This class is `@MainActor`-isolated and should only be accessed from the main thread.
+/// All SwiftData operations are performed on the main context.
 @MainActor
 @Observable
 final class CanvasManager {
+
+    // MARK: - Properties
+
+    /// The SwiftData model context for persistence operations.
     @ObservationIgnored
     let context: ModelContext
 
+    /// Creates a new canvas manager with the specified model context.
+    ///
+    /// - Parameter context: The SwiftData model context to use for persistence
     init(context: ModelContext) {
         self.context = context
     }
 
-    // MARK: - Cached data for views to consume
+    // MARK: - Cached Data
+
+    /// All canvas files, sorted by most recently updated.
+    ///
+    /// This array is automatically refreshed after any mutation operation.
+    /// Views should observe this property for reactive updates.
     var canvases: [CanvasFile] = []
 
-    /// Set this to request opening a specific canvas (used for cross-tab navigation)
+    /// Canvas file waiting to be opened in the UI.
+    ///
+    /// Set this property to trigger navigation to a specific canvas.
+    /// The UI layer should observe this and clear it after handling.
     var pendingCanvasToOpen: CanvasFile? = nil
 
-    // MARK: - Sort
+    // MARK: - Sorting
+
+    /// Sort descriptors for canvas queries (most recent first).
     private var canvasSort: [SortDescriptor<CanvasFile>] {
         [
             SortDescriptor(\CanvasFile.updatedAt, order: .reverse),
@@ -36,7 +79,12 @@ final class CanvasManager {
         ]
     }
 
-    // MARK: - Cache Reload
+    // MARK: - Cache Management
+
+    /// Reloads the in-memory cache from the persistent store.
+    ///
+    /// Called automatically after mutations. In case of fetch errors,
+    /// the cache is cleared to prevent stale data.
     private func reloadCache() {
         do {
             let descriptor = FetchDescriptor<CanvasFile>(sortBy: canvasSort)
@@ -49,13 +97,25 @@ final class CanvasManager {
         }
     }
 
-    // MARK: - Public API: Refresh
-    /// Refreshes in-memory cache by fetching the latest data from the ModelContext.
+    // MARK: - Refresh
+
+    /// Refreshes the in-memory cache by fetching the latest data from SwiftData.
+    ///
+    /// Call this method when returning from background or after CloudKit sync
+    /// to ensure the UI reflects the most current data.
     func refreshAll() async {
         reloadCache()
     }
 
-    // MARK: - Public API: Fetching
+    // MARK: - Fetching
+
+    /// Fetches all canvases from the persistent store.
+    ///
+    /// This method updates the `canvases` cache and returns the fetched results.
+    /// Use `refreshAll()` for async refresh without return value.
+    ///
+    /// - Returns: Array of all canvas files, sorted by most recently updated
+    /// - Throws: SwiftData fetch errors
     @discardableResult
     func fetchCanvases() throws -> [CanvasFile] {
         let descriptor = FetchDescriptor<CanvasFile>(sortBy: canvasSort)
@@ -65,14 +125,32 @@ final class CanvasManager {
     }
 
     // MARK: - Saving
+
+    /// Persists any pending changes to the SwiftData store.
+    ///
+    /// This method is called automatically by mutation methods. Only call
+    /// directly if you've made manual changes to canvas objects.
+    ///
+    /// - Throws: SwiftData save errors
     func saveContext() throws {
         if context.hasChanges {
             try context.save()
         }
     }
 
-    // MARK: - Creating / Inserting
-    /// Creates, inserts, and saves a new canvas file.
+    // MARK: - Creating
+
+    /// Creates a new canvas file with the specified properties.
+    ///
+    /// The canvas is inserted into the persistent store immediately.
+    /// Device name is automatically recorded for sync attribution.
+    ///
+    /// - Parameters:
+    ///   - title: Display title for the canvas (default: "Untitled Canvas")
+    ///   - drawing: Initial PencilKit drawing content (default: empty)
+    ///   - thumbnailData: Optional PNG thumbnail for list display
+    /// - Returns: The newly created and persisted canvas file
+    /// - Throws: SwiftData save errors
     @discardableResult
     func createCanvas(
         title: String = "Untitled Canvas",
@@ -95,7 +173,14 @@ final class CanvasManager {
         return canvas
     }
 
-    /// Inserts and saves an existing canvas instance (e.g., imported).
+    /// Inserts an existing canvas file (e.g., from import) into the store.
+    ///
+    /// Use this method when importing canvases from external sources.
+    /// The canvas's `updatedAt` timestamp is refreshed.
+    ///
+    /// - Parameter canvas: The canvas file to insert
+    /// - Returns: The same canvas file after insertion
+    /// - Throws: SwiftData save errors
     @discardableResult
     func createCanvas(existing canvas: CanvasFile) throws -> CanvasFile {
         #if canImport(DeviceKit)
@@ -110,7 +195,16 @@ final class CanvasManager {
     }
 
     // MARK: - Updating
-    /// Applies changes to a canvas and saves.
+
+    /// Applies changes to a canvas and persists them.
+    ///
+    /// Use the closure to modify canvas properties. The `updatedAt` timestamp
+    /// and device name are automatically updated.
+    ///
+    /// - Parameters:
+    ///   - canvas: The canvas to update
+    ///   - changes: Optional closure to apply modifications
+    /// - Throws: SwiftData save errors
     func updateCanvas(_ canvas: CanvasFile, applying changes: ((CanvasFile) -> Void)? = nil) throws {
         changes?(canvas)
         #if canImport(DeviceKit)
@@ -121,7 +215,16 @@ final class CanvasManager {
         reloadCache()
     }
 
-    /// Persists a new drawing to the canvas and saves.
+    /// Saves a PencilKit drawing to a canvas file.
+    ///
+    /// The drawing is serialized and stored externally (not in SwiftData).
+    /// Optionally updates the thumbnail for list display.
+    ///
+    /// - Parameters:
+    ///   - drawing: The PencilKit drawing to save
+    ///   - canvas: The canvas file to save to
+    ///   - thumbnailData: Optional updated thumbnail PNG data
+    /// - Throws: SwiftData save errors
     func saveDrawing(_ drawing: PKDrawing, to canvas: CanvasFile, thumbnailData: Data? = nil) throws {
         canvas.saveDrawing(drawing)
         if let thumbnailData {
@@ -135,19 +238,40 @@ final class CanvasManager {
     }
 
     // MARK: - Loading
-    /// Loads the PKDrawing from a canvas (returns empty drawing if missing/corrupt).
+
+    /// Loads the PencilKit drawing from a canvas file.
+    ///
+    /// If the drawing data is missing or corrupted, returns an empty drawing.
+    /// The drawing is deserialized from external storage.
+    ///
+    /// - Parameter canvas: The canvas to load from
+    /// - Returns: The canvas's PencilKit drawing, or empty if unavailable
     func loadDrawing(from canvas: CanvasFile) -> PKDrawing {
         canvas.loadDrawing()
     }
 
     // MARK: - Deleting
+
+    /// Permanently deletes a canvas file from the store.
+    ///
+    /// This operation cannot be undone. Associated drawing data is also removed.
+    ///
+    /// - Parameter canvas: The canvas to delete
+    /// - Throws: SwiftData save errors
     func deleteCanvas(_ canvas: CanvasFile) throws {
         context.delete(canvas)
         try saveContext()
         reloadCache()
     }
 
-    // MARK: - Samples
+    // MARK: - Sample Data
+
+    /// Creates sample canvas files for SwiftUI previews.
+    ///
+    /// Clears existing cached data and creates three sample canvases:
+    /// "Sketch", "Ideas", and "Storyboard".
+    ///
+    /// - Throws: SwiftData save errors
     func loadSamples() throws {
         self.canvases = []
 

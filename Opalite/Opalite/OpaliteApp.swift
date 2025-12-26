@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Observation
+import TipKit
 
 @main
 @MainActor
@@ -12,7 +13,7 @@ struct OpaliteApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openWindow) private var openWindow
 
-    @AppStorage("userName") private var userName: String = "User"
+    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -46,6 +47,12 @@ struct OpaliteApp: App {
 
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
         canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
+
+        // Configure TipKit for user onboarding tips
+        try? Tips.configure([
+            .displayFrequency(.immediate),
+            .datastoreLocation(.applicationDefault)
+        ])
     }
 
     var body: some Scene {
@@ -143,6 +150,9 @@ struct OpaliteApp: App {
                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                         do {
                             try colorManager.createPalette(name: "New Palette")
+                            // Trigger tips for first palette
+                            DragAndDropTip.hasCreatedPalette = true
+                            PaletteMenuTip.hasCreatedPalette = true
                         } catch {
                             toastManager.show(error: .paletteCreationFailed)
                         }
@@ -224,6 +234,9 @@ struct OpaliteApp: App {
                         if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                             do {
                                 try colorManager.createPalette(name: "New Palette")
+                                // Trigger tips for first palette
+                                DragAndDropTip.hasCreatedPalette = true
+                                PaletteMenuTip.hasCreatedPalette = true
                             } catch {
                                 toastManager.show(error: .paletteCreationFailed)
                             }

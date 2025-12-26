@@ -359,6 +359,13 @@ struct SwatchView: View {
         return provider
     }
 
+    /// Renders the swatch as PNG image data for drag and drop or sharing.
+    ///
+    /// Creates a gradient image from the swatch colors with an optional badge overlay
+    /// showing the color name or hex code.
+    ///
+    /// - Parameter size: The size of the output image
+    /// - Returns: PNG data of the rendered swatch, or nil if rendering fails
     private func renderSwatchImage(size: CGSize) -> Data? {
         let badgeOverlay = Group {
             if showOverlays {
@@ -377,7 +384,7 @@ struct SwatchView: View {
             }
         }
 
-        let view = Rectangle()
+        let swatchView = Rectangle()
             .fill(
                 LinearGradient(
                     gradient: Gradient(colors: fill.map { $0.swiftUIColor }),
@@ -391,73 +398,7 @@ struct SwatchView: View {
                     .frame(maxWidth: 500, alignment: .leading)
             }
 
-        #if canImport(UIKit)
-        // Prefer SwiftUI's ImageRenderer when available. This avoids UIKit hosting / safe-area / backing-store quirks
-        // that can cause transparent strips or fully-empty renders on iPad.
-        if #available(iOS 16.0, *) {
-            let renderer = ImageRenderer(content: view)
-            renderer.proposedSize = ProposedViewSize(size)
-            // Prefer trait-based scale instead of UIScreen.main (deprecated in iOS 26)
-            // Use a temporary hosting controller to obtain a traitCollection in context
-            let hc = UIHostingController(rootView: view)
-            hc.view.frame = CGRect(origin: .zero, size: size)
-            hc.view.bounds = CGRect(origin: .zero, size: size)
-            let traitScale = hc.traitCollection.displayScale
-            renderer.scale = CGFloat(traitScale)
-
-            renderer.isOpaque = false
-
-            if let uiImage = renderer.uiImage {
-                return uiImage.pngData()
-            }
-        }
-
-        // Fallback for iOS 15 and earlier: host in a UIHostingController and drawHierarchy.
-        // (Layer rendering can be blank for some SwiftUI content when offscreen.)
-        let controller = UIHostingController(rootView: view)
-        controller.view.frame = CGRect(origin: .zero, size: size)
-        controller.view.bounds = CGRect(origin: .zero, size: size)
-        controller.view.backgroundColor = .clear
-        controller.view.isOpaque = false
-
-        controller.view.setNeedsLayout()
-        controller.view.layoutIfNeeded()
-
-        let format = UIGraphicsImageRendererFormat.default()
-        // Prefer trait-based scale; avoid UIScreen.main
-        let hc = UIHostingController(rootView: view)
-        let traitScale = hc.traitCollection.displayScale
-        format.scale = CGFloat(traitScale)
-        format.opaque = false
-
-        let renderer = UIGraphicsImageRenderer(size: size, format: format)
-        let image = renderer.image { _ in
-            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
-        }
-        return image.pngData()
-        #elseif canImport(AppKit)
-        let hostingView = NSHostingView(rootView: view)
-        hostingView.frame = CGRect(origin: .zero, size: size)
-        hostingView.wantsLayer = true
-        hostingView.layer?.backgroundColor = NSColor.clear.cgColor
-
-        // Ensure layout is up to date
-        hostingView.layoutSubtreeIfNeeded()
-
-        // Use AppKit's caching APIs to avoid coordinate-system / flipping issues that can
-        // produce a transparent strip when drawing via a raw CG context.
-        guard let rep = hostingView.bitmapImageRepForCachingDisplay(in: hostingView.bounds) else {
-            return nil
-        }
-
-        // Match screen scale to avoid subtle rendering artifacts
-        rep.size = hostingView.bounds.size
-
-        hostingView.cacheDisplay(in: hostingView.bounds, to: rep)
-        return rep.representation(using: .png, properties: [:])
-        #else
-        return nil
-        #endif
+        return ColorImageRenderer.renderViewAsPNGData(swatchView, size: size, opaque: false)
     }
 }
 

@@ -180,10 +180,8 @@ struct MainView: View {
             }
 
             if newTab == .swatchBar {
-                // Only open if not already open (iOS check; macOS Window handles this automatically)
-                if !colorManager.isSwatchBarOpen {
-                    openWindow(id: "swatchBar")
-                }
+                // Open SwatchBar or bring existing one to front
+                AppDelegate.openSwatchBarWindow()
                 selectedTab = oldTab
                 return
             }

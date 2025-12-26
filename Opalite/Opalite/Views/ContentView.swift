@@ -18,7 +18,7 @@ struct ContentView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
 
-    @AppStorage("appTheme") private var appThemeRaw: String = AppThemeOption.system.rawValue
+    @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {
         let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
