@@ -187,13 +187,15 @@ struct PortfolioView: View {
                         TipView(dragAndDropTip)
                             .padding(.horizontal, 20)
 
-                        ForEach(colorManager.palettes.sorted(by: { $0.createdAt > $1.createdAt } )) { palette in
+                        // Palettes are pre-sorted by updatedAt from ColorManager (shows recently edited first)
+                        ForEach(colorManager.palettes) { palette in
                             VStack(alignment: .leading, spacing: 5) {
                                 PaletteRowHeaderView(palette: palette)
                                     .zIndex(0)
 
                                 SwatchRowView(
-                                    colors: palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? [],
+                                    // Colors are pre-sorted by updatedAt from ColorManager
+                                    colors: palette.colors ?? [],
                                     palette: palette,
                                     swatchWidth: swatchSize.size,
                                     swatchHeight: swatchSize.size,
@@ -502,7 +504,10 @@ struct PortfolioView: View {
                         shareFileURL = try SharingService.exportColor(color)
                         isShowingFileShareSheet = true
                     } catch {
-                        // Export failed silently
+                        #if DEBUG
+                        print("[PortfolioView] Failed to export color '\(color.name ?? "unnamed")': \(error.localizedDescription)")
+                        #endif
+                        toastManager.show(error: .exportFailed(reason: "Color export failed"))
                     }
                 } label: {
                     Label("Export Color", systemImage: "square.and.arrow.up")

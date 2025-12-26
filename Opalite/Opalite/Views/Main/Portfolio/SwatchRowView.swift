@@ -98,7 +98,8 @@ struct SwatchRowView: View {
             } else {
                 ScrollView(.horizontal) {
                     HStack(spacing: 12) {
-                        ForEach(colors.sorted(by: { $0.updatedAt > $1.updatedAt }), id: \.self) { color in
+                        // Colors are pre-sorted by updatedAt from ColorManager
+                        ForEach(colors, id: \.self) { color in
                             if let onTap = onTap {
                                 Button {
                                     HapticsManager.shared.selection()
@@ -218,7 +219,13 @@ struct SwatchRowView: View {
         Task { @MainActor in
             var droppedColor = colorManager.colors.first(where: { $0.id == uuid })
             if droppedColor == nil {
-                _ = try? colorManager.fetchColors()
+                do {
+                    _ = try colorManager.fetchColors()
+                } catch {
+                    #if DEBUG
+                    print("[SwatchRowView] Failed to fetch colors during drop: \(error.localizedDescription)")
+                    #endif
+                }
                 droppedColor = colorManager.colors.first(where: { $0.id == uuid })
             }
             guard let color = droppedColor else { return }
@@ -244,7 +251,13 @@ struct SwatchRowView: View {
                 // Try to find existing color first
                 var existingColor = colorManager.colors.first(where: { $0.id == uuid })
                 if existingColor == nil {
-                    _ = try? colorManager.fetchColors()
+                    do {
+                        _ = try colorManager.fetchColors()
+                    } catch {
+                        #if DEBUG
+                        print("[SwatchRowView] Failed to fetch colors during JSON drop: \(error.localizedDescription)")
+                        #endif
+                    }
                     existingColor = colorManager.colors.first(where: { $0.id == uuid })
                 }
 
@@ -289,7 +302,9 @@ struct SwatchRowView: View {
                     }
                 }
             } catch {
-                // Import failed silently
+                #if DEBUG
+                print("[SwatchRowView] Failed to import dropped color: \(error.localizedDescription)")
+                #endif
             }
         }
     }

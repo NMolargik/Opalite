@@ -72,6 +72,13 @@ struct ColorSpectrumPickerView: View {
                 }
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Color spectrum picker")
+                .accessibilityValue(currentColorDescription)
+                .accessibilityHint("Drag to select a color. Horizontal position changes hue, vertical changes brightness.")
+                .accessibilityAdjustableAction { direction in
+                    adjustColor(direction: direction)
+                }
 
                 // Opacity slider
                 VStack(alignment: .leading, spacing: 8) {
@@ -81,11 +88,14 @@ struct ColorSpectrumPickerView: View {
 
                     HStack {
                         Slider(value: $color.alpha, in: 0...1)
+                            .accessibilityLabel("Opacity")
+                            .accessibilityValue("\(Int(color.alpha * 100)) percent")
 
                         Text("\(Int(color.alpha * 100))%")
                             .monospacedDigit()
                             .frame(width: 48, alignment: .trailing)
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                     }
                 }
 
@@ -108,6 +118,34 @@ struct ColorSpectrumPickerView: View {
         .onChange(of: color.id) { _, _ in
             // Sync when the color binding changes to a different color
             syncDragLocationFromColor()
+        }
+    }
+
+    private var currentColorDescription: String {
+        let hueNames = ["Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Magenta", "Pink", "Red"]
+        let hueIndex = Int(dragLocation.x * 9)
+        let hueName = hueNames[min(hueIndex, hueNames.count - 1)]
+        let brightness = Int((1.0 - dragLocation.y) * 100)
+        return "\(hueName), \(brightness)% brightness"
+    }
+
+    private func adjustColor(direction: AccessibilityAdjustmentDirection) {
+        let step: CGFloat = 0.05
+        switch direction {
+        case .increment:
+            dragLocation.x = min(1.0, dragLocation.x + step)
+        case .decrement:
+            dragLocation.x = max(0.0, dragLocation.x - step)
+        @unknown default:
+            break
+        }
+        let hue = Double(dragLocation.x)
+        let brightness = Double(1.0 - dragLocation.y)
+        let newColor = Color(hue: hue, saturation: 1.0, brightness: brightness)
+        if let rgba = newColor.rgbaComponents {
+            color.red = rgba.red
+            color.green = rgba.green
+            color.blue = rgba.blue
         }
     }
 

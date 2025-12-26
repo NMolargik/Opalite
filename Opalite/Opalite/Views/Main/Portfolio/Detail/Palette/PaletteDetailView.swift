@@ -39,7 +39,8 @@ struct PaletteDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 SwatchView(
-                    fill: palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? [],
+                    // Colors are pre-sorted by updatedAt from ColorManager
+                    fill: palette.colors ?? [],
                     height: 260,
                     badgeText: palette.name,
                     showOverlays: true,

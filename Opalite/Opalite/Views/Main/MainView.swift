@@ -15,9 +15,7 @@ struct MainView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    @Namespace private var namespace
     @State private var selectedTab: Tabs = .portfolio
-    @State private var previousTab: Tabs = .portfolio
     @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
@@ -108,7 +106,13 @@ struct MainView: View {
 
                             Button(role: .destructive) {
                                 HapticsManager.shared.selection()
-                                try? canvasManager.deleteCanvas(canvasFile)
+                                do {
+                                    try canvasManager.deleteCanvas(canvasFile)
+                                } catch {
+                                    #if DEBUG
+                                    print("[MainView] Failed to delete canvas '\(canvasFile.title)': \(error.localizedDescription)")
+                                    #endif
+                                }
                             } label: {
                                 Label("Delete Canvas", systemImage: "trash")
                             }
@@ -124,12 +128,16 @@ struct MainView: View {
                 Button {
                     HapticsManager.shared.selection()
                     if subscriptionManager.hasOnyxEntitlement {
-                        let newCanvas = try? canvasManager.createCanvas()
-                        if let newCanvas {
+                        do {
+                            let newCanvas = try canvasManager.createCanvas()
                             // Defer tab selection to allow view hierarchy to update first
                             DispatchQueue.main.async {
                                 selectedTab = .canvasBody(newCanvas)
                             }
+                        } catch {
+                            #if DEBUG
+                            print("[MainView] Failed to create canvas: \(error.localizedDescription)")
+                            #endif
                         }
                     } else {
                         isShowingPaywall = true
@@ -159,8 +167,14 @@ struct MainView: View {
                 if let canvas = canvasToRename {
                     let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmed.isEmpty {
-                        try? canvasManager.updateCanvas(canvas) { c in
-                            c.title = trimmed
+                        do {
+                            try canvasManager.updateCanvas(canvas) { c in
+                                c.title = trimmed
+                            }
+                        } catch {
+                            #if DEBUG
+                            print("[MainView] Failed to rename canvas: \(error.localizedDescription)")
+                            #endif
                         }
                     }
                 }
@@ -186,7 +200,6 @@ struct MainView: View {
                 return
             }
 
-            previousTab = oldTab
         }
         .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
             if let canvas = newCanvas {

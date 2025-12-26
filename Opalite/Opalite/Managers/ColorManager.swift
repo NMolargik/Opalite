@@ -28,8 +28,12 @@ class ColorManager {
     }
     
     // MARK: - Cached data for views to consume
+    /// Palettes sorted by updatedAt (most recently edited first)
     var palettes: [OpalitePalette] = []
+    /// Colors sorted by updatedAt (most recently edited first)
     var colors: [OpaliteColor] = []
+
+    /// Colors not assigned to any palette
     var looseColors: [OpaliteColor] {
         colors.filter { $0.palette == nil }
     }
@@ -73,6 +77,36 @@ class ColorManager {
             print("[ColorManager] reloadCache error: \(error)")
             #endif
         }
+    }
+
+    // MARK: - Targeted Cache Updates
+    // These methods update the in-memory cache without a full database fetch,
+    // improving performance for single-item operations.
+
+    private func insertPaletteIntoCache(_ palette: OpalitePalette) {
+        // Insert at beginning since it's most recently updated
+        palettes.insert(palette, at: 0)
+    }
+
+    private func insertColorIntoCache(_ color: OpaliteColor) {
+        // Insert at beginning since it's most recently updated
+        colors.insert(color, at: 0)
+    }
+
+    private func removePaletteFromCache(_ palette: OpalitePalette) {
+        palettes.removeAll { $0.id == palette.id }
+    }
+
+    private func removeColorFromCache(_ color: OpaliteColor) {
+        colors.removeAll { $0.id == color.id }
+    }
+
+    private func resortPalettesCache() {
+        palettes.sort { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
+    }
+
+    private func resortColorsCache() {
+        colors.sort { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
     }
     
     // MARK: - Private helpers: Relationship management
@@ -214,7 +248,10 @@ class ColorManager {
         palette.colors?.forEach { $0.palette = palette }
         context.insert(palette)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: insert new palette at front (most recently updated)
+        insertPaletteIntoCache(palette)
+        // Also insert any colors that came with the palette
+        palette.colors?.forEach { insertColorIntoCache($0) }
         return palette
     }
 
@@ -224,7 +261,10 @@ class ColorManager {
         palette.colors?.forEach { $0.palette = palette }
         context.insert(palette)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: insert new palette at front
+        insertPaletteIntoCache(palette)
+        // Also insert any colors that came with the palette
+        palette.colors?.forEach { insertColorIntoCache($0) }
         return palette
     }
     
@@ -262,10 +302,11 @@ class ColorManager {
 
         context.insert(color)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: insert new color at front (most recently updated)
+        insertColorIntoCache(color)
         return color
     }
-    
+
     // Insert an existing color into the context
     func createColor(existing color: OpaliteColor) throws -> OpaliteColor {
         #if canImport(DeviceKit)
@@ -274,7 +315,8 @@ class ColorManager {
         #endif
         context.insert(color)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: insert new color at front
+        insertColorIntoCache(color)
         return color
     }
 
@@ -284,7 +326,8 @@ class ColorManager {
         changes?(palette)
         palette.updatedAt = .now
         try saveContext()
-        reloadCache()
+        // Targeted cache update: re-sort since updatedAt changed
+        resortPalettesCache()
     }
 
     /// Applies changes to a color and saves.
@@ -295,27 +338,32 @@ class ColorManager {
         #endif
         color.updatedAt = .now
         try saveContext()
-        reloadCache()
+        // Targeted cache update: re-sort since updatedAt changed
+        resortColorsCache()
     }
     
     // MARK: - Deleting
     /// Deletes a palette. Pass `andColors: true` to also delete its colors; otherwise relationships are nullified by default.
     func deletePalette(_ palette: OpalitePalette, andColors: Bool = false) throws {
-        if andColors, let colors = palette.colors {
-            for c in colors {
+        let colorsToRemove = andColors ? (palette.colors ?? []) : []
+        if andColors {
+            for c in colorsToRemove {
                 context.delete(c)
             }
         }
         context.delete(palette)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: remove deleted items from cache
+        removePaletteFromCache(palette)
+        colorsToRemove.forEach { removeColorFromCache($0) }
     }
 
     /// Deletes a color.
     func deleteColor(_ color: OpaliteColor) throws {
         context.delete(color)
         try saveContext()
-        reloadCache()
+        // Targeted cache update: remove deleted color from cache
+        removeColorFromCache(color)
     }
 
     // MARK: - Samples

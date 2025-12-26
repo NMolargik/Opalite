@@ -69,7 +69,9 @@ struct ColorCodesPickerView: View {
                             #if os(iOS) || os(visionOS)
                             .submitLabel(.done)
                             #endif
-                            .frame(width: 100)
+                            .frame(minWidth: 100)
+                            .accessibilityLabel("Hex color code")
+                            .accessibilityHint("Enter a 6 or 8 character hex code")
                         
                         Spacer()
 
@@ -203,7 +205,7 @@ struct ColorCodesPickerView: View {
                             .submitLabel(.done)
                             #endif
                             .multilineTextAlignment(.center)
-                            .frame(width: 80)
+                            .frame(minWidth: 80)
                             .textFieldStyle(.roundedBorder)
                             .font(.system(.body, design: .monospaced))
                             .onChange(of: alphaInput) { _, newValue in
@@ -212,6 +214,8 @@ struct ColorCodesPickerView: View {
                                     alphaInput = sanitized
                                 }
                             }
+                            .accessibilityLabel("Opacity percentage")
+                            .accessibilityHint("Enter a value from 0 to 100")
 
                         Spacer()
 
@@ -269,9 +273,11 @@ struct ColorCodesPickerView: View {
                 .keyboardType(.numberPad)
                 #endif
                 .multilineTextAlignment(.center)
-                .frame(width: 56)
+                .frame(minWidth: 56)
                 .textFieldStyle(.roundedBorder)
                 .font(.system(.body, design: .monospaced))
+                .accessibilityLabel("\(label) channel value")
+                .accessibilityHint("Enter a value from 0 to 255")
         }
     }
 

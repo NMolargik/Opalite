@@ -35,7 +35,6 @@ struct SwatchView: View {
     @Binding var showCopiedFeedback: Bool
 
     @State private var editedBadgeText: String = ""
-    @State private var isMenuPresented: Bool = false
     @FocusState private var badgeFocused: Bool
 
     init(

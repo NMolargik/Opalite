@@ -58,11 +58,17 @@ extension CanvasFile {
 extension CanvasFile {
     /// Reconstruct a PKDrawing for editing/display
     func loadDrawing() -> PKDrawing {
-        guard let drawingData,
-              let drawing = try? PKDrawing(data: drawingData) else {
+        guard let drawingData else {
             return PKDrawing()
         }
-        return drawing
+        do {
+            return try PKDrawing(data: drawingData)
+        } catch {
+            #if DEBUG
+            print("[CanvasFile] Failed to load drawing data for '\(title)': \(error.localizedDescription)")
+            #endif
+            return PKDrawing()
+        }
     }
 
     /// Persist changes from a Canvas/PencilKit view

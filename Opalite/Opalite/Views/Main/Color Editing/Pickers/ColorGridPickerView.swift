@@ -60,6 +60,9 @@ struct ColorGridPickerView: View {
                                     color.alpha = rgba.alpha
                                 }
                             }
+                            .accessibilityLabel(accessibilityLabelFor(row: row, column: column, rows: rows, columns: columns))
+                            .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+                            .accessibilityHint("Double tap to select this color")
                     }
                 }
 
@@ -71,11 +74,14 @@ struct ColorGridPickerView: View {
 
                     HStack {
                         Slider(value: $color.alpha, in: 0...1)
+                            .accessibilityLabel("Opacity")
+                            .accessibilityValue("\(Int(color.alpha * 100)) percent")
 
                         Text("\(Int(color.alpha * 100))%")
                             .monospacedDigit()
                             .frame(width: 48, alignment: .trailing)
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                     }
                 }
             }
@@ -127,6 +133,27 @@ struct ColorGridPickerView: View {
                abs(rgba.green - color.green) < epsilon &&
                abs(rgba.blue  - color.blue)  < epsilon &&
                abs(rgba.alpha - color.alpha) < epsilon
+    }
+
+    private func accessibilityLabelFor(row: Int, column: Int, rows: Int, columns: Int) -> String {
+        if row == 0 {
+            let t = Double(column) / Double(max(columns - 1, 1))
+            let brightness = Int((1.0 - t) * 100)
+            return "Gray, \(brightness)% brightness"
+        }
+
+        let hueNames = ["Red", "Orange", "Yellow", "Yellow-Green", "Green", "Cyan", "Light Blue", "Blue", "Purple", "Magenta"]
+        let hueIndex = column % hueNames.count
+        let hueName = hueNames[hueIndex]
+
+        let colorRow = Double(row - 1)
+        let colorRowCount = Double(max(rows - 1, 1))
+        let t = colorRow / colorRowCount
+
+        let saturation = Int((0.35 + t * 0.55) * 100)
+        let brightness = Int((0.95 - t * 0.45) * 100)
+
+        return "\(hueName), \(saturation)% saturation, \(brightness)% brightness"
     }
 }
 

@@ -97,6 +97,8 @@ struct ColorChannelsPickerView: View {
 
             Slider(value: value, in: 0...1)
                 .tint(tint)
+                .accessibilityLabel("\(label) channel")
+                .accessibilityValue("\(Int(value.wrappedValue * 255)) of 255")
         }
     }
 }
