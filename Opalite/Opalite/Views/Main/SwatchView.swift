@@ -22,6 +22,18 @@ struct SwatchView: View {
     private var matchedNamespace: Namespace.ID? = nil
     private var matchedID: AnyHashable? = nil
 
+    // Color blindness simulation
+    @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
+
+    private var colorBlindnessMode: ColorBlindnessMode {
+        ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
+    }
+
+    /// Colors with color blindness simulation applied (if active)
+    private var displayColors: [OpaliteColor] {
+        fill.simulatingColorBlindness(colorBlindnessMode)
+    }
+
     private var fill: [OpaliteColor]
     private var width: CGFloat?
     private var height: CGFloat?
@@ -143,7 +155,7 @@ struct SwatchView: View {
         return RoundedRectangle(cornerRadius: 16)
             .fill(
                 LinearGradient(
-                    gradient: Gradient(colors: fill.map { $0.swiftUIColor }),
+                    gradient: Gradient(colors: displayColors.map { $0.swiftUIColor }),
                     startPoint: .leading,
                     endPoint: .trailing
                 )
@@ -202,7 +214,7 @@ struct SwatchView: View {
                 // Read-only label state
                 if isEditingBadge != true {
                     Text(badgeText)
-                        .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
                         .bold()
                         .if(allowBadgeTapToEdit && saveBadge != nil) { view in
                             view.onTapGesture {
@@ -221,7 +233,7 @@ struct SwatchView: View {
                             set: { editedBadgeText = $0 }
                         ))
                         .textFieldStyle(.plain)
-                        .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
                         .bold()
                         .submitLabel(.done)
                         .focused($badgeFocused)
@@ -245,7 +257,7 @@ struct SwatchView: View {
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
                                 .imageScale(.large)
-                                .foregroundStyle(fill.first?.idealTextColor() ?? .black, .green)
+                                .foregroundStyle(displayColors.first?.idealTextColor() ?? .black, .green)
                         }
                         .contentShape(Circle())
                         .hoverEffect(.lift)
@@ -289,7 +301,7 @@ struct SwatchView: View {
                 } label: {
                     Image(systemName: showCopiedFeedback ? "checkmark" : "ellipsis")
                         .imageScale(.large)
-                        .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
                         .frame(width: 8, height: 8)
                         .padding(12)
                         .background(
@@ -395,7 +407,7 @@ struct SwatchView: View {
         let badgeOverlay = Group {
             if showOverlays {
                 Text(badgeText)
-                    .foregroundStyle(fill.first?.idealTextColor() ?? .black)
+                    .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
                     .bold()
                     .frame(height: 20)
                     .padding(8)
@@ -412,7 +424,7 @@ struct SwatchView: View {
         let swatchView = Rectangle()
             .fill(
                 LinearGradient(
-                    gradient: Gradient(colors: fill.map { $0.swiftUIColor }),
+                    gradient: Gradient(colors: displayColors.map { $0.swiftUIColor }),
                     startPoint: .leading,
                     endPoint: .trailing
                 )

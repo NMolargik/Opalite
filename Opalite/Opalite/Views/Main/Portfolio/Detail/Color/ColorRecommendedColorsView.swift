@@ -30,7 +30,7 @@ struct ColorRecommendedColorsView: View {
                             } label: {
                                 Label("Copy Hex", systemImage: "number")
                             }
-                            
+
                             Button {
                                 HapticsManager.shared.selection()
                                 onCreateColor(color)
@@ -42,6 +42,7 @@ struct ColorRecommendedColorsView: View {
                     )
                 }
             )
+            .clipped()
         }
     }
 

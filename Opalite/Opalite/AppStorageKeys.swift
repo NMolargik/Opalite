@@ -28,4 +28,7 @@ enum AppStorageKeys {
 
     /// The app's color scheme preference (system, light, or dark).
     static let appTheme = "appTheme"
+
+    /// The color blindness simulation mode for accessibility testing.
+    static let colorBlindnessMode = "colorBlindnessMode"
 }

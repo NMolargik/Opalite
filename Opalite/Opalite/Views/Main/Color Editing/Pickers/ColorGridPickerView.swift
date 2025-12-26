@@ -114,9 +114,9 @@ struct ColorGridPickerView: View {
         let colorRowCount = Double(max(rows - 1, 1))
         let t = colorRow / colorRowCount // 0 at first color row → 1 at bottom
 
-        // Tuned ranges: start less saturated and bright, get more saturated and darker down the rows
-        let saturation = clamp(0.35 + t * 0.55, lower: 0.0, upper: 1.0)   // 0.35 → 0.90
-        let brightness = clamp(0.95 - t * 0.45, lower: 0.0, upper: 1.0)   // 0.95 → 0.50
+        // Tuned ranges: start saturated and bright, get even more saturated and darker down the rows
+        let saturation = clamp(0.65 + t * 0.35, lower: 0.0, upper: 1.0)   // 0.65 → 1.0
+        let brightness = clamp(1.0 - t * 0.45, lower: 0.0, upper: 1.0)    // 1.0 → 0.55
 
         return Color(hue: hue, saturation: saturation, brightness: brightness)
     }
@@ -150,8 +150,8 @@ struct ColorGridPickerView: View {
         let colorRowCount = Double(max(rows - 1, 1))
         let t = colorRow / colorRowCount
 
-        let saturation = Int((0.35 + t * 0.55) * 100)
-        let brightness = Int((0.95 - t * 0.45) * 100)
+        let saturation = Int((0.65 + t * 0.35) * 100)
+        let brightness = Int((1.0 - t * 0.45) * 100)
 
         return "\(hueName), \(saturation)% saturation, \(brightness)% brightness"
     }

@@ -19,6 +19,11 @@ struct ContentView: View {
     @State private var paywallContext: String = ""
 
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
+    @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
+
+    private var colorBlindnessMode: ColorBlindnessMode {
+        ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
+    }
 
     private var preferredColorScheme: ColorScheme? {
         let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
@@ -79,6 +84,15 @@ struct ContentView: View {
                 .zIndex(0)
                 .preferredColorScheme(preferredColorScheme)
                 .accessibilityIdentifier("mainView")
+                .safeAreaInset(edge: .top) {
+                    if colorBlindnessMode != .off {
+                        ColorBlindnessBannerView(mode: colorBlindnessMode) {
+                            withAnimation(.easeInOut) {
+                                colorBlindnessModeRaw = ColorBlindnessMode.off.rawValue
+                            }
+                        }
+                    }
+                }
             }
         }
         .task {

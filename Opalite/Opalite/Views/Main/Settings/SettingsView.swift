@@ -20,6 +20,7 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
+    @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
 
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
@@ -70,6 +71,24 @@ struct SettingsView: View {
                         Label("App Theme", systemImage: "circle.lefthalf.filled")
                             .foregroundStyle(.primary)
                     }
+                }
+
+                Section {
+                    Picker(selection: Binding<ColorBlindnessMode>(
+                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
+                        set: { colorBlindnessModeRaw = $0.rawValue }
+                    )) {
+                        ForEach(ColorBlindnessMode.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    } label: {
+                        Label("Color Vision", systemImage: "eye")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("Accessibility")
+                } footer: {
+                    Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
                 }
 
                 Section {

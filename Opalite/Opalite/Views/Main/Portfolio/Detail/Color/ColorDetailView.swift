@@ -41,6 +41,7 @@ struct ColorDetailView: View {
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
     @State private var isShowingPaywall: Bool = false
+    @State private var isShowingContrastChecker: Bool = false
 
     let color: OpaliteColor
     
@@ -177,6 +178,10 @@ struct ColorDetailView: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Data file export requires Onyx")
         }
+        .sheet(isPresented: $isShowingContrastChecker) {
+            ColorContrastCheckerView(sourceColor: color)
+                .environment(colorManager)
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -186,11 +191,22 @@ struct ColorDetailView: View {
                     Text("Edit")
                 }
             }
-            
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticsManager.shared.selection()
+                    isShowingContrastChecker = true
+                } label: {
+                    Label("Contrast", systemImage: "square.lefthalf.filled")
+                }
+                .accessibilityLabel("Check WCAG contrast")
+                .accessibilityHint("Opens contrast checker to compare this color against others")
+            }
+
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
