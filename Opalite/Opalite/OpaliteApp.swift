@@ -150,9 +150,7 @@ struct OpaliteApp: App {
                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                         do {
                             try colorManager.createPalette(name: "New Palette")
-                            // Trigger tips for first palette
-                            DragAndDropTip.hasCreatedPalette = true
-                            PaletteMenuTip.hasCreatedPalette = true
+                            OpaliteTipActions.advanceTipsAfterContentCreation()
                         } catch {
                             toastManager.show(error: .paletteCreationFailed)
                         }
@@ -234,9 +232,7 @@ struct OpaliteApp: App {
                         if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                             do {
                                 try colorManager.createPalette(name: "New Palette")
-                                // Trigger tips for first palette
-                                DragAndDropTip.hasCreatedPalette = true
-                                PaletteMenuTip.hasCreatedPalette = true
+                                OpaliteTipActions.advanceTipsAfterContentCreation()
                             } catch {
                                 toastManager.show(error: .paletteCreationFailed)
                             }

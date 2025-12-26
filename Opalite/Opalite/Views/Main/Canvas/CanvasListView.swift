@@ -25,9 +25,10 @@ struct CanvasListView: View {
     @State private var renameText: String = ""
 
     private var filteredCanvases: [CanvasFile] {
-        let sorted = canvasManager.canvases.sorted(by: { $0.createdAt > $1.createdAt })
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return sorted }
-        return sorted.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        // Canvases are pre-sorted by CanvasManager
+        let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedSearch.isEmpty else { return canvasManager.canvases }
+        return canvasManager.canvases.filter { $0.title.localizedCaseInsensitiveContains(trimmedSearch) }
     }
     
     var body: some View {

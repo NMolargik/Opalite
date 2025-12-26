@@ -7,6 +7,19 @@
 
 import TipKit
 
+// MARK: - Tip Helpers
+
+/// Helper to advance tips after user creates content.
+/// Call this after successfully creating a color or palette to unlock subsequent tips.
+enum OpaliteTipActions {
+    /// Advances all tips after user creates their first content (color or palette).
+    static func advanceTipsAfterContentCreation() {
+        ColorDetailsTip.hasSeenCreateTip = true
+        DragAndDropTip.hasCreatedPalette = true
+        PaletteMenuTip.hasCreatedPalette = true
+    }
+}
+
 // MARK: - Create Content Tip
 
 /// Tip shown to new users explaining the plus button for creating colors and palettes.

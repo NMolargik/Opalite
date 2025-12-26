@@ -69,6 +69,7 @@ struct SwatchStarfieldView: View {
                             }
                         }
                         .compositingGroup()
+                        .drawingGroup() // Render to Metal texture for better animation performance
                     }
                 }
             }

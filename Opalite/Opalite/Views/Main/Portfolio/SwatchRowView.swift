@@ -124,6 +124,7 @@ struct SwatchRowView: View {
                     }
                     .padding(.horizontal)
                 }
+                .scrollClipDisabled()
                 .scrollIndicators(.hidden)
             }
         }

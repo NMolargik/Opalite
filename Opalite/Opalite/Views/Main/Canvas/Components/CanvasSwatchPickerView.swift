@@ -24,8 +24,9 @@ struct CanvasSwatchPickerView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 // MARK: - Loose Colors Section
+                // Colors are pre-sorted by updatedAt from ColorManager
                 if !colorManager.looseColors.isEmpty {
-                    ForEach(colorManager.looseColors.sorted(by: { $0.updatedAt > $1.updatedAt }), id: \.id) { color in
+                    ForEach(colorManager.looseColors, id: \.id) { color in
                         swatchButton(for: color)
                     }
 
@@ -36,8 +37,9 @@ struct CanvasSwatchPickerView: View {
                 }
 
                 // MARK: - Palette Sections
-                ForEach(Array(colorManager.palettes.sorted(by: { $0.updatedAt > $1.updatedAt }).enumerated()), id: \.element.id) { index, palette in
-                    let paletteColors = palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? []
+                // Palettes are pre-sorted by updatedAt from ColorManager
+                ForEach(Array(colorManager.palettes.enumerated()), id: \.element.id) { index, palette in
+                    let paletteColors = palette.colors ?? []
 
                     if !paletteColors.isEmpty {
                         ForEach(paletteColors, id: \.id) { color in

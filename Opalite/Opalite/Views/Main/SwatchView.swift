@@ -37,6 +37,10 @@ struct SwatchView: View {
     @State private var editedBadgeText: String = ""
     @FocusState private var badgeFocused: Bool
 
+    // Cached drag image to avoid regenerating on every drag
+    @State private var cachedDragImage: Data? = nil
+    @State private var cachedDragImageKey: String = ""
+
     init(
         fill: [OpaliteColor],
         width: CGFloat? = nil,
@@ -324,10 +328,32 @@ struct SwatchView: View {
     }
 
     // MARK: - Drag Support
+
+    /// Creates a cache key based on colors and badge text
+    private var dragImageCacheKey: String {
+        let colorKeys = fill.map { "\($0.id)-\($0.red)-\($0.green)-\($0.blue)-\($0.alpha)" }.joined(separator: "|")
+        return "\(colorKeys)|\(badgeText)|\(showOverlays)"
+    }
+
     private func provideDragItem() -> NSItemProvider {
-        // Always provide a PNG preview of the swatch
-        let size = CGSize(width: 512, height: 512)
-        guard let imageData = renderSwatchImage(size: size) else {
+        // Use cached image if available, otherwise render and cache
+        let currentKey = dragImageCacheKey
+        let imageData: Data?
+
+        if cachedDragImageKey == currentKey, let cached = cachedDragImage {
+            imageData = cached
+        } else {
+            let size = CGSize(width: 512, height: 512)
+            let rendered = renderSwatchImage(size: size)
+            imageData = rendered
+            // Update cache for next drag
+            if rendered != nil {
+                cachedDragImage = rendered
+                cachedDragImageKey = currentKey
+            }
+        }
+
+        guard let imageData else {
             return NSItemProvider()
         }
 

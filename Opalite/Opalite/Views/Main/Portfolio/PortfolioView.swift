@@ -223,6 +223,7 @@ struct PortfolioView: View {
                     }
                 }
             }
+            .scrollClipDisabled()
             .navigationTitle("Opalite")
             .toolbarBackground(.hidden)
             .task {
@@ -253,9 +254,8 @@ struct PortfolioView: View {
                     onApprove: { newColor in
                         do {
                             _ = try colorManager.createColor(existing: newColor)
-                            // User created content, advance tips
                             createContentTip.invalidate(reason: .actionPerformed)
-                            ColorDetailsTip.hasSeenCreateTip = true
+                            OpaliteTipActions.advanceTipsAfterContentCreation()
                         } catch {
                             toastManager.show(error: .colorCreationFailed)
                         }
@@ -338,11 +338,8 @@ struct PortfolioView: View {
                                 if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                     do {
                                         try colorManager.createPalette(name: "New Palette")
-                                        // User created content, advance tips
                                         createContentTip.invalidate(reason: .actionPerformed)
-                                        ColorDetailsTip.hasSeenCreateTip = true
-                                        DragAndDropTip.hasCreatedPalette = true
-                                        PaletteMenuTip.hasCreatedPalette = true
+                                        OpaliteTipActions.advanceTipsAfterContentCreation()
                                     } catch {
                                         toastManager.show(error: .paletteCreationFailed)
                                     }

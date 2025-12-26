@@ -27,8 +27,9 @@ struct SwatchBarView: View {
                     ScrollView {
                         LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                             // MARK: - Palette Sections (collapsible with sticky headers)
-                            ForEach(colorManager.palettes.sorted(by: { $0.updatedAt > $1.updatedAt })) { palette in
-                                let paletteColors = palette.colors?.sorted(by: { $0.updatedAt > $1.updatedAt }) ?? []
+                            // Palettes are pre-sorted by updatedAt from ColorManager
+                            ForEach(colorManager.palettes) { palette in
+                                let paletteColors = palette.colors ?? []
                                 if !paletteColors.isEmpty {
                                     Section {
                                         if expandedPalettes.contains(palette.id) {
@@ -45,9 +46,10 @@ struct SwatchBarView: View {
                             }
                             
                             // MARK: - Loose Colors Section
+                            // Colors are pre-sorted by updatedAt from ColorManager
                             if !colorManager.looseColors.isEmpty {
                                 Section {
-                                    ForEach(colorManager.looseColors.sorted(by: { $0.updatedAt > $1.updatedAt })) { color in
+                                    ForEach(colorManager.looseColors) { color in
                                         swatchCell(for: color)
                                             .padding(.horizontal)
                                             .padding(.vertical, 4)
