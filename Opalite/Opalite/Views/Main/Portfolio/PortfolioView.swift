@@ -40,11 +40,14 @@ struct PortfolioView: View {
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
     @State private var isShowingFileImporter = false
+    @State private var colorToExport: OpaliteColor?
     @State private var importError: String?
     @State private var isShowingImportError = false
     @State private var quickActionTrigger: UUID? = nil
     @State private var copiedColorID: UUID? = nil
     @State private var isShowingPhotoColorPicker = false
+    @State private var colorToDelete: OpaliteColor?
+    @State private var isShowingSwatchBarInfo = false
 
     @Namespace private var namespace
     @Namespace private var swatchNS
@@ -279,6 +282,33 @@ struct PortfolioView: View {
             } message: {
                 Text(importError ?? "An unknown error occurred.")
             }
+            .alert(
+                "Delete \(colorToDelete?.name ?? colorToDelete?.hexString ?? "Color")?",
+                isPresented: Binding(
+                    get: { colorToDelete != nil },
+                    set: { if !$0 { colorToDelete = nil } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) {
+                    HapticsManager.shared.selection()
+                    colorToDelete = nil
+                }
+                Button("Delete", role: .destructive) {
+                    HapticsManager.shared.selection()
+                    if let color = colorToDelete {
+                        withAnimation {
+                            do {
+                                try colorManager.deleteColor(color)
+                            } catch {
+                                toastManager.show(error: .colorDeletionFailed)
+                            }
+                        }
+                    }
+                    colorToDelete = nil
+                }
+            } message: {
+                Text("This action cannot be undone.")
+            }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "This feature requires Onyx")
             }
@@ -287,18 +317,20 @@ struct PortfolioView: View {
                 PhotoColorPickerSheet()
             }
             #endif
+            .sheet(item: $colorToExport) { color in
+                ColorExportSheet(color: color)
+            }
+            .sheet(isPresented: $isShowingSwatchBarInfo) {
+                SwatchBarInfoSheet()
+            }
             .toolbar {
                 if isIPadOrMac {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             HapticsManager.shared.selection()
-                            // Open SwatchBar or bring existing one to front
-                            AppDelegate.openSwatchBarWindow()
+                            isShowingSwatchBarInfo = true
                         } label: {
-                            Label(
-                                colorManager.isSwatchBarOpen ? "Show SwatchBar" : "Open SwatchBar",
-                                systemImage: "square.stack"
-                            )
+                            Label("SwatchBar", systemImage: "square.stack")
                         }
                     }
 
@@ -364,8 +396,6 @@ struct PortfolioView: View {
                                 }
                             } icon: {
                                 Image(systemName: "swatchpalette.fill")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.purple, .orange, .red)
                             }
                         })
 
@@ -377,7 +407,7 @@ struct PortfolioView: View {
                             isShowingPhotoColorPicker = true
                         }, label: {
                             Label {
-                                Text("Pick from Photo")
+                                Text("Sample from Photo")
                             } icon: {
                                 Image(systemName: "eyedropper.halffull")
                             }
@@ -518,17 +548,9 @@ struct PortfolioView: View {
                 
                 Button {
                     HapticsManager.shared.selection()
-                    do {
-                        shareFileURL = try SharingService.exportColor(color)
-                        isShowingFileShareSheet = true
-                    } catch {
-                        #if DEBUG
-                        print("[PortfolioView] Failed to export color '\(color.name ?? "unnamed")': \(error.localizedDescription)")
-                        #endif
-                        toastManager.show(error: .exportFailed(reason: "Color export failed"))
-                    }
+                    colorToExport = color
                 } label: {
-                    Label("Export Color", systemImage: "square.and.arrow.up")
+                    Label("Export...", systemImage: "square.and.arrow.up")
                 }
                 
                 Divider()
@@ -546,13 +568,7 @@ struct PortfolioView: View {
                 
                 Button(role: .destructive) {
                     HapticsManager.shared.selection()
-                    withAnimation {
-                        do {
-                            try colorManager.deleteColor(color)
-                        } catch {
-                            toastManager.show(error: .colorDeletionFailed)
-                        }
-                    }
+                    colorToDelete = color
                 } label: {
                     Label("Delete Color", systemImage: "trash.fill")
                 }

@@ -43,7 +43,7 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
         case .codes:
             return "Color codes"
         case .image:
-            return "Pick from image"
+            return "Sample from image"
         }
     }
 }

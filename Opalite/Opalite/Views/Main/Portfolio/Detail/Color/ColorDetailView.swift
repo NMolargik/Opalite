@@ -42,6 +42,7 @@ struct ColorDetailView: View {
     @State private var isShowingFileShareSheet = false
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingContrastChecker: Bool = false
+    @State private var isShowingExportSheet: Bool = false
 
     // Smart color naming
     @State private var nameSuggestionService = ColorNameSuggestionService()
@@ -206,6 +207,9 @@ struct ColorDetailView: View {
             ColorContrastCheckerView(sourceColor: color)
                 .environment(colorManager)
         }
+        .sheet(isPresented: $isShowingExportSheet) {
+            ColorExportSheet(color: color)
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -306,28 +310,9 @@ struct ColorDetailView: View {
                     
                     Button {
                         HapticsManager.shared.selection()
-                        if subscriptionManager.hasOnyxEntitlement {
-                            do {
-                                shareFileURL = try SharingService.exportColor(color)
-                                isShowingFileShareSheet = true
-                            } catch {
-                                // Export failed silently
-                            }
-                        } else {
-                            isShowingPaywall = true
-                        }
+                        isShowingExportSheet = true
                     } label: {
-                        Label {
-                            HStack {
-                                Text("Export Color")
-                                if !subscriptionManager.hasOnyxEntitlement {
-                                    Image(systemName: "lock.fill")
-                                        .font(.footnote)
-                                }
-                            }
-                        } icon: {
-                            Image(systemName: "paintpalette.fill")
-                        }
+                        Label("Export...", systemImage: "square.and.arrow.up")
                     }
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")

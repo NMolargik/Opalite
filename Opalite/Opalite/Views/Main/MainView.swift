@@ -17,6 +17,7 @@ struct MainView: View {
 
     @State private var selectedTab: Tabs = .portfolio
     @State private var isShowingPaywall: Bool = false
+    @State private var isShowingSwatchBarInfo: Bool = false
 
     // Rename canvas state
     @State private var canvasToRename: CanvasFile? = nil
@@ -194,8 +195,8 @@ struct MainView: View {
             }
 
             if newTab == .swatchBar {
-                // Open SwatchBar or bring existing one to front
-                AppDelegate.openSwatchBarWindow()
+                // Show SwatchBar info sheet
+                isShowingSwatchBarInfo = true
                 selectedTab = oldTab
                 return
             }
@@ -216,6 +217,9 @@ struct MainView: View {
         }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Canvas access requires Onyx")
+        }
+        .sheet(isPresented: $isShowingSwatchBarInfo) {
+            SwatchBarInfoSheet()
         }
     }
 }

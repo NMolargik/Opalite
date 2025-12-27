@@ -49,8 +49,8 @@ struct ColorRecommendedColorsView: View {
                 HapticsManager.shared.selection()
                 isShowingInfo = true
             } label: {
-                Image(systemName: "info.circle")
-                    .foregroundStyle(.secondary)
+                Image(systemName: "questionmark.circle")
+                    .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about color harmonies")

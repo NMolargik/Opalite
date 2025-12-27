@@ -49,7 +49,7 @@ struct PhotoColorPickerSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Pick from Photo")
+            .navigationTitle("Sample from Photo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -128,9 +128,14 @@ struct PhotoColorPickerSheet: View {
 
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let maxWidth: CGFloat = 300
+        let aspectRatio = uiImage.size.width / uiImage.size.height
+        let displayWidth = min(maxWidth, uiImage.size.width)
+        let displayHeight = displayWidth / aspectRatio
+
+        VStack(spacing: 8) {
             GeometryReader { geometry in
-                let imageRect = calculateImageRect(for: uiImage, in: geometry.size)
+                let imageRect = CGRect(x: 0, y: 0, width: geometry.size.width, height: geometry.size.height)
 
                 ZStack {
                     Image(uiImage: uiImage)
@@ -166,7 +171,8 @@ struct PhotoColorPickerSheet: View {
                         }
                 )
             }
-            .aspectRatio(uiImage.size, contentMode: .fit)
+            .frame(width: displayWidth, height: displayHeight)
+            .frame(maxWidth: .infinity)
 
             Text("Tap or drag on the image to pick a color")
                 .font(.footnote)
@@ -296,19 +302,21 @@ struct PhotoColorPickerSheet: View {
     }
 
     private func importStagedColors() {
-        var successCount = 0
-
-        for color in stagedColors {
-            do {
-                _ = try colorManager.createColor(existing: color)
-                successCount += 1
-            } catch {
-                // Continue importing other colors
+        withAnimation {
+            var successCount = 0
+            
+            for color in stagedColors {
+                do {
+                    _ = try colorManager.createColor(existing: color)
+                    successCount += 1
+                } catch {
+                    // Continue importing other colors
+                }
             }
-        }
-
-        if successCount > 0 {
-            OpaliteTipActions.advanceTipsAfterContentCreation()
+            
+            if successCount > 0 {
+                OpaliteTipActions.advanceTipsAfterContentCreation()
+            }
         }
 
         dismiss()

@@ -32,7 +32,8 @@ struct PaletteDetailView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var exportPDFURL: URL?
     @State private var isShowingPDFShareSheet = false
-    
+    @State private var isShowingExportSheet: Bool = false
+
     let palette: OpalitePalette
 
     var body: some View {
@@ -134,6 +135,9 @@ struct PaletteDetailView: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Data file export requires Onyx")
         }
+        .sheet(isPresented: $isShowingExportSheet) {
+            PaletteExportSheet(palette: palette)
+        }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
                 HapticsManager.shared.selection()
@@ -207,7 +211,8 @@ struct PaletteDetailView: View {
                     } label: {
                         Label("Share As Image", systemImage: "photo.badge.plus")
                     }
-                    
+                    .disabled(palette.colors?.isEmpty ?? true)
+
                     Button {
                         HapticsManager.shared.selection()
                         do {
@@ -219,35 +224,19 @@ struct PaletteDetailView: View {
                     } label: {
                         Label("Share As PDF", systemImage: "doc.richtext")
                     }
+                    .disabled(palette.colors?.isEmpty ?? true)
 
                     Button {
                         HapticsManager.shared.selection()
-                        if subscriptionManager.hasOnyxEntitlement {
-                            do {
-                                shareFileURL = try SharingService.exportPalette(palette)
-                                isShowingFileShareSheet = true
-                            } catch {
-                                // Export failed silently
-                            }
-                        } else {
-                            isShowingPaywall = true
-                        }
+                        isShowingExportSheet = true
                     } label: {
-                        Label {
-                            HStack {
-                                Text("Export Palette")
-                                if !subscriptionManager.hasOnyxEntitlement {
-                                    Image(systemName: "lock.fill")
-                                        .font(.footnote)
-                                }
-                            }
-                        } icon: {
-                            Image(systemName: "swatchpalette.fill")
-                        }
+                        Label("Export...", systemImage: "square.and.arrow.up")
                     }
+                    .disabled(palette.colors?.isEmpty ?? true)
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
+                .disabled(palette.colors?.isEmpty ?? true)
             }
         }
     }
