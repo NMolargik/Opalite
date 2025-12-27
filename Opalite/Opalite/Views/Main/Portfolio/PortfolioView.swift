@@ -44,6 +44,7 @@ struct PortfolioView: View {
     @State private var isShowingImportError = false
     @State private var quickActionTrigger: UUID? = nil
     @State private var copiedColorID: UUID? = nil
+    @State private var isShowingPhotoColorPicker = false
 
     @Namespace private var namespace
     @Namespace private var swatchNS
@@ -281,6 +282,11 @@ struct PortfolioView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "This feature requires Onyx")
             }
+            #if canImport(UIKit)
+            .sheet(isPresented: $isShowingPhotoColorPicker) {
+                PhotoColorPickerSheet()
+            }
+            #endif
             .toolbar {
                 if isIPadOrMac {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -364,6 +370,21 @@ struct PortfolioView: View {
                         })
 
                         Divider()
+
+                        #if canImport(UIKit)
+                        Button(action: {
+                            HapticsManager.shared.selection()
+                            isShowingPhotoColorPicker = true
+                        }, label: {
+                            Label {
+                                Text("Pick from Photo")
+                            } icon: {
+                                Image(systemName: "eyedropper.halffull")
+                            }
+                        })
+
+                        Divider()
+                        #endif
 
                         Button(action: {
                             HapticsManager.shared.selection()
