@@ -46,6 +46,11 @@ struct SwatchView: View {
     private var contextMenu: AnyView?
     @Binding var showCopiedFeedback: Bool
 
+    // Name suggestions support
+    private var nameSuggestions: [String]
+    private var isLoadingSuggestions: Bool
+    private var onSuggestionSelected: ((String) -> Void)?
+
     @State private var editedBadgeText: String = ""
     @FocusState private var badgeFocused: Bool
 
@@ -67,7 +72,10 @@ struct SwatchView: View {
         matchedID: AnyHashable? = nil,
         menu: AnyView? = nil,
         contextMenu: AnyView? = nil,
-        showCopiedFeedback: Binding<Bool> = .constant(false)
+        showCopiedFeedback: Binding<Bool> = .constant(false),
+        nameSuggestions: [String] = [],
+        isLoadingSuggestions: Bool = false,
+        onSuggestionSelected: ((String) -> Void)? = nil
     ) {
         self.fill = fill
         self.width = width
@@ -83,6 +91,9 @@ struct SwatchView: View {
         self.menu = menu
         self.contextMenu = contextMenu
         self._showCopiedFeedback = showCopiedFeedback
+        self.nameSuggestions = nameSuggestions
+        self.isLoadingSuggestions = isLoadingSuggestions
+        self.onSuggestionSelected = onSuggestionSelected
     }
 
     init<MenuContent: View>(
@@ -98,6 +109,9 @@ struct SwatchView: View {
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
         showCopiedFeedback: Binding<Bool> = .constant(false),
+        nameSuggestions: [String] = [],
+        isLoadingSuggestions: Bool = false,
+        onSuggestionSelected: ((String) -> Void)? = nil,
         @ViewBuilder menu: @escaping () -> MenuContent
     ) {
         self.init(
@@ -113,7 +127,10 @@ struct SwatchView: View {
             matchedNamespace: matchedNamespace,
             matchedID: matchedID,
             menu: AnyView(menu()),
-            showCopiedFeedback: showCopiedFeedback
+            showCopiedFeedback: showCopiedFeedback,
+            nameSuggestions: nameSuggestions,
+            isLoadingSuggestions: isLoadingSuggestions,
+            onSuggestionSelected: onSuggestionSelected
         )
     }
     
@@ -130,6 +147,9 @@ struct SwatchView: View {
         matchedNamespace: Namespace.ID? = nil,
         matchedID: AnyHashable? = nil,
         showCopiedFeedback: Binding<Bool> = .constant(false),
+        nameSuggestions: [String] = [],
+        isLoadingSuggestions: Bool = false,
+        onSuggestionSelected: ((String) -> Void)? = nil,
         @ViewBuilder contextMenu: @escaping () -> ContextMenuContent
     ) {
         self.init(
@@ -146,7 +166,10 @@ struct SwatchView: View {
             matchedID: matchedID,
             menu: nil,
             contextMenu: AnyView(contextMenu()),
-            showCopiedFeedback: showCopiedFeedback
+            showCopiedFeedback: showCopiedFeedback,
+            nameSuggestions: nameSuggestions,
+            isLoadingSuggestions: isLoadingSuggestions,
+            onSuggestionSelected: onSuggestionSelected
         )
     }
     
@@ -210,85 +233,132 @@ struct SwatchView: View {
     @ViewBuilder
     private var badgeContent: some View {
         if showOverlays {
-            ZStack(alignment: .leading) {
-                // Read-only label state
-                if isEditingBadge != true {
-                    Text(badgeText)
-                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
-                        .bold()
-                        .if(allowBadgeTapToEdit && saveBadge != nil) { view in
-                            view.onTapGesture {
-                                withAnimation(.easeInOut) {
-                                    isEditingBadge = true
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack(alignment: .leading) {
+                    // Read-only label state
+                    if isEditingBadge != true {
+                        Text(badgeText)
+                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                            .bold()
+                            .if(allowBadgeTapToEdit && saveBadge != nil) { view in
+                                view.onTapGesture {
+                                    withAnimation(.easeInOut) {
+                                        isEditingBadge = true
+                                    }
                                 }
                             }
-                        }
-                }
-
-                // Editing state
-                if isEditingBadge == true {
-                    HStack(spacing: 8) {
-                        TextField("Badge", text: Binding(
-                            get: { editedBadgeText.isEmpty ? badgeText : editedBadgeText },
-                            set: { editedBadgeText = $0 }
-                        ))
-                        .textFieldStyle(.plain)
-                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
-                        .bold()
-                        .submitLabel(.done)
-                        .focused($badgeFocused)
-                        .onSubmit {
-                            let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
-                            saveBadge?(finalText)
-                            editedBadgeText = ""
-                            withAnimation(.easeInOut) {
-                                isEditingBadge = false
-                            }
-                        }
-
-                        Button {
-                            HapticsManager.shared.selection()
-                            let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
-                            saveBadge?(finalText)
-                            editedBadgeText = ""
-                            withAnimation(.easeInOut) {
-                                isEditingBadge = false
-                            }
-                        } label: {
-                            Image(systemName: "checkmark.circle.fill")
-                                .imageScale(.large)
-                                .foregroundStyle(displayColors.first?.idealTextColor() ?? .black, .green)
-                        }
-                        .contentShape(Circle())
-                        .hoverEffect(.lift)
                     }
-                    .onAppear {
-                        // Ensure the TextField receives focus right after it appears
+
+                    // Editing state
+                    if isEditingBadge == true {
+                        HStack(spacing: 8) {
+                            TextField("Badge", text: Binding(
+                                get: { editedBadgeText.isEmpty ? badgeText : editedBadgeText },
+                                set: { editedBadgeText = $0 }
+                            ))
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                            .bold()
+                            .submitLabel(.done)
+                            .focused($badgeFocused)
+                            .onSubmit {
+                                let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
+                                saveBadge?(finalText)
+                                editedBadgeText = ""
+                                withAnimation(.easeInOut) {
+                                    isEditingBadge = false
+                                }
+                            }
+
+                            Button {
+                                HapticsManager.shared.selection()
+                                let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
+                                saveBadge?(finalText)
+                                editedBadgeText = ""
+                                withAnimation(.easeInOut) {
+                                    isEditingBadge = false
+                                }
+                            } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .imageScale(.large)
+                                    .foregroundStyle(.black, .green)
+                            }
+                            .contentShape(Circle())
+                            .hoverEffect(.lift)
+                        }
+                        .onAppear {
+                            // Ensure the TextField receives focus right after it appears
+                            DispatchQueue.main.async {
+                                badgeFocused = true
+                            }
+                        }
+                    }
+                }
+                .onChange(of: isEditingBadge) { _, to in
+                    if to == true {
                         DispatchQueue.main.async {
                             badgeFocused = true
                         }
                     }
                 }
-            }
-            .onChange(of: isEditingBadge) { _, to in
-                if to == true {
-                    DispatchQueue.main.async {
-                        badgeFocused = true
-                    }
+                .frame(height: 20)
+                .padding(8)
+                .glassIfAvailable(
+                    GlassConfiguration(style: .clear)
+                )
+
+                // Name suggestions (shown when editing)
+                if isEditingBadge == true {
+                    suggestionsView
                 }
             }
-            .frame(height: 20)
             .padding(8)
-            .glassIfAvailable(
-                GlassConfiguration(style: .clear)
-            )
-            .padding(8)
-            .mask(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-            )
             .contentTransition(.interpolate)
             .animation(.bouncy, value: isEditingBadge)
         }
+    }
+
+    // MARK: - Suggestions View
+    @ViewBuilder
+    private var suggestionsView: some View {
+        Group {
+            if isLoadingSuggestions {
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Generating suggestions...")
+                        .font(.caption)
+                        .foregroundStyle(.white)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(.ultraThinMaterial, in: Capsule())
+                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            } else if !nameSuggestions.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(Array(nameSuggestions.enumerated()), id: \.element) { index, suggestion in
+                        Button {
+                            HapticsManager.shared.selection()
+                            onSuggestionSelected?(suggestion)
+                        } label: {
+                            Text(suggestion)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(.ultraThinMaterial, in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .hoverEffect(.lift)
+                        .transition(.opacity.combined(with: .scale(scale: 0.8)).combined(with: .offset(y: 5)))
+                    }
+                }
+                .transition(.opacity)
+            }
+        }
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isLoadingSuggestions)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: nameSuggestions)
     }
     
     // MARK: - Menu Content

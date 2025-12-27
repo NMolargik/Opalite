@@ -43,6 +43,9 @@ struct ColorDetailView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingContrastChecker: Bool = false
 
+    // Smart color naming
+    @State private var nameSuggestionService = ColorNameSuggestionService()
+
     let color: OpaliteColor
     
     init(color: OpaliteColor) {
@@ -63,9 +66,30 @@ struct ColorDetailView: View {
                         viewModel.rename(to: newName, using: colorManager) { error in
                             toastManager.show(error: error)
                         }
+                        nameSuggestionService.clearSuggestions()
                     },
-                    allowBadgeTapToEdit: true
+                    allowBadgeTapToEdit: true,
+                    nameSuggestions: nameSuggestionService.suggestions,
+                    isLoadingSuggestions: nameSuggestionService.isGenerating,
+                    onSuggestionSelected: { suggestion in
+                        viewModel.rename(to: suggestion, using: colorManager) { error in
+                            toastManager.show(error: error)
+                        }
+                        nameSuggestionService.clearSuggestions()
+                        withAnimation(.easeInOut) {
+                            isEditingName = false
+                        }
+                    }
                 )
+                .onChange(of: isEditingName) { _, newValue in
+                    if newValue == true && nameSuggestionService.isAvailable {
+                        Task {
+                            await nameSuggestionService.generateSuggestions(for: color)
+                        }
+                    } else if newValue == false {
+                        nameSuggestionService.clearSuggestions()
+                    }
+                }
                 
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
