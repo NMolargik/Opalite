@@ -187,7 +187,7 @@ struct PortfolioView: View {
                         TipView(dragAndDropTip)
                             .padding(.horizontal, 20)
 
-                        // Palettes are pre-sorted by updatedAt from ColorManager (shows recently edited first)
+                        // Palettes are pre-sorted by createdAt from ColorManager (most recently created first)
                         ForEach(colorManager.palettes) { palette in
                             VStack(alignment: .leading, spacing: 5) {
                                 PaletteRowHeaderView(palette: palette)

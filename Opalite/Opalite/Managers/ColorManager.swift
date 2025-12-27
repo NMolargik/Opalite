@@ -28,7 +28,7 @@ class ColorManager {
     }
     
     // MARK: - Cached data for views to consume
-    /// Palettes sorted by updatedAt (most recently edited first)
+    /// Palettes sorted by createdAt (most recently created first)
     var palettes: [OpalitePalette] = []
     /// Colors sorted by updatedAt (most recently edited first)
     var colors: [OpaliteColor] = []
@@ -53,7 +53,6 @@ class ColorManager {
     // MARK: - Fetch Helpers
     private var paletteSort: [SortDescriptor<OpalitePalette>] {
         [
-            SortDescriptor(\OpalitePalette.updatedAt, order: .reverse),
             SortDescriptor(\OpalitePalette.createdAt, order: .reverse)
         ]
     }
@@ -102,7 +101,7 @@ class ColorManager {
     }
 
     private func resortPalettesCache() {
-        palettes.sort { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
+        palettes.sort { $0.createdAt > $1.createdAt }
     }
 
     private func resortColorsCache() {
