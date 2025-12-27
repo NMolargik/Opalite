@@ -61,6 +61,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
+		EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
 		EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB3BCAD52EF8B58F0059764A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteThumbnail.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -194,6 +196,8 @@
 			children = (
 				EB3BCAD52EF8B58F0059764A /* QuickLook.framework */,
 				EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */,
+				EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */,
+				EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -649,6 +653,7 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Opalite uses your Camera to let you take images to sample for colors.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Opalite uses your photo library to let you sample images for colors.";
+				INFOPLIST_KEY_NSSiriUsageDescription = "Siri can open colors and palettes using voice commands.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -702,6 +707,7 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Opalite uses your Camera to let you take images to sample for colors.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Opalite uses your photo library to let you sample images for colors.";
+				INFOPLIST_KEY_NSSiriUsageDescription = "Siri can open colors and palettes using voice commands.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

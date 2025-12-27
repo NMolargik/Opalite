@@ -77,6 +77,7 @@ struct OpaliteApp: App {
                             quickActionManager.requestCreateNewColor()
                         }
                     }
+
                     #endif
                 }
                 .onChange(of: userName) { _, newName in

@@ -59,7 +59,6 @@ class ColorManager {
 
     private var colorSort: [SortDescriptor<OpaliteColor>] {
         [
-            SortDescriptor(\OpaliteColor.updatedAt, order: .reverse),
             SortDescriptor(\OpaliteColor.createdAt, order: .reverse)
         ]
     }

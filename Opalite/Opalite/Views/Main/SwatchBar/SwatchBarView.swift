@@ -27,9 +27,9 @@ struct SwatchBarView: View {
                     ScrollView {
                         LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                             // MARK: - Palette Sections (collapsible with sticky headers)
-                            // Palettes are pre-sorted by updatedAt from ColorManager
+                            // Palettes sorted by createdAt (newest first)
                             ForEach(colorManager.palettes) { palette in
-                                let paletteColors = palette.colors ?? []
+                                let paletteColors = palette.sortedColors
                                 if !paletteColors.isEmpty {
                                     Section {
                                         if expandedPalettes.contains(palette.id) {

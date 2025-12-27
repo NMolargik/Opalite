@@ -138,7 +138,7 @@ struct SearchView: View {
                                     HStack(spacing: 12) {
                                         // Mini palette preview
                                         HStack(spacing: 0) {
-                                            ForEach(Array((palette.colors ?? []).prefix(4)), id: \.id) { color in
+                                            ForEach(Array(palette.sortedColors.prefix(4)), id: \.id) { color in
                                                 Rectangle()
                                                     .fill(Color(
                                                         red: color.red,

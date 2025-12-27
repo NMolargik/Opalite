@@ -24,72 +24,76 @@ struct OnboardingPageView: View {
     @State private var iconAnimated: Bool = false
     @State private var titleAnimated: Bool = false
     @State private var featuresAnimated: [Bool] = []
+    @State private var mainIconBounce: Bool = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            // Animated icon
-            ZStack {
-                // Glow effect
-                iconImage(size: 80)
-                    .blur(radius: 5)
-                    .opacity(iconAnimated ? 0.6 : 0)
-                    .accessibilityHidden(true)
-
-                // Main icon
-                iconImage(size: 72)
-                    .symbolEffect(.bounce, options: .nonRepeating, value: isActive)
-                    .accessibilityHidden(true)
-            }
-            .scaleEffect(iconAnimated ? 1 : 0.5)
-            .opacity(iconAnimated ? 1 : 0)
-
-            // Title and subtitle
+        ScrollView {
             VStack(spacing: 12) {
-                Text(page.title)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .multilineTextAlignment(.center)
-                    .accessibilityAddTraits(.isHeader)
-
-                Text(page.subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 32)
+                Spacer()
+                
+                // Animated icon
+                ZStack {
+                    // Glow effect
+                    iconImage(size: 80)
+                        .blur(radius: 5)
+                        .opacity(iconAnimated ? 0.6 : 0)
+                        .accessibilityHidden(true)
+                    
+                    
+                    // Main icon
+                    iconImage(size: 72)
+                        .symbolEffect(.bounce, options: .nonRepeating.speed(1.1), value: mainIconBounce)
+                        .accessibilityHidden(true)
+                }
+                .scaleEffect(iconAnimated ? 1 : 0.5)
+                .opacity(iconAnimated ? 1 : 0)
+                
+                // Title and subtitle
+                VStack(spacing: 12) {
+                    Text(page.title)
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.center)
+                        .accessibilityAddTraits(.isHeader)
+                    
+                    Text(page.subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 32)
+                }
+                .offset(y: titleAnimated ? 0 : 20)
+                .opacity(titleAnimated ? 1 : 0)
+                .accessibilityElement(children: .combine)
+                
+                Spacer()
+                
+                // Features list
+                VStack(spacing: 6) {
+                    ForEach(Array(page.features.enumerated()), id: \.element.id) { index, feature in
+                        OnboardingFeatureRow(feature: feature)
+                            .offset(x: index < featuresAnimated.count && featuresAnimated[index] ? 0 : -30)
+                            .opacity(index < featuresAnimated.count && featuresAnimated[index] ? 1 : 0)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .frame(maxWidth: 400)
+                
+                Spacer()
             }
-            .offset(y: titleAnimated ? 0 : 20)
-            .opacity(titleAnimated ? 1 : 0)
-            .accessibilityElement(children: .combine)
-
-            Spacer()
-
-            // Features list
-            VStack(spacing: 12) {
-                ForEach(Array(page.features.enumerated()), id: \.element.id) { index, feature in
-                    OnboardingFeatureRow(feature: feature)
-                        .offset(x: index < featuresAnimated.count && featuresAnimated[index] ? 0 : -30)
-                        .opacity(index < featuresAnimated.count && featuresAnimated[index] ? 1 : 0)
+            .onChange(of: isActive) { _, newValue in
+                if newValue {
+                    animateContent()
+                } else {
+                    resetAnimations()
                 }
             }
-            .padding(.horizontal, 24)
-            .frame(maxWidth: 400)
-
-            Spacer()
-        }
-        .onChange(of: isActive) { _, newValue in
-            if newValue {
-                animateContent()
-            } else {
-                resetAnimations()
-            }
-        }
-        .onAppear {
-            featuresAnimated = Array(repeating: false, count: page.features.count)
-            if isActive {
-                animateContent()
+            .onAppear {
+                featuresAnimated = Array(repeating: false, count: page.features.count)
+                if isActive {
+                    animateContent()
+                }
             }
         }
     }
@@ -99,6 +103,7 @@ struct OnboardingPageView: View {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1)) {
             iconAnimated = true
         }
+        mainIconBounce.toggle()
 
         // Title animation
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.2)) {
@@ -118,6 +123,7 @@ struct OnboardingPageView: View {
     private func resetAnimations() {
         iconAnimated = false
         titleAnimated = false
+        mainIconBounce = false
         featuresAnimated = Array(repeating: false, count: page.features.count)
     }
 

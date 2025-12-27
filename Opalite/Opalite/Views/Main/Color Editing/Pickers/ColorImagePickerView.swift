@@ -50,7 +50,7 @@ struct ColorImagePickerView: View {
                         HapticsManager.shared.impact()
                         isShowingCamera = true
                     } label: {
-                        Label("Camera", systemImage: "camera")
+                        Label("Capture Photo", systemImage: "camera")
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)

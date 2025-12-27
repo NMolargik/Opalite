@@ -462,8 +462,6 @@ enum SharingService {
         zip.append(filenameData)
         zip.append(content)
 
-        let localHeaderSize = UInt32(30 + filenameData.count + content.count)
-
         // Central directory header
         let cdStart = UInt32(zip.count)
         zip.append(contentsOf: [0x50, 0x4B, 0x01, 0x02]) // Signature

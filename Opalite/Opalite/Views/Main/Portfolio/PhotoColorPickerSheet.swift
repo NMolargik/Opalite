@@ -98,7 +98,7 @@ struct PhotoColorPickerSheet: View {
                 HapticsManager.shared.impact()
                 isShowingCamera = true
             } label: {
-                Label("Camera", systemImage: "camera")
+                Label("Capture Photo", systemImage: "camera")
             }
             .buttonStyle(.borderedProminent)
 
@@ -197,7 +197,7 @@ struct PhotoColorPickerSheet: View {
                 Text(color.hexString)
                     .font(.headline.monospaced())
 
-                Text("Tap 'Stage Color' to add to import list")
+                Text("Tap 'Stage' to add to import list")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -208,7 +208,7 @@ struct PhotoColorPickerSheet: View {
                 HapticsManager.shared.selection()
                 stageCurrentColor()
             } label: {
-                Label("Stage Color", systemImage: "plus.circle.fill")
+                Label("Stage", systemImage: "plus.circle.fill")
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
@@ -256,9 +256,7 @@ struct PhotoColorPickerSheet: View {
                                 .overlay(alignment: .topTrailing) {
                                     Button {
                                         HapticsManager.shared.selection()
-                                        withAnimation {
-                                            stagedColors.remove(at: index)
-                                        }
+                                        stagedColors.remove(at: index)
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .font(.caption)

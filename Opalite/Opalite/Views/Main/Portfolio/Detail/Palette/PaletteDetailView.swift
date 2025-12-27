@@ -40,8 +40,8 @@ struct PaletteDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 SwatchView(
-                    // Colors are pre-sorted by updatedAt from ColorManager
-                    fill: palette.colors ?? [],
+                    // Colors sorted by createdAt (newest first)
+                    fill: palette.sortedColors,
                     height: 260,
                     badgeText: palette.name,
                     showOverlays: true,
@@ -203,7 +203,7 @@ struct PaletteDetailView: View {
                 Menu {
                     Button {
                         HapticsManager.shared.selection()
-                        if let image = gradientImage(from: palette.colors ?? []) {
+                        if let image = gradientImage(from: palette.sortedColors) {
                             shareImage = image
                             shareImageTitle = palette.name
                             isShowingShareSheet = true
@@ -211,7 +211,7 @@ struct PaletteDetailView: View {
                     } label: {
                         Label("Share As Image", systemImage: "photo.badge.plus")
                     }
-                    .disabled(palette.colors?.isEmpty ?? true)
+                    .disabled(palette.sortedColors.isEmpty)
 
                     Button {
                         HapticsManager.shared.selection()
@@ -224,7 +224,7 @@ struct PaletteDetailView: View {
                     } label: {
                         Label("Share As PDF", systemImage: "doc.richtext")
                     }
-                    .disabled(palette.colors?.isEmpty ?? true)
+                    .disabled(palette.sortedColors.isEmpty)
 
                     Button {
                         HapticsManager.shared.selection()
@@ -232,11 +232,11 @@ struct PaletteDetailView: View {
                     } label: {
                         Label("Export...", systemImage: "square.and.arrow.up")
                     }
-                    .disabled(palette.colors?.isEmpty ?? true)
+                    .disabled(palette.sortedColors.isEmpty)
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
-                .disabled(palette.colors?.isEmpty ?? true)
+                .disabled(palette.sortedColors.isEmpty)
             }
         }
     }

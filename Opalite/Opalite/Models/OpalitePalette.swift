@@ -24,6 +24,11 @@ final class OpalitePalette {
     
     // Relationship
     @Relationship var colors: [OpaliteColor]? = []
+
+    /// Colors sorted by creation date (newest first)
+    var sortedColors: [OpaliteColor] {
+        (colors ?? []).sorted { $0.createdAt > $1.createdAt }
+    }
     
     // Init
     init(

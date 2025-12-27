@@ -37,9 +37,9 @@ struct CanvasSwatchPickerView: View {
                 }
 
                 // MARK: - Palette Sections
-                // Palettes are pre-sorted by updatedAt from ColorManager
+                // Palettes sorted by createdAt (newest first)
                 ForEach(Array(colorManager.palettes.enumerated()), id: \.element.id) { index, palette in
-                    let paletteColors = palette.colors ?? []
+                    let paletteColors = palette.sortedColors
 
                     if !paletteColors.isEmpty {
                         ForEach(paletteColors, id: \.id) { color in

@@ -55,7 +55,7 @@ struct PaletteRowHeaderView: View {
                 
                 Button {
                     HapticsManager.shared.selection()
-                    if let image = gradientImage(from: palette.colors ?? []) {
+                    if let image = gradientImage(from: palette.sortedColors) {
                         shareImage = image
                         shareImageTitle = palette.name
                         isShowingShareSheet = true
@@ -63,7 +63,7 @@ struct PaletteRowHeaderView: View {
                 } label: {
                     Label("Share As Image", systemImage: "photo.on.rectangle")
                 }
-                .disabled(palette.colors?.isEmpty ?? true)
+                .disabled(palette.sortedColors.isEmpty)
 
                 Button {
                     HapticsManager.shared.selection()
@@ -76,7 +76,7 @@ struct PaletteRowHeaderView: View {
                 } label: {
                     Label("Share As PDF", systemImage: "doc.richtext")
                 }
-                .disabled(palette.colors?.isEmpty ?? true)
+                .disabled(palette.sortedColors.isEmpty)
 
                 Button {
                     HapticsManager.shared.selection()
@@ -84,7 +84,7 @@ struct PaletteRowHeaderView: View {
                 } label: {
                     Label("Export...", systemImage: "square.and.arrow.up")
                 }
-                .disabled(palette.colors?.isEmpty ?? true)
+                .disabled(palette.sortedColors.isEmpty)
 
                 Divider()
 

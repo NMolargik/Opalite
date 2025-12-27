@@ -14,7 +14,7 @@ struct PaletteMembersView: View {
     var body: some View {
         SectionCard(title: "Components", systemImage: "swatchpalette") {
             SwatchRowView(
-                colors: palette.colors ?? [],
+                colors: palette.sortedColors,
                 palette: palette,
                 swatchWidth: 180,
                 swatchHeight: 150,

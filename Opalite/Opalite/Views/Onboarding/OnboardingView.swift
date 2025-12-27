@@ -41,10 +41,10 @@ struct OnboardingView: View {
             subtitle: "Capture and craft the perfect colors for your projects",
             features: [
                 OnboardingFeature(icon: "square.grid.3x3.fill", iconColor: .blue, text: "Pick from a color grid"),
-                OnboardingFeature(icon: "rainbow", iconColor: .purple, text: "Explore the spectrum"),
+                OnboardingFeature(icon: "rainbow", iconColor: .purple, text: "Select from the spectrum"),
                 OnboardingFeature(icon: "slider.horizontal.3", iconColor: .green, text: "Fine-tune with sliders"),
                 OnboardingFeature(icon: "number", iconColor: .orange, text: "Enter exact color codes"),
-                OnboardingFeature(icon: "eyedropper.halffull", iconColor: .pink, text: "Extract from images")
+                OnboardingFeature(icon: "eyedropper.halffull", iconColor: .pink, text: "Sample from images")
             ]
         ),
         OnboardingPage(
@@ -54,7 +54,7 @@ struct OnboardingView: View {
             subtitle: "Group your colors into meaningful collections",
             features: [
                 OnboardingFeature(icon: "rectangle.stack.fill", iconColor: .blue, text: "Create unlimited palettes", requiresOnyx: true),
-                OnboardingFeature(icon: "building.2.fill", iconColor: .indigo, text: "Organize by brand or project"),
+                OnboardingFeature(icon: "building.2.fill", iconColor: .indigo, text: "Organize colors by brand or project"),
                 OnboardingFeature(icon: "hand.tap.fill", iconColor: .teal, text: "Drag to assign colors"),
                 OnboardingFeature(icon: "magnifyingglass", iconColor: .green, text: "Search across all colors"),
                 OnboardingFeature(icon: "character.cursor.ibeam", iconColor: .orange, text: "Name and annotate each color")
@@ -68,7 +68,7 @@ struct OnboardingView: View {
             features: [
                 OnboardingFeature(icon: "pencil.tip", iconColor: .blue, text: "Sketch with your colors", requiresOnyx: true),
                 OnboardingFeature(icon: "square.on.square.dashed", iconColor: .purple, text: "Draw shapes and outlines", requiresOnyx: true),
-                OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Apple Pencil support", requiresOnyx: true),
+                OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Draw precisely with Apple Pencil", requiresOnyx: true),
                 OnboardingFeature(icon: "doc.fill.badge.plus", iconColor: .green, text: "Create multiple canvases", requiresOnyx: true),
             ]
         ),
@@ -142,21 +142,8 @@ struct OnboardingView: View {
 
                     // Bottom controls
                     VStack(spacing: 20) {
-                        // Page indicator
-                        HStack(spacing: 8) {
-                            ForEach(0..<pages.count, id: \.self) { index in
-                                Capsule()
-                                    .fill(index == currentPage ? Color.primary : Color.primary.opacity(0.3))
-                                    .frame(width: index == currentPage ? 24 : 8, height: 8)
-                                    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: currentPage)
-                            }
-                        }
-                        .padding(.bottom, 8)
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Page \(currentPage + 1) of \(pages.count)")
-
                         // Navigation buttons
-                        HStack(spacing: 16) {
+                        HStack(spacing: 8) {
                             // Back button
                             if currentPage > 0 {
                                 Button {
@@ -181,6 +168,21 @@ struct OnboardingView: View {
                             }
 
                             Spacer()
+                            
+                            // Page indicator
+                            HStack(spacing: 4) {
+                                ForEach(0..<pages.count, id: \.self) { index in
+                                    Capsule()
+                                        .fill(index == currentPage ? Color.primary : Color.primary.opacity(0.3))
+                                        .frame(width: index == currentPage ? 24 : 8, height: 8)
+                                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: currentPage)
+                                }
+                            }
+                            .padding(.bottom, 8)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("Page \(currentPage + 1) of \(pages.count)")
+                            
+                            Spacer()
 
                             // Next / Get Started button
                             Button {
@@ -194,7 +196,7 @@ struct OnboardingView: View {
                                 }
                             } label: {
                                 HStack(spacing: 6) {
-                                    Text(currentPage < pages.count - 1 ? "Next" : "Get Started")
+                                    Text(currentPage < pages.count - 1 ? "Next" : "Done")
                                     Image(systemName: currentPage < pages.count - 1 ? "chevron.right" : "arrow.right")
                                 }
                                 .font(.headline)

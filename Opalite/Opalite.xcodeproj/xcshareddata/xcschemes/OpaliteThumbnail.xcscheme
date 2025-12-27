@@ -43,6 +43,30 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EBD4AD362EE48DF400012D16"
+               BuildableName = "OpaliteUITests.xctest"
+               BlueprintName = "OpaliteUITests"
+               ReferencedContainer = "container:Opalite.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EBD4AD2C2EE48DF400012D16"
+               BuildableName = "OpaliteTests.xctest"
+               BlueprintName = "OpaliteTests"
+               ReferencedContainer = "container:Opalite.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

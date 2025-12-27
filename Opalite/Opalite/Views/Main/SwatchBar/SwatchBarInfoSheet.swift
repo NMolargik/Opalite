@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SwatchBarInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var bounceTrigger = false
 
     var body: some View {
         NavigationStack {
@@ -20,6 +21,11 @@ struct SwatchBarInfoSheet: View {
                         .foregroundStyle(.purple.gradient)
                         .padding(.top, 20)
                         .accessibilityHidden(true)
+                        .symbolEffect(.bounce, options: .speed(0.01), value: bounceTrigger)
+                        .onAppear {
+                            // Trigger a one-time SF Symbol bounce when the view appears
+                            bounceTrigger.toggle()
+                        }
 
                     // Title
                     Text("SwatchBar")
@@ -31,7 +37,7 @@ struct SwatchBarInfoSheet: View {
                         featureRow(
                             icon: "rectangle.on.rectangle",
                             title: "Minimal Footprint",
-                            description: "SwatchBar is a secondary window designed for fast color reference while taking up minimal screen real estate."
+                            description: "SwatchBar is a secondary window designed for fast color reference while taking up minimal screen real estate. We recommend making it as narrow as possible."
                         )
 
                         featureRow(
@@ -43,7 +49,7 @@ struct SwatchBarInfoSheet: View {
                         featureRow(
                             icon: "eyedropper",
                             title: "Color Sampling",
-                            description: "Use your design app's color sampler tool to pick colors directly from the SwatchBar window."
+                            description: "Use your favorite app's color sampler tool to pick colors directly from the SwatchBar window."
                         )
 
                         featureRow(

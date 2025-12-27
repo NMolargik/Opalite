@@ -198,8 +198,8 @@ struct PortfolioView: View {
                                     .zIndex(0)
 
                                 SwatchRowView(
-                                    // Colors are pre-sorted by updatedAt from ColorManager
-                                    colors: palette.colors ?? [],
+                                    // Colors sorted by createdAt (newest first)
+                                    colors: palette.sortedColors,
                                     palette: palette,
                                     swatchWidth: swatchSize.size,
                                     swatchHeight: swatchSize.size,
