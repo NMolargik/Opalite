@@ -87,7 +87,7 @@ struct OnboardingView: View {
         OnboardingPage(
             icon: "icloud.fill",
             iconColors: [.blue, .gray],
-            title: "Sync Everywhere",
+            title: "iCloud Sync",
             subtitle: "Your colors, palettes, and canvases follow you across Apple devices",
             features: [
                 OnboardingFeature(icon: "lock.shield.fill", iconColor: .green, text: "Private storage within iCloud"),

@@ -22,6 +22,7 @@ struct PortfolioView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(QuickActionManager.self) private var quickActionManager
+    @Environment(HexCopyManager.self) private var hexCopyManager
 
     // MARK: - Tips
     private let createContentTip = CreateContentTip()
@@ -518,7 +519,7 @@ struct PortfolioView: View {
             Group {
                 Button {
                     HapticsManager.shared.selection()
-                    copyHex(for: color)
+                    hexCopyManager.copyHex(for: color)
                     copiedColorID = color.id
                 } label: {
                     Label("Copy Hex", systemImage: "number")
@@ -597,5 +598,7 @@ struct PortfolioView: View {
         .environment(manager)
         .environment(ToastManager())
         .environment(SubscriptionManager())
+        .environment(QuickActionManager())
+        .environment(HexCopyManager())
         .modelContainer(container)
 }

@@ -25,6 +25,7 @@ struct ColorDetailView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var viewModel: ColorDetailView.ViewModel
@@ -254,7 +255,7 @@ struct ColorDetailView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
-                    copyHex(for: color)
+                    hexCopyManager.copyHex(for: color)
                     withAnimation(.easeIn(duration: 0.15)) {
                         didCopyHex = true
                     }
@@ -271,7 +272,7 @@ struct ColorDetailView: View {
                 }
                 .tint(didCopyHex ? .green : nil)
                 .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")
-                .accessibilityValue(color.hexString)
+                .accessibilityValue(hexCopyManager.formattedHex(for: color))
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -368,5 +369,6 @@ struct ColorDetailView: View {
     .environment(manager)
     .environment(ToastManager())
     .environment(SubscriptionManager())
+    .environment(HexCopyManager())
     .modelContainer(container)
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PaletteMembersView: View {
+    @Environment(HexCopyManager.self) private var hexCopyManager
+
     let palette: OpalitePalette
     let onRemoveColor: (OpaliteColor) -> Void
 
@@ -25,7 +27,7 @@ struct PaletteMembersView: View {
                         Group {
                             Button {
                                 HapticsManager.shared.selection()
-                                copyHex(for: color)
+                                hexCopyManager.copyHex(for: color)
                             } label: {
                                 Label("Copy Hex", systemImage: "number")
                             }
@@ -40,13 +42,8 @@ struct PaletteMembersView: View {
                     )
                 }
             )
+            .clipped()
         }
-    }
-
-    private func copyHex(for color: OpaliteColor) {
-        #if canImport(UIKit)
-        UIPasteboard.general.string = color.hexString
-        #endif
     }
 }
 
@@ -56,4 +53,5 @@ struct PaletteMembersView: View {
         onRemoveColor: { _ in }
     )
     .padding()
+    .environment(HexCopyManager())
 }

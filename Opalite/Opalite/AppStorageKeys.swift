@@ -31,4 +31,10 @@ enum AppStorageKeys {
 
     /// The color blindness simulation mode for accessibility testing.
     static let colorBlindnessMode = "colorBlindnessMode"
+
+    /// Whether to include the "#" prefix when copying hex codes.
+    static let includeHexPrefix = "includeHexPrefix"
+
+    /// Whether the user has been asked about their hex prefix preference.
+    static let hasAskedHexPreference = "hasAskedHexPreference"
 }

@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
+    @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
 
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
@@ -89,6 +90,17 @@ struct SettingsView: View {
                     Text("Accessibility")
                 } footer: {
                     Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
+                }
+
+                Section {
+                    Toggle(isOn: $includeHexPrefix) {
+                        Label("Include # in Hex Codes", systemImage: "number")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("Copying")
+                } footer: {
+                    Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
                 }
 
                 Section {

@@ -22,6 +22,7 @@ struct OpaliteApp: App {
     let subscriptionManager = SubscriptionManager()
     let importCoordinator = ImportCoordinator()
     let quickActionManager = QuickActionManager()
+    let hexCopyManager = HexCopyManager()
 
     init() {
         let schema = Schema([
@@ -70,9 +71,7 @@ struct OpaliteApp: App {
                     if newPhase == .active, let shortcutType = AppDelegate.pendingShortcutType {
                         AppDelegate.pendingShortcutType = nil
                         if shortcutType == "OpenSwatchBarAction" {
-                            if !colorManager.isSwatchBarOpen {
-                                openWindow(id: "swatchBar")
-                            }
+                            AppDelegate.openSwatchBarWindow()
                         } else if shortcutType == "CreateNewColorAction" {
                             quickActionManager.requestCreateNewColor()
                         }
@@ -84,7 +83,8 @@ struct OpaliteApp: App {
                     colorManager.author = userName
                 }
                 .onOpenURL { url in
-                    // Handle swatchBar URL scheme
+                    // Handle swatchBar URL scheme - use openWindow directly here
+                    // since this is the fallback from AppDelegate.openSwatchBarWindow()
                     if url.scheme == "opalite" && url.host == "swatchBar" {
                         openWindow(id: "swatchBar")
                         return
@@ -124,6 +124,7 @@ struct OpaliteApp: App {
                     Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
                 }
                 .environment(quickActionManager)
+        .environment(hexCopyManager)
         }
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
@@ -186,7 +187,7 @@ struct OpaliteApp: App {
             CommandMenu("View") {
                 Button("Open SwatchBar") {
                     HapticsManager.shared.selection()
-                    #if targetEnvironment(macCatalyst)
+                    #if os(iOS)
                     AppDelegate.openSwatchBarWindow()
                     #else
                     openWindow(id: "swatchBar")
@@ -283,6 +284,7 @@ struct OpaliteApp: App {
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(quickActionManager)
+        .environment(hexCopyManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #elseif os(iOS)
@@ -294,9 +296,11 @@ struct OpaliteApp: App {
                 }
                 .onAppear {
                     colorManager.isSwatchBarOpen = true
+                    AppDelegate.registerSwatchBarSceneSession()
                 }
                 .onDisappear {
                     colorManager.isSwatchBarOpen = false
+                    AppDelegate.swatchBarSceneSession = nil
                 }
         }
         .handlesExternalEvents(matching: Set(arrayLiteral: "swatchBar"))
@@ -306,20 +310,9 @@ struct OpaliteApp: App {
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(quickActionManager)
+        .environment(hexCopyManager)
         .windowResizability(.contentSize)
         .defaultSize(width: 180, height: 500)
 #endif
     }
-}
-
-func copyHex(for color: OpaliteColor) {
-    let hex = color.hexString
-    #if os(iOS) || os(visionOS)
-    UIPasteboard.general.string = hex
-    #elseif os(macOS)
-    NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(hex, forType: .string)
-    #else
-    _ = hex // No-op for unsupported platforms
-    #endif
 }

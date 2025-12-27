@@ -91,8 +91,16 @@ struct PaywallView: View {
             if let context = featureContext {
                 Text(context)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(.red)
+                    )
             } else {
                 Text("Unlock the full power of Opalite")
                     .font(.subheadline)

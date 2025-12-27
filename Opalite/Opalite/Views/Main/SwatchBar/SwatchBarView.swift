@@ -10,6 +10,7 @@ import SwiftData
 
 struct SwatchBarView: View {
     @Environment(ColorManager.self) private var colorManager
+    @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.openWindow) private var openWindow
 
     @State private var copiedColorID: UUID? = nil
@@ -71,14 +72,15 @@ struct SwatchBarView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         HapticsManager.shared.selection()
-                        if !colorManager.isMainWindowOpen {
-                            openWindow(id: "main")
-                        }
+                        #if os(iOS)
+                        AppDelegate.openMainWindow()
+                        #else
+                        openWindow(id: "main")
+                        #endif
                     } label: {
-                        Label("Open Opalite", systemImage: "macwindow")
+                        Label("Opalite", systemImage: "macwindow")
                     }
                     .tint(.red)
-                    .disabled(colorManager.isMainWindowOpen)
                 }
 
                 ToolbarItem {
@@ -245,7 +247,7 @@ struct SwatchBarView: View {
     }
 
     private func copyHexWithFeedback(for color: OpaliteColor) {
-        copyHex(for: color)
+        hexCopyManager.copyHex(for: color)
 
         // Show feedback overlay
         withAnimation(.easeIn(duration: 0.1)) {
@@ -274,5 +276,6 @@ struct SwatchBarView: View {
 
     return SwatchBarView()
         .environment(manager)
+        .environment(HexCopyManager())
         .modelContainer(container)
 }

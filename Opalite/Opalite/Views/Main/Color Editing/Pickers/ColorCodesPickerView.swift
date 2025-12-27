@@ -14,6 +14,7 @@ import AppKit
 #endif
 
 struct ColorCodesPickerView: View {
+    @Environment(HexCopyManager.self) private var hexCopyManager
     @Binding var color: OpaliteColor
 
     @State private var hexInput: String = ""
@@ -77,13 +78,7 @@ struct ColorCodesPickerView: View {
 
                         Button {
                             HapticsManager.shared.impact()
-                            let hex = color.hexString
-                            #if os(iOS) || os(visionOS)
-                            UIPasteboard.general.string = hex
-                            #elseif os(macOS)
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(hex, forType: .string)
-                            #endif
+                            hexCopyManager.copyHex(for: color)
 
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 didCopyHex = true
@@ -399,5 +394,6 @@ private struct ColorCodesPickerPreviewContainer: View {
 
 #Preview {
     ColorCodesPickerPreviewContainer()
+        .environment(HexCopyManager())
 }
 

@@ -18,6 +18,7 @@ import AppKit
 
 struct ColorEditorView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(HexCopyManager.self) private var hexCopyManager
     @Namespace private var swatchNamespace
     
     var onCancel: () -> Void
@@ -121,13 +122,7 @@ struct ColorEditorView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         HapticsManager.shared.impact()
-                        let hex = viewModel.tempColor.hexString
-                        #if os(iOS) || os(visionOS)
-                        UIPasteboard.general.string = hex
-                        #elseif os(macOS)
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(hex, forType: .string)
-                        #endif
+                        hexCopyManager.copyHex(for: viewModel.tempColor)
 
                         withAnimation(.easeInOut(duration: 0.2)) {
                             viewModel.didCopyHex = true
@@ -146,7 +141,7 @@ struct ColorEditorView: View {
                     }
                     .tint(viewModel.didCopyHex ? .green : nil)
                     .accessibilityLabel(viewModel.didCopyHex ? "Hex code copied" : "Copy hex code")
-                    .accessibilityValue(viewModel.tempColor.hexString)
+                    .accessibilityValue(hexCopyManager.formattedHex(for: viewModel.tempColor))
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -187,10 +182,8 @@ struct ColorEditorView: View {
                 #elseif os(macOS)
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        let hex = viewModel.tempColor.hexString
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(hex, forType: .string)
-                        
+                        hexCopyManager.copyHex(for: viewModel.tempColor)
+
                         withAnimation(.easeInOut(duration: 0.2)) {
                             viewModel.didCopyHex = true
                         }

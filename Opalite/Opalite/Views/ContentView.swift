@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(QuickActionManager.self) private var quickActionManager: QuickActionManager
+    @Environment(HexCopyManager.self) private var hexCopyManager: HexCopyManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
 
     @State private var appStage: AppStage = .splash
@@ -100,9 +101,15 @@ struct ContentView: View {
         }
         .onAppear {
             colorManager.isMainWindowOpen = true
+            #if os(iOS)
+            AppDelegate.registerMainSceneSession()
+            #endif
         }
         .onDisappear {
             colorManager.isMainWindowOpen = false
+            #if os(iOS)
+            AppDelegate.mainSceneSession = nil
+            #endif
         }
         .onChange(of: quickActionManager.paywallTrigger?.id) { _, _ in
             if let trigger = quickActionManager.paywallTrigger {
@@ -113,6 +120,24 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: paywallContext)
+        }
+        .alert(
+            "Hex Code Format",
+            isPresented: Binding(
+                get: { hexCopyManager.showPreferenceAlert },
+                set: { hexCopyManager.showPreferenceAlert = $0 }
+            )
+        ) {
+            Button("Include #") {
+                HapticsManager.shared.selection()
+                hexCopyManager.userChoseIncludePrefix()
+            }
+            Button("Exclude #") {
+                HapticsManager.shared.selection()
+                hexCopyManager.userChoseExcludePrefix()
+            }
+        } message: {
+            Text("Would you like to include the \"#\" symbol when copying hex codes?\n\nYou can change this later in Settings.")
         }
     }
     
@@ -139,4 +164,5 @@ struct ContentView: View {
         .environment(SubscriptionManager())
         .environment(ToastManager())
         .environment(QuickActionManager())
+        .environment(HexCopyManager())
 }

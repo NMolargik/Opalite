@@ -328,7 +328,7 @@ struct SwatchView: View {
                         .controlSize(.small)
                     Text("Generating suggestions...")
                         .font(.caption)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(fill.first?.idealTextColor() ?? .white)
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -344,7 +344,7 @@ struct SwatchView: View {
                             Text(suggestion)
                                 .font(.caption)
                                 .fontWeight(.medium)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(fill.first?.idealTextColor() ?? .white)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                                 .background(.ultraThinMaterial, in: Capsule())

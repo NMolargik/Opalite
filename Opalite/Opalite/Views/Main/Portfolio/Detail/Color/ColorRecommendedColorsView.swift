@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ColorRecommendedColorsView: View {
+    @Environment(HexCopyManager.self) private var hexCopyManager
+
     let baseColor: OpaliteColor
     let onCreateColor: (OpaliteColor) -> Void
 
@@ -27,7 +29,7 @@ struct ColorRecommendedColorsView: View {
                         Group {
                             Button {
                                 HapticsManager.shared.selection()
-                                copyHex(for: color)
+                                hexCopyManager.copyHex(for: color)
                             } label: {
                                 Label("Copy Hex", systemImage: "number")
                             }
@@ -193,6 +195,7 @@ private struct ColorHarmoniesInfoSheet: View {
         onCreateColor: { _ in }
     )
     .padding()
+    .environment(HexCopyManager())
 }
 
 #Preview("Info Sheet") {

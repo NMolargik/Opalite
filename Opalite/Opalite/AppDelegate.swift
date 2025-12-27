@@ -14,6 +14,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     /// Pending quick action type to handle after launch
     static var pendingShortcutType: String?
 
+    /// Reference to the SwatchBar scene session for single-instance management
+    static weak var swatchBarSceneSession: UISceneSession?
+
+    /// Reference to the Main scene session for single-instance management
+    static weak var mainSceneSession: UISceneSession?
+
     func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
         // Forward to SceneDelegate via static storage; this is called when app is running on older setups
         AppDelegate.pendingShortcutType = shortcutItem.type
@@ -66,49 +72,82 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         return config
     }
 
+    /// Opens the main Opalite window or brings an existing one to the foreground.
+    ///
+    /// This checks for an existing main scene and activates it.
+    /// If no main window exists, it opens a new one.
+    @MainActor
+    static func openMainWindow() {
+        // Check if we have a stored main scene session
+        if let session = mainSceneSession {
+            UIApplication.shared.requestSceneSessionActivation(
+                session,
+                userActivity: nil,
+                options: nil,
+                errorHandler: nil
+            )
+            return
+        }
+
+        // No existing main window, request a new scene
+        UIApplication.shared.requestSceneSessionActivation(
+            nil,
+            userActivity: nil,
+            options: nil,
+            errorHandler: nil
+        )
+    }
+
     /// Opens the SwatchBar window or brings an existing one to the foreground.
     ///
     /// This checks for an existing SwatchBar scene and activates it.
     /// If no SwatchBar window exists, it opens a new one via URL scheme.
     @MainActor
     static func openSwatchBarWindow() {
-        // Check if SwatchBar scene already exists and bring it to front
-        for scene in UIApplication.shared.connectedScenes {
-            if let windowScene = scene as? UIWindowScene,
-               scene.session.configuration.name == "SwatchBar" ||
-               windowScene.windows.first?.rootViewController?.title == "SwatchBar" {
-                // Activate the existing SwatchBar window
-                UIApplication.shared.requestSceneSessionActivation(
-                    scene.session,
-                    userActivity: nil,
-                    options: nil,
-                    errorHandler: nil
-                )
-                return
-            }
+        // Check if we have a stored SwatchBar scene session
+        if let session = swatchBarSceneSession {
+            UIApplication.shared.requestSceneSessionActivation(
+                session,
+                userActivity: nil,
+                options: nil,
+                errorHandler: nil
+            )
+            return
         }
 
-        // Also check by activity identifier
-        for scene in UIApplication.shared.connectedScenes {
-            if let activity = scene.session.stateRestorationActivity,
-               activity.targetContentIdentifier == "swatchBar" {
-                UIApplication.shared.requestSceneSessionActivation(
-                    scene.session,
-                    userActivity: nil,
-                    options: nil,
-                    errorHandler: nil
-                )
-                return
-            }
-        }
-
-        // No existing SwatchBar window, open a new one
+        // No existing SwatchBar window, open a new one via URL scheme
         if let url = URL(string: "opalite://swatchBar") {
             UIApplication.shared.open(url, options: [:]) { success in
                 if !success {
                     print("Failed to open SwatchBar window via URL")
                 }
             }
+        }
+    }
+
+    /// Registers a scene session as the main window session.
+    @MainActor
+    static func registerMainSceneSession() {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { scene in
+                // Find a scene that isn't the SwatchBar
+                scene.session !== swatchBarSceneSession
+            }) {
+            mainSceneSession = windowScene.session
+        }
+    }
+
+    /// Registers a scene session as the SwatchBar session.
+    @MainActor
+    static func registerSwatchBarSceneSession() {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { scene in
+                // Find a scene that isn't the main window
+                scene.session !== mainSceneSession
+            }) {
+            swatchBarSceneSession = windowScene.session
         }
     }
 

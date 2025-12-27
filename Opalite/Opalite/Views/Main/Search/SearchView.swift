@@ -18,6 +18,8 @@ struct SearchView: View {
 
     @State private var searchText: String = ""
     @State private var isShowingPaywall: Bool = false
+    @State private var isSearchPresented: Bool = false
+    @FocusState private var isSearchFocused: Bool
 
     // MARK: - Filtered Results
 
@@ -202,12 +204,12 @@ struct SearchView: View {
                                         if !subscriptionManager.hasOnyxEntitlement {
                                             Image(systemName: "lock.fill")
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(.red)
                                         }
 
                                         Image(systemName: "chevron.right")
                                             .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(.red)
                                     }
                                 }
                             }
@@ -220,7 +222,15 @@ struct SearchView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Search")
-            .searchable(text: $searchText, prompt: "Color, palette, or canvas")
+            .searchable(text: $searchText, isPresented: $isSearchPresented, prompt: "Color, palette, or canvas")
+            .searchFocused($isSearchFocused)
+            .onAppear {
+                // Delay slightly to ensure the view is fully presented
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isSearchPresented = true
+                    isSearchFocused = true
+                }
+            }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "Canvas access requires Onyx")
             }
