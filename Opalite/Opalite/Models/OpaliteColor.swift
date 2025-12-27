@@ -223,59 +223,59 @@ extension OpaliteColor {
         return (r, g, b)
     }
 
-    // MARK: - Harmony
+    // MARK: - Color Harmony
 
-    /// Generates a complementary color (opposite hue on the color wheel)
-    func complementaryColor() -> OpaliteColor {
+    /// Helper to create a color at a given hue offset (in degrees)
+    private func colorAtHueOffset(_ degrees: Double, name: String) -> OpaliteColor {
         let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-
-        // Complementary hue = h + 180°
-        var newHue = h + 0.5
+        var newHue = h + (degrees / 360.0)
         if newHue > 1 { newHue -= 1 }
-
+        if newHue < 0 { newHue += 1 }
         let rgb = Self.hslToRGB(h: newHue, s: s, l: l)
-
-        return OpaliteColor(
-            name: "\(name ?? "Color") Complement",
-            red: rgb.r,
-            green: rgb.g,
-            blue: rgb.b,
-            alpha: alpha
-        )
+        return OpaliteColor(name: name, red: rgb.r, green: rgb.g, blue: rgb.b, alpha: alpha)
     }
 
-    /// Generates two analogous colors that harmonize with this color
+    /// Complementary: 180° opposite on the color wheel
+    func complementaryColor() -> OpaliteColor {
+        colorAtHueOffset(180, name: "Complementary")
+    }
+
+    /// Analogous: ±30° from base (adjacent colors)
+    func analogousColors() -> [OpaliteColor] {
+        [
+            colorAtHueOffset(-30, name: "Analogous"),
+            colorAtHueOffset(30, name: "Analogous")
+        ]
+    }
+
+    /// Triadic: 120° apart (3 evenly spaced colors)
+    func triadicColors() -> [OpaliteColor] {
+        [
+            colorAtHueOffset(120, name: "Triadic"),
+            colorAtHueOffset(240, name: "Triadic")
+        ]
+    }
+
+    /// Tetradic/Square: 90° apart (4 evenly spaced colors)
+    func tetradicColors() -> [OpaliteColor] {
+        [
+            colorAtHueOffset(90, name: "Tetradic"),
+            colorAtHueOffset(180, name: "Tetradic"),
+            colorAtHueOffset(270, name: "Tetradic")
+        ]
+    }
+
+    /// Split-Complementary: base + two colors adjacent to the complement (±30° from 180°)
+    func splitComplementaryColors() -> [OpaliteColor] {
+        [
+            colorAtHueOffset(150, name: "Split-Comp"),
+            colorAtHueOffset(210, name: "Split-Comp")
+        ]
+    }
+
+    /// Legacy alias for analogousColors()
     func harmoniousColors() -> [OpaliteColor] {
-        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
-
-        let shift = 30.0 / 360.0
-
-        var h1 = h + shift
-        if h1 > 1 { h1 -= 1 }
-
-        var h2 = h - shift
-        if h2 < 0 { h2 += 1 }
-
-        let rgb1 = Self.hslToRGB(h: h1, s: s, l: l)
-        let rgb2 = Self.hslToRGB(h: h2, s: s, l: l)
-
-        let color1 = OpaliteColor(
-            name: "\(name ?? "Color") Analogous 1",
-            red: rgb1.r,
-            green: rgb1.g,
-            blue: rgb1.b,
-            alpha: alpha
-        )
-
-        let color2 = OpaliteColor(
-            name: "\(name ?? "Color") Analogous 2",
-            red: rgb2.r,
-            green: rgb2.g,
-            blue: rgb2.b,
-            alpha: alpha
-        )
-
-        return [color1, color2]
+        analogousColors()
     }
 
     // MARK: - Accessibility

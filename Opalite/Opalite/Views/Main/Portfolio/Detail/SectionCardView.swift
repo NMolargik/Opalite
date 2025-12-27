@@ -7,10 +7,23 @@
 
 import SwiftUI
 
-struct SectionCard<Content: View>: View {
+struct SectionCard<Content: View, TrailingContent: View>: View {
     let title: String
     let systemImage: String
     @ViewBuilder var content: Content
+    @ViewBuilder var trailing: TrailingContent
+
+    init(
+        title: String,
+        systemImage: String,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder trailing: () -> TrailingContent
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.content = content()
+        self.trailing = trailing()
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -21,6 +34,7 @@ struct SectionCard<Content: View>: View {
                     .font(.headline)
                     .bold()
                 Spacer(minLength: 0)
+                trailing
             }
             .padding(16)
 
@@ -36,6 +50,19 @@ struct SectionCard<Content: View>: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.white.opacity(0.08), lineWidth: 1)
         )
+    }
+}
+
+extension SectionCard where TrailingContent == EmptyView {
+    init(
+        title: String,
+        systemImage: String,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.content = content()
+        self.trailing = EmptyView()
     }
 }
 

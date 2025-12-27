@@ -11,11 +11,12 @@ struct ColorRecommendedColorsView: View {
     let baseColor: OpaliteColor
     let onCreateColor: (OpaliteColor) -> Void
 
+    @State private var isShowingInfo = false
+
     var body: some View {
-        SectionCard(title: "Recommended Colors", systemImage: "paintpalette") {
-            let recommended = buildRecommendedColors()
+        SectionCard(title: "Color Harmonies", systemImage: "paintpalette") {
             SwatchRowView(
-                colors: recommended,
+                colors: buildHarmonyColors(),
                 palette: nil,
                 swatchWidth: 180,
                 swatchHeight: 150,
@@ -43,48 +44,140 @@ struct ColorRecommendedColorsView: View {
                 }
             )
             .clipped()
+        } trailing: {
+            Button {
+                HapticsManager.shared.selection()
+                isShowingInfo = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Learn about color harmonies")
+        }
+        .sheet(isPresented: $isShowingInfo) {
+            ColorHarmoniesInfoSheet()
         }
     }
 
-    private func buildRecommendedColors() -> [OpaliteColor] {
-        let complementRaw = baseColor.complementaryColor()
-        let harmonyRaw = baseColor.harmoniousColors()
+    private func buildHarmonyColors() -> [OpaliteColor] {
+        var colors: [OpaliteColor] = []
 
-        var recommended: [OpaliteColor] = [
-            OpaliteColor(
-                name: "Complementary",
-                red: complementRaw.red,
-                green: complementRaw.green,
-                blue: complementRaw.blue,
-                alpha: complementRaw.alpha
-            )
-        ]
+        // Complementary (1)
+        colors.append(baseColor.complementaryColor())
 
-        if harmonyRaw.indices.contains(0) {
-            recommended.append(
-                OpaliteColor(
-                    name: "Harmonious",
-                    red: harmonyRaw[0].red,
-                    green: harmonyRaw[0].green,
-                    blue: harmonyRaw[0].blue,
-                    alpha: harmonyRaw[0].alpha
-                )
-            )
+        // Analogous (2)
+        colors.append(contentsOf: baseColor.analogousColors())
+
+        // Triadic (2)
+        colors.append(contentsOf: baseColor.triadicColors())
+
+        // Split-Complementary (2)
+        colors.append(contentsOf: baseColor.splitComplementaryColors())
+
+        // Tetradic (3)
+        colors.append(contentsOf: baseColor.tetradicColors())
+
+        return colors
+    }
+}
+
+// MARK: - Info Sheet
+
+private struct ColorHarmoniesInfoSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text("Color harmonies are combinations of colors that are aesthetically pleasing and work well together. They're based on the position of colors on the color wheel.")
+                        .foregroundStyle(.secondary)
+
+                    harmonySection(
+                        name: "Complementary",
+                        icon: "circle.lefthalf.filled",
+                        color: .red,
+                        description: "Colors directly opposite each other on the color wheel (180° apart). Creates high contrast and visual tension.",
+                        example: "Red & Green, Blue & Orange"
+                    )
+
+                    harmonySection(
+                        name: "Analogous",
+                        icon: "circle.and.line.horizontal",
+                        color: .orange,
+                        description: "Colors adjacent to each other on the wheel (±30°). Creates a harmonious, cohesive feel with low contrast.",
+                        example: "Blue, Blue-Green, Green"
+                    )
+
+                    harmonySection(
+                        name: "Triadic",
+                        icon: "triangle",
+                        color: .yellow,
+                        description: "Three colors evenly spaced on the wheel (120° apart). Offers strong visual contrast while retaining balance.",
+                        example: "Red, Yellow, Blue"
+                    )
+
+                    harmonySection(
+                        name: "Split-Complementary",
+                        icon: "arrow.triangle.branch",
+                        color: .green,
+                        description: "A base color plus the two colors adjacent to its complement (150° & 210°). High contrast but less tension than complementary.",
+                        example: "Blue, Yellow-Orange, Red-Orange"
+                    )
+
+                    harmonySection(
+                        name: "Tetradic (Square)",
+                        icon: "square",
+                        color: .blue,
+                        description: "Four colors evenly spaced on the wheel (90° apart). Rich color palette that works best when one color dominates.",
+                        example: "Red, Yellow, Green, Blue"
+                    )
+                }
+                .padding()
+            }
+            .navigationTitle("Color Harmonies")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
         }
+    }
 
-        if harmonyRaw.indices.contains(1) {
-            recommended.append(
-                OpaliteColor(
-                    name: "Harmonious",
-                    red: harmonyRaw[1].red,
-                    green: harmonyRaw[1].green,
-                    blue: harmonyRaw[1].blue,
-                    alpha: harmonyRaw[1].alpha
-                )
-            )
+    @ViewBuilder
+    private func harmonySection(
+        name: String,
+        icon: String,
+        color: Color,
+        description: String,
+        example: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 30)
+
+                Text(name)
+                    .font(.headline)
+            }
+
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+
+            Text("Example: \(example)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
-
-        return recommended
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -100,4 +193,8 @@ struct ColorRecommendedColorsView: View {
         onCreateColor: { _ in }
     )
     .padding()
+}
+
+#Preview("Info Sheet") {
+    ColorHarmoniesInfoSheet()
 }
