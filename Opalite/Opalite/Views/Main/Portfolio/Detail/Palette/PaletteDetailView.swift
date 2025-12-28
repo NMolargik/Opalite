@@ -59,7 +59,7 @@ struct PaletteDetailView: View {
                 )
                 .overlay {
                     if palette.colors?.isEmpty == true {
-                        Text("No Colors Added To This Palette")
+                        Text("This Palette is empty.")
                     }
                 }
                 if horizontalSizeClass == .regular {

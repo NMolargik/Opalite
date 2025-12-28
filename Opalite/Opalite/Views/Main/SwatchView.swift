@@ -238,7 +238,7 @@ struct SwatchView: View {
                     // Read-only label state
                     if isEditingBadge != true {
                         Text(badgeText)
-                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .inverseTheme)
                             .bold()
                             .if(allowBadgeTapToEdit && saveBadge != nil) { view in
                                 view.onTapGesture {
