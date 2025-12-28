@@ -128,6 +128,18 @@ struct PaletteDetailView: View {
         }
         .onAppear {
             notesDraft = palette.notes ?? ""
+            colorManager.activePalette = palette
+        }
+        .onDisappear {
+            colorManager.activePalette = nil
+        }
+        .onChange(of: colorManager.renamePaletteTrigger) { _, newValue in
+            if newValue != nil {
+                colorManager.renamePaletteTrigger = nil
+                withAnimation {
+                    isEditingName = true
+                }
+            }
         }
         .navigationTitle("Palette")
         .navigationBarTitleDisplayMode(.inline)

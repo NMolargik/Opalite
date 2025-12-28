@@ -36,7 +36,8 @@ struct PortfolioView: View {
     @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
     @State private var pendingPaletteToAddTo: OpalitePalette? = nil
-    @State private var swatchSize: SwatchSize = .small
+    @AppStorage(AppStorageKeys.swatchSize) private var swatchSizeRaw: String = SwatchSize.medium.rawValue
+    @State private var swatchSize: SwatchSize = .medium
     @State private var navigationPath = [PortfolioNavigationNode]()
     @State private var shareFileURL: URL?
     @State private var isShowingFileShareSheet = false
@@ -110,11 +111,8 @@ struct PortfolioView: View {
                             }
                         },
                         contextMenuContent: { color in
-                            if (!swatchSize.showOverlays) {
-                                return menuContent(color: color)
-                            } else {
-                                return AnyView(EmptyView())
-                            }
+                            // Always provide context menu for right-click support
+                            return menuContent(color: color)
                         },
                         matchedNamespace: swatchNS,
                         copiedColorID: $copiedColorID
@@ -213,11 +211,8 @@ struct PortfolioView: View {
                                         }
                                     },
                                     contextMenuContent: { color in
-                                        if (!swatchSize.showOverlays) {
-                                            return menuContent(color: color, palette: palette)
-                                        } else {
-                                            return AnyView(EmptyView())
-                                        }
+                                        // Always provide context menu for right-click support
+                                        return menuContent(color: color, palette: palette)
                                     },
                                     matchedNamespace: swatchNS,
                                     copiedColorID: $copiedColorID
@@ -231,8 +226,15 @@ struct PortfolioView: View {
             .scrollClipDisabled()
             .navigationTitle("Opalite")
             .toolbarBackground(.hidden)
-            .task {
-                swatchSize = isCompact ? .small : .medium
+            .onAppear {
+                // Load persisted swatch size
+                if let stored = SwatchSize(rawValue: swatchSizeRaw) {
+                    swatchSize = stored
+                }
+            }
+            .onChange(of: swatchSize) { _, newValue in
+                // Persist swatch size changes
+                swatchSizeRaw = newValue.rawValue
             }
             .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
                 guard let token = newValue else { return }

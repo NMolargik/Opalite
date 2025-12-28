@@ -144,16 +144,18 @@ struct OpaliteApp: App {
         .commands {
             // Replace the New Item command group (Cmd+N)
             CommandGroup(replacing: .newItem) {
-                Button("New Color") {
+                Button {
                     HapticsManager.shared.selection()
                     if !colorManager.isMainWindowOpen {
                         openWindow(id: "main")
                     }
                     quickActionManager.requestCreateNewColor()
+                } label: {
+                    Label("New Color", systemImage: "paintpalette.fill")
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
-                Button("New Palette") {
+                Button {
                     HapticsManager.shared.selection()
                     if !colorManager.isMainWindowOpen {
                         openWindow(id: "main")
@@ -168,10 +170,12 @@ struct OpaliteApp: App {
                     } else {
                         quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
                     }
+                } label: {
+                    Label("New Palette", systemImage: "swatchpalette.fill")
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
 
-                Button("New Canvas") {
+                Button {
                     HapticsManager.shared.selection()
                     if !colorManager.isMainWindowOpen {
                         openWindow(id: "main")
@@ -186,32 +190,40 @@ struct OpaliteApp: App {
                     } else {
                         quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
                     }
+                } label: {
+                    Label("New Canvas", systemImage: "pencil.and.outline")
                 }
                 .keyboardShortcut("n", modifiers: [.command, .option])
 
                 Divider()
             }
 
-            // View Menu
-            CommandMenu("View") {
-                Button("Open SwatchBar") {
+            // Add to the existing View menu (not creating a duplicate)
+            CommandGroup(after: .toolbar) {
+                Divider()
+
+                Button {
                     HapticsManager.shared.selection()
                     #if os(iOS)
                     AppDelegate.openSwatchBarWindow()
                     #else
                     openWindow(id: "swatchBar")
                     #endif
+                } label: {
+                    Label("SwatchBar", systemImage: "square.stack.fill")
                 }
                 .keyboardShortcut("b", modifiers: [.command, .shift])
 
                 Divider()
 
-                Button("Refresh") {
+                Button {
                     HapticsManager.shared.selection()
                     Task {
                         await colorManager.refreshAll()
                         await canvasManager.refreshAll()
                     }
+                } label: {
+                    Label("Refresh All", systemImage: "arrow.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
             }
@@ -219,23 +231,27 @@ struct OpaliteApp: App {
             // Portfolio Menu
             CommandMenu("Portfolio") {
                 Section("Colors") {
-                    Button("Create New Color") {
+                    Button {
                         HapticsManager.shared.selection()
                         if !colorManager.isMainWindowOpen {
                             openWindow(id: "main")
                         }
                         quickActionManager.requestCreateNewColor()
+                    } label: {
+                        Label("New Color", systemImage: "paintpalette.fill")
                     }
 
-                    Button("Refresh Colors") {
+                    Button {
                         Task { await colorManager.refreshAll() }
+                    } label: {
+                        Label("Refresh Colors", systemImage: "arrow.clockwise")
                     }
                 }
 
                 Divider()
 
                 Section("Palettes") {
-                    Button("Create New Palette") {
+                    Button {
                         HapticsManager.shared.selection()
                         if !colorManager.isMainWindowOpen {
                             openWindow(id: "main")
@@ -250,13 +266,69 @@ struct OpaliteApp: App {
                         } else {
                             quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
                         }
+                    } label: {
+                        Label("New Palette", systemImage: "swatchpalette.fill")
                     }
+                }
+
+                Divider()
+
+                // Active Color Actions (only enabled when viewing a color detail)
+                Section("Active Color") {
+                    Button {
+                        HapticsManager.shared.selection()
+                        if let color = colorManager.activeColor {
+                            hexCopyManager.copyHex(for: color)
+                        }
+                    } label: {
+                        Label("Copy Hex", systemImage: "number")
+                    }
+                    .disabled(colorManager.activeColor == nil)
+                    .keyboardShortcut("c", modifiers: [.command, .shift])
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        colorManager.editColorTrigger = UUID()
+                    } label: {
+                        Label("Edit Color", systemImage: "slider.horizontal.3")
+                    }
+                    .disabled(colorManager.activeColor == nil)
+                    .keyboardShortcut("e", modifiers: .command)
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        colorManager.addToPaletteTrigger = UUID()
+                    } label: {
+                        Label("Add to Palette", systemImage: "swatchpalette")
+                    }
+                    .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette != nil)
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        colorManager.removeFromPaletteTrigger = UUID()
+                    } label: {
+                        Label("Remove from Palette", systemImage: "swatchpalette.fill")
+                    }
+                    .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette == nil)
+                }
+
+                Divider()
+
+                // Active Palette Actions (only enabled when viewing a palette detail)
+                Section("Active Palette") {
+                    Button {
+                        HapticsManager.shared.selection()
+                        colorManager.renamePaletteTrigger = UUID()
+                    } label: {
+                        Label("Rename Palette", systemImage: "character.cursor.ibeam")
+                    }
+                    .disabled(colorManager.activePalette == nil)
                 }
             }
 
             // Canvas Menu
             CommandMenu("Canvas") {
-                Button("New Canvas") {
+                Button {
                     HapticsManager.shared.selection()
                     if !colorManager.isMainWindowOpen {
                         openWindow(id: "main")
@@ -271,10 +343,58 @@ struct OpaliteApp: App {
                     } else {
                         quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
                     }
+                } label: {
+                    Label("New Canvas", systemImage: "pencil.and.outline")
                 }
 
-                Button("Refresh Canvases") {
+                Button {
                     Task { await canvasManager.refreshAll() }
+                } label: {
+                    Label("Refresh Canvases", systemImage: "arrow.clockwise")
+                }
+
+                Divider()
+
+                Section("Shapes") {
+                    Button {
+                        HapticsManager.shared.selection()
+                        canvasManager.pendingShape = .square
+                    } label: {
+                        Label("Square", systemImage: "square")
+                    }
+                    .keyboardShortcut("1", modifiers: [.command, .shift])
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        canvasManager.pendingShape = .circle
+                    } label: {
+                        Label("Circle", systemImage: "circle")
+                    }
+                    .keyboardShortcut("2", modifiers: [.command, .shift])
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        canvasManager.pendingShape = .triangle
+                    } label: {
+                        Label("Triangle", systemImage: "triangle")
+                    }
+                    .keyboardShortcut("3", modifiers: [.command, .shift])
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        canvasManager.pendingShape = .line
+                    } label: {
+                        Label("Line", systemImage: "line.diagonal")
+                    }
+                    .keyboardShortcut("4", modifiers: [.command, .shift])
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        canvasManager.pendingShape = .arrow
+                    } label: {
+                        Label("Arrow", systemImage: "arrow.right")
+                    }
+                    .keyboardShortcut("5", modifiers: [.command, .shift])
                 }
             }
         }

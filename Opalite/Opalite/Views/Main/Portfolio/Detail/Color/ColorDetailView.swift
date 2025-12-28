@@ -320,8 +320,36 @@ struct ColorDetailView: View {
                 }
             }
         }
+        .onAppear {
+            colorManager.activeColor = color
+        }
+        .onDisappear {
+            colorManager.activeColor = nil
+        }
+        .onChange(of: colorManager.editColorTrigger) { _, newValue in
+            if newValue != nil {
+                colorManager.editColorTrigger = nil
+                isShowingColorEditor = true
+            }
+        }
+        .onChange(of: colorManager.addToPaletteTrigger) { _, newValue in
+            if newValue != nil {
+                colorManager.addToPaletteTrigger = nil
+                if color.palette == nil {
+                    isShowingPaletteSelection = true
+                }
+            }
+        }
+        .onChange(of: colorManager.removeFromPaletteTrigger) { _, newValue in
+            if newValue != nil {
+                colorManager.removeFromPaletteTrigger = nil
+                if color.palette != nil {
+                    showDetachConfirmation = true
+                }
+            }
+        }
     }
-    
+
     @ViewBuilder
     private func shareSheet(image: PlatformImage?) -> some View {
         EmptyView()

@@ -400,10 +400,13 @@ struct SwatchView: View {
     }
 
     // MARK: - Context Menu Content
+    /// Uses explicit contextMenu if provided, otherwise falls back to menu content for right-click support
     @ViewBuilder
     private var contextMenuContent: some View {
         if let contextMenu {
             contextMenu
+        } else if let menu {
+            menu
         } else {
             EmptyView()
         }

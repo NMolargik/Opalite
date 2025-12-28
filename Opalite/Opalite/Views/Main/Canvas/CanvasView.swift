@@ -203,6 +203,13 @@ struct CanvasView: View {
         } message: {
             Text("This will permanently delete \"\(canvasFile.title)\". This action cannot be undone.")
         }
+        .onChange(of: canvasManager.pendingShape) { _, newShape in
+            // Apply shape from menu bar command
+            if let shape = newShape {
+                pendingShape = shape
+                canvasManager.pendingShape = nil
+            }
+        }
         .onChange(of: colorManager.selectedCanvasColor) { _, newColor in
             // Apply color from SwatchBar window to current drawing tool
             if let color = newColor {

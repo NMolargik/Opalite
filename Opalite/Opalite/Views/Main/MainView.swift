@@ -15,6 +15,8 @@ struct MainView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
+    @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
+
     @State private var selectedTab: Tabs = .portfolio
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingSwatchBarInfo: Bool = false
@@ -195,9 +197,18 @@ struct MainView: View {
             }
 
             if newTab == .swatchBar {
-                // Show SwatchBar info sheet
-                isShowingSwatchBarInfo = true
                 selectedTab = oldTab
+                if skipSwatchBarConfirmation {
+                    // Skip the info sheet and launch directly
+                    #if os(iOS)
+                    AppDelegate.openSwatchBarWindow()
+                    #else
+                    openWindow(id: "swatchBar")
+                    #endif
+                } else {
+                    // Show SwatchBar info sheet
+                    isShowingSwatchBarInfo = true
+                }
                 return
             }
 

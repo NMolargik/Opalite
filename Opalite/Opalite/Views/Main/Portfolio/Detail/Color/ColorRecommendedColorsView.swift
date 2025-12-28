@@ -25,24 +25,10 @@ struct ColorRecommendedColorsView: View {
                 showOverlays: true,
                 showsNavigation: false,
                 menuContent: { color in
-                    AnyView(
-                        Group {
-                            Button {
-                                HapticsManager.shared.selection()
-                                hexCopyManager.copyHex(for: color)
-                            } label: {
-                                Label("Copy Hex", systemImage: "number")
-                            }
-
-                            Button {
-                                HapticsManager.shared.selection()
-                                onCreateColor(color)
-                            } label: {
-                                let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"
-                                Label("Add \(addSuffix)", systemImage: "plus")
-                            }
-                        }
-                    )
+                    harmonyMenuContent(for: color)
+                },
+                contextMenuContent: { color in
+                    harmonyMenuContent(for: color)
                 }
             )
             .clipped()
@@ -60,6 +46,27 @@ struct ColorRecommendedColorsView: View {
         .sheet(isPresented: $isShowingInfo) {
             ColorHarmoniesInfoSheet()
         }
+    }
+
+    private func harmonyMenuContent(for color: OpaliteColor) -> AnyView {
+        AnyView(
+            Group {
+                Button {
+                    HapticsManager.shared.selection()
+                    hexCopyManager.copyHex(for: color)
+                } label: {
+                    Label("Copy Hex", systemImage: "number")
+                }
+
+                Button {
+                    HapticsManager.shared.selection()
+                    onCreateColor(color)
+                } label: {
+                    let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"
+                    Label("Add \(addSuffix)", systemImage: "plus")
+                }
+            }
+        )
     }
 
     private func buildHarmonyColors() -> [OpaliteColor] {

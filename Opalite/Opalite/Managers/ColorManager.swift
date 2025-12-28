@@ -47,7 +47,29 @@ class ColorManager {
 
     /// Tracks whether the main window is currently open (for single-instance enforcement from SwatchBar).
     var isMainWindowOpen: Bool = false
-    
+
+    /// The currently active/viewed color in a detail view.
+    /// Set by ColorDetailView on appear, cleared on disappear.
+    /// Used by menu bar commands to provide context-aware actions.
+    var activeColor: OpaliteColor? = nil
+
+    /// The currently active/viewed palette in a detail view.
+    /// Set by PaletteDetailView on appear, cleared on disappear.
+    /// Used by menu bar commands to provide context-aware actions.
+    var activePalette: OpalitePalette? = nil
+
+    /// Triggers the color editor for the active color from menu bar.
+    var editColorTrigger: UUID? = nil
+
+    /// Triggers the palette selection sheet for the active color from menu bar.
+    var addToPaletteTrigger: UUID? = nil
+
+    /// Triggers removing the active color from its palette from menu bar.
+    var removeFromPaletteTrigger: UUID? = nil
+
+    /// Triggers renaming the active palette from menu bar.
+    var renamePaletteTrigger: UUID? = nil
+
     var author: String = "User"
     
     // MARK: - Fetch Helpers

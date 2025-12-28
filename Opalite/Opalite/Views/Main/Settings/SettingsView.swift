@@ -22,6 +22,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
+    @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
 
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
@@ -101,6 +102,17 @@ struct SettingsView: View {
                     Text("Copying")
                 } footer: {
                     Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
+                }
+
+                Section {
+                    Toggle(isOn: $skipSwatchBarConfirmation) {
+                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("SwatchBar")
+                } footer: {
+                    Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
                 }
 
                 Section {

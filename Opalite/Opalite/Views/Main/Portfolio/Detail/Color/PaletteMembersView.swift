@@ -22,28 +22,35 @@ struct PaletteMembersView: View {
                 swatchHeight: 150,
                 showOverlays: true,
                 showsNavigation: true,
+                menuContent: { color in
+                    componentMenuContent(for: color)
+                },
                 contextMenuContent: { color in
-                    AnyView(
-                        Group {
-                            Button {
-                                HapticsManager.shared.selection()
-                                hexCopyManager.copyHex(for: color)
-                            } label: {
-                                Label("Copy Hex", systemImage: "number")
-                            }
-
-                            Button(role: .destructive) {
-                                HapticsManager.shared.selection()
-                                onRemoveColor(color)
-                            } label: {
-                                Label("Remove From Palette", systemImage: "xmark.circle")
-                            }
-                        }
-                    )
+                    componentMenuContent(for: color)
                 }
             )
             .clipped()
         }
+    }
+
+    private func componentMenuContent(for color: OpaliteColor) -> AnyView {
+        AnyView(
+            Group {
+                Button {
+                    HapticsManager.shared.selection()
+                    hexCopyManager.copyHex(for: color)
+                } label: {
+                    Label("Copy Hex", systemImage: "number")
+                }
+
+                Button(role: .destructive) {
+                    HapticsManager.shared.selection()
+                    onRemoveColor(color)
+                } label: {
+                    Label("Remove From Palette", systemImage: "xmark.circle")
+                }
+            }
+        )
     }
 }
 

@@ -37,4 +37,10 @@ enum AppStorageKeys {
 
     /// Whether the user has been asked about their hex prefix preference.
     static let hasAskedHexPreference = "hasAskedHexPreference"
+
+    /// The preferred swatch size in PortfolioView.
+    static let swatchSize = "swatchSize"
+
+    /// Whether to skip the SwatchBar info sheet and launch directly.
+    static let skipSwatchBarConfirmation = "skipSwatchBarConfirmation"
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum SwatchSize: CaseIterable, Equatable {
+enum SwatchSize: String, CaseIterable, Equatable {
     case small
     case medium
     case large
