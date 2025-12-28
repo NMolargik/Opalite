@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import PencilKit
 @testable import Opalite
 
 // MARK: - OpaliteColor Tests
@@ -40,6 +41,31 @@ struct OpaliteColorTests {
         #expect(color.palette == nil)
     }
 
+    @Test func colorWithAllProperties() {
+        let date = Date()
+        let color = OpaliteColor(
+            id: UUID(),
+            name: "Full Color",
+            notes: "Test notes",
+            createdByDisplayName: "Test User",
+            createdOnDeviceName: "iPhone",
+            updatedOnDeviceName: "iPad",
+            createdAt: date,
+            updatedAt: date,
+            red: 0.1,
+            green: 0.2,
+            blue: 0.3,
+            alpha: 0.5
+        )
+
+        #expect(color.name == "Full Color")
+        #expect(color.notes == "Test notes")
+        #expect(color.createdByDisplayName == "Test User")
+        #expect(color.createdOnDeviceName == "iPhone")
+        #expect(color.updatedOnDeviceName == "iPad")
+        #expect(color.alpha == 0.5)
+    }
+
     // MARK: - Hex String
 
     @Test func hexStringBlack() {
@@ -68,15 +94,23 @@ struct OpaliteColorTests {
     }
 
     @Test func hexStringCustomColor() {
-        // RGB(128, 64, 192) should be #8040C0
         let color = OpaliteColor(red: 128.0/255.0, green: 64.0/255.0, blue: 192.0/255.0)
         #expect(color.hexString == "#8040C0")
     }
 
     @Test func hexWithAlphaString() {
         let color = OpaliteColor(red: 1, green: 0.5, blue: 0, alpha: 0.5)
-        // RGB(255, 128, 0) with alpha 128 -> #FF800080
         #expect(color.hexWithAlphaString == "#FF800080")
+    }
+
+    @Test func hexWithAlphaFullOpaque() {
+        let color = OpaliteColor(red: 1, green: 1, blue: 1, alpha: 1)
+        #expect(color.hexWithAlphaString == "#FFFFFFFF")
+    }
+
+    @Test func hexWithAlphaTransparent() {
+        let color = OpaliteColor(red: 0, green: 0, blue: 0, alpha: 0)
+        #expect(color.hexWithAlphaString == "#00000000")
     }
 
     // MARK: - RGB String
@@ -91,9 +125,19 @@ struct OpaliteColorTests {
         #expect(white.rgbString == "rgb(255, 255, 255)")
     }
 
+    @Test func rgbStringMidGray() {
+        let gray = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
+        #expect(gray.rgbString == "rgb(128, 128, 128)")
+    }
+
     @Test func rgbaString() {
         let color = OpaliteColor(red: 1, green: 0.5, blue: 0, alpha: 0.75)
         #expect(color.rgbaString == "rgba(255, 128, 0, 0.75)")
+    }
+
+    @Test func rgbaStringFullAlpha() {
+        let color = OpaliteColor(red: 1, green: 0, blue: 0, alpha: 1.0)
+        #expect(color.rgbaString == "rgba(255, 0, 0, 1.0)")
     }
 
     // MARK: - HSL String
@@ -115,8 +159,22 @@ struct OpaliteColorTests {
 
     @Test func hslStringGray() {
         let gray = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
-        // Gray has 0 saturation
         #expect(gray.hslString == "hsl(0, 0%, 50%)")
+    }
+
+    @Test func hslStringYellow() {
+        let yellow = OpaliteColor(red: 1, green: 1, blue: 0)
+        #expect(yellow.hslString == "hsl(60, 100%, 50%)")
+    }
+
+    @Test func hslStringCyan() {
+        let cyan = OpaliteColor(red: 0, green: 1, blue: 1)
+        #expect(cyan.hslString == "hsl(180, 100%, 50%)")
+    }
+
+    @Test func hslStringMagenta() {
+        let magenta = OpaliteColor(red: 1, green: 0, blue: 1)
+        #expect(magenta.hslString == "hsl(300, 100%, 50%)")
     }
 
     // MARK: - HSL Conversion
@@ -128,6 +186,32 @@ struct OpaliteColorTests {
         #expect(l == 0.5)
     }
 
+    @Test func rgbToHSLGreen() {
+        let (h, s, l) = OpaliteColor.rgbToHSL(r: 0, g: 1, b: 0)
+        #expect(abs(h - 1.0/3.0) < 0.001)
+        #expect(s == 1)
+        #expect(l == 0.5)
+    }
+
+    @Test func rgbToHSLBlue() {
+        let (h, s, l) = OpaliteColor.rgbToHSL(r: 0, g: 0, b: 1)
+        #expect(abs(h - 2.0/3.0) < 0.001)
+        #expect(s == 1)
+        #expect(l == 0.5)
+    }
+
+    @Test func rgbToHSLWhite() {
+        let (h, s, l) = OpaliteColor.rgbToHSL(r: 1, g: 1, b: 1)
+        #expect(s == 0)
+        #expect(l == 1)
+    }
+
+    @Test func rgbToHSLBlack() {
+        let (h, s, l) = OpaliteColor.rgbToHSL(r: 0, g: 0, b: 0)
+        #expect(s == 0)
+        #expect(l == 0)
+    }
+
     @Test func hslToRGBRed() {
         let (r, g, b) = OpaliteColor.hslToRGB(h: 0, s: 1, l: 0.5)
         #expect(abs(r - 1.0) < 0.001)
@@ -135,8 +219,14 @@ struct OpaliteColorTests {
         #expect(abs(b - 0.0) < 0.001)
     }
 
+    @Test func hslToRGBGray() {
+        let (r, g, b) = OpaliteColor.hslToRGB(h: 0, s: 0, l: 0.5)
+        #expect(abs(r - 0.5) < 0.001)
+        #expect(abs(g - 0.5) < 0.001)
+        #expect(abs(b - 0.5) < 0.001)
+    }
+
     @Test func hslRoundTrip() {
-        // Test that RGB -> HSL -> RGB produces the same values
         let originalR = 0.3
         let originalG = 0.6
         let originalB = 0.9
@@ -149,15 +239,32 @@ struct OpaliteColorTests {
         #expect(abs(b - originalB) < 0.001)
     }
 
+    @Test func hslRoundTripMultipleColors() {
+        let testCases: [(Double, Double, Double)] = [
+            (0.0, 0.0, 0.0),
+            (1.0, 1.0, 1.0),
+            (0.5, 0.5, 0.5),
+            (0.2, 0.4, 0.8),
+            (0.9, 0.1, 0.5),
+        ]
+
+        for (originalR, originalG, originalB) in testCases {
+            let (h, s, l) = OpaliteColor.rgbToHSL(r: originalR, g: originalG, b: originalB)
+            let (r, g, b) = OpaliteColor.hslToRGB(h: h, s: s, l: l)
+
+            #expect(abs(r - originalR) < 0.01)
+            #expect(abs(g - originalG) < 0.01)
+            #expect(abs(b - originalB) < 0.01)
+        }
+    }
+
     // MARK: - Color Harmony
 
     @Test func complementaryColor() {
         let red = OpaliteColor(name: "Red", red: 1, green: 0, blue: 0)
         let complement = red.complementaryColor()
 
-        // Complementary of red should be cyan (hue shifted 180°)
         #expect(complement.name == "Complementary")
-        // Cyan is roughly (0, 1, 1) but with same saturation/lightness
         #expect(complement.red < 0.1)
         #expect(complement.green > 0.9)
         #expect(complement.blue > 0.9)
@@ -196,6 +303,14 @@ struct OpaliteColorTests {
         #expect(splitComp[0].name == "Split-Comp")
     }
 
+    @Test func harmoniousColorsIsAliasForAnalogous() {
+        let color = OpaliteColor(red: 0.5, green: 0.3, blue: 0.7)
+        let harmonious = color.harmoniousColors()
+        let analogous = color.analogousColors()
+
+        #expect(harmonious.count == analogous.count)
+    }
+
     // MARK: - Accessibility
 
     @Test func relativeLuminanceBlack() {
@@ -208,33 +323,43 @@ struct OpaliteColorTests {
         #expect(white.relativeLuminance == 1)
     }
 
+    @Test func relativeLuminanceGray() {
+        let gray = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
+        #expect(gray.relativeLuminance > 0)
+        #expect(gray.relativeLuminance < 1)
+    }
+
     @Test func contrastRatioBlackWhite() {
         let black = OpaliteColor(red: 0, green: 0, blue: 0)
         let white = OpaliteColor(red: 1, green: 1, blue: 1)
 
-        // Black vs white should have maximum contrast ratio of 21
         let ratio = black.contrastRatio(against: white)
         #expect(ratio == 21.0)
     }
 
+    @Test func contrastRatioSymmetric() {
+        let color1 = OpaliteColor(red: 0.2, green: 0.4, blue: 0.6)
+        let color2 = OpaliteColor(red: 0.8, green: 0.6, blue: 0.4)
+
+        let ratio1 = color1.contrastRatio(against: color2)
+        let ratio2 = color2.contrastRatio(against: color1)
+
+        #expect(abs(ratio1 - ratio2) < 0.001)
+    }
+
     @Test func contrastRatioSameColor() {
         let color = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
-
-        // Same color should have contrast ratio of 1
         let ratio = color.contrastRatio(against: color)
         #expect(ratio == 1.0)
     }
 
     @Test func idealTextColorOnBlack() {
         let black = OpaliteColor(red: 0, green: 0, blue: 0)
-        // White text should be better on black background
-        // We can't directly compare SwiftUI Color, but we can verify the method runs
         _ = black.idealTextColor()
     }
 
     @Test func idealTextColorOnWhite() {
         let white = OpaliteColor(red: 1, green: 1, blue: 1)
-        // Black text should be better on white background
         _ = white.idealTextColor()
     }
 
@@ -251,14 +376,33 @@ struct OpaliteColorTests {
         #expect(modified.name == color.name)
     }
 
-    @Test func withAlphaClampsValues() {
+    @Test func withAlphaClampsHigh() {
         let color = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
-
         let tooHigh = color.withAlpha(1.5)
         #expect(tooHigh.alpha == 1.0)
+    }
 
+    @Test func withAlphaClampsLow() {
+        let color = OpaliteColor(red: 0.5, green: 0.5, blue: 0.5)
         let tooLow = color.withAlpha(-0.5)
         #expect(tooLow.alpha == 0.0)
+    }
+
+    @Test func withAlphaPreservesMetadata() {
+        let color = OpaliteColor(
+            name: "Test",
+            notes: "Notes",
+            createdByDisplayName: "User",
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5,
+            alpha: 1.0
+        )
+        let modified = color.withAlpha(0.5)
+
+        #expect(modified.name == color.name)
+        #expect(modified.notes == color.notes)
+        #expect(modified.createdByDisplayName == color.createdByDisplayName)
     }
 
     // MARK: - Export
@@ -279,6 +423,18 @@ struct OpaliteColorTests {
         #expect(dict["red"] as? Double == 1.0)
         #expect(dict["green"] as? Double == 0.0)
         #expect(dict["blue"] as? Double == 0.0)
+        #expect(dict["alpha"] as? Double == 1.0)
+    }
+
+    @Test func dictionaryRepresentationIncludesAllFormats() {
+        let color = OpaliteColor(name: "Test", red: 0.5, green: 0.5, blue: 0.5)
+        let dict = color.dictionaryRepresentation
+
+        #expect(dict["hex"] != nil)
+        #expect(dict["hexWithAlpha"] != nil)
+        #expect(dict["rgb"] != nil)
+        #expect(dict["rgba"] != nil)
+        #expect(dict["hsl"] != nil)
     }
 
     @Test func jsonRepresentation() throws {
@@ -287,9 +443,163 @@ struct OpaliteColorTests {
         let jsonData = try color.jsonRepresentation()
         #expect(jsonData.count > 0)
 
-        // Verify it's valid JSON
         let parsed = try JSONSerialization.jsonObject(with: jsonData)
         #expect(parsed is [String: Any])
+    }
+
+    @Test func jsonRepresentationIsValid() throws {
+        let color = OpaliteColor(name: "Test", red: 1, green: 0, blue: 0)
+        let jsonData = try color.jsonRepresentation()
+
+        let dict = try JSONSerialization.jsonObject(with: jsonData) as! [String: Any]
+        #expect(dict["name"] as? String == "Test")
+    }
+
+    // MARK: - Sample Data
+
+    @Test func sampleColorExists() {
+        let sample = OpaliteColor.sample
+        #expect(sample.name != nil)
+        #expect(sample.red >= 0 && sample.red <= 1)
+        #expect(sample.green >= 0 && sample.green <= 1)
+        #expect(sample.blue >= 0 && sample.blue <= 1)
+    }
+
+    @Test func sample2ColorExists() {
+        let sample = OpaliteColor.sample2
+        #expect(sample.name != nil)
+    }
+}
+
+// MARK: - Color Blindness Simulation Tests
+
+struct ColorBlindnessSimulationTests {
+
+    @Test func offModeReturnsOriginalColor() {
+        let color = OpaliteColor(red: 1, green: 0, blue: 0)
+        let simulated = color.simulatingColorBlindness(.off)
+
+        #expect(simulated.red == color.red)
+        #expect(simulated.green == color.green)
+        #expect(simulated.blue == color.blue)
+    }
+
+    @Test func protanopiaChangesRed() {
+        let red = OpaliteColor(red: 1, green: 0, blue: 0)
+        let simulated = red.simulatingColorBlindness(.protanopia)
+
+        // Protanopia affects red perception
+        #expect(simulated.red != red.red || simulated.green != red.green)
+    }
+
+    @Test func deuteranopiaChangesGreen() {
+        let green = OpaliteColor(red: 0, green: 1, blue: 0)
+        let simulated = green.simulatingColorBlindness(.deuteranopia)
+
+        // Deuteranopia affects green perception
+        #expect(simulated.green != green.green || simulated.red != green.red)
+    }
+
+    @Test func tritanopiaChangesBlue() {
+        let blue = OpaliteColor(red: 0, green: 0, blue: 1)
+        let simulated = blue.simulatingColorBlindness(.tritanopia)
+
+        // Tritanopia affects blue perception
+        #expect(simulated.blue != blue.blue || simulated.green != blue.green)
+    }
+
+    @Test func simulationPreservesMetadata() {
+        let color = OpaliteColor(
+            id: UUID(),
+            name: "Test",
+            notes: "Notes",
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5
+        )
+        let simulated = color.simulatingColorBlindness(.protanopia)
+
+        #expect(simulated.id == color.id)
+        #expect(simulated.name == color.name)
+        #expect(simulated.notes == color.notes)
+    }
+
+    @Test func simulationClampsValues() {
+        // Edge case: ensure values stay in valid range
+        let color = OpaliteColor(red: 1, green: 1, blue: 1)
+        let simulated = color.simulatingColorBlindness(.protanopia)
+
+        #expect(simulated.red >= 0 && simulated.red <= 1)
+        #expect(simulated.green >= 0 && simulated.green <= 1)
+        #expect(simulated.blue >= 0 && simulated.blue <= 1)
+    }
+
+    @Test func arraySimulationOffReturnsOriginal() {
+        let colors = [
+            OpaliteColor(red: 1, green: 0, blue: 0),
+            OpaliteColor(red: 0, green: 1, blue: 0),
+        ]
+        let simulated = colors.simulatingColorBlindness(.off)
+
+        #expect(simulated.count == colors.count)
+        #expect(simulated[0].red == colors[0].red)
+    }
+
+    @Test func arraySimulationAppliesMode() {
+        let colors = [
+            OpaliteColor(red: 1, green: 0, blue: 0),
+            OpaliteColor(red: 0, green: 1, blue: 0),
+        ]
+        let simulated = colors.simulatingColorBlindness(.protanopia)
+
+        #expect(simulated.count == colors.count)
+        // At least one color should change
+        let changed = simulated[0].red != colors[0].red ||
+                      simulated[0].green != colors[0].green
+        #expect(changed)
+    }
+}
+
+// MARK: - ColorBlindnessMode Tests
+
+struct ColorBlindnessModeTests {
+
+    @Test func allCasesExist() {
+        #expect(ColorBlindnessMode.allCases.count == 4)
+    }
+
+    @Test func offModeProperties() {
+        let mode = ColorBlindnessMode.off
+        #expect(mode.title == "Off")
+        #expect(mode.shortTitle == "Normal Vision")
+        #expect(mode.description == "No simulation active")
+    }
+
+    @Test func protanopiaProperties() {
+        let mode = ColorBlindnessMode.protanopia
+        #expect(mode.title == "Protanopia (Red-blind)")
+        #expect(mode.shortTitle == "Protanopia")
+        #expect(mode.description.contains("red"))
+    }
+
+    @Test func deuteranopiaProperties() {
+        let mode = ColorBlindnessMode.deuteranopia
+        #expect(mode.title == "Deuteranopia (Green-blind)")
+        #expect(mode.shortTitle == "Deuteranopia")
+        #expect(mode.description.contains("green"))
+    }
+
+    @Test func tritanopiaProperties() {
+        let mode = ColorBlindnessMode.tritanopia
+        #expect(mode.title == "Tritanopia (Blue-blind)")
+        #expect(mode.shortTitle == "Tritanopia")
+        #expect(mode.description.contains("blue"))
+    }
+
+    @Test func identifiableConformance() {
+        for mode in ColorBlindnessMode.allCases {
+            #expect(mode.id == mode.rawValue)
+        }
     }
 }
 
@@ -325,6 +635,17 @@ struct OpalitePaletteTests {
 
         #expect(palette.tags.count == 3)
         #expect(palette.tags.contains("warm"))
+        #expect(palette.tags.contains("autumn"))
+        #expect(palette.tags.contains("nature"))
+    }
+
+    @Test func paletteNotes() {
+        let palette = OpalitePalette(
+            name: "With Notes",
+            notes: "Test notes"
+        )
+
+        #expect(palette.notes == "Test notes")
     }
 
     @Test func suggestedExportFilename() {
@@ -342,6 +663,21 @@ struct OpalitePaletteTests {
         #expect(filename == "opalite-palette.json")
     }
 
+    @Test func suggestedExportFilenameWithSpaces() {
+        let palette = OpalitePalette(name: "My Palette Name")
+        let filename = palette.suggestedExportFilename
+
+        #expect(!filename.contains(" "))
+        #expect(filename.hasSuffix(".opalite-palette.json"))
+    }
+
+    @Test func suggestedExportFilenameWithSpecialChars() {
+        let palette = OpalitePalette(name: "Test!@#$%Palette")
+        let filename = palette.suggestedExportFilename
+
+        #expect(filename.hasSuffix(".opalite-palette.json"))
+    }
+
     @Test func dictionaryRepresentation() {
         let palette = OpalitePalette(
             name: "Export Test",
@@ -356,6 +692,16 @@ struct OpalitePaletteTests {
         #expect((dict["tags"] as? [String])?.contains("test") == true)
     }
 
+    @Test func dictionaryRepresentationIncludesColors() {
+        let color = OpaliteColor(name: "Red", red: 1, green: 0, blue: 0)
+        let palette = OpalitePalette(name: "With Color", colors: [color])
+
+        let dict = palette.dictionaryRepresentation
+        let colors = dict["colors"] as? [[String: Any]]
+
+        #expect(colors?.count == 1)
+    }
+
     @Test func jsonRepresentation() throws {
         let palette = OpalitePalette(name: "JSON Palette")
 
@@ -365,6 +711,287 @@ struct OpalitePaletteTests {
         let parsed = try JSONSerialization.jsonObject(with: jsonData)
         #expect(parsed is [String: Any])
     }
+
+    @Test func samplePaletteExists() {
+        let sample = OpalitePalette.sample
+        #expect(!sample.name.isEmpty)
+        #expect(sample.colors != nil)
+    }
+}
+
+// MARK: - CanvasFile Tests
+
+struct CanvasFileTests {
+
+    @Test func canvasFileInitialization() {
+        let canvas = CanvasFile(title: "Test Canvas")
+
+        #expect(canvas.title == "Test Canvas")
+        #expect(canvas.drawingData != nil)
+    }
+
+    @Test func canvasFileDefaultTitle() {
+        let canvas = CanvasFile()
+
+        #expect(canvas.title == "Untitled Canvas")
+    }
+
+    @Test func canvasFileDefaultCanvasSize() {
+        let size = CanvasFile.defaultCanvasSize
+
+        #expect(size.width == 4096)
+        #expect(size.height == 4096)
+    }
+
+    @Test func loadDrawingReturnsEmptyForNilData() {
+        let canvas = CanvasFile()
+        canvas.drawingData = nil
+
+        let drawing = canvas.loadDrawing()
+        #expect(drawing.strokes.isEmpty)
+    }
+
+    @Test func loadDrawingReturnsEmptyForInvalidData() {
+        let canvas = CanvasFile()
+        canvas.drawingData = Data([0x00, 0x01, 0x02]) // Invalid data
+
+        let drawing = canvas.loadDrawing()
+        #expect(drawing.strokes.isEmpty)
+    }
+
+    @Test func saveDrawingUpdatesTimestamp() {
+        let canvas = CanvasFile()
+        let originalUpdatedAt = canvas.updatedAt
+
+        // Small delay to ensure time difference
+        Thread.sleep(forTimeInterval: 0.01)
+
+        canvas.saveDrawing(PKDrawing())
+
+        #expect(canvas.updatedAt > originalUpdatedAt)
+    }
+
+    @Test func saveAndLoadDrawingRoundTrip() {
+        let canvas = CanvasFile()
+        let drawing = PKDrawing()
+
+        canvas.saveDrawing(drawing)
+        let loaded = canvas.loadDrawing()
+
+        #expect(loaded.strokes.count == drawing.strokes.count)
+    }
+
+    @Test func canvasSizeReturnsNilWhenNotSet() {
+        let canvas = CanvasFile()
+        canvas.canvasWidth = 0
+        canvas.canvasHeight = 0
+
+        #expect(canvas.canvasSize == nil)
+    }
+
+    @Test func canvasSizeReturnsValueWhenSet() {
+        let canvas = CanvasFile()
+        canvas.canvasWidth = 100
+        canvas.canvasHeight = 200
+
+        let size = canvas.canvasSize
+        #expect(size?.width == 100)
+        #expect(size?.height == 200)
+    }
+
+    @Test func setCanvasSizeOnlyOnce() {
+        let canvas = CanvasFile()
+        canvas.canvasWidth = 0
+        canvas.canvasHeight = 0
+
+        canvas.setCanvasSize(CGSize(width: 100, height: 100))
+        #expect(canvas.canvasWidth == 100)
+
+        // Second call should not change size
+        canvas.setCanvasSize(CGSize(width: 200, height: 200))
+        #expect(canvas.canvasWidth == 100)
+    }
+
+    @Test func expandCanvasIfNeededExpands() {
+        let canvas = CanvasFile()
+        canvas.canvasWidth = 100
+        canvas.canvasHeight = 100
+
+        canvas.expandCanvasIfNeeded(to: CGSize(width: 200, height: 150))
+
+        #expect(canvas.canvasWidth == 200)
+        #expect(canvas.canvasHeight == 150)
+    }
+
+    @Test func expandCanvasIfNeededDoesNotShrink() {
+        let canvas = CanvasFile()
+        canvas.canvasWidth = 200
+        canvas.canvasHeight = 200
+
+        canvas.expandCanvasIfNeeded(to: CGSize(width: 100, height: 100))
+
+        #expect(canvas.canvasWidth == 200)
+        #expect(canvas.canvasHeight == 200)
+    }
+}
+
+// MARK: - OnyxSubscription Tests
+
+struct OnyxSubscriptionTests {
+
+    @Test func monthlyProperties() {
+        let monthly = OnyxSubscription.monthly
+
+        #expect(monthly.rawValue == "onyx_1m_0.99")
+        #expect(monthly.displayName == "Onyx Monthly")
+        #expect(monthly.period == "month")
+        #expect(monthly.savingsPercentage == nil)
+    }
+
+    @Test func annualProperties() {
+        let annual = OnyxSubscription.annual
+
+        #expect(annual.rawValue == "onyx_1yr_4.99")
+        #expect(annual.displayName == "Onyx Annual")
+        #expect(annual.period == "year")
+        #expect(annual.savingsPercentage == 58)
+    }
+
+    @Test func productIDsContainsAllCases() {
+        let productIDs = OnyxSubscription.productIDs
+
+        #expect(productIDs.count == 2)
+        #expect(productIDs.contains("onyx_1m_0.99"))
+        #expect(productIDs.contains("onyx_1yr_4.99"))
+    }
+
+    @Test func identifiableConformance() {
+        for subscription in OnyxSubscription.allCases {
+            #expect(subscription.id == subscription.rawValue)
+        }
+    }
+}
+
+// MARK: - ToastStyle Tests
+
+struct ToastStyleTests {
+
+    @Test func errorStyleProperties() {
+        let style = ToastStyle.error
+        #expect(style.iconName == "xmark.circle.fill")
+    }
+
+    @Test func successStyleProperties() {
+        let style = ToastStyle.success
+        #expect(style.iconName == "checkmark.circle.fill")
+    }
+
+    @Test func infoStyleProperties() {
+        let style = ToastStyle.info
+        #expect(style.iconName == "info.circle.fill")
+    }
+}
+
+// MARK: - ToastItem Tests
+
+struct ToastItemTests {
+
+    @Test func toastItemDefaultValues() {
+        let toast = ToastItem(message: "Test")
+
+        #expect(toast.message == "Test")
+        #expect(toast.style == .info)
+        #expect(toast.icon == nil)
+        #expect(toast.duration == 3.0)
+    }
+
+    @Test func toastItemCustomValues() {
+        let toast = ToastItem(
+            message: "Error!",
+            style: .error,
+            icon: "xmark",
+            duration: 5.0
+        )
+
+        #expect(toast.message == "Error!")
+        #expect(toast.style == .error)
+        #expect(toast.icon == "xmark")
+        #expect(toast.duration == 5.0)
+    }
+
+    @Test func toastItemFromError() {
+        let toast = ToastItem(error: .colorCreationFailed)
+
+        #expect(toast.message == "Unable to create color")
+        #expect(toast.style == .error)
+        #expect(toast.icon != nil)
+    }
+
+    @Test func toastItemEquality() {
+        let toast1 = ToastItem(message: "Test")
+        let toast2 = ToastItem(message: "Test")
+
+        // Different IDs means not equal
+        #expect(toast1 != toast2)
+        #expect(toast1 == toast1)
+    }
+}
+
+// MARK: - OpaliteError Tests
+
+struct OpaliteErrorTests {
+
+    @Test func colorErrorDescriptions() {
+        #expect(OpaliteError.colorCreationFailed.errorDescription == "Unable to create color")
+        #expect(OpaliteError.colorUpdateFailed.errorDescription == "Unable to update color")
+        #expect(OpaliteError.colorDeletionFailed.errorDescription == "Unable to delete color")
+        #expect(OpaliteError.colorFetchFailed.errorDescription == "Unable to load colors")
+    }
+
+    @Test func paletteErrorDescriptions() {
+        #expect(OpaliteError.paletteCreationFailed.errorDescription == "Unable to create palette")
+        #expect(OpaliteError.paletteUpdateFailed.errorDescription == "Unable to update palette")
+        #expect(OpaliteError.paletteDeletionFailed.errorDescription == "Unable to delete palette")
+        #expect(OpaliteError.paletteFetchFailed.errorDescription == "Unable to load palettes")
+    }
+
+    @Test func canvasErrorDescriptions() {
+        #expect(OpaliteError.canvasCreationFailed.errorDescription == "Unable to create canvas")
+        #expect(OpaliteError.canvasUpdateFailed.errorDescription == "Unable to update canvas")
+        #expect(OpaliteError.canvasDeletionFailed.errorDescription == "Unable to delete canvas")
+        #expect(OpaliteError.canvasFetchFailed.errorDescription == "Unable to load canvases")
+        #expect(OpaliteError.canvasSaveFailed.errorDescription == "Unable to save canvas")
+    }
+
+    @Test func importExportErrorDescriptions() {
+        #expect(OpaliteError.importFailed(reason: "test").errorDescription == "Import failed: test")
+        #expect(OpaliteError.exportFailed(reason: "test").errorDescription == "Export failed: test")
+        #expect(OpaliteError.pdfExportFailed.errorDescription == "Unable to export PDF")
+    }
+
+    @Test func subscriptionErrorDescriptions() {
+        #expect(OpaliteError.subscriptionLoadFailed.errorDescription == "Unable to load subscription options")
+        #expect(OpaliteError.subscriptionPurchaseFailed.errorDescription == "Purchase could not be completed")
+        #expect(OpaliteError.subscriptionRestoreFailed.errorDescription == "Unable to restore purchases")
+    }
+
+    @Test func errorSystemImages() {
+        #expect(OpaliteError.colorCreationFailed.systemImage == "plus.circle.fill")
+        #expect(OpaliteError.colorUpdateFailed.systemImage == "pencil.circle.fill")
+        #expect(OpaliteError.colorDeletionFailed.systemImage == "trash.circle.fill")
+        #expect(OpaliteError.saveFailed.systemImage == "externaldrive.fill.badge.xmark")
+    }
+
+    @Test func errorEquality() {
+        #expect(OpaliteError.colorCreationFailed == OpaliteError.colorCreationFailed)
+        #expect(OpaliteError.colorCreationFailed != OpaliteError.colorUpdateFailed)
+    }
+
+    @Test func unknownErrorWithMessage() {
+        let error = OpaliteError.unknownError("Custom message")
+        #expect(error.errorDescription == "Custom message")
+        #expect(error.systemImage == "exclamationmark.triangle.fill")
+    }
 }
 
 // MARK: - HexCopyManager Tests
@@ -372,7 +999,6 @@ struct OpalitePaletteTests {
 struct HexCopyManagerTests {
 
     @Test @MainActor func formattedHexWithPrefix() {
-        // Reset UserDefaults for test
         UserDefaults.standard.set(true, forKey: "includeHexPrefix")
         UserDefaults.standard.set(true, forKey: "hasAskedHexPreference")
 
@@ -396,6 +1022,108 @@ struct HexCopyManagerTests {
 
         #expect(hex == "FF0000")
     }
+
+    @Test @MainActor func formattedHexVariousColors() {
+        let manager = HexCopyManager()
+        manager.includeHexPrefix = true
+
+        let white = OpaliteColor(red: 1, green: 1, blue: 1)
+        let black = OpaliteColor(red: 0, green: 0, blue: 0)
+
+        #expect(manager.formattedHex(for: white) == "#FFFFFF")
+        #expect(manager.formattedHex(for: black) == "#000000")
+    }
+
+    @Test @MainActor func initialState() {
+        let manager = HexCopyManager()
+
+        #expect(manager.showPreferenceAlert == false)
+        #expect(manager.pendingCopyColor == nil)
+    }
+}
+
+// MARK: - ColorEditorViewModel Tests
+
+struct ColorEditorViewModelTests {
+
+    @Test func viewModelWithExistingColor() {
+        let color = OpaliteColor(
+            name: "Test",
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5
+        )
+
+        let viewModel = ColorEditorView.ViewModel(color: color)
+
+        #expect(viewModel.originalColor?.name == "Test")
+        #expect(viewModel.tempColor.red == 0.5)
+        #expect(viewModel.tempColor.name == "Test")
+    }
+
+    @Test func viewModelWithNilColor() {
+        let viewModel = ColorEditorView.ViewModel(color: nil)
+
+        #expect(viewModel.originalColor == nil)
+        #expect(viewModel.tempColor.red == 0.5)
+        #expect(viewModel.tempColor.green == 0.6)
+        #expect(viewModel.tempColor.blue == 0.7)
+    }
+
+    @Test func viewModelDefaultState() {
+        let viewModel = ColorEditorView.ViewModel(color: nil)
+
+        #expect(viewModel.mode == .grid)
+        #expect(viewModel.isShowingPaletteStrip == false)
+        #expect(viewModel.isColorExpanded == false)
+        #expect(viewModel.didCopyHex == false)
+    }
+
+    @Test func viewModelTempColorIsIndependent() {
+        let color = OpaliteColor(name: "Original", red: 0.5, green: 0.5, blue: 0.5)
+        let viewModel = ColorEditorView.ViewModel(color: color)
+
+        // Modify temp color
+        viewModel.tempColor.red = 0.8
+
+        // Original should be unchanged
+        #expect(color.red == 0.5)
+        #expect(viewModel.tempColor.red == 0.8)
+    }
+}
+
+// MARK: - ColorDetailViewModel Tests
+
+struct ColorDetailViewModelTests {
+
+    @Test func viewModelInitialization() {
+        let color = OpaliteColor(name: "Test", notes: "Test notes", red: 0.5, green: 0.5, blue: 0.5)
+        let viewModel = ColorDetailView.ViewModel(color: color)
+
+        #expect(viewModel.notesDraft == "Test notes")
+        #expect(viewModel.isSavingNotes == false)
+    }
+
+    @Test func viewModelWithNilNotes() {
+        let color = OpaliteColor(name: "Test", red: 0.5, green: 0.5, blue: 0.5)
+        let viewModel = ColorDetailView.ViewModel(color: color)
+
+        #expect(viewModel.notesDraft == "")
+    }
+
+    @Test func badgeTextWithName() {
+        let color = OpaliteColor(name: "My Color", red: 0.5, green: 0.5, blue: 0.5)
+        let viewModel = ColorDetailView.ViewModel(color: color)
+
+        #expect(viewModel.badgeText == "My Color")
+    }
+
+    @Test func badgeTextWithoutName() {
+        let color = OpaliteColor(red: 1, green: 0, blue: 0)
+        let viewModel = ColorDetailView.ViewModel(color: color)
+
+        #expect(viewModel.badgeText == "#FF0000")
+    }
 }
 
 // MARK: - Color Utility Tests
@@ -403,18 +1131,23 @@ struct HexCopyManagerTests {
 struct ColorUtilityTests {
 
     @Test func hexRounding() {
-        // Test that colors at boundary values round correctly
-        // 127.5 should round to 128 (0x80)
         let color = OpaliteColor(red: 127.5/255.0, green: 127.5/255.0, blue: 127.5/255.0)
         #expect(color.hexString == "#808080")
     }
 
     @Test func extremeValues() {
-        // Test with values at 0 and 1
         let black = OpaliteColor(red: 0.0, green: 0.0, blue: 0.0)
         let white = OpaliteColor(red: 1.0, green: 1.0, blue: 1.0)
 
         #expect(black.hexString == "#000000")
         #expect(white.hexString == "#FFFFFF")
+    }
+
+    @Test func nearBoundaryValues() {
+        let almostWhite = OpaliteColor(red: 0.999, green: 0.999, blue: 0.999)
+        let almostBlack = OpaliteColor(red: 0.001, green: 0.001, blue: 0.001)
+
+        #expect(almostWhite.hexString == "#FFFFFF")
+        #expect(almostBlack.hexString == "#000000")
     }
 }

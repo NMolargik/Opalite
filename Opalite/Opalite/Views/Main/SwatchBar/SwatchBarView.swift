@@ -63,6 +63,7 @@ struct SwatchBarView: View {
                     }
                 }
             }
+            .padding(.bottom)
             .background(.ultraThinMaterial)
             .navigationTitle("SwatchBar")
             #if os(iOS)
@@ -139,6 +140,7 @@ struct SwatchBarView: View {
                 .presentationDragIndicator(.visible)
             }
         }
+        .frame(minWidth: 250)
     }
 
     @ViewBuilder

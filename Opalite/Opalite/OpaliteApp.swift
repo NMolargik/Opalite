@@ -83,10 +83,19 @@ struct OpaliteApp: App {
                     colorManager.author = userName
                 }
                 .onOpenURL { url in
-                    // Handle swatchBar URL scheme - use openWindow directly here
-                    // since this is the fallback from AppDelegate.openSwatchBarWindow()
+                    // Handle swatchBar URL scheme
                     if url.scheme == "opalite" && url.host == "swatchBar" {
+                        #if os(iOS)
+                        // Check if SwatchBar already exists and activate it
+                        if AppDelegate.swatchBarSceneSession != nil {
+                            AppDelegate.openSwatchBarWindow()
+                        } else {
+                            // No existing SwatchBar, create a new one
+                            openWindow(id: "swatchBar")
+                        }
+                        #else
                         openWindow(id: "swatchBar")
+                        #endif
                         return
                     }
                     importCoordinator.handleIncomingURL(url, colorManager: colorManager)
@@ -286,7 +295,7 @@ struct OpaliteApp: App {
         .environment(quickActionManager)
         .environment(hexCopyManager)
         .windowResizability(.contentSize)
-        .defaultSize(width: 180, height: 500)
+        .defaultSize(width: 250, height: 1000)
 #elseif os(iOS)
         WindowGroup(id: "swatchBar") {
             SwatchBarView()
@@ -312,7 +321,7 @@ struct OpaliteApp: App {
         .environment(quickActionManager)
         .environment(hexCopyManager)
         .windowResizability(.contentSize)
-        .defaultSize(width: 180, height: 500)
+        .defaultSize(width: 250, height: 1000)
 #endif
     }
 }
