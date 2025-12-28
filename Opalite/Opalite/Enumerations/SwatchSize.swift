@@ -35,6 +35,15 @@ enum SwatchSize: String, CaseIterable, Equatable {
         return nextIndex == all.endIndex ? all.first! : all[nextIndex]
     }
 
+    /// Cycles between small and medium only (for compact screens)
+    var nextCompact: SwatchSize {
+        switch self {
+        case .small: return .medium
+        case .medium: return .small
+        case .large: return .small
+        }
+    }
+
     var accessibilityName: String {
         switch self {
         case .small: return "Small"

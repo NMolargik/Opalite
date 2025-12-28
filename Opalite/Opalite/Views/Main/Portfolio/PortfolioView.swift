@@ -236,6 +236,14 @@ struct PortfolioView: View {
                 // Persist swatch size changes
                 swatchSizeRaw = newValue.rawValue
             }
+            .onChange(of: hSizeClass) { _, newValue in
+                // Large swatches aren't available on compact screens
+                if newValue == .compact && swatchSize == .large {
+                    withAnimation(.bouncy) {
+                        swatchSize = .medium
+                    }
+                }
+            }
             .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
                 guard let token = newValue else { return }
                 quickActionTrigger = token
@@ -342,20 +350,18 @@ struct PortfolioView: View {
                     }
                 }
                 
-                if !isCompact {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: {
-                            HapticsManager.shared.selection()
-                            withAnimation(.bouncy) {
-                                swatchSize = swatchSize.next
-                            }
-                        }) {
-                            Image(systemName: "square.arrowtriangle.4.outward")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        HapticsManager.shared.selection()
+                        withAnimation(.bouncy) {
+                            swatchSize = isCompact ? swatchSize.nextCompact : swatchSize.next
                         }
-                        .accessibilityLabel("Change swatch size")
-                        .accessibilityHint("Cycles through small, medium, and large swatch sizes")
-                        .accessibilityValue(swatchSize.accessibilityName)
+                    }) {
+                        Image(systemName: "square.arrowtriangle.4.outward")
                     }
+                    .accessibilityLabel("Change swatch size")
+                    .accessibilityHint(isCompact ? "Cycles between small and medium swatch sizes" : "Cycles through small, medium, and large swatch sizes")
+                    .accessibilityValue(swatchSize.accessibilityName)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
