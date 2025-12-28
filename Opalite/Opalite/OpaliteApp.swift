@@ -79,8 +79,11 @@ struct OpaliteApp: App {
 
                     #endif
                 }
-                .onChange(of: userName) { _, newName in
+                .task {
                     colorManager.author = userName
+                }
+                .onChange(of: userName) { _, newName in
+                    colorManager.author = newName
                 }
                 .onOpenURL { url in
                     // Handle swatchBar URL scheme

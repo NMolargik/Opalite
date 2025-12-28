@@ -350,18 +350,20 @@ struct PortfolioView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        HapticsManager.shared.selection()
-                        withAnimation(.bouncy) {
-                            swatchSize = isCompact ? swatchSize.nextCompact : swatchSize.next
+                if !colorManager.colors.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: {
+                            HapticsManager.shared.selection()
+                            withAnimation(.bouncy) {
+                                swatchSize = isCompact ? swatchSize.nextCompact : swatchSize.next
+                            }
+                        }) {
+                            Image(systemName: "square.arrowtriangle.4.outward")
                         }
-                    }) {
-                        Image(systemName: "square.arrowtriangle.4.outward")
+                        .accessibilityLabel("Change swatch size")
+                        .accessibilityHint(isCompact ? "Cycles between small and medium swatch sizes" : "Cycles through small, medium, and large swatch sizes")
+                        .accessibilityValue(swatchSize.accessibilityName)
                     }
-                    .accessibilityLabel("Change swatch size")
-                    .accessibilityHint(isCompact ? "Cycles between small and medium swatch sizes" : "Cycles through small, medium, and large swatch sizes")
-                    .accessibilityValue(swatchSize.accessibilityName)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {

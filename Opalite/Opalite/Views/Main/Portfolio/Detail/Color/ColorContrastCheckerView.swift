@@ -91,7 +91,7 @@ struct ColorContrastCheckerView: View {
 
     @ViewBuilder
     private var colorComparisonSection: some View {
-        SectionCard(title: "Comparison", systemImage: "square.lefthalf.filled") {
+        SectionCard(title: "Comparison", systemImage: "circle.righthalf.filled") {
             HStack(spacing: 16) {
                 // Source color
                 VStack(spacing: 8) {
@@ -113,7 +113,7 @@ struct ColorContrastCheckerView: View {
                         .foregroundStyle(.tertiary)
                 }
 
-                Image(systemName: "arrow.left.arrow.right")
+                Text("vs")
                     .font(.title2)
                     .foregroundStyle(.secondary)
 

@@ -13,7 +13,6 @@ struct CanvasView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(ToastManager.self) private var toastManager
-    @Environment(\.dismiss) private var dismiss
 
     let canvasFile: CanvasFile
 
@@ -193,9 +192,9 @@ struct CanvasView: View {
             }
             Button("Delete", role: .destructive) {
                 HapticsManager.shared.impact()
-                dismiss()
                 do {
                     try canvasManager.deleteCanvas(canvasFile)
+                    // MainView observes canvasManager.canvases and will switch to portfolio
                 } catch {
                     toastManager.show(error: .canvasDeletionFailed)
                 }

@@ -99,7 +99,7 @@ struct SplashView: View {
                             )
                             .accessibilityAddTraits(.isHeader)
 
-                        Text("Color management for creators")
+                        Text("Color management for all")
                             .font(.title3)
                             .foregroundStyle(.secondary)
                     }

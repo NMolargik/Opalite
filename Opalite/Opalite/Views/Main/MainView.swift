@@ -226,11 +226,27 @@ struct MainView: View {
                 }
             }
         }
+        .onChange(of: canvasManager.canvases) { _, newCanvases in
+            handleCanvasListChange(newCanvases)
+        }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Canvas access requires Onyx")
         }
         .sheet(isPresented: $isShowingSwatchBarInfo) {
             SwatchBarInfoSheet()
+        }
+    }
+
+    // MARK: - Helpers
+
+    /// Handles canvas list changes - switches to portfolio if the current canvas was deleted
+    private func handleCanvasListChange(_ canvases: [CanvasFile]) {
+        if case .canvasBody(let optionalCanvas) = selectedTab, let canvas = optionalCanvas {
+            let canvasID = canvas.id
+            let canvasStillExists = canvases.contains { (file: CanvasFile) in file.id == canvasID }
+            if !canvasStillExists {
+                selectedTab = .portfolio
+            }
         }
     }
 }

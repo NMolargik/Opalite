@@ -173,10 +173,12 @@ final class CanvasManager {
         canvas.createdAt = .now
         canvas.updatedAt = .now
 
+        let canvasID = canvas.id
         context.insert(canvas)
         try saveContext()
         reloadCache()
-        return canvas
+        // Return the canvas from the cache to avoid returning a detached object
+        return canvases.first { $0.id == canvasID } ?? canvas
     }
 
     /// Inserts an existing canvas file (e.g., from import) into the store.
@@ -194,10 +196,12 @@ final class CanvasManager {
         #endif
         canvas.updatedAt = .now
 
+        let canvasID = canvas.id
         context.insert(canvas)
         try saveContext()
         reloadCache()
-        return canvas
+        // Return the canvas from the cache to avoid returning a detached object
+        return canvases.first { $0.id == canvasID } ?? canvas
     }
 
     // MARK: - Updating
@@ -232,12 +236,14 @@ final class CanvasManager {
     ///   - thumbnailData: Optional updated thumbnail PNG data
     /// - Throws: SwiftData save errors
     func saveDrawing(_ drawing: PKDrawing, to canvas: CanvasFile, thumbnailData: Data? = nil) throws {
-        canvas.saveDrawing(drawing)
+        // Use fresh canvas from cache to avoid detached object crashes with external storage
+        guard let freshCanvas = freshCanvas(for: canvas) else { return }
+        freshCanvas.saveDrawing(drawing)
         if let thumbnailData {
-            canvas.thumbnailData = thumbnailData
+            freshCanvas.thumbnailData = thumbnailData
         }
         #if canImport(DeviceKit)
-        canvas.lastEditedDeviceName = Device.current.safeDescription
+        freshCanvas.lastEditedDeviceName = Device.current.safeDescription
         #endif
         try saveContext()
         reloadCache()
@@ -253,7 +259,26 @@ final class CanvasManager {
     /// - Parameter canvas: The canvas to load from
     /// - Returns: The canvas's PencilKit drawing, or empty if unavailable
     func loadDrawing(from canvas: CanvasFile) -> PKDrawing {
-        canvas.loadDrawing()
+        // Use fresh canvas from cache to avoid detached object crashes with external storage
+        guard let freshCanvas = freshCanvas(for: canvas) else { return PKDrawing() }
+        return freshCanvas.loadDrawing()
+    }
+
+    // MARK: - Helpers
+
+    /// Returns the fresh canvas from the cache matching the given canvas's ID.
+    /// This prevents crashes when accessing external storage attributes on detached objects.
+    /// Falls back to fetching from the database if not found in cache.
+    private func freshCanvas(for canvas: CanvasFile) -> CanvasFile? {
+        let canvasID = canvas.id
+        // First try the cache
+        if let cached = canvases.first(where: { $0.id == canvasID }) {
+            return cached
+        }
+        // Fallback: fetch from database
+        let predicate = #Predicate<CanvasFile> { $0.id == canvasID }
+        let descriptor = FetchDescriptor<CanvasFile>(predicate: predicate)
+        return try? context.fetch(descriptor).first
     }
 
     // MARK: - Deleting

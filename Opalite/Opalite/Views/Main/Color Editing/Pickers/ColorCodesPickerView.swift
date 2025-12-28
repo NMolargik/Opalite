@@ -91,10 +91,10 @@ struct ColorCodesPickerView: View {
                         } label: {
                             if didCopyHex {
                                 Label("Copied", systemImage: "checkmark")
-                                    .frame(height: 18)
+                                    .frame(width: 100, height: 18)
                             } else {
                                 Label("Copy", systemImage: "doc.on.doc")
-                                    .frame(height: 18)
+                                    .frame(width: 100, height: 18)
 
                             }
                         }

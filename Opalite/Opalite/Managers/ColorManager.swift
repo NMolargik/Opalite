@@ -333,6 +333,10 @@ class ColorManager {
         color.createdOnDeviceName = Device.current.safeDescription
         color.updatedOnDeviceName = Device.current.safeDescription
         #endif
+        // Set author if not already set (e.g., when creating a new color via the editor)
+        if color.createdByDisplayName == nil || color.createdByDisplayName?.isEmpty == true {
+            color.createdByDisplayName = self.author
+        }
         context.insert(color)
         try saveContext()
         // Targeted cache update: insert new color at front

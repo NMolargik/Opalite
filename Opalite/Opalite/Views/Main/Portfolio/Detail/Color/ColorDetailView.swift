@@ -226,7 +226,7 @@ struct ColorDetailView: View {
                     HapticsManager.shared.selection()
                     isShowingContrastChecker = true
                 } label: {
-                    Label("Contrast", systemImage: "square.lefthalf.filled")
+                    Label("Contrast", systemImage: "circle.righthalf.filled")
                 }
                 .accessibilityLabel("Check WCAG contrast")
                 .accessibilityHint("Opens contrast checker to compare this color against others")
