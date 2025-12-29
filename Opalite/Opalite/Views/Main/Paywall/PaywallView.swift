@@ -53,11 +53,11 @@ struct PaywallView: View {
             }
         }
         .onAppear {
-            // Default to annual (best value)
+            // Default to annual subscription
             if let annual = subscriptionManager.annualProduct {
                 selectedProduct = annual
-            } else if let monthly = subscriptionManager.monthlyProduct {
-                selectedProduct = monthly
+            } else if let lifetime = subscriptionManager.lifetimeProduct {
+                selectedProduct = lifetime
             }
         }
         .onChange(of: subscriptionManager.hasOnyxEntitlement) { _, hasEntitlement in
@@ -158,17 +158,22 @@ struct PaywallView: View {
                     }
                 }
 
-                if let monthly = subscriptionManager.monthlyProduct {
+                if let lifetime = subscriptionManager.lifetimeProduct {
                     ProductOptionView(
-                        product: monthly,
-                        subscription: .monthly,
-                        isSelected: selectedProduct?.id == monthly.id
+                        product: lifetime,
+                        subscription: .lifetime,
+                        isSelected: selectedProduct?.id == lifetime.id
                     ) {
-                        selectedProduct = monthly
+                        selectedProduct = lifetime
                     }
                 }
             }
         }
+    }
+
+    private var selectedIsSubscription: Bool {
+        guard let product = selectedProduct else { return true }
+        return OnyxSubscription(rawValue: product.id)?.isSubscription ?? true
     }
 
     @ViewBuilder
@@ -183,7 +188,7 @@ struct PaywallView: View {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text("Subscribe")
+                    Text(selectedIsSubscription ? "Subscribe" : "Purchase")
                         .font(.headline)
                 }
             }
@@ -196,8 +201,8 @@ struct PaywallView: View {
             )
         }
         .disabled(selectedProduct == nil || isPurchasing)
-        .accessibilityLabel(isPurchasing ? "Subscribing" : "Subscribe")
-        .accessibilityHint(selectedProduct != nil ? "Subscribes to \(selectedProduct?.displayName ?? "Onyx")" : "Select a subscription plan first")
+        .accessibilityLabel(isPurchasing ? "Processing" : (selectedIsSubscription ? "Subscribe" : "Purchase"))
+        .accessibilityHint(selectedProduct != nil ? "Purchases \(selectedProduct?.displayName ?? "Onyx")" : "Select a plan first")
     }
 
     @ViewBuilder
@@ -220,10 +225,17 @@ struct PaywallView: View {
     @ViewBuilder
     private var legalSection: some View {
         VStack(spacing: 8) {
-            Text("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            if selectedIsSubscription {
+                Text("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            } else {
+                Text("One-time purchase. Payment will be charged to your Apple ID account.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
 
             Link("Privacy Policy", destination: URL(string: "https://molargiksoftware.com/#/privacy")!)
                 .font(.caption)
@@ -292,8 +304,8 @@ private struct ProductOptionView: View {
                         Text(subscription.displayName)
                             .font(.headline)
 
-                        if let savings = subscription.savingsPercentage {
-                            Text("Save \(savings)%")
+                        if !subscription.isSubscription {
+                            Text("Best Value")
                                 .font(.caption)
                                 .fontWeight(.semibold)
                                 .padding(.horizontal, 8)
@@ -303,7 +315,7 @@ private struct ProductOptionView: View {
                         }
                     }
 
-                    Text("\(product.displayPrice) / \(subscription.period)")
+                    Text("\(product.displayPrice) \(subscription.priceDescription)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -323,7 +335,7 @@ private struct ProductOptionView: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(subscription.displayName), \(product.displayPrice) per \(subscription.period)")
+        .accessibilityLabel("\(subscription.displayName), \(product.displayPrice) \(subscription.priceDescription)")
         .accessibilityValue(isSelected ? "Selected" : "Not selected")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }

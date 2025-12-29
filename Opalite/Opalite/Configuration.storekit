@@ -4,7 +4,21 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : true,
+      "internalID" : "onyx_lifetime_001",
+      "localizations" : [
+        {
+          "description" : "Lifetime access to all Onyx features",
+          "displayName" : "Onyx Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "onyx_lifetime_20",
+      "referenceName" : "Onyx Lifetime",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_applicationInternalID" : "1",
@@ -69,34 +83,6 @@
       ],
       "name" : "Onyx",
       "subscriptions" : [
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "0.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "onyx_monthly_001",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Monthly access to all Onyx features",
-              "displayName" : "Onyx Monthly",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "onyx_1m_0.99",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Onyx Monthly",
-          "subscriptionGroupID" : "onyx_group",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        },
         {
           "adHocOffers" : [
 

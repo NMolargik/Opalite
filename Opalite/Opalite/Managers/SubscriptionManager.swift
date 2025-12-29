@@ -24,7 +24,7 @@ final class SubscriptionManager {
 
     // MARK: - Computed Properties
 
-    /// Whether the user has an active Onyx subscription (monthly or annual).
+    /// Whether the user has an active Onyx entitlement (annual subscription or lifetime purchase).
     var hasOnyxEntitlement: Bool {
         !purchasedProductIDs.intersection(OnyxSubscription.productIDs).isEmpty
     }
@@ -39,14 +39,14 @@ final class SubscriptionManager {
         return nil
     }
 
-    /// The monthly product, if loaded.
-    var monthlyProduct: Product? {
-        products.first { $0.id == OnyxSubscription.monthly.rawValue }
-    }
-
-    /// The annual product, if loaded.
+    /// The annual subscription product, if loaded.
     var annualProduct: Product? {
         products.first { $0.id == OnyxSubscription.annual.rawValue }
+    }
+
+    /// The lifetime purchase product, if loaded.
+    var lifetimeProduct: Product? {
+        products.first { $0.id == OnyxSubscription.lifetime.rawValue }
     }
 
     // MARK: - Initialization
@@ -72,7 +72,7 @@ final class SubscriptionManager {
 
         do {
             let storeProducts = try await Product.products(for: OnyxSubscription.productIDs)
-            // Sort by price (monthly first, then annual)
+            // Sort by price (annual first, then lifetime)
             products = storeProducts.sorted { $0.price < $1.price }
             error = nil
         } catch {

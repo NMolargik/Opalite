@@ -7,32 +7,32 @@
 
 import StoreKit
 
-/// Defines the Onyx subscription products available for purchase.
+/// Defines the Onyx products available for purchase.
 enum OnyxSubscription: String, CaseIterable, Identifiable {
-    case monthly = "onyx_1m_0.99"
     case annual = "onyx_1yr_4.99"
+    case lifetime = "onyx_lifetime_20"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .monthly: return "Onyx Monthly"
         case .annual: return "Onyx Annual"
+        case .lifetime: return "Onyx Lifetime"
         }
     }
 
-    var period: String {
+    var priceDescription: String {
         switch self {
-        case .monthly: return "month"
-        case .annual: return "year"
+        case .annual: return "per year"
+        case .lifetime: return "one-time purchase"
         }
     }
 
-    /// Percentage savings compared to monthly (annual only)
-    var savingsPercentage: Int? {
+    /// Whether this is a subscription (auto-renewing) or one-time purchase
+    var isSubscription: Bool {
         switch self {
-        case .monthly: return nil
-        case .annual: return 58  // ($0.99 * 12 = $11.88) vs $4.99 = ~58% savings
+        case .annual: return true
+        case .lifetime: return false
         }
     }
 
