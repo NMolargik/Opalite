@@ -22,11 +22,50 @@ final class OpaliteWatch_Watch_AppUITestsLaunchTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
+        // Verify the app launched successfully
+        XCTAssertTrue(app.state == .runningForeground)
 
+        // Capture launch screenshot
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    @MainActor
+    func testLaunchWithEmptyState() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Wait for UI to settle
+        let navTitle = app.staticTexts["Opalite"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5))
+
+        // Capture the main view state
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Main View"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    @MainActor
+    func testLaunchAccessibility() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Verify accessibility elements are present
+        let navTitle = app.staticTexts["Opalite"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5))
+
+        // The refresh button should be accessible
+        let refreshButton = app.buttons["arrow.clockwise"]
+        if refreshButton.waitForExistence(timeout: 3) {
+            XCTAssertTrue(refreshButton.isEnabled)
+        }
+
+        // Capture accessibility state
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Accessibility Check"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
