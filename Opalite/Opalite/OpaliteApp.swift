@@ -24,6 +24,11 @@ struct OpaliteApp: App {
     let quickActionManager = QuickActionManager()
     let hexCopyManager = HexCopyManager()
 
+    #if os(iOS)
+    /// Handles WatchConnectivity messages from Apple Watch for hex copying.
+    let phoneSessionManager = PhoneSessionManager.shared
+    #endif
+
     init() {
         let schema = Schema([
             OpaliteColor.self,

@@ -109,6 +109,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/OpaliteColor.swift,
+				Models/OpalitePalette.swift,
+			);
+			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
+		};
 		EB3BCAE62EF8B58F0059764A /* Exceptions for "OpaliteQuickLook" folder in "OpaliteQuickLook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -184,6 +192,7 @@
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
 				EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
 				EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
+				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";
@@ -726,12 +735,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "OpaliteWatch Watch App/OpaliteWatch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWatch;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.molargiksoftware.Opalite;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -750,7 +760,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -759,12 +769,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "OpaliteWatch Watch App/OpaliteWatch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWatch;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.molargiksoftware.Opalite;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -784,7 +795,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -807,7 +818,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpaliteWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpaliteWatch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -831,7 +842,7 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpaliteWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpaliteWatch Watch App";
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -853,7 +864,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_TARGET_NAME = "OpaliteWatch Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -876,7 +887,7 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_TARGET_NAME = "OpaliteWatch Watch App";
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};

@@ -15,6 +15,7 @@ struct SplashView: View {
     @State private var hasAppeared: Bool = false
     @State private var showContent: Bool = false
     @State private var showButton: Bool = false
+    @State private var pulse: Bool = false
 
     // Generate row configurations once
     private let rowConfigs: [SwatchRowConfig] = (0..<7).map { index in
@@ -77,11 +78,13 @@ struct SplashView: View {
                             .accessibilityHidden(true)
 
                         // Gem icon
-                        Image("opalitegem")
+                        Image("gemstone")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 200, height: 200)
-                            .accessibilityLabel("Opalite app icon")
+                            .accessibilityLabel("Opalite gemstone")
+                            .scaleEffect(pulse ? 1.06 : 0.94)
+                            .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: pulse)
                     }
                     .scaleEffect(showContent ? 1 : 0.5)
                     .opacity(showContent ? 1 : 0)
@@ -103,7 +106,18 @@ struct SplashView: View {
                             .font(.title3)
                             .foregroundStyle(.secondary)
                     }
-                    .offset(y: showContent ? 0 : 30)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.95)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.35), radius: 20, y: 10)
                     .opacity(showContent ? 1 : 0)
                     .accessibilityElement(children: .combine)
 
@@ -160,6 +174,11 @@ struct SplashView: View {
             // Show button last
             withAnimation(.spring(response: 0.5, dampingFraction: 0.75).delay(0.8)) {
                 showButton = true
+            }
+
+            // Start pulsing the gemstone once content is shown
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                pulse = true
             }
         }
     }
@@ -339,3 +358,4 @@ private struct InfiniteSwatchRow: View {
         onContinue: {}
     )
 }
+

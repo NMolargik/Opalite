@@ -14,6 +14,15 @@ struct ColorDetailsSectionView: View {
         SectionCard(title: "Details", systemImage: "info.circle") {
             VStack(alignment: .leading, spacing: 16) {
                 DetailRowView(icon: "person", title: "Created By", value: color.createdByDisplayName ?? "—")
+                
+                Divider().opacity(0.25)
+                
+                DetailRowView(icon: "number", title: "Hex", value: color.hexString)
+                DetailRowView(icon: "slider.horizontal.3", title: "RGB", value: color.rgbString)
+                DetailRowView(icon: "circle.lefthalf.filled", title: "HSL", value: color.hslString)
+                
+                Divider().opacity(0.25)
+
                 DetailRowView(icon: DeviceKind.from(color.createdOnDeviceName).symbolName, title: "Created On", value: color.createdOnDeviceName ?? "—")
                 DetailRowView(icon: "calendar", title: "Created At", value: formatted(color.createdAt))
 
