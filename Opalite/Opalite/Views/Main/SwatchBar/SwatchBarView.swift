@@ -7,6 +7,9 @@
 
 import SwiftUI
 import SwiftData
+#if targetEnvironment(macCatalyst)
+import UIKit
+#endif
 
 struct SwatchBarView: View {
     @Environment(ColorManager.self) private var colorManager
@@ -141,7 +144,49 @@ struct SwatchBarView: View {
             }
         }
         .frame(minWidth: 250)
+        #if targetEnvironment(macCatalyst)
+        .onAppear {
+            positionSwatchBarWindowAtRightEdge()
+        }
+        #endif
     }
+
+    #if targetEnvironment(macCatalyst)
+    private func positionSwatchBarWindowAtRightEdge() {
+        // Find the SwatchBar window scene
+        guard let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { scene in
+                // Find the scene that isn't the main window
+                scene.session !== AppDelegate.mainSceneSession
+            }) else { return }
+
+        let screenBounds = windowScene.screen.bounds
+
+        // SwatchBar dimensions
+        let swatchBarWidth: CGFloat = 250
+        let swatchBarHeight: CGFloat = min(1000, screenBounds.height - 100)
+
+        // Position near the right edge with padding
+        let rightPadding: CGFloat = 20
+        let topPadding: CGFloat = 50
+
+        let xPosition = screenBounds.width - swatchBarWidth - rightPadding
+        let yPosition = topPadding
+
+        let targetFrame = CGRect(
+            x: xPosition,
+            y: yPosition,
+            width: swatchBarWidth,
+            height: swatchBarHeight
+        )
+
+        let geometryPreferences = UIWindowScene.GeometryPreferences.Mac(systemFrame: targetFrame)
+        windowScene.requestGeometryUpdate(geometryPreferences) { error in
+            print("[Opalite] SwatchBar positioning error: \(error.localizedDescription)")
+        }
+    }
+    #endif
 
     @ViewBuilder
     private func sectionHeader(for palette: OpalitePalette) -> some View {
