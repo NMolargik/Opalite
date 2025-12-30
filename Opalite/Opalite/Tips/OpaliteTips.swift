@@ -134,3 +134,27 @@ struct PaletteMenuTip: Tip {
         Tips.MaxDisplayCount(1)
     }
 }
+
+// MARK: - Screen Sampler Tip (Mac Catalyst Only)
+
+#if targetEnvironment(macCatalyst)
+/// Tip explaining the system-wide color sampling feature on Mac.
+struct ScreenSamplerTip: Tip {
+
+    var title: Text {
+        Text("Sample Colors from Anywhere")
+    }
+
+    var message: Text? {
+        Text("Use Create → Sample from Screen (⌘⇧E) to pick colors from any app on your Mac.")
+    }
+
+    var image: Image? {
+        Image(systemName: "macwindow.on.rectangle")
+    }
+
+    var options: [TipOption] {
+        Tips.MaxDisplayCount(3)
+    }
+}
+#endif

@@ -28,6 +28,9 @@ struct PortfolioView: View {
     private let createContentTip = CreateContentTip()
     private let dragAndDropTip = DragAndDropTip()
     private let colorDetailsTip = ColorDetailsTip()
+    #if targetEnvironment(macCatalyst)
+    private let screenSamplerTip = ScreenSamplerTip()
+    #endif
 
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var isShowingPaywall: Bool = false
@@ -112,6 +115,12 @@ struct PortfolioView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
 
+                    #if targetEnvironment(macCatalyst)
+                    // MARK: - Screen Sampler Tip (Mac only)
+                    TipView(screenSamplerTip)
+                        .padding(.horizontal, 20)
+                    #endif
+
                     // MARK: - Colors Row
                     HStack {
                         Image(systemName: "paintpalette.fill")
@@ -178,7 +187,8 @@ struct PortfolioView: View {
                                     HapticsManager.shared.selection()
                                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                         do {
-                                            try colorManager.createPalette(name: "New Palette")
+                                            let newPalette = try colorManager.createPalette(name: "New Palette")
+                                            prependPaletteToOrder(newPalette.id)
                                             // User created content, advance tips
                                             createContentTip.invalidate(reason: .actionPerformed)
                                             ColorDetailsTip.hasSeenCreateTip = true
@@ -256,10 +266,20 @@ struct PortfolioView: View {
                     }
                 }
             }
+            .padding(.bottom)
             .scrollClipDisabled()
             #if canImport(UIKit)
             .onDrop(of: [.image], isTargeted: nil) { providers in
                 handleImageDrop(providers: providers)
+            }
+            #endif
+            #if targetEnvironment(macCatalyst)
+            .background {
+                Button("") {
+                    sampleFromScreen()
+                }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
+                .hidden()
             }
             #endif
             .navigationTitle("Opalite")
@@ -419,10 +439,6 @@ struct PortfolioView: View {
                             Label("SwatchBar", systemImage: "square.stack")
                         }
                     }
-
-                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
-                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
-                    }
                 }
                 
                 if !colorManager.palettes.isEmpty {
@@ -454,6 +470,9 @@ struct PortfolioView: View {
                     }
                 }
                 
+                if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Menu {
                         Button(action: {
@@ -474,7 +493,8 @@ struct PortfolioView: View {
                                 HapticsManager.shared.selection()
                                 if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                                     do {
-                                        try colorManager.createPalette(name: "New Palette")
+                                        let newPalette = try colorManager.createPalette(name: "New Palette")
+                                        prependPaletteToOrder(newPalette.id)
                                         createContentTip.invalidate(reason: .actionPerformed)
                                         OpaliteTipActions.advanceTipsAfterContentCreation()
                                     } catch {
@@ -509,6 +529,19 @@ struct PortfolioView: View {
                                 Text("Sample from Photo")
                             } icon: {
                                 Image(systemName: "eyedropper.halffull")
+                            }
+                        })
+                        #endif
+
+                        #if targetEnvironment(macCatalyst)
+                        Button(action: {
+                            HapticsManager.shared.selection()
+                            sampleFromScreen()
+                        }, label: {
+                            Label {
+                                Text("Sample from Screen")
+                            } icon: {
+                                Image(systemName: "macwindow.on.rectangle")
                             }
                         })
                         #endif
@@ -604,7 +637,8 @@ struct PortfolioView: View {
                         importError = "A palette with this ID already exists."
                         isShowingImportError = true
                     } else {
-                        _ = try colorManager.createPalette(existing: preview.palette)
+                        let importedPalette = try colorManager.createPalette(existing: preview.palette)
+                        prependPaletteToOrder(importedPalette.id)
                         Task { await colorManager.refreshAll() }
                     }
                 } else {
@@ -694,6 +728,28 @@ struct PortfolioView: View {
         )
     }
 
+    // MARK: - Palette Order Helper
+
+    /// Prepends a new palette ID to the saved order so it appears at the top.
+    private func prependPaletteToOrder(_ paletteID: UUID) {
+        var currentOrder: [UUID] = []
+        if !paletteOrderData.isEmpty,
+           let decoded = try? JSONDecoder().decode([UUID].self, from: paletteOrderData) {
+            currentOrder = decoded
+        }
+
+        // Remove if already exists (shouldn't happen for new palettes, but safe)
+        currentOrder.removeAll { $0 == paletteID }
+
+        // Prepend to front
+        currentOrder.insert(paletteID, at: 0)
+
+        // Save
+        if let encoded = try? JSONEncoder().encode(currentOrder) {
+            paletteOrderData = encoded
+        }
+    }
+
     // MARK: - Image Drop Handler
 
     #if canImport(UIKit)
@@ -712,6 +768,44 @@ struct PortfolioView: View {
         }
 
         return true
+    }
+    #endif
+
+    // MARK: - System Color Sampler (Mac Catalyst)
+
+    #if targetEnvironment(macCatalyst)
+    private func sampleFromScreen() {
+        SystemColorSampler.sample { uiColor in
+            guard let uiColor else {
+                // User cancelled or sampling failed
+                return
+            }
+
+            // Extract RGB components
+            var red: CGFloat = 0
+            var green: CGFloat = 0
+            var blue: CGFloat = 0
+            var alpha: CGFloat = 0
+            uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+            // Create and save the color
+            let newColor = OpaliteColor(
+                name: nil,
+                red: Double(red),
+                green: Double(green),
+                blue: Double(blue),
+                alpha: Double(alpha)
+            )
+
+            do {
+                _ = try colorManager.createColor(existing: newColor)
+                HapticsManager.shared.impact()
+                toastManager.showSuccess("Color sampled from screen")
+                OpaliteTipActions.advanceTipsAfterContentCreation()
+            } catch {
+                toastManager.show(error: .colorCreationFailed)
+            }
+        }
     }
     #endif
 }

@@ -14,6 +14,7 @@ struct OpaliteApp: App {
     @Environment(\.openWindow) private var openWindow
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
+    @AppStorage(AppStorageKeys.paletteOrder) private var paletteOrderData: Data = Data()
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -170,7 +171,8 @@ struct OpaliteApp: App {
                     }
                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                         do {
-                            try colorManager.createPalette(name: "New Palette")
+                            let newPalette = try colorManager.createPalette(name: "New Palette")
+                            prependPaletteToOrder(newPalette.id)
                             OpaliteTipActions.advanceTipsAfterContentCreation()
                         } catch {
                             toastManager.show(error: .paletteCreationFailed)
@@ -451,5 +453,24 @@ struct OpaliteApp: App {
         .windowResizability(.contentSize)
         .defaultSize(width: 250, height: 1000)
 #endif
+    }
+    
+    private func prependPaletteToOrder(_ paletteID: UUID) {
+        var currentOrder: [UUID] = []
+        if !paletteOrderData.isEmpty,
+           let decoded = try? JSONDecoder().decode([UUID].self, from: paletteOrderData) {
+            currentOrder = decoded
+        }
+
+        // Remove if already exists (shouldn't happen for new palettes, but safe)
+        currentOrder.removeAll { $0 == paletteID }
+
+        // Prepend to front
+        currentOrder.insert(paletteID, at: 0)
+
+        // Save
+        if let encoded = try? JSONEncoder().encode(currentOrder) {
+            paletteOrderData = encoded
+        }
     }
 }
