@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = EB224D022EF38D9B00F350D4 /* DeviceKit */; };
 		EB3BCAD62EF8B58F0059764A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAD52EF8B58F0059764A /* QuickLook.framework */; };
 		EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };

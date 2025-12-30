@@ -19,6 +19,8 @@ struct PaletteRowHeaderView: View {
     private let paletteMenuTip = PaletteMenuTip()
 
     @State private var showDeleteConfirmation = false
+    @State private var showRenameAlert = false
+    @State private var renameText: String = ""
     @State private var shareImage: UIImage?
     @State private var shareImageTitle: String = "Shared from Opalite"
     @State private var isShowingShareSheet = false
@@ -50,7 +52,15 @@ struct PaletteRowHeaderView: View {
                         Label("New Color", systemImage: "plus.square.dashed")
                     }
                 }
-                
+
+                Button {
+                    HapticsManager.shared.selection()
+                    renameText = palette.name
+                    showRenameAlert = true
+                } label: {
+                    Label("Rename Palette", systemImage: "pencil")
+                }
+
                 Divider()
                 
                 Button {
@@ -165,6 +175,27 @@ struct PaletteRowHeaderView: View {
             }
         } message: {
             Text("This action cannot be undone.")
+        }
+        .alert("Rename Palette", isPresented: $showRenameAlert) {
+            TextField("Palette name", text: $renameText)
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+                renameText = ""
+            }
+            Button("Save") {
+                HapticsManager.shared.selection()
+                let newName = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !newName.isEmpty {
+                    do {
+                        try colorManager.renamePalette(palette, to: newName)
+                    } catch {
+                        toastManager.show(error: .paletteUpdateFailed)
+                    }
+                }
+                renameText = ""
+            }
+        } message: {
+            Text("Enter a new name for this palette.")
         }
         .background(shareSheet(image: shareImage))
         .sheet(isPresented: $isShowingPaywall) {

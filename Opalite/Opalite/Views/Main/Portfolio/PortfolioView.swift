@@ -48,13 +48,46 @@ struct PortfolioView: View {
     @State private var quickActionTrigger: UUID? = nil
     @State private var copiedColorID: UUID? = nil
     @State private var isShowingPhotoColorPicker = false
+    @State private var droppedImageItem: DroppedImageItem? = nil
     @State private var colorToDelete: OpaliteColor?
     @State private var isShowingSwatchBarInfo = false
+    @State private var isShowingQuickAddHex = false
+    @State private var isShowingPaletteOrder = false
+    @AppStorage(AppStorageKeys.paletteOrder) private var paletteOrderData: Data = Data()
+    @State private var colorToRename: OpaliteColor?
+    @State private var renameText: String = ""
 
     @Namespace private var namespace
     @Namespace private var swatchNS
     
     var isCompact: Bool { hSizeClass == .compact }
+
+    /// Palettes ordered according to user's custom order
+    private var orderedPalettes: [OpalitePalette] {
+        guard !paletteOrderData.isEmpty,
+              let savedOrder = try? JSONDecoder().decode([UUID].self, from: paletteOrderData) else {
+            return colorManager.palettes
+        }
+
+        let paletteDict = Dictionary(uniqueKeysWithValues: colorManager.palettes.map { ($0.id, $0) })
+        var result: [OpalitePalette] = []
+
+        // Add palettes in saved order
+        for id in savedOrder {
+            if let palette = paletteDict[id] {
+                result.append(palette)
+            }
+        }
+
+        // Add any new palettes not in the saved order (at the end)
+        for palette in colorManager.palettes {
+            if !savedOrder.contains(palette.id) {
+                result.append(palette)
+            }
+        }
+
+        return result
+    }
 
     private var isIPadOrMac: Bool {
 #if os(macOS)
@@ -190,8 +223,8 @@ struct PortfolioView: View {
                         TipView(dragAndDropTip)
                             .padding(.horizontal, 20)
 
-                        // Palettes are pre-sorted by createdAt from ColorManager (most recently created first)
-                        ForEach(colorManager.palettes) { palette in
+                        // Palettes ordered by user's custom order (or default order)
+                        ForEach(orderedPalettes) { palette in
                             VStack(alignment: .leading, spacing: 5) {
                                 PaletteRowHeaderView(palette: palette)
                                     .zIndex(0)
@@ -224,6 +257,11 @@ struct PortfolioView: View {
                 }
             }
             .scrollClipDisabled()
+            #if canImport(UIKit)
+            .onDrop(of: [.image], isTargeted: nil) { providers in
+                handleImageDrop(providers: providers)
+            }
+            #endif
             .navigationTitle("Opalite")
             .toolbarBackground(.hidden)
             .onAppear {
@@ -320,6 +358,34 @@ struct PortfolioView: View {
             } message: {
                 Text("This action cannot be undone.")
             }
+            .alert(
+                "Rename Color",
+                isPresented: Binding(
+                    get: { colorToRename != nil },
+                    set: { if !$0 { colorToRename = nil } }
+                )
+            ) {
+                TextField("Color name", text: $renameText)
+                Button("Cancel", role: .cancel) {
+                    HapticsManager.shared.selection()
+                    colorToRename = nil
+                    renameText = ""
+                }
+                Button("Save") {
+                    HapticsManager.shared.selection()
+                    if let color = colorToRename {
+                        do {
+                            try colorManager.renameColor(color, to: renameText.isEmpty ? nil : renameText)
+                        } catch {
+                            toastManager.show(error: .colorUpdateFailed)
+                        }
+                    }
+                    colorToRename = nil
+                    renameText = ""
+                }
+            } message: {
+                Text("Enter a new name for this color.")
+            }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "This feature requires Onyx")
             }
@@ -327,12 +393,21 @@ struct PortfolioView: View {
             .sheet(isPresented: $isShowingPhotoColorPicker) {
                 PhotoColorPickerSheet()
             }
+            .sheet(item: $droppedImageItem) { item in
+                PhotoColorPickerSheet(initialImage: item.image)
+            }
             #endif
             .sheet(item: $colorToExport) { color in
                 ColorExportSheet(color: color)
             }
             .sheet(isPresented: $isShowingSwatchBarInfo) {
                 SwatchBarInfoSheet()
+            }
+            .sheet(isPresented: $isShowingQuickAddHex) {
+                QuickAddHexSheet()
+            }
+            .sheet(isPresented: $isShowingPaletteOrder) {
+                PaletteOrderSheet(isForExport: false)
             }
             .toolbar {
                 if isIPadOrMac {
@@ -350,6 +425,19 @@ struct PortfolioView: View {
                     }
                 }
                 
+                if !colorManager.palettes.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            HapticsManager.shared.selection()
+                            isShowingPaletteOrder = true
+                        } label: {
+                            Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
+                        }
+                        .accessibilityLabel("Reorder palettes")
+                        .accessibilityHint("Opens a sheet to reorder your palettes")
+                    }
+                }
+
                 if !colorManager.colors.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
@@ -423,9 +511,20 @@ struct PortfolioView: View {
                                 Image(systemName: "eyedropper.halffull")
                             }
                         })
+                        #endif
+
+                        Button(action: {
+                            HapticsManager.shared.selection()
+                            isShowingQuickAddHex = true
+                        }, label: {
+                            Label {
+                                Text("Quick Add Hex")
+                            } icon: {
+                                Image(systemName: "number")
+                            }
+                        })
 
                         Divider()
-                        #endif
 
                         Button(action: {
                             HapticsManager.shared.selection()
@@ -534,7 +633,15 @@ struct PortfolioView: View {
                 } label: {
                     Label("Copy Hex", systemImage: "number")
                 }
-                  
+
+                Button {
+                    HapticsManager.shared.selection()
+                    renameText = color.name ?? ""
+                    colorToRename = color
+                } label: {
+                    Label("Rename Color", systemImage: "pencil")
+                }
+
                 if palette == nil {
                     Button {
                         HapticsManager.shared.selection()
@@ -543,7 +650,7 @@ struct PortfolioView: View {
                         Label("Add To Palette", systemImage: "swatchpalette.fill")
                     }
                 }
-                
+
                 Divider()
                 
                 Button {
@@ -586,7 +693,37 @@ struct PortfolioView: View {
             }
         )
     }
+
+    // MARK: - Image Drop Handler
+
+    #if canImport(UIKit)
+    private func handleImageDrop(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first(where: { $0.canLoadObject(ofClass: UIImage.self) }) else {
+            return false
+        }
+
+        provider.loadObject(ofClass: UIImage.self) { image, error in
+            Task { @MainActor in
+                if let uiImage = image as? UIImage {
+                    HapticsManager.shared.impact()
+                    droppedImageItem = DroppedImageItem(image: uiImage)
+                }
+            }
+        }
+
+        return true
+    }
+    #endif
 }
+
+// MARK: - Identifiable wrapper for dropped images
+
+#if canImport(UIKit)
+private struct DroppedImageItem: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+#endif
 
 #Preview("Portfolio") {
     // In-memory SwiftData container for previews

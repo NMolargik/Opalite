@@ -354,6 +354,13 @@ class ColorManager {
         resortPalettesCache()
     }
 
+    /// Renames a palette.
+    func renamePalette(_ palette: OpalitePalette, to newName: String) throws {
+        try updatePalette(palette) { p in
+            p.name = newName
+        }
+    }
+
     /// Applies changes to a color and saves.
     func updateColor(_ color: OpaliteColor, applying changes: ((OpaliteColor) -> Void)? = nil) throws {
         changes?(color)
@@ -365,7 +372,14 @@ class ColorManager {
         // Targeted cache update: re-sort since updatedAt changed
         resortColorsCache()
     }
-    
+
+    /// Renames a color. Pass nil to clear the name.
+    func renameColor(_ color: OpaliteColor, to newName: String?) throws {
+        try updateColor(color) { c in
+            c.name = newName
+        }
+    }
+
     // MARK: - Deleting
     /// Deletes a palette. Pass `andColors: true` to also delete its colors; otherwise relationships are nullified by default.
     func deletePalette(_ palette: OpalitePalette, andColors: Bool = false) throws {

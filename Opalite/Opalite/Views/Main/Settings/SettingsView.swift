@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isRestoringPurchases: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL? = nil
+    @State private var isShowingExportSelection: Bool = false
     
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
@@ -195,16 +196,17 @@ struct SettingsView: View {
 
                     Button {
                         HapticsManager.shared.selection()
-                        exportColorsToPDF()
+                        isShowingExportSelection = true
                     } label: {
                         Label("Export Portfolio to PDF", systemImage: "doc.richtext")
                             .foregroundStyle(.blue)
                     }
-                    .accessibilityHint("Creates a PDF document of all your colors and palettes")
+                    .disabled(colorManager.colors.isEmpty && colorManager.palettes.isEmpty)
+                    .accessibilityHint("Opens selection to choose which palettes and colors to export")
                 } header: {
                     Text("Data")
                 } footer: {
-                    Text("Export includes your current colors and palettes.")
+                    Text("Choose which palettes and colors to include in the PDF export.")
                 }
 
                 Section {
@@ -310,6 +312,11 @@ struct SettingsView: View {
         .sheet(item: $exportPDFURL) { item in
             ShareSheet(items: [item.url])
         }
+        .sheet(isPresented: $isShowingExportSelection) {
+            PaletteOrderSheet(isForExport: true) { palettes, looseColors in
+                exportColorsToPDF(palettes: palettes, looseColors: looseColors)
+            }
+        }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Loads of additional features!")
         }
@@ -345,14 +352,12 @@ struct SettingsView: View {
         }
     }
 
-    private func exportColorsToPDF() {
+    private func exportColorsToPDF(palettes: [OpalitePalette], looseColors: [OpaliteColor]) {
         #if canImport(UIKit)
         do {
-            _ = try colorManager.fetchColors()
-            _ = try colorManager.fetchPalettes()
             let url = try PortfolioPDFExporter.export(
-                palettes: colorManager.palettes,
-                looseColors: colorManager.looseColors,
+                palettes: palettes,
+                looseColors: looseColors,
                 userName: userName
             )
             exportPDFURL = IdentifiableURL(url: url)

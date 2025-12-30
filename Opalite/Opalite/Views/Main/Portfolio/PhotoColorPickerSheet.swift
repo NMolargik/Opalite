@@ -20,6 +20,9 @@ struct PhotoColorPickerSheet: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
 
+    /// Optional initial image to start with (e.g., from drag-and-drop)
+    var initialImage: UIImage?
+
     @State private var selectedImage: UIImage?
     @State private var sampledPoint: CGPoint?
     @State private var currentColor: OpaliteColor?
@@ -78,6 +81,11 @@ struct PhotoColorPickerSheet: View {
         .onChange(of: selectedImage) { _, _ in
             sampledPoint = nil
             currentColor = nil
+        }
+        .onAppear {
+            if let initialImage, selectedImage == nil {
+                selectedImage = initialImage
+            }
         }
     }
 

@@ -43,4 +43,8 @@ enum AppStorageKeys {
 
     /// Whether to skip the SwatchBar info sheet and launch directly.
     static let skipSwatchBarConfirmation = "skipSwatchBarConfirmation"
+
+    /// Custom order of palette UUIDs for display in PortfolioView.
+    /// Stored as a JSON-encoded array of UUID strings.
+    static let paletteOrder = "paletteOrder"
 }

@@ -21,7 +21,7 @@ final class OpalitePalette {
     // User-facing metadata
     var notes: String?
     var tags: [String] = []
-    
+
     // Relationship
     @Relationship var colors: [OpaliteColor]? = []
 

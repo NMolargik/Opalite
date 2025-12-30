@@ -46,4 +46,27 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
             return "Sample from image"
         }
     }
+
+    /// Keyboard shortcut key (1-5) for switching modes on iPad/Mac
+    var keyboardShortcutKey: Character {
+        switch self {
+        case .grid: return "1"
+        case .spectrum: return "2"
+        case .sliders: return "3"
+        case .codes: return "4"
+        case .image: return "5"
+        }
+    }
+
+    /// Initialize from a keyboard character (1-5)
+    init?(fromKey key: Character) {
+        switch key {
+        case "1": self = .grid
+        case "2": self = .spectrum
+        case "3": self = .sliders
+        case "4": self = .codes
+        case "5": self = .image
+        default: return nil
+        }
+    }
 }

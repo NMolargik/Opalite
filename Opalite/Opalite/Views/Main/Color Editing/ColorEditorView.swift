@@ -8,6 +8,7 @@
 import SwiftUI
 import PhotosUI
 import Observation
+import TipKit
 
 #if canImport(UIKit)
 import UIKit
@@ -16,16 +17,33 @@ import UIKit
 import AppKit
 #endif
 
+/// Tip for keyboard shortcuts in the color editor (iPad/Mac)
+struct ColorEditorKeyboardShortcutsTip: Tip {
+    var title: Text {
+        Text("Keyboard Shortcuts")
+    }
+
+    var message: Text? {
+        Text("Press 1-5 on your keyboard to quickly switch between color picker modes.")
+    }
+
+    var image: Image? {
+        Image(systemName: "keyboard")
+    }
+}
+
 struct ColorEditorView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Namespace private var swatchNamespace
-    
+
     var onCancel: () -> Void
     var onApprove: (OpaliteColor) -> Void
-    
+
     @State private var viewModel: ViewModel
     let palette: OpalitePalette?
+
+    private let keyboardShortcutsTip = ColorEditorKeyboardShortcutsTip()
     
     private var paletteColors: [OpaliteColor] {
         palette?.colors ?? []
@@ -242,22 +260,50 @@ struct ColorEditorView: View {
                 }
                 #endif
             }
+            .background {
+                // Hidden buttons for keyboard shortcuts (1-5) on iPad/Mac
+                keyboardShortcutButtons
+            }
         }
     }
-    
+
     // MARK: - Subviews
+
+    /// Hidden buttons that provide keyboard shortcuts (1-5) for switching color picker modes
+    @ViewBuilder
+    private var keyboardShortcutButtons: some View {
+        ForEach(ColorPickerTab.allCases) { tab in
+            Button("") {
+                guard !viewModel.isColorExpanded else { return }
+                HapticsManager.shared.impact()
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    viewModel.mode = tab
+                }
+                keyboardShortcutsTip.invalidate(reason: .actionPerformed)
+            }
+            .keyboardShortcut(KeyEquivalent(tab.keyboardShortcutKey), modifiers: [])
+            .hidden()
+        }
+    }
 
     @ViewBuilder
     private var modePickerView: some View {
-        Picker("Input Mode", selection: $viewModel.mode) {
-            ForEach(ColorPickerTab.allCases) { option in
-                option.symbol
-                    .tag(option)
-                    .accessibilityLabel(option.accessibilityLabel)
+        VStack(spacing: 8) {
+            // Show keyboard shortcuts tip on iPad/Mac
+            if horizontalSizeClass == .regular {
+                TipView(keyboardShortcutsTip)
             }
+
+            Picker("Input Mode", selection: $viewModel.mode) {
+                ForEach(ColorPickerTab.allCases) { option in
+                    option.symbol
+                        .tag(option)
+                        .accessibilityLabel(option.accessibilityLabel)
+                }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel("Color picker mode")
         }
-        .pickerStyle(.segmented)
-        .accessibilityLabel("Color picker mode")
     }
     
     @ViewBuilder
