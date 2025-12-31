@@ -40,7 +40,9 @@ struct WatchSwatchView: View {
                     .lineLimit(1)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 6))
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .clear)
+                    )
                     .padding(6)
             }
             .overlay {

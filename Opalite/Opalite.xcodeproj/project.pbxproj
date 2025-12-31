@@ -112,6 +112,7 @@
 		EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Extensions/GlassIfAvailable.swift,
 				Models/OpaliteColor.swift,
 				Models/OpalitePalette.swift,
 			);

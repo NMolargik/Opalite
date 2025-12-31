@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var appStage: AppStage = .splash
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
+    @State private var isColorBlindnessBannerVisible: Bool = true
 
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
@@ -86,12 +87,17 @@ struct ContentView: View {
                 .preferredColorScheme(preferredColorScheme)
                 .accessibilityIdentifier("mainView")
                 .safeAreaInset(edge: .top) {
-                    if colorBlindnessMode != .off {
+                    if colorBlindnessMode != .off && isColorBlindnessBannerVisible {
                         ColorBlindnessBannerView(mode: colorBlindnessMode) {
                             withAnimation(.easeInOut) {
-                                colorBlindnessModeRaw = ColorBlindnessMode.off.rawValue
+                                isColorBlindnessBannerVisible = false
                             }
                         }
+                    }
+                }
+                .onChange(of: colorBlindnessMode) { oldValue, newValue in
+                    if newValue != .off {
+                        isColorBlindnessBannerVisible = true
                     }
                 }
             }
@@ -166,3 +172,4 @@ struct ContentView: View {
         .environment(QuickActionManager())
         .environment(HexCopyManager())
 }
+

@@ -34,7 +34,7 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
     #if targetEnvironment(macCatalyst)
     private func positionSwatchBarWindow(_ windowScene: UIWindowScene) {
         // Get the screen bounds
-        guard let screen = windowScene.screen as? UIScreen ?? UIScreen.main as UIScreen? else { return }
+        let screen = windowScene.screen
         let screenBounds = screen.bounds
 
         // SwatchBar dimensions (matches defaultSize in OpaliteApp)
