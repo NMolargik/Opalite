@@ -23,11 +23,18 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         #if targetEnvironment(macCatalyst)
-        // Position SwatchBar window near the right edge of the screen
-        guard let windowScene = scene as? UIWindowScene,
-              session.configuration.name == "SwatchBar" else { return }
+        guard let windowScene = scene as? UIWindowScene else { return }
 
-        positionSwatchBarWindow(windowScene)
+        // Configure titlebar for all windows
+        if let titlebar = windowScene.titlebar {
+            titlebar.titleVisibility = .visible
+            titlebar.toolbarStyle = .unified
+        }
+
+        // Position SwatchBar window near the right edge of the screen
+        if session.configuration.name == "SwatchBar" {
+            positionSwatchBarWindow(windowScene)
+        }
         #endif
     }
 

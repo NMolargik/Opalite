@@ -114,11 +114,13 @@ struct SearchView: View {
                                             )
 
                                         VStack(alignment: .leading, spacing: 2) {
-                                            Text(color.name ?? "Unnamed Color")
+                                            Text(color.name ?? color.hexString)
                                                 .font(.body)
-                                            Text(color.hexString)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                            if color.name != nil {
+                                                Text(color.hexString)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                            }
                                         }
                                     }
                                 }

@@ -17,6 +17,7 @@ import UIKit
 
 struct PortfolioView: View {
     @Environment(\.horizontalSizeClass) private var hSizeClass
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
@@ -51,7 +52,9 @@ struct PortfolioView: View {
     @State private var quickActionTrigger: UUID? = nil
     @State private var copiedColorID: UUID? = nil
     @State private var isShowingPhotoColorPicker = false
+#if os(iOS) && !targetEnvironment(macCatalyst)
     @State private var droppedImageItem: DroppedImageItem? = nil
+#endif
     @State private var colorToDelete: OpaliteColor?
     @State private var isShowingSwatchBarInfo = false
     @State private var isShowingQuickAddHex = false
@@ -268,11 +271,11 @@ struct PortfolioView: View {
             }
             .padding(.bottom)
             .scrollClipDisabled()
-            #if canImport(UIKit)
+#if os(iOS) && !targetEnvironment(macCatalyst)
             .onDrop(of: [.image], isTargeted: nil) { providers in
                 handleImageDrop(providers: providers)
             }
-            #endif
+#endif
             #if targetEnvironment(macCatalyst)
             .background {
                 Button("") {
@@ -308,6 +311,16 @@ struct PortfolioView: View {
                 pendingPaletteToAddTo = nil
                 isShowingColorEditor = true
             }
+#if os(iOS) && !targetEnvironment(macCatalyst)
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    checkForSharedImage()
+                }
+            }
+            .onAppear {
+                checkForSharedImage()
+            }
+#endif
             .refreshable {
                 Task { await colorManager.refreshAll() }
             }
@@ -409,14 +422,14 @@ struct PortfolioView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "This feature requires Onyx")
             }
-            #if canImport(UIKit)
-            .sheet(isPresented: $isShowingPhotoColorPicker) {
+#if os(iOS) && !targetEnvironment(macCatalyst)
+            .fullScreenCover(isPresented: $isShowingPhotoColorPicker) {
                 PhotoColorPickerSheet()
             }
-            .sheet(item: $droppedImageItem) { item in
+            .fullScreenCover(item: $droppedImageItem) { item in
                 PhotoColorPickerSheet(initialImage: item.image)
             }
-            #endif
+#endif
             .sheet(item: $colorToExport) { color in
                 ColorExportSheet(color: color)
             }
@@ -520,7 +533,7 @@ struct PortfolioView: View {
 
                         Divider()
 
-                        #if canImport(UIKit)
+#if os(iOS) && !targetEnvironment(macCatalyst)
                         Button(action: {
                             HapticsManager.shared.selection()
                             isShowingPhotoColorPicker = true
@@ -531,7 +544,7 @@ struct PortfolioView: View {
                                 Image(systemName: "eyedropper.halffull")
                             }
                         })
-                        #endif
+#endif
 
                         #if targetEnvironment(macCatalyst)
                         Button(action: {
@@ -752,7 +765,7 @@ struct PortfolioView: View {
 
     // MARK: - Image Drop Handler
 
-    #if canImport(UIKit)
+#if os(iOS) && !targetEnvironment(macCatalyst)
     private func handleImageDrop(providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first(where: { $0.canLoadObject(ofClass: UIImage.self) }) else {
             return false
@@ -769,7 +782,22 @@ struct PortfolioView: View {
 
         return true
     }
-    #endif
+
+    /// Checks for a shared image from the Share Extension and opens the photo picker if found.
+    private func checkForSharedImage() {
+        guard SharedImageManager.shared.hasSharedImage(),
+              let image = SharedImageManager.shared.loadSharedImage() else {
+            return
+        }
+
+        // Clear the shared image so we don't re-open it
+        SharedImageManager.shared.clearSharedImage()
+
+        // Open the photo color picker with the shared image
+        HapticsManager.shared.impact()
+        droppedImageItem = DroppedImageItem(image: image)
+    }
+#endif
 
     // MARK: - System Color Sampler (Mac Catalyst)
 
@@ -812,7 +840,7 @@ struct PortfolioView: View {
 
 // MARK: - Identifiable wrapper for dropped images
 
-#if canImport(UIKit)
+#if os(iOS) && !targetEnvironment(macCatalyst)
 private struct DroppedImageItem: Identifiable {
     let id = UUID()
     let image: UIImage
@@ -843,3 +871,4 @@ private struct DroppedImageItem: Identifiable {
         .environment(HexCopyManager())
         .modelContainer(container)
 }
+

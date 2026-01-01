@@ -134,12 +134,24 @@ struct PhotoColorPickerSheet: View {
 
     // MARK: - Image Content
 
+    private func calculateImageDisplaySize(for uiImage: UIImage) -> CGSize {
+        let maxWidth: CGFloat = 350
+        let maxHeight: CGFloat = 300
+        let aspectRatio = uiImage.size.width / uiImage.size.height
+
+        let widthFromHeight = maxHeight * aspectRatio
+        let heightFromWidth = maxWidth / aspectRatio
+
+        if heightFromWidth <= maxHeight {
+            return CGSize(width: maxWidth, height: heightFromWidth)
+        } else {
+            return CGSize(width: widthFromHeight, height: maxHeight)
+        }
+    }
+
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
-        let maxWidth: CGFloat = 300
-        let aspectRatio = uiImage.size.width / uiImage.size.height
-        let displayWidth = min(maxWidth, uiImage.size.width)
-        let displayHeight = displayWidth / aspectRatio
+        let displaySize = calculateImageDisplaySize(for: uiImage)
 
         VStack(spacing: 8) {
             GeometryReader { geometry in
@@ -179,7 +191,7 @@ struct PhotoColorPickerSheet: View {
                         }
                 )
             }
-            .frame(width: displayWidth, height: displayHeight)
+            .frame(width: displaySize.width, height: displaySize.height)
             .frame(maxWidth: .infinity)
 
             Text("Tap or drag on the image to pick a color")

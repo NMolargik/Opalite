@@ -107,6 +107,14 @@ struct OpaliteApp: App {
                         #endif
                         return
                     }
+
+                    // Handle shared image from Share Extension
+                    if url.scheme == "opalite" && url.host == "sharedImage" {
+                        // The PortfolioView will automatically detect and open the shared image
+                        // when it becomes active (via scenePhase observer)
+                        return
+                    }
+
                     importCoordinator.handleIncomingURL(url, colorManager: colorManager)
                 }
                 .sheet(isPresented: Binding(

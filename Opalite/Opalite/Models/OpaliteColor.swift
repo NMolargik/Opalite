@@ -340,7 +340,7 @@ extension OpaliteColor {
     var dictionaryRepresentation: [String: Any] {
         [
             "id": id.uuidString,
-            "name": name ?? "Unnamed Color",
+            "name": name as Any,
             "notes": notes as Any,
             "hex": hexString,
             "hexWithAlpha": hexWithAlphaString,
