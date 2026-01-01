@@ -232,10 +232,23 @@ struct SearchView: View {
                     isSearchPresented = true
                     isSearchFocused = true
                 }
+
+                #if targetEnvironment(macCatalyst)
+                // Fix search bar styling issues on Mac Catalyst
+                let searchBar = UISearchBar.appearance()
+                searchBar.searchTextPositionAdjustment = UIOffset(horizontal: 0, vertical: 0)
+
+                let searchTextField = UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self])
+                searchTextField.focusEffect = nil
+                searchTextField.contentVerticalAlignment = .center
+                #endif
             }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView(featureContext: "Canvas access requires Onyx")
             }
+            #if targetEnvironment(macCatalyst)
+            .focusEffectDisabled()
+            #endif
         }
     }
 }

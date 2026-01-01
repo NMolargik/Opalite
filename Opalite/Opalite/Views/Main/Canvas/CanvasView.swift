@@ -27,6 +27,14 @@ struct CanvasView: View {
     @State private var showRenameTitleAlert: Bool = false
     @State private var showClearConfirmation: Bool = false
     @State private var showDeleteConfirmation: Bool = false
+    @State private var showToolPickerTrigger: UUID = UUID()
+    @State private var externalTool: PKTool? = nil
+
+    // Mac Catalyst custom tool picker state
+    #if targetEnvironment(macCatalyst)
+    @State private var selectedTool: PKTool = PKInkingTool(.pen, color: .label, width: 4)
+    @State private var strokeWidth: CGFloat = 4
+    #endif
 
     // MARK: - Canvas Size & Scroll State
     @State private var effectiveCanvasSize: CGSize? = nil
@@ -47,7 +55,9 @@ struct CanvasView: View {
                 appearTrigger: appearTrigger,
                 canvasSize: effectiveCanvasSize,
                 contentOffset: $canvasContentOffset,
-                zoomScale: $canvasZoomScale
+                zoomScale: $canvasZoomScale,
+                showToolPickerTrigger: showToolPickerTrigger,
+                externalTool: $externalTool
             )
 
             // Shape placement overlay
@@ -117,8 +127,34 @@ struct CanvasView: View {
             CanvasSwatchPickerView { color in
                 selectedInkColor = color.uiColor
                 forceColorUpdate = UUID()
+                #if targetEnvironment(macCatalyst)
+                // Update the selected tool color, switching from eraser to pen if needed
+                if let inkTool = selectedTool as? PKInkingTool {
+                    selectedTool = PKInkingTool(inkTool.inkType, color: color.uiColor, width: inkTool.width)
+                } else {
+                    // Currently on eraser or other non-inking tool, switch to pen
+                    selectedTool = PKInkingTool(.pen, color: color.uiColor, width: strokeWidth)
+                    externalTool = selectedTool
+                }
+                #endif
             }
         }
+        #if targetEnvironment(macCatalyst)
+        .overlay(alignment: .bottom) {
+            MacCatalystToolPicker(
+                selectedTool: Binding(
+                    get: { selectedTool },
+                    set: { newTool in
+                        selectedTool = newTool
+                        externalTool = newTool
+                    }
+                ),
+                selectedColor: $selectedInkColor,
+                strokeWidth: $strokeWidth
+            )
+            .padding(.bottom, 20)
+        }
+        #endif
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Text(canvasFile.title)

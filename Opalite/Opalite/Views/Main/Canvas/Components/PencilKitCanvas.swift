@@ -16,6 +16,8 @@ struct PencilKitCanvas: View {
     var canvasSize: CGSize?
     @Binding var contentOffset: CGPoint
     @Binding var zoomScale: CGFloat
+    var showToolPickerTrigger: UUID
+    @Binding var externalTool: PKTool?
 
     var body: some View {
         CanvasDetail_PencilKitRepresentable(
@@ -25,7 +27,9 @@ struct PencilKitCanvas: View {
             appearTrigger: appearTrigger,
             canvasSize: canvasSize,
             contentOffset: $contentOffset,
-            zoomScale: $zoomScale
+            zoomScale: $zoomScale,
+            showToolPickerTrigger: showToolPickerTrigger,
+            externalTool: $externalTool
         )
         .ignoresSafeArea(edges: .bottom)
     }
@@ -40,13 +44,20 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     var canvasSize: CGSize?
     @Binding var contentOffset: CGPoint
     @Binding var zoomScale: CGFloat
+    var showToolPickerTrigger: UUID
+    @Binding var externalTool: PKTool?
 
     func makeUIView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
         view.drawing = drawing
         view.backgroundColor = .clear
         view.isOpaque = false
+        #if targetEnvironment(macCatalyst)
+        // On Mac Catalyst, allow drawing with mouse/trackpad
+        view.drawingPolicy = .anyInput
+        #else
         view.drawingPolicy = .default
+        #endif
         view.delegate = context.coordinator
 
         // Disable bouncing to prevent showing hard edges
@@ -102,6 +113,23 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             context.coordinator.reattachToolPicker()
         }
 
+        // Show tool picker when triggered (for Mac Catalyst toolbar button)
+        if context.coordinator.lastShowToolPickerTrigger != showToolPickerTrigger {
+            context.coordinator.lastShowToolPickerTrigger = showToolPickerTrigger
+            context.coordinator.reattachToolPicker()
+        }
+
+        // Apply external tool changes (from Mac Catalyst custom tool picker)
+        if let tool = externalTool {
+            context.coordinator.isProgrammaticToolChange = true
+            uiView.tool = tool
+            context.coordinator.isProgrammaticToolChange = false
+            // Clear it after applying
+            DispatchQueue.main.async {
+                self.externalTool = nil
+            }
+        }
+
         // Check if we need to force a color update from our swatch picker
         let shouldForceUpdate = context.coordinator.lastForceColorUpdate != forceColorUpdate
         if shouldForceUpdate {
@@ -143,6 +171,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         var isProgrammaticToolChange = false
         var lastForceColorUpdate: UUID?
         var lastAppearTrigger: UUID?
+        var lastShowToolPickerTrigger: UUID?
         var storedCanvasSize: CGSize?
         var viewSize: CGSize = .zero
 
@@ -207,9 +236,38 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         }
 
         func reattachToolPicker() {
-            guard let canvasView = canvasView, let toolPicker = toolPicker else { return }
+            guard let canvasView = canvasView else { return }
+
+            // Ensure tool picker exists
+            if toolPicker == nil {
+                toolPicker = PKToolPicker()
+                toolPicker?.addObserver(canvasView)
+                toolPicker?.addObserver(self)
+            }
+
+            guard let toolPicker else { return }
             toolPicker.setVisible(true, forFirstResponder: canvasView)
-            canvasView.becomeFirstResponder()
+            _ = canvasView.becomeFirstResponder()
+
+            #if targetEnvironment(macCatalyst)
+            // On Mac Catalyst, aggressively ensure tool picker visibility
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak canvasView, weak toolPicker] in
+                guard let canvasView, let toolPicker else { return }
+                // Force the canvas to be first responder and show picker
+                if !canvasView.isFirstResponder {
+                    _ = canvasView.becomeFirstResponder()
+                }
+                toolPicker.setVisible(true, forFirstResponder: canvasView)
+
+                // Also try showing via the window
+                if let window = canvasView.window {
+                    toolPicker.setVisible(true, forFirstResponder: canvasView)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        _ = canvasView.becomeFirstResponder()
+                    }
+                }
+            }
+            #endif
         }
 
         func attachToolPicker(to canvasView: PKCanvasView) {
@@ -227,7 +285,16 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             toolPicker.setVisible(true, forFirstResponder: canvasView)
             toolPicker.addObserver(canvasView)
             toolPicker.addObserver(self)
-            canvasView.becomeFirstResponder()
+            _ = canvasView.becomeFirstResponder()
+
+            #if targetEnvironment(macCatalyst)
+            // On Mac Catalyst, the tool picker needs additional prompting to appear
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak canvasView, weak toolPicker] in
+                guard let canvasView, let toolPicker else { return }
+                toolPicker.setVisible(true, forFirstResponder: canvasView)
+                _ = canvasView.becomeFirstResponder()
+            }
+            #endif
         }
 
         func toolPickerSelectedToolDidChange(_ toolPicker: PKToolPicker) {
@@ -259,6 +326,8 @@ private struct CanvasDetail_PencilKitRepresentable: NSViewRepresentable {
     var canvasSize: CGSize?
     @Binding var contentOffset: CGPoint
     @Binding var zoomScale: CGFloat
+    var showToolPickerTrigger: UUID
+    @Binding var externalTool: PKTool?
 
     func makeNSView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()

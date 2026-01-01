@@ -14,11 +14,13 @@ struct ColorRecommendedColorsView: View {
     let onCreateColor: (OpaliteColor) -> Void
 
     @State private var isShowingInfo = false
+    @State private var actionFeedbackColorID: UUID?
+    @State private var harmonyColors: [OpaliteColor] = []
 
     var body: some View {
         SectionCard(title: "Color Harmonies", systemImage: "paintpalette") {
             SwatchRowView(
-                colors: buildHarmonyColors(),
+                colors: harmonyColors,
                 palette: nil,
                 swatchWidth: 180,
                 swatchHeight: 150,
@@ -29,7 +31,8 @@ struct ColorRecommendedColorsView: View {
                 },
                 contextMenuContent: { color in
                     harmonyMenuContent(for: color)
-                }
+                },
+                copiedColorID: $actionFeedbackColorID
             )
             .clipped()
         } trailing: {
@@ -46,6 +49,11 @@ struct ColorRecommendedColorsView: View {
         .sheet(isPresented: $isShowingInfo) {
             ColorHarmoniesInfoSheet()
         }
+        .onAppear {
+            if harmonyColors.isEmpty {
+                harmonyColors = buildHarmonyColors()
+            }
+        }
     }
 
     private func harmonyMenuContent(for color: OpaliteColor) -> AnyView {
@@ -54,6 +62,9 @@ struct ColorRecommendedColorsView: View {
                 Button {
                     HapticsManager.shared.selection()
                     hexCopyManager.copyHex(for: color)
+                    withAnimation {
+                        actionFeedbackColorID = color.id
+                    }
                 } label: {
                     Label("Copy Hex", systemImage: "number")
                 }
@@ -61,6 +72,9 @@ struct ColorRecommendedColorsView: View {
                 Button {
                     HapticsManager.shared.selection()
                     onCreateColor(color)
+                    withAnimation {
+                        actionFeedbackColorID = color.id
+                    }
                 } label: {
                     let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"
                     Label("Add \(addSuffix)", systemImage: "plus")

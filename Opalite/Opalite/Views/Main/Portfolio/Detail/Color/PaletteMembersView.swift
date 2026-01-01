@@ -13,6 +13,8 @@ struct PaletteMembersView: View {
     let palette: OpalitePalette
     let onRemoveColor: (OpaliteColor) -> Void
 
+    @State private var copiedColorID: UUID?
+
     var body: some View {
         SectionCard(title: "Components", systemImage: "swatchpalette") {
             SwatchRowView(
@@ -27,7 +29,8 @@ struct PaletteMembersView: View {
                 },
                 contextMenuContent: { color in
                     componentMenuContent(for: color)
-                }
+                },
+                copiedColorID: $copiedColorID
             )
             .clipped()
         }
@@ -39,6 +42,9 @@ struct PaletteMembersView: View {
                 Button {
                     HapticsManager.shared.selection()
                     hexCopyManager.copyHex(for: color)
+                    withAnimation {
+                        copiedColorID = color.id
+                    }
                 } label: {
                     Label("Copy Hex", systemImage: "number")
                 }

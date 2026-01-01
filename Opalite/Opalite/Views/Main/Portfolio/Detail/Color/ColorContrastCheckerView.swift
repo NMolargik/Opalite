@@ -20,6 +20,7 @@ struct ColorContrastCheckerView: View {
 
     @State private var comparisonColor: OpaliteColor?
     @State private var hexInput: String = ""
+    @State private var showingWCAGInfo: Bool = false
 
     // MARK: - WCAG Thresholds
 
@@ -180,6 +181,20 @@ struct ColorContrastCheckerView: View {
                 }
             }
             .padding(.horizontal, 16)
+        } trailing: {
+            Button {
+                HapticsManager.shared.selection()
+                showingWCAGInfo = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityLabel("Learn about WCAG")
+        }
+        .alert("About WCAG", isPresented: $showingWCAGInfo) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("WCAG (Web Content Accessibility Guidelines) defines contrast ratio requirements to ensure text is readable for people with visual impairments.\n\nAA is the minimum recommended level for most content. AAA provides enhanced accessibility.\n\n\"Large\" text is 18pt (24px) or larger, or 14pt (18.5px) bold.")
         }
     }
 
