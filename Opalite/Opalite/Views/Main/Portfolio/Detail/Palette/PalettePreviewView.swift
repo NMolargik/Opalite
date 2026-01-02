@@ -12,6 +12,7 @@ struct PalettePreviewView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     let palette: OpalitePalette
     @Binding var isEditingName: Bool?
@@ -68,7 +69,7 @@ struct PalettePreviewView: View {
                                             color: color,
                                             width: layout.swatchSize,
                                             height: layout.swatchSize,
-                                            badgeText: layout.showHexBadges ? color.hexString : "",
+                                            badgeText: layout.showHexBadges ? (color.name ?? color.hexString) : "",
                                             showOverlays: layout.showHexBadges
                                         )
                                         .frame(width: layout.swatchSize, height: layout.swatchSize)
@@ -282,7 +283,7 @@ struct PalettePreviewView: View {
                     swatchSize: swatchSize,
                     horizontalSpacing: actualHorizontalSpacing,
                     verticalSpacing: verticalSpacing,
-                    showHexBadges: swatchSize >= 110
+                    showHexBadges: swatchSize >= 110 && horizontalSizeClass != .compact
                 )
             }
         }
@@ -323,3 +324,4 @@ struct PalettePreviewView: View {
     .environment(manager)
     .environment(ToastManager())
 }
+
