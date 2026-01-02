@@ -59,7 +59,7 @@ struct ColorDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 SwatchView(
-                    fill: [color],
+                    color: color,
                     height: 260,
                     badgeText: viewModel.badgeText,
                     showOverlays: true,

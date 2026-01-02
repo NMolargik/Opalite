@@ -25,13 +25,27 @@ struct PaletteExportSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // Preview of the palette being exported
-                    SwatchView(
-                        fill: palette.colors ?? [],
-                        height: 100,
-                        badgeText: palette.name,
-                        showOverlays: true
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: (palette.colors ?? []).map { $0.swiftUIColor }),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 100)
+                        .overlay(alignment: .topLeading) {
+                            Text(palette.name)
+                                .bold()
+                                .foregroundStyle((palette.colors?.first)?.idealTextColor() ?? .black)
+                                .padding(12)
+                                .glassIfAvailable(GlassConfiguration(style: .clear))
+                                .padding(8)
+                        }
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(.thinMaterial, lineWidth: 3)
+                        )
 
                     // Color count
                     Text("\(palette.colors?.count ?? 0) colors")
@@ -83,8 +97,8 @@ struct PaletteExportSheet: View {
 
     @ViewBuilder
     private func formatButton(for format: PaletteExportFormat) -> some View {
-        let isOpalite = format == .opalite
-        let requiresOnyx = !isOpalite && !subscriptionManager.hasOnyxEntitlement
+        let isFreeFormat = format == .opalite || format == .image
+        let requiresOnyx = !isFreeFormat && !subscriptionManager.hasOnyxEntitlement
 
         Button {
             HapticsManager.shared.selection()
@@ -141,6 +155,7 @@ struct PaletteExportSheet: View {
 
     private func iconColor(for format: PaletteExportFormat) -> Color {
         switch format {
+        case .image: return .cyan
         case .opalite: return .purple
         case .ase: return .red
         case .procreate: return .orange

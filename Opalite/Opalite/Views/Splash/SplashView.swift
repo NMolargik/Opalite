@@ -336,7 +336,7 @@ private struct InfiniteSwatchRow: View {
                         HStack(spacing: spacing) {
                             ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                                 SwatchView(
-                                    fill: [color],
+                                    color: color,
                                     width: swatchWidth,
                                     height: swatchHeight,
                                     badgeText: "",

@@ -23,7 +23,7 @@ struct ColorImportConfirmationSheet: View {
                 VStack(spacing: 24) {
                     // Color Preview
                     SwatchView(
-                        fill: [preview.color],
+                        color: preview.color,
                         height: 180,
                         badgeText: preview.color.name ?? preview.color.hexString,
                         showOverlays: true

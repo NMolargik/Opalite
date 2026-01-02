@@ -31,12 +31,27 @@ struct PaletteImportConfirmationSheet: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Palette Preview
-                    SwatchView(
-                        fill: allColors,
-                        height: 180,
-                        badgeText: preview.palette.name,
-                        showOverlays: true
-                    )
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: allColors.map { $0.swiftUIColor }),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 180)
+                        .overlay(alignment: .topLeading) {
+                            Text(preview.palette.name)
+                                .bold()
+                                .foregroundStyle(allColors.first?.idealTextColor() ?? .black)
+                                .padding(12)
+                                .glassIfAvailable(GlassConfiguration(style: .clear))
+                                .padding(8)
+                        }
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(.thinMaterial, lineWidth: 3)
+                        )
 
                     // Metadata
                     GroupBox {

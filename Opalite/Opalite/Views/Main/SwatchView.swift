@@ -29,12 +29,12 @@ struct SwatchView: View {
         ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
     }
 
-    /// Colors with color blindness simulation applied (if active)
-    private var displayColors: [OpaliteColor] {
-        fill.simulatingColorBlindness(colorBlindnessMode)
+    /// Color with color blindness simulation applied (if active)
+    private var displayColor: OpaliteColor {
+        [color].simulatingColorBlindness(colorBlindnessMode).first ?? color
     }
 
-    private var fill: [OpaliteColor]
+    private var color: OpaliteColor
     private var width: CGFloat?
     private var height: CGFloat?
     private var badgeText: String
@@ -59,7 +59,7 @@ struct SwatchView: View {
     @State private var cachedDragImageKey: String = ""
 
     init(
-        fill: [OpaliteColor],
+        color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         badgeText: String,
@@ -77,7 +77,7 @@ struct SwatchView: View {
         isLoadingSuggestions: Bool = false,
         onSuggestionSelected: ((String) -> Void)? = nil
     ) {
-        self.fill = fill
+        self.color = color
         self.width = width
         self.height = height
         self.badgeText = badgeText
@@ -97,7 +97,7 @@ struct SwatchView: View {
     }
 
     init<MenuContent: View>(
-        fill: [OpaliteColor],
+        color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         badgeText: String,
@@ -115,7 +115,7 @@ struct SwatchView: View {
         @ViewBuilder menu: @escaping () -> MenuContent
     ) {
         self.init(
-            fill: fill,
+            color: color,
             width: width,
             height: height,
             badgeText: badgeText,
@@ -133,9 +133,9 @@ struct SwatchView: View {
             onSuggestionSelected: onSuggestionSelected
         )
     }
-    
+
     init<ContextMenuContent: View>(
-        fill: [OpaliteColor],
+        color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         badgeText: String,
@@ -153,7 +153,7 @@ struct SwatchView: View {
         @ViewBuilder contextMenu: @escaping () -> ContextMenuContent
     ) {
         self.init(
-            fill: fill,
+            color: color,
             width: width,
             height: height,
             badgeText: badgeText,
@@ -176,13 +176,7 @@ struct SwatchView: View {
     // MARK: - The View
     var body: some View {
         return RoundedRectangle(cornerRadius: 16)
-            .fill(
-                LinearGradient(
-                    gradient: Gradient(colors: displayColors.map { $0.swiftUIColor }),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .fill(displayColor.swiftUIColor)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(.thinMaterial, lineWidth: 5)
@@ -208,7 +202,7 @@ struct SwatchView: View {
                 view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
             }
             .zIndex(2)
-            .if(!fill.isEmpty && isEditingBadge != true) { view in
+            .if(isEditingBadge != true) { view in
                 view.onDrag {
                     provideDragItem()
                 }
@@ -219,14 +213,8 @@ struct SwatchView: View {
     }
 
     private var accessibilityDescription: String {
-        if fill.isEmpty {
-            return "Empty swatch"
-        } else if fill.count == 1, let first = fill.first {
-            let name = first.name ?? "Unnamed color"
-            return "\(name), \(first.hexString)"
-        } else {
-            return "\(badgeText.isEmpty ? "Color palette" : badgeText), \(fill.count) colors"
-        }
+        let name = color.name ?? "Unnamed color"
+        return "\(name), \(color.hexString)"
     }
     
     // MARK: - Badge Content
@@ -238,7 +226,7 @@ struct SwatchView: View {
                     // Read-only label state
                     if isEditingBadge != true {
                         Text(badgeText)
-                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .inverseTheme)
+                            .foregroundStyle(displayColor.idealTextColor())
                             .bold()
                             .if(allowBadgeTapToEdit && saveBadge != nil) { view in
                                 view.onTapGesture {
@@ -257,7 +245,7 @@ struct SwatchView: View {
                                 set: { editedBadgeText = $0 }
                             ))
                             .textFieldStyle(.plain)
-                            .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                            .foregroundStyle(displayColor.idealTextColor())
                             .bold()
                             .submitLabel(.done)
                             .focused($badgeFocused)
@@ -328,7 +316,7 @@ struct SwatchView: View {
                         .controlSize(.small)
                     Text("Generating suggestions...")
                         .font(.caption)
-                        .foregroundStyle(fill.first?.idealTextColor() ?? .white)
+                        .foregroundStyle(color.idealTextColor())
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -344,7 +332,7 @@ struct SwatchView: View {
                             Text(suggestion)
                                 .font(.caption)
                                 .fontWeight(.medium)
-                                .foregroundStyle(fill.first?.idealTextColor() ?? .white)
+                                .foregroundStyle(color.idealTextColor())
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                                 .background(.ultraThinMaterial, in: Capsule())
@@ -371,7 +359,7 @@ struct SwatchView: View {
                 } label: {
                     Image(systemName: showCopiedFeedback ? "checkmark" : "ellipsis")
                         .imageScale(.large)
-                        .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                        .foregroundStyle(displayColor.idealTextColor())
                         .frame(width: 8, height: 8)
                         .padding(12)
                         .background(
@@ -414,10 +402,9 @@ struct SwatchView: View {
 
     // MARK: - Drag Support
 
-    /// Creates a cache key based on colors and badge text
+    /// Creates a cache key based on color and badge text
     private var dragImageCacheKey: String {
-        let colorKeys = fill.map { "\($0.id)-\($0.red)-\($0.green)-\($0.blue)-\($0.alpha)" }.joined(separator: "|")
-        return "\(colorKeys)|\(badgeText)|\(showOverlays)"
+        return "\(color.id)-\(color.red)-\(color.green)-\(color.blue)-\(color.alpha)|\(badgeText)|\(showOverlays)"
     }
 
     private func provideDragItem() -> NSItemProvider {
@@ -444,25 +431,23 @@ struct SwatchView: View {
 
         let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
 
-        // For single colors, include full JSON data for cross-device drops and ID for same-device palette management
-        if fill.count == 1, let first = fill.first {
-            // Register full JSON color data (works cross-device via Universal Control)
-            provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier, visibility: .all) { completion in
-                do {
-                    let jsonData = try first.jsonRepresentation()
-                    completion(jsonData, nil)
-                } catch {
-                    completion(nil, error)
-                }
-                return nil
+        // Include full JSON data for cross-device drops and ID for same-device palette management
+        // Register full JSON color data (works cross-device via Universal Control)
+        provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier, visibility: .all) { completion in
+            do {
+                let jsonData = try self.color.jsonRepresentation()
+                completion(jsonData, nil)
+            } catch {
+                completion(nil, error)
             }
+            return nil
+        }
 
-            // Also include color ID for efficient same-device palette management
-            if let idData = first.id.uuidString.data(using: .utf8) {
-                provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColorID.identifier, visibility: .all) { completion in
-                    completion(idData, nil)
-                    return nil
-                }
+        // Also include color ID for efficient same-device palette management
+        if let idData = color.id.uuidString.data(using: .utf8) {
+            provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColorID.identifier, visibility: .all) { completion in
+                completion(idData, nil)
+                return nil
             }
         }
 
@@ -471,7 +456,7 @@ struct SwatchView: View {
 
     /// Renders the swatch as PNG image data for drag and drop or sharing.
     ///
-    /// Creates a gradient image from the swatch colors with an optional badge overlay
+    /// Creates a solid color image with an optional badge overlay
     /// showing the color name or hex code.
     ///
     /// - Parameter size: The size of the output image
@@ -480,7 +465,7 @@ struct SwatchView: View {
         let badgeOverlay = Group {
             if showOverlays {
                 Text(badgeText)
-                    .foregroundStyle(displayColors.first?.idealTextColor() ?? .black)
+                    .foregroundStyle(displayColor.idealTextColor())
                     .bold()
                     .frame(height: 20)
                     .padding(8)
@@ -495,13 +480,7 @@ struct SwatchView: View {
         }
 
         let swatchView = Rectangle()
-            .fill(
-                LinearGradient(
-                    gradient: Gradient(colors: displayColors.map { $0.swiftUIColor }),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .fill(displayColor.swiftUIColor)
             .frame(width: size.width, height: size.height)
             .overlay(alignment: .topLeading) {
                 badgeOverlay
@@ -520,8 +499,6 @@ private struct StatefulPreview: View {
     @State private var isEditing: Bool? = true
 
     var body: some View {
-        let sampleColors: [OpaliteColor] = [OpaliteColor.sample, OpaliteColor.sample2]
-
         VStack {
             Toggle("Editing Badge", isOn: Binding(
                 get: { isEditing ?? false },
@@ -531,7 +508,7 @@ private struct StatefulPreview: View {
 
             HStack(alignment: .bottom) {
                 SwatchView(
-                    fill: [sampleColors.first!],
+                    color: OpaliteColor.sample,
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
@@ -550,7 +527,7 @@ private struct StatefulPreview: View {
                 )
 
                 SwatchView(
-                    fill: [OpaliteColor(red: 0, green: 0, blue: 0)],
+                    color: OpaliteColor(red: 0, green: 0, blue: 0),
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
@@ -565,7 +542,7 @@ private struct StatefulPreview: View {
                 )
 
                 SwatchView(
-                    fill: [OpaliteColor(red: 255, green: 255, blue: 255)],
+                    color: OpaliteColor(red: 1, green: 1, blue: 1),
                     width: 250,
                     height: 250,
                     badgeText: "Sample Color",
@@ -580,16 +557,16 @@ private struct StatefulPreview: View {
                 )
 
                 SwatchView(
-                    fill: [OpaliteColor(red: 1, green: 1.0, blue: 0.5)],
-                      width: 75,
-                      height: 75,
+                    color: OpaliteColor(red: 1, green: 1.0, blue: 0.5),
+                    width: 75,
+                    height: 75,
                     badgeText: "",
                     showOverlays: false
-                  )
+                )
             }
 
             SwatchView(
-                fill: sampleColors,
+                color: OpaliteColor.sample2,
                 height: 350,
                 badgeText: "Sample Color",
                 showOverlays: false,

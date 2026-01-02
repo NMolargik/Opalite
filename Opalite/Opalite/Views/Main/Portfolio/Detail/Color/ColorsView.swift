@@ -21,7 +21,7 @@ struct ColorsView: View {
                             ColorDetailView(color: color)
                         } label: {
                             SwatchView(
-                                fill: [color],
+                                color: color,
                                 width: 200,
                                 height: 200,
                                 badgeText: color.name ?? color.hexString,

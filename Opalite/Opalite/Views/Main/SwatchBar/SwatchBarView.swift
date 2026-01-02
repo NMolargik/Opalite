@@ -247,7 +247,7 @@ struct SwatchBarView: View {
             }()
 
             SwatchView(
-                fill: [color],
+                color: color,
                 width: availableWidth,
                 height: swatchHeight,
                 badgeText: labelText,

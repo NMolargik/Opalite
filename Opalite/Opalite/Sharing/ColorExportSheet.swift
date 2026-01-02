@@ -34,7 +34,7 @@ struct ColorExportSheet: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Preview of the color being exported
                     SwatchView(
-                        fill: [color],
+                        color: color,
                         height: 100,
                         badgeText: color.name ?? color.hexString,
                         showOverlays: true

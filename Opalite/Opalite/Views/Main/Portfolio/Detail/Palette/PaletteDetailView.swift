@@ -39,29 +39,10 @@ struct PaletteDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                SwatchView(
-                    // Colors sorted by createdAt (newest first)
-                    fill: palette.sortedColors,
-                    height: 260,
-                    badgeText: palette.name,
-                    showOverlays: true,
-                    isEditingBadge: $isEditingName,
-                    saveBadge: { newName in
-                        do {
-                            try colorManager.updatePalette(palette) { pal in
-                                pal.name = newName.isEmpty ? palette.name : newName
-                            }
-                        } catch {
-                            toastManager.show(error: .paletteUpdateFailed)
-                        }
-                    },
-                    allowBadgeTapToEdit: true
+                PalettePreviewView(
+                    palette: palette,
+                    isEditingName: $isEditingName
                 )
-                .overlay {
-                    if palette.colors?.isEmpty == true {
-                        Text("This Palette is empty.")
-                    }
-                }
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 16) {
                         PaletteDetailsSectionView(palette: palette)
@@ -213,18 +194,6 @@ struct PaletteDetailView: View {
             
             ToolbarItem(placement: .confirmationAction) {
                 Menu {
-                    Button {
-                        HapticsManager.shared.selection()
-                        if let image = gradientImage(from: palette.sortedColors) {
-                            shareImage = image
-                            shareImageTitle = palette.name
-                            isShowingShareSheet = true
-                        }
-                    } label: {
-                        Label("Share As Image", systemImage: "photo.badge.plus")
-                    }
-                    .disabled(palette.sortedColors.isEmpty)
-
                     Button {
                         HapticsManager.shared.selection()
                         do {

@@ -76,6 +76,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 // MARK: - Palette Export Formats
 
 enum PaletteExportFormat: String, CaseIterable, Identifiable {
+    case image = "image"
     case opalite = "opalite"
     case ase = "ase"
     case procreate = "procreate"
@@ -87,6 +88,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
+        case .image: return "Image"
         case .opalite: return "Opalite Palette"
         case .ase: return "Adobe Swatch Exchange"
         case .procreate: return "Procreate Swatches"
@@ -98,6 +100,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
 
     var fileExtension: String {
         switch self {
+        case .image: return "png"
         case .opalite: return "opalitepalette"
         case .ase: return "ase"
         case .procreate: return "swatches"
@@ -109,6 +112,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
+        case .image: return "photo.fill"
         case .opalite: return "swatchpalette.fill"
         case .ase: return "a.square.fill"
         case .procreate: return "paintbrush.fill"
@@ -120,6 +124,8 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
 
     var description: String {
         switch self {
+        case .image:
+            return "Share as a PNG image. Perfect for social media or design inspiration."
         case .opalite:
             return "Native Opalite format. Import back into Opalite on any device."
         case .ase:
@@ -548,6 +554,11 @@ enum SharingService {
         do {
             let data: Data
             switch format {
+            case .image:
+                guard let imageData = generatePaletteImage(for: palette) else {
+                    throw SharingError.exportFailed(NSError(domain: "SharingService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to render palette image"]))
+                }
+                data = imageData
             case .opalite:
                 data = try palette.jsonRepresentation()
             case .ase:
@@ -569,6 +580,13 @@ enum SharingService {
     }
 
     // MARK: - Palette Format Generators
+
+    /// Generates a PNG image of the palette preview
+    private static func generatePaletteImage(for palette: OpalitePalette) -> Data? {
+        let size = CGSize(width: 1200, height: 600)
+        let view = PaletteExportImageView(palette: palette, size: size)
+        return ColorImageRenderer.renderViewAsPNGData(view, size: size, opaque: true)
+    }
 
     /// Generates Adobe Swatch Exchange (ASE) format for a palette
     private static func generatePaletteASE(for palette: OpalitePalette) throws -> Data {
@@ -972,5 +990,170 @@ enum SharingService {
     /// Creates a clean filename from a hex code (e.g., "#FF5733" -> "FF5733")
     private static func filenameFromHex(_ hex: String) -> String {
         hex.replacingOccurrences(of: "#", with: "")
+    }
+}
+
+// MARK: - Palette Export Image View
+
+/// A view that renders the palette preview for image export.
+/// This mirrors PalettePreviewView but is designed for static rendering without environment dependencies.
+private struct PaletteExportImageView: View {
+    let palette: OpalitePalette
+    let size: CGSize
+
+    private let padding: CGFloat = 32
+    private let spacing: CGFloat = 16
+    private let extraVerticalPadding: CGFloat = 88
+
+    /// The background color, using the palette's stored preference or defaulting to white
+    private var background: PreviewBackground {
+        palette.previewBackground ?? .white
+    }
+
+    var body: some View {
+        let availableWidth = size.width - (padding * 2)
+        let availableHeight = size.height - (padding * 2) - (extraVerticalPadding * 2)
+        let colors = palette.sortedColors
+        let layout = calculateLayout(
+            colorCount: colors.count,
+            availableWidth: availableWidth,
+            availableHeight: availableHeight
+        )
+
+        ZStack {
+            // Background
+            RoundedRectangle(cornerRadius: 32)
+                .fill(background.color)
+
+            // Color swatches grid
+            if colors.isEmpty {
+                Text("This palette is empty")
+                    .foregroundStyle(background.idealTextColor.opacity(0.6))
+                    .font(.title2)
+            } else {
+                VStack(spacing: layout.verticalSpacing) {
+                    ForEach(0..<layout.rows, id: \.self) { row in
+                        HStack(spacing: layout.horizontalSpacing) {
+                            ForEach(0..<layout.columns, id: \.self) { col in
+                                let index = row * layout.columns + col
+                                if index < colors.count {
+                                    let color = colors[index]
+                                    swatchView(for: color, size: layout.swatchSize, showBadge: layout.showHexBadges)
+                                } else {
+                                    Color.clear
+                                        .frame(width: layout.swatchSize, height: layout.swatchSize)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Name badge (top left only - no background picker for export)
+            VStack {
+                HStack {
+                    nameBadge
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding(20)
+        }
+        .frame(width: size.width, height: size.height)
+    }
+
+    @ViewBuilder
+    private func swatchView(for color: OpaliteColor, size: CGFloat, showBadge: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(color.swiftUIColor)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 3)
+            )
+            .overlay(alignment: .topLeading) {
+                if showBadge {
+                    Text(color.hexString)
+                        .foregroundStyle(color.idealTextColor())
+                        .bold()
+                        .font(.caption)
+                        .padding(6)
+                        .background(Color.black.opacity(0.2), in: RoundedRectangle(cornerRadius: 6))
+                        .padding(8)
+                }
+            }
+            .frame(width: size, height: size)
+    }
+
+    @ViewBuilder
+    private var nameBadge: some View {
+        Text(palette.name)
+            .foregroundStyle(background.idealTextColor)
+            .bold()
+            .font(.title2)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.black.opacity(0.15), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Layout Calculation
+
+    private struct LayoutInfo {
+        let rows: Int
+        let columns: Int
+        let swatchSize: CGFloat
+        let horizontalSpacing: CGFloat
+        let verticalSpacing: CGFloat
+        let showHexBadges: Bool
+    }
+
+    private func calculateLayout(
+        colorCount: Int,
+        availableWidth: CGFloat,
+        availableHeight: CGFloat
+    ) -> LayoutInfo {
+        guard colorCount > 0 else {
+            return LayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
+        }
+
+        let minSpacing: CGFloat = 16
+        let maxSpacing: CGFloat = 32
+
+        var bestLayout = LayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
+
+        // Try different row configurations (1, 2, or 3 rows)
+        for rows in 1...3 {
+            let columns = Int(ceil(Double(colorCount) / Double(rows)))
+
+            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
+            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
+
+            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
+            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
+
+            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
+            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
+
+            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
+
+            var actualHorizontalSpacing = horizontalSpacing
+            if columns > 1 {
+                let usedWidth = CGFloat(columns) * swatchSize
+                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
+                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
+            }
+
+            if swatchSize > bestLayout.swatchSize {
+                bestLayout = LayoutInfo(
+                    rows: rows,
+                    columns: columns,
+                    swatchSize: swatchSize,
+                    horizontalSpacing: actualHorizontalSpacing,
+                    verticalSpacing: verticalSpacing,
+                    showHexBadges: swatchSize >= 110
+                )
+            }
+        }
+
+        return bestLayout
     }
 }

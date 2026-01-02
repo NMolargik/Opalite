@@ -330,10 +330,10 @@ struct ColorEditorView: View {
             if viewModel.isShowingPaletteStrip, !paletteStripColors.isEmpty {
                 HStack(spacing: 12) {
                     SwatchView(
-                        fill: [viewModel.tempColor],
+                        color: viewModel.tempColor,
                         height: viewModel.isColorExpanded ? nil : 60,
                         badgeText: "",
-                        showOverlays: false,
+                        showOverlays: false
                     )
                         .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
 
@@ -341,10 +341,10 @@ struct ColorEditorView: View {
 
                     ForEach(paletteStripColors, id: \.self) { color in
                         SwatchView(
-                            fill: [color],
+                            color: color,
                             height: viewModel.isColorExpanded ? nil : 60,
                             badgeText: "",
-                            showOverlays: false,
+                            showOverlays: false
                         )
                             .transition(.scale(scale: 0.2, anchor: .bottom))
                     }
@@ -352,7 +352,7 @@ struct ColorEditorView: View {
                 .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
             } else {
                 SwatchView(
-                    fill: [viewModel.tempColor],
+                    color: viewModel.tempColor,
                     height: viewModel.isColorExpanded ? nil : 60,
                     badgeText: "",
                     showOverlays: false
@@ -376,7 +376,7 @@ struct ColorEditorView: View {
                 VStack(spacing: 12) {
                     ForEach(0..<midIndex, id: \.self) { index in
                         SwatchView(
-                            fill: [colors[index]],
+                            color: colors[index],
                             height: viewModel.isColorExpanded ? nil : 60,
                             badgeText: "",
                             showOverlays: false
@@ -386,7 +386,7 @@ struct ColorEditorView: View {
                     }
 
                     SwatchView(
-                        fill: [viewModel.tempColor],
+                        color: viewModel.tempColor,
                         height: viewModel.isColorExpanded ? nil : 60,
                         badgeText: "",
                         showOverlays: false
@@ -396,7 +396,7 @@ struct ColorEditorView: View {
 
                     ForEach(midIndex..<colors.count, id: \.self) { index in
                         SwatchView(
-                            fill: [colors[index]],
+                            color: colors[index],
                             height: viewModel.isColorExpanded ? nil : 60,
                             badgeText: "",
                             showOverlays: false
@@ -408,7 +408,7 @@ struct ColorEditorView: View {
                 .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
             } else {
                 SwatchView(
-                    fill: [viewModel.tempColor],
+                    color: viewModel.tempColor,
                     height: viewModel.isColorExpanded ? nil : 60,
                     badgeText: "",
                     showOverlays: false

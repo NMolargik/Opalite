@@ -22,7 +22,7 @@ struct SwatchStarfieldView: View {
         var z: CGFloat          // depth (0...1], where smaller is closer
         var speed: CGFloat      // depth units per second
         var baseSize: CGFloat   // base size in points at z ~= 1
-        var fill: [OpaliteColor]
+        var fill: OpaliteColor
         var cornerRadius: CGFloat
         var phase: CGFloat
     }
@@ -118,7 +118,7 @@ struct SwatchStarfieldView: View {
         let alpha = min(1.0, max(0.0, Double((1.0 - animatedZ) * 1.35)))
 
         SwatchView(
-            fill: star.fill,
+            color: star.fill,
             width: starSize,
             height: starSize,
             badgeText: "",
@@ -179,129 +179,27 @@ struct SwatchStarfieldView: View {
         }
     }
 
-    private func randomSpaceFill() -> [OpaliteColor] {
-        // We want a *lot* more variety than "mostly white".
-        // Keep a small amount of white-ish stars for realism, but bias heavily toward vivid neon gradients.
+    private func randomSpaceFill() -> OpaliteColor {
+        // We want a lot of variety in star colors.
+        // Keep a small amount of white-ish stars for realism, but bias toward vivid colors.
 
         // ~15%: near-white / pale stars
         if Double.random(in: 0...1) < 0.15 {
-            let v1 = Double.random(in: 0.82...1.0)
-            let v2 = Double.random(in: 0.78...1.0)
-            let tint = Double.random(in: 0.0...0.18) // tiny warm/cool tint
-
-            return [
-                OpaliteColor(red: v1, green: v1 - tint * 0.4, blue: v1 + tint, alpha: 1.0),
-                OpaliteColor(red: v2, green: v2 - tint * 0.2, blue: v2 + tint * 0.8, alpha: 1.0)
-            ]
-        }
-
-        // ~35%: single-color "point" stars (no gradient)
-        if Double.random(in: 0...1) < 0.35 {
-            let hue = Double.random(in: 0...1)
-            let sat = Double.random(in: 0.75...1.0)
-            let val = Double.random(in: 0.85...1.0)
-            let (r, g, b) = hsvToRgb(h: hue, s: sat, v: val)
-            return [OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)]
+            let v = Double.random(in: 0.82...1.0)
+            let tint = Double.random(in: 0.0...0.18)
+            return OpaliteColor(red: v, green: v - tint * 0.4, blue: v + tint, alpha: 1.0)
         }
 
         // Otherwise: vivid, high-saturation stars.
         // Use HSV to guarantee bright, saturated colors.
-        let hue1 = Double.random(in: 0...1)
-        let sat1 = Double.random(in: 0.78...1.0)
-        let val1 = Double.random(in: 0.82...1.0)
-
-        // Second color: hue-shifted for a gradient streak
-        let hueShift = Double.random(in: 0.06...0.22) * (Bool.random() ? 1 : -1)
-        let hue2 = (hue1 + hueShift).truncatingRemainder(dividingBy: 1.0)
-
-        let sat2 = min(1.0, max(0.65, sat1 + Double.random(in: -0.18...0.10)))
-        let val2 = min(1.0, max(0.70, val1 + Double.random(in: -0.20...0.08)))
-
-        let (r1, g1, b1) = hsvToRgb(h: hue1, s: sat1, v: val1)
-        let (r2, g2, b2) = hsvToRgb(h: hue2, s: sat2, v: val2)
-
-        // Occasionally add a 3rd color to make some stars feel like multicolor streaks
-        if Double.random(in: 0...1) < 0.35 {
-            let hue3 = (hue2 + Double.random(in: 0.08...0.25)).truncatingRemainder(dividingBy: 1.0)
-            let sat3 = Double.random(in: 0.72...1.0)
-            let val3 = Double.random(in: 0.78...1.0)
-            let (r3, g3, b3) = hsvToRgb(h: hue3, s: sat3, v: val3)
-
-            return [
-                OpaliteColor(red: r1, green: g1, blue: b1, alpha: 1.0),
-                OpaliteColor(red: r2, green: g2, blue: b2, alpha: 1.0),
-                OpaliteColor(red: r3, green: g3, blue: b3, alpha: 1.0)
-            ]
-        }
-
-        return [
-            OpaliteColor(red: r1, green: g1, blue: b1, alpha: 1.0),
-            OpaliteColor(red: r2, green: g2, blue: b2, alpha: 1.0)
-        ]
+        let hue = Double.random(in: 0...1)
+        let sat = Double.random(in: 0.75...1.0)
+        let val = Double.random(in: 0.82...1.0)
+        let (r, g, b) = hsvToRgb(h: hue, s: sat, v: val)
+        return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
 
 #Preview("Swatch Starfield") {
     SwatchStarfieldView(starCount: 75)
-}
-private struct StatefulPreview: View {
-    @State private var isEditing: Bool? = true
-
-    var body: some View {
-        let sampleColors: [OpaliteColor] = [OpaliteColor.sample, OpaliteColor.sample2]
-
-        VStack {
-            Toggle("Editing Badge", isOn: Binding(
-                get: { isEditing ?? false },
-                set: { isEditing = $0 }
-            ))
-            .padding(.bottom)
-
-            HStack(alignment: .bottom) {
-                SwatchView(
-                    fill: [sampleColors.first!],
-                    width: 250,
-                    height: 250,
-                    badgeText: "Sample Color",
-                    showOverlays: true,
-                    isEditingBadge: .constant(nil)
-                )
-
-                SwatchView(
-                    fill: [OpaliteColor(red: 0, green: 0, blue: 0)],
-                    width: 250,
-                    height: 250,
-                    badgeText: "Sample Color",
-                    showOverlays: true,
-                    isEditingBadge: $isEditing
-                )
-
-                SwatchView(
-                    fill: [OpaliteColor(red: 255, green: 255, blue: 255)],
-                    width: 250,
-                    height: 250,
-                    badgeText: "Sample Color",
-                    showOverlays: true,
-                    isEditingBadge: .constant(nil)
-                )
-
-                SwatchView(
-                    fill: [OpaliteColor(red: 1, green: 1.0, blue: 0.5)],
-                      width: 75,
-                      height: 75,
-                    badgeText: "",
-                    showOverlays: false
-                  )
-            }
-
-            SwatchView(
-                fill: sampleColors,
-                height: 350,
-                badgeText: "Sample Color",
-                showOverlays: false,
-                isEditingBadge: $isEditing
-            )
-        }
-        .padding()
-    }
 }

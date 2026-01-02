@@ -62,18 +62,6 @@ struct PaletteRowHeaderView: View {
                 }
 
                 Divider()
-                
-                Button {
-                    HapticsManager.shared.selection()
-                    if let image = gradientImage(from: palette.sortedColors) {
-                        shareImage = image
-                        shareImageTitle = palette.name
-                        isShowingShareSheet = true
-                    }
-                } label: {
-                    Label("Share As Image", systemImage: "photo.on.rectangle")
-                }
-                .disabled(palette.sortedColors.isEmpty)
 
                 Button {
                     HapticsManager.shared.selection()

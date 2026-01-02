@@ -194,7 +194,7 @@ struct SwatchRowView: View {
     @ViewBuilder
     private func swatchCell(for color: OpaliteColor) -> some View {
         SwatchView(
-            fill: [color],
+            color: color,
             width: swatchWidth,
             height: swatchHeight,
             badgeText: color.name ?? color.hexString,

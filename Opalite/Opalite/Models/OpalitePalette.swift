@@ -22,6 +22,9 @@ final class OpalitePalette {
     var notes: String?
     var tags: [String] = []
 
+    // Preview background color (stored as raw value)
+    var previewBackgroundRaw: String?
+
     // Relationship
     @Relationship var colors: [OpaliteColor]? = []
 
@@ -29,6 +32,19 @@ final class OpalitePalette {
     var sortedColors: [OpaliteColor] {
         (colors ?? []).sorted { $0.createdAt > $1.createdAt }
     }
+
+    #if !os(watchOS)
+    /// Preview background color (computed from stored raw value)
+    var previewBackground: PreviewBackground? {
+        get {
+            guard let raw = previewBackgroundRaw else { return nil }
+            return PreviewBackground(rawValue: raw)
+        }
+        set {
+            previewBackgroundRaw = newValue?.rawValue
+        }
+    }
+    #endif
     
     // Init
     init(

@@ -97,7 +97,7 @@ struct ColorContrastCheckerView: View {
                 // Source color
                 VStack(spacing: 8) {
                     SwatchView(
-                        fill: [sourceColor],
+                        color: sourceColor,
                         width: 100,
                         height: 100,
                         badgeText: "",
@@ -122,7 +122,7 @@ struct ColorContrastCheckerView: View {
                 VStack(spacing: 8) {
                     if let comparison = comparisonColor {
                         SwatchView(
-                            fill: [comparison],
+                            color: comparison,
                             width: 100,
                             height: 100,
                             badgeText: "",
@@ -283,7 +283,7 @@ struct ColorContrastCheckerView: View {
                                     comparisonColor = color
                                 } label: {
                                     SwatchView(
-                                        fill: [color],
+                                        color: color,
                                         width: 50,
                                         height: 50,
                                         badgeText: "",
