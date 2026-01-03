@@ -96,7 +96,7 @@ struct SettingsView: View {
 
                 Section {
                     Toggle(isOn: $includeHexPrefix) {
-                        Label("Include # in Hex Codes", systemImage: "number")
+                        Label("Include # in Copied Codes", systemImage: "number")
                             .foregroundStyle(.primary)
                     }
                 } header: {
@@ -214,7 +214,7 @@ struct SettingsView: View {
                         HapticsManager.shared.selection()
                         isShowingDeleteAllCanvasesAlert = true
                     } label: {
-                        Label("Delete All Canvases", systemImage: "document.on.trash")
+                        Label("Delete All Canvases", systemImage: "scribble")
                             .foregroundStyle(.red)
                     }
                     .accessibilityHint("Permanently removes all drawing canvases")
@@ -223,7 +223,7 @@ struct SettingsView: View {
                         HapticsManager.shared.selection()
                         isShowingDeleteAllColorsAlert = true
                     } label: {
-                        Label("Delete All Colors & Palettes", systemImage: "trash")
+                        Label("Delete All Colors & Palettes", systemImage: "trash.fill")
                             .foregroundStyle(.red)
                     }
                     .accessibilityHint("Permanently removes all colors and palettes from your portfolio")

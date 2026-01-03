@@ -226,7 +226,7 @@ extension OpaliteColor {
     // MARK: - Color Harmony
 
     /// Helper to create a color at a given hue offset (in degrees)
-    private func colorAtHueOffset(_ degrees: Double, name: String) -> OpaliteColor {
+    private func colorAtHueOffset(_ degrees: Double, name: String? = nil) -> OpaliteColor {
         let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
         var newHue = h + (degrees / 360.0)
         if newHue > 1 { newHue -= 1 }

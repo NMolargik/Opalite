@@ -325,7 +325,7 @@ struct OpaliteApp: App {
                         HapticsManager.shared.selection()
                         colorManager.removeFromPaletteTrigger = UUID()
                     } label: {
-                        Label("Remove from Palette", systemImage: "swatchpalette.fill")
+                        Label("Remove from Palette", systemImage: "minus.circle")
                     }
                     .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette == nil)
                 }

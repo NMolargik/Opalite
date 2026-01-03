@@ -144,6 +144,7 @@ struct QuickAddHexSheet: View {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
+                    .tint(.red)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {

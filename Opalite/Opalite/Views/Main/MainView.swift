@@ -117,7 +117,7 @@ struct MainView: View {
                                     #endif
                                 }
                             } label: {
-                                Label("Delete Canvas", systemImage: "trash")
+                                Label("Delete Canvas", systemImage: "trash.fill")
                             }
                             .tint(.red)
                         }

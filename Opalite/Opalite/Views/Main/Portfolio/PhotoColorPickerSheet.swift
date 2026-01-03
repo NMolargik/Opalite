@@ -60,6 +60,7 @@ struct PhotoColorPickerSheet: View {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
+                    .tint(.red)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -109,8 +110,6 @@ struct PhotoColorPickerSheet: View {
                 Label("Capture Photo", systemImage: "camera")
             }
             .buttonStyle(.borderedProminent)
-
-            Spacer()
         }
     }
 

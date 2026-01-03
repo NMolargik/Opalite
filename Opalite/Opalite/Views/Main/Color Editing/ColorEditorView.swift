@@ -151,13 +151,10 @@ struct ColorEditorView: View {
                             }
                         }
                     } label: {
-                        if viewModel.didCopyHex {
-                            Text("Hex Copied")
-                        } else {
-                            Image(systemName: "number")
-                        }
+                        Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
+                            .contentTransition(.symbolEffect(.replace))
                     }
-                    .tint(viewModel.didCopyHex ? .green : nil)
+                    .tint(viewModel.didCopyHex ? .green : .inverseTheme)
                     .accessibilityLabel(viewModel.didCopyHex ? "Hex code copied" : "Copy hex code")
                     .accessibilityValue(hexCopyManager.formattedHex(for: viewModel.tempColor))
                 }
@@ -171,9 +168,10 @@ struct ColorEditorView: View {
                     } label: {
                         Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
+                    .toolbarButtonTint()
                     .accessibilityLabel(viewModel.isColorExpanded ? "Show editor" : "Expand color preview")
                 }
-                
+
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
                         HapticsManager.shared.impact()
@@ -185,7 +183,7 @@ struct ColorEditorView: View {
                     }
                     .tint(.red)
                 }
-                                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
                         HapticsManager.shared.impact()
@@ -195,8 +193,9 @@ struct ColorEditorView: View {
                     } label: {
                         Label("Save", systemImage: "checkmark")
                     }
+                    .tint(.blue)
                 }
-                
+
                 #elseif os(macOS)
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -213,8 +212,9 @@ struct ColorEditorView: View {
                     } label: {
                         Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
                     }
+                    .toolbarButtonTint()
                 }
-                
+
                 if canShowPaletteStripToggle {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
@@ -227,7 +227,7 @@ struct ColorEditorView: View {
                         }
                     }
                 }
-                
+
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
@@ -236,8 +236,9 @@ struct ColorEditorView: View {
                     } label: {
                         Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
+                    .toolbarButtonTint()
                 }
-                
+
                 ToolbarItemGroup(placement: .principal) {
                     Button {
                         withAnimation(.easeInOut) {
@@ -247,7 +248,7 @@ struct ColorEditorView: View {
                         Label("Cancel", systemImage: "xmark")
                     }
                     .tint(.red)
-                    
+
                     Button {
                         withAnimation(.easeInOut) {
                             onApprove(viewModel.tempColor)
@@ -256,7 +257,7 @@ struct ColorEditorView: View {
                         Label("Save", systemImage: "checkmark")
                     }
                     .tint(.green)
-                    
+
                 }
                 #endif
             }

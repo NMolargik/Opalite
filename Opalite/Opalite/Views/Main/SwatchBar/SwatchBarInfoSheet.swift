@@ -69,6 +69,7 @@ struct SwatchBarInfoSheet: View {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
+                    .tint(.red)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {

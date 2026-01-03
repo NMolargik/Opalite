@@ -53,7 +53,7 @@ struct PaletteMembersView: View {
                     HapticsManager.shared.selection()
                     onRemoveColor(color)
                 } label: {
-                    Label("Remove From Palette", systemImage: "xmark.circle")
+                    Label("Remove From Palette", systemImage: "minus.circle")
                 }
             }
         )

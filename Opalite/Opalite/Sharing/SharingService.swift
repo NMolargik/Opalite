@@ -13,6 +13,7 @@ import Compression
 // MARK: - Color Export Formats
 
 enum ColorExportFormat: String, CaseIterable, Identifiable {
+    case image = "image"
     case opalite = "opalite"
     case ase = "ase"
     case procreate = "procreate"
@@ -24,6 +25,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
+        case .image: return "Image"
         case .opalite: return "Opalite Color"
         case .ase: return "Adobe Swatch Exchange"
         case .procreate: return "Procreate Swatch"
@@ -35,6 +37,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 
     var fileExtension: String {
         switch self {
+        case .image: return "png"
         case .opalite: return "opalitecolor"
         case .ase: return "ase"
         case .procreate: return "swatches"
@@ -46,6 +49,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
+        case .image: return "photo.fill"
         case .opalite: return "paintpalette.fill"
         case .ase: return "a.square.fill"
         case .procreate: return "paintbrush.fill"
@@ -57,6 +61,8 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 
     var description: String {
         switch self {
+        case .image:
+            return "Share as a PNG image. Perfect for social media or design inspiration."
         case .opalite:
             return "Native Opalite format. Import back into Opalite on any device."
         case .ase:
@@ -77,6 +83,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
 
 enum PaletteExportFormat: String, CaseIterable, Identifiable {
     case image = "image"
+    case pdf = "pdf"
     case opalite = "opalite"
     case ase = "ase"
     case procreate = "procreate"
@@ -89,6 +96,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .image: return "Image"
+        case .pdf: return "PDF Document"
         case .opalite: return "Opalite Palette"
         case .ase: return "Adobe Swatch Exchange"
         case .procreate: return "Procreate Swatches"
@@ -101,6 +109,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
     var fileExtension: String {
         switch self {
         case .image: return "png"
+        case .pdf: return "pdf"
         case .opalite: return "opalitepalette"
         case .ase: return "ase"
         case .procreate: return "swatches"
@@ -113,6 +122,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .image: return "photo.fill"
+        case .pdf: return "doc.richtext"
         case .opalite: return "swatchpalette.fill"
         case .ase: return "a.square.fill"
         case .procreate: return "paintbrush.fill"
@@ -126,6 +136,8 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
         switch self {
         case .image:
             return "Share as a PNG image. Perfect for social media or design inspiration."
+        case .pdf:
+            return "Professional PDF with color details. Great for printing or sharing with clients."
         case .opalite:
             return "Native Opalite format. Import back into Opalite on any device."
         case .ase:
@@ -209,6 +221,11 @@ enum SharingService {
         do {
             let data: Data
             switch format {
+            case .image:
+                guard let imageData = generateColorImage(for: color) else {
+                    throw SharingError.exportFailed(NSError(domain: "SharingService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to render color image"]))
+                }
+                data = imageData
             case .opalite:
                 data = try color.jsonRepresentation()
             case .ase:
@@ -552,6 +569,16 @@ enum SharingService {
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
 
         do {
+            switch format {
+            case .pdf:
+                // PDF uses PortfolioPDFExporter which writes directly to a file
+                // We need to get the userName from AppStorage default
+                let userName = UserDefaults.standard.string(forKey: AppStorageKeys.userName) ?? "User"
+                return try PortfolioPDFExporter.exportPalette(palette, userName: userName)
+            default:
+                break
+            }
+
             let data: Data
             switch format {
             case .image:
@@ -559,6 +586,9 @@ enum SharingService {
                     throw SharingError.exportFailed(NSError(domain: "SharingService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to render palette image"]))
                 }
                 data = imageData
+            case .pdf:
+                // Handled above, this case won't be reached
+                fatalError("PDF case should be handled above")
             case .opalite:
                 data = try palette.jsonRepresentation()
             case .ase:
@@ -580,6 +610,13 @@ enum SharingService {
     }
 
     // MARK: - Palette Format Generators
+
+    /// Generates a PNG image of a single color
+    private static func generateColorImage(for color: OpaliteColor) -> Data? {
+        let size = ColorImageRenderer.defaultSize
+        let view = ColorExportImageView(color: color, size: size)
+        return ColorImageRenderer.renderViewAsPNGData(view, size: size, opaque: false)
+    }
 
     /// Generates a PNG image of the palette preview
     private static func generatePaletteImage(for palette: OpalitePalette) -> Data? {
@@ -1155,5 +1192,51 @@ private struct PaletteExportImageView: View {
         }
 
         return bestLayout
+    }
+}
+
+// MARK: - Color Export Image View
+
+/// A view that renders a single color swatch for image export.
+/// Designed for static rendering without environment dependencies.
+private struct ColorExportImageView: View {
+    let color: OpaliteColor
+    let size: CGSize
+
+    private let padding: CGFloat = 32
+    private let cornerRadius: CGFloat = 32
+
+    var body: some View {
+        ZStack {
+            // Background with color
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(color.swiftUIColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 3)
+                )
+
+            // Name/Hex badge at top left
+            VStack {
+                HStack {
+                    nameBadge
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding(20)
+        }
+        .frame(width: size.width, height: size.height)
+    }
+
+    @ViewBuilder
+    private var nameBadge: some View {
+        Text(color.name ?? color.hexString)
+            .foregroundStyle(color.idealTextColor())
+            .bold()
+            .font(.title2)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.black.opacity(0.15), in: RoundedRectangle(cornerRadius: 12))
     }
 }

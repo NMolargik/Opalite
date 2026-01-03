@@ -30,17 +30,12 @@ struct ColorDetailView: View {
 
     @State private var viewModel: ColorDetailView.ViewModel
 
-    @State private var shareImage: PlatformImage?
-    @State private var shareImageTitle: String = "Shared from Opalite"
-    @State private var isShowingShareSheet = false
     @State private var showDeleteConfirmation = false
     @State private var isShowingColorEditor = false
     @State private var isEditingName: Bool? = false
     @State private var isShowingPaletteSelection: Bool = false
     @State private var showDetachConfirmation: Bool = false
     @State private var didCopyHex: Bool = false
-    @State private var shareFileURL: URL?
-    @State private var isShowingFileShareSheet = false
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingContrastChecker: Bool = false
     @State private var isShowingExportSheet: Bool = false
@@ -130,7 +125,7 @@ struct ColorDetailView: View {
                             onCreateColor: { suggested in
                                 do {
                                     _ = try colorManager.createColor(
-                                        name: suggested.name,
+                                        name: nil,
                                         notes: suggested.notes,
                                         device: nil,
                                         red: suggested.red,
@@ -145,16 +140,16 @@ struct ColorDetailView: View {
                             }
                         )
                         
+                        notesSection
+                        
                         ColorDetailsSectionView(color: color)
 
-                        notesSection
                     }
                 }
             }
             .padding()
         }
         .navigationBarTitleDisplayMode(.inline)
-        .background(shareSheet(image: shareImage))
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
                 HapticsManager.shared.selection()
@@ -212,6 +207,19 @@ struct ColorDetailView: View {
             ColorExportSheet(color: color)
         }
         .toolbar {
+            // Primary actions - stay visible
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    HapticsManager.shared.selection()
+                    isShowingExportSheet = true
+                } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+                .tint(.blue)
+                .accessibilityLabel("Export color")
+                .accessibilityHint("Opens export options for this color")
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
@@ -219,6 +227,7 @@ struct ColorDetailView: View {
                 } label: {
                     Text("Edit")
                 }
+                .toolbarButtonTint()
             }
 
             ToolbarItem(placement: .topBarTrailing) {
@@ -228,6 +237,7 @@ struct ColorDetailView: View {
                 } label: {
                     Label("Contrast", systemImage: "circle.righthalf.filled")
                 }
+                .toolbarButtonTint()
                 .accessibilityLabel("Check WCAG contrast")
                 .accessibilityHint("Opens contrast checker to compare this color against others")
             }
@@ -251,7 +261,7 @@ struct ColorDetailView: View {
                 .accessibilityLabel(color.palette != nil ? "Remove from palette" : "Add to palette")
                 .accessibilityHint(color.palette != nil ? "Removes this color from its current palette" : "Opens palette selection to add this color")
             }
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
@@ -270,12 +280,13 @@ struct ColorDetailView: View {
                         systemImage: didCopyHex ? "checkmark" : "number"
                     )
                 }
-                .tint(didCopyHex ? .green : nil)
+                .tint(didCopyHex ? .green : .inverseTheme)
                 .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")
                 .accessibilityValue(hexCopyManager.formattedHex(for: color))
             }
-            
-            ToolbarItem(placement: .topBarTrailing) {
+
+            // Secondary actions - collapse first
+            ToolbarItem(placement: .secondaryAction) {
                 Button {
                     HapticsManager.shared.selection()
                     withAnimation {
@@ -284,40 +295,17 @@ struct ColorDetailView: View {
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
                 }
+                .toolbarButtonTint()
             }
-            
-            ToolbarItem(placement: .topBarTrailing) {
+
+            ToolbarItem(placement: .secondaryAction) {
                 Button(role: .destructive){
                     HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("Delete", systemImage: "trash.fill")
                 }
                 .tint(.red)
-            }
-            
-            ToolbarItem(placement: .confirmationAction) {
-                Menu {
-                    Button {
-                        HapticsManager.shared.selection()
-                        if let image = solidColorImage(from: color) {
-                            shareImage = image
-                            shareImageTitle = color.name ?? color.hexString
-                            isShowingShareSheet = true
-                        }
-                    } label: {
-                        Label("Share As Image", systemImage: "photo.badge.plus")
-                    }
-                    
-                    Button {
-                        HapticsManager.shared.selection()
-                        isShowingExportSheet = true
-                    } label: {
-                        Label("Export...", systemImage: "square.and.arrow.up")
-                    }
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                }
             }
         }
         .onAppear {
@@ -348,17 +336,6 @@ struct ColorDetailView: View {
                 }
             }
         }
-    }
-
-    @ViewBuilder
-    private func shareSheet(image: PlatformImage?) -> some View {
-        EmptyView()
-            .background(
-                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
-            )
     }
 
     @ViewBuilder

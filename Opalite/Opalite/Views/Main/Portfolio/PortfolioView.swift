@@ -35,9 +35,6 @@ struct PortfolioView: View {
 
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var isShowingPaywall: Bool = false
-    @State private var shareImage: UIImage?
-    @State private var shareImageTitle: String = "Shared from Opalite"
-    @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
     @State private var pendingPaletteToAddTo: OpalitePalette? = nil
     @AppStorage(AppStorageKeys.swatchSize) private var swatchSizeRaw: String = SwatchSize.medium.rawValue
@@ -324,7 +321,6 @@ struct PortfolioView: View {
             .refreshable {
                 Task { await colorManager.refreshAll() }
             }
-            .background(shareSheet(image: shareImage))
             .sheet(item: $paletteSelectionColor) { color in
                 PaletteSelectionSheet(color: color)
                     .environment(colorManager)
@@ -451,6 +447,7 @@ struct PortfolioView: View {
                         } label: {
                             Label("SwatchBar", systemImage: "square.stack")
                         }
+                        .toolbarButtonTint()
                     }
                 }
                 
@@ -462,6 +459,7 @@ struct PortfolioView: View {
                         } label: {
                             Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
                         }
+                        .toolbarButtonTint()
                         .accessibilityLabel("Reorder palettes")
                         .accessibilityHint("Opens a sheet to reorder your palettes")
                     }
@@ -477,6 +475,7 @@ struct PortfolioView: View {
                         }) {
                             Image(systemName: "square.arrowtriangle.4.outward")
                         }
+                        .toolbarButtonTint()
                         .accessibilityLabel("Change swatch size")
                         .accessibilityHint(isCompact ? "Cycles between small and medium swatch sizes" : "Cycles through small, medium, and large swatch sizes")
                         .accessibilityValue(swatchSize.accessibilityName)
@@ -601,17 +600,6 @@ struct PortfolioView: View {
         }
     }
     
-    @ViewBuilder
-    private func shareSheet(image: UIImage?) -> some View {
-        EmptyView()
-            .background(
-                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
-            )
-    }
-    
     private func handleFileImport(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
@@ -699,25 +687,14 @@ struct PortfolioView: View {
                 }
 
                 Divider()
-                
-                Button {
-                    HapticsManager.shared.selection()
-                    if let image = solidColorImage(from: color) {
-                        shareImage = image
-                        shareImageTitle = color.name ?? color.hexString
-                        isShowingShareSheet = true
-                    }
-                } label: {
-                    Label("Share As Image", systemImage: "photo.on.rectangle")
-                }
-                
+
                 Button {
                     HapticsManager.shared.selection()
                     colorToExport = color
                 } label: {
-                    Label("Export...", systemImage: "square.and.arrow.up")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
-                
+
                 Divider()
                 
                 if let _ = palette {
@@ -727,7 +704,7 @@ struct PortfolioView: View {
                             colorManager.detachColorFromPalette(color)
                         }
                     } label: {
-                        Label("Remove From Palette", systemImage: "swatchpalette")
+                        Label("Remove From Palette", systemImage: "minus.circle")
                     }
                 }
                 

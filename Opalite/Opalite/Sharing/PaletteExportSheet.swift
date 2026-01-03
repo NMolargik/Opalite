@@ -79,6 +79,7 @@ struct PaletteExportSheet: View {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
+                    .tint(.red)
                 }
             }
         }
@@ -97,7 +98,7 @@ struct PaletteExportSheet: View {
 
     @ViewBuilder
     private func formatButton(for format: PaletteExportFormat) -> some View {
-        let isFreeFormat = format == .opalite || format == .image
+        let isFreeFormat = format == .opalite || format == .image || format == .pdf
         let requiresOnyx = !isFreeFormat && !subscriptionManager.hasOnyxEntitlement
 
         Button {
@@ -156,6 +157,7 @@ struct PaletteExportSheet: View {
     private func iconColor(for format: PaletteExportFormat) -> Color {
         switch format {
         case .image: return .cyan
+        case .pdf: return .red
         case .opalite: return .purple
         case .ase: return .red
         case .procreate: return .orange

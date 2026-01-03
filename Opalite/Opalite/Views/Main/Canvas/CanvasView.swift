@@ -172,6 +172,7 @@ struct CanvasView: View {
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
                 }
+                .toolbarButtonTint()
             }
 
             ToolbarItem(placement: .topBarTrailing) {
@@ -199,12 +200,13 @@ struct CanvasView: View {
                             HapticsManager.shared.impact()
                             showDeleteConfirmation = true
                         } label: {
-                            Label("Delete Canvas", systemImage: "trash")
+                            Label("Delete Canvas", systemImage: "trash.fill")
                         }
                     }
                 } label: {
                     Label("Options", systemImage: "ellipsis.circle")
                 }
+                .toolbarButtonTint()
             }
 
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {

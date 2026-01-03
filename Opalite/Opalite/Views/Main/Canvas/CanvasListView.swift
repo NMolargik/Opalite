@@ -84,7 +84,7 @@ struct CanvasListView: View {
                                 toastManager.show(error: .canvasDeletionFailed)
                             }
                         } label: {
-                            Label("Delete", systemImage: "trash")
+                            Label("Delete", systemImage: "trash.fill")
                         }
                     }
                 }
@@ -109,7 +109,7 @@ struct CanvasListView: View {
                                 } label: {
                                     Label("Close", systemImage: "xmark")
                                 }
-                                
+                                .tint(.red)
                             }
                         }
                 }
@@ -146,6 +146,8 @@ struct CanvasListView: View {
                     HapticsManager.shared.impact()
                     canvasToRename = nil
                 }
+                .tint(.red)
+                
                 Button("Rename") {
                     HapticsManager.shared.impact()
                     if let canvas = canvasToRename {

@@ -83,6 +83,7 @@ struct ColorContrastCheckerView: View {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
+                    .tint(.red)
                 }
             }
         }

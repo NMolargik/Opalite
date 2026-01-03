@@ -222,78 +222,15 @@ struct SwatchView: View {
     private var badgeContent: some View {
         if showOverlays {
             VStack(alignment: .leading, spacing: 8) {
-                ZStack(alignment: .leading) {
-                    // Read-only label state
-                    if isEditingBadge != true {
-                        Text(badgeText)
-                            .foregroundStyle(displayColor.idealTextColor())
-                            .bold()
-                            .if(allowBadgeTapToEdit && saveBadge != nil) { view in
-                                view.onTapGesture {
-                                    withAnimation(.easeInOut) {
-                                        isEditingBadge = true
-                                    }
-                                }
-                            }
-                    }
-
-                    // Editing state
-                    if isEditingBadge == true {
-                        HStack(spacing: 8) {
-                            TextField("Badge", text: Binding(
-                                get: { editedBadgeText.isEmpty ? badgeText : editedBadgeText },
-                                set: { editedBadgeText = $0 }
-                            ))
-                            .textFieldStyle(.plain)
-                            .foregroundStyle(displayColor.idealTextColor())
-                            .bold()
-                            .submitLabel(.done)
-                            .focused($badgeFocused)
-                            .onSubmit {
-                                let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
-                                saveBadge?(finalText)
-                                editedBadgeText = ""
-                                withAnimation(.easeInOut) {
-                                    isEditingBadge = false
-                                }
-                            }
-
-                            Button {
-                                HapticsManager.shared.selection()
-                                let finalText = editedBadgeText.isEmpty ? badgeText : editedBadgeText
-                                saveBadge?(finalText)
-                                editedBadgeText = ""
-                                withAnimation(.easeInOut) {
-                                    isEditingBadge = false
-                                }
-                            } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .imageScale(.large)
-                                    .foregroundStyle(.black, .green)
-                            }
-                            .contentShape(Circle())
-                            .hoverEffect(.lift)
-                        }
-                        .onAppear {
-                            // Ensure the TextField receives focus right after it appears
-                            DispatchQueue.main.async {
-                                badgeFocused = true
-                            }
-                        }
-                    }
-                }
-                .onChange(of: isEditingBadge) { _, to in
-                    if to == true {
-                        DispatchQueue.main.async {
-                            badgeFocused = true
-                        }
-                    }
-                }
-                .frame(height: 20)
-                .padding(8)
-                .glassIfAvailable(
-                    GlassConfiguration(style: .clear)
-                )
+                badgeEditableContent
+                    .frame(height: 20)
+                    .padding(8)
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .clear)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .contentTransition(.interpolate)
+                    .animation(.bouncy, value: isEditingBadge)
 
                 // Name suggestions (shown when editing)
                 if isEditingBadge == true {
@@ -301,8 +238,74 @@ struct SwatchView: View {
                 }
             }
             .padding(8)
-            .contentTransition(.interpolate)
-            .animation(.bouncy, value: isEditingBadge)
+            .onChange(of: isEditingBadge) { _, newValue in
+                if newValue == true {
+                    DispatchQueue.main.async {
+                        badgeFocused = true
+                    }
+                }
+            }
+        }
+    }
+
+    private var isEditing: Bool {
+        isEditingBadge == true
+    }
+
+    @ViewBuilder
+    private var badgeEditableContent: some View {
+        ZStack(alignment: .leading) {
+            if !isEditing {
+                // Read-only state
+                Text(badgeText)
+                    .foregroundStyle(displayColor.idealTextColor())
+                    .bold()
+                    .transition(.blurReplace)
+                    .if(allowBadgeTapToEdit && saveBadge != nil) { view in
+                        view.onTapGesture {
+                            editedBadgeText = badgeText
+                            withAnimation(.bouncy) {
+                                isEditingBadge = true
+                            }
+                        }
+                    }
+            } else {
+                // Editing state
+                HStack(spacing: 8) {
+                    TextField("Name", text: $editedBadgeText)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(displayColor.idealTextColor())
+                        .bold()
+                        .submitLabel(.done)
+                        .focused($badgeFocused)
+                        .onSubmit {
+                            saveBadgeText()
+                        }
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        saveBadgeText()
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .imageScale(.large)
+                            .foregroundStyle(.black, .green)
+                    }
+                    .contentShape(Circle())
+                    .hoverEffect(.lift)
+                }
+                .transition(.blurReplace)
+            }
+        }
+    }
+
+    private func saveBadgeText() {
+        let finalText = editedBadgeText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !finalText.isEmpty {
+            saveBadge?(finalText)
+        }
+        editedBadgeText = ""
+        withAnimation(.easeInOut) {
+            isEditingBadge = false
         }
     }
 
@@ -472,10 +475,8 @@ struct SwatchView: View {
                     .glassIfAvailable(
                         GlassConfiguration(style: .clear)
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .padding(8)
-                    .mask(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    )
             }
         }
 

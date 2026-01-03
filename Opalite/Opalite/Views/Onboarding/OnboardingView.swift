@@ -157,10 +157,14 @@ struct OnboardingView: View {
                                         Text("Back")
                                     }
                                     .font(.headline)
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(.white)
                                     .padding(.horizontal, 24)
                                     .padding(.vertical, 14)
-                                    .background(.ultraThinMaterial, in: Capsule())
+                                    .glassIfAvailable(
+                                        GlassConfiguration(style: .clear)
+                                            .tint(.red)
+                                            .interactive()
+                                    )
                                 }
                                 .accessibilityLabel("Back")
                                 .accessibilityHint("Goes to the previous page")
@@ -197,9 +201,10 @@ struct OnboardingView: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     Text(currentPage < pages.count - 1 ? "Next" : "Done")
-                                    Image(systemName: currentPage < pages.count - 1 ? "chevron.right" : "arrow.right")
+                                    Image(systemName: "chevron.right")
                                 }
-                                .font(.headline)
+                                .font(.body)
+                                .bold()
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 28)
                                 .padding(.vertical, 14)

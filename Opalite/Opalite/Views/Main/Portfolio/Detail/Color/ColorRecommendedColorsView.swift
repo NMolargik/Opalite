@@ -41,7 +41,7 @@ struct ColorRecommendedColorsView: View {
                 isShowingInfo = true
             } label: {
                 Image(systemName: "questionmark.circle")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.gray)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about color harmonies")
@@ -76,8 +76,7 @@ struct ColorRecommendedColorsView: View {
                         actionFeedbackColorID = color.id
                     }
                 } label: {
-                    let addSuffix: String = (baseColor.palette != nil) ? "To Palette" : "To Colors"
-                    Label("Add \(addSuffix)", systemImage: "plus")
+                    Label(baseColor.palette != nil ? "Add To Palette" : "Save To Colors", systemImage: "plus")
                 }
             }
         )

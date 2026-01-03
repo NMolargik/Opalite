@@ -17,21 +17,10 @@ struct PaletteDetailView: View {
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
 
-    @State private var shareImage: UIImage?
-    @State private var shareImageTitle: String = "Shared from Opalite"
-    @State private var isShowingShareSheet = false
     @State private var showDeleteConfirmation = false
-    @State private var isShowingColorEditor = false
     @State private var isEditingName: Bool? = false
     @State private var notesDraft: String = ""
     @State private var isSavingNotes: Bool = false
-    @State private var isShowingPaletteSelection: Bool = false
-    @State private var showDetachConfirmation: Bool = false
-    @State private var shareFileURL: URL?
-    @State private var isShowingFileShareSheet = false
-    @State private var isShowingPaywall: Bool = false
-    @State private var exportPDFURL: URL?
-    @State private var isShowingPDFShareSheet = false
     @State private var isShowingExportSheet: Bool = false
 
     let palette: OpalitePalette
@@ -83,8 +72,6 @@ struct PaletteDetailView: View {
                             }
                         })
                         
-                        PaletteDetailsSectionView(palette: palette)
-
                         NotesSectionView(
                             notes: $notesDraft,
                             isSaving: $isSavingNotes,
@@ -102,6 +89,8 @@ struct PaletteDetailView: View {
                                 }
                             }
                         )
+                        
+                        PaletteDetailsSectionView(palette: palette)
                     }
                 }
             }
@@ -124,10 +113,6 @@ struct PaletteDetailView: View {
         }
         .navigationTitle("Palette")
         .navigationBarTitleDisplayMode(.inline)
-        .background(shareSheet(image: shareImage))
-        .sheet(isPresented: $isShowingPaywall) {
-            PaywallView(featureContext: "Data file export requires Onyx")
-        }
         .sheet(isPresented: $isShowingExportSheet) {
             PaletteExportSheet(palette: palette)
         }
@@ -163,20 +148,20 @@ struct PaletteDetailView: View {
             Text("This action cannot be undone.")
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(role: .destructive){
+            // Export button first for priority
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
                     HapticsManager.shared.selection()
-                    showDeleteConfirmation = true
+                    isShowingExportSheet = true
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
-                .tint(.red)
+                .tint(.blue)
+                .disabled(palette.sortedColors.isEmpty)
+                .accessibilityLabel("Export palette")
+                .accessibilityHint("Opens export options for this palette")
             }
-            
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
@@ -186,54 +171,23 @@ struct PaletteDetailView: View {
                 } label: {
                     Label("Rename", systemImage: "character.cursor.ibeam")
                 }
+                .toolbarButtonTint()
             }
-            
+
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
-            
-            ToolbarItem(placement: .confirmationAction) {
-                Menu {
-                    Button {
-                        HapticsManager.shared.selection()
-                        do {
-                            exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
-                            isShowingPDFShareSheet = true
-                        } catch {
-                            toastManager.show(error: .pdfExportFailed)
-                        }
-                    } label: {
-                        Label("Share As PDF", systemImage: "doc.richtext")
-                    }
-                    .disabled(palette.sortedColors.isEmpty)
 
-                    Button {
-                        HapticsManager.shared.selection()
-                        isShowingExportSheet = true
-                    } label: {
-                        Label("Export...", systemImage: "square.and.arrow.up")
-                    }
-                    .disabled(palette.sortedColors.isEmpty)
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive){
+                    HapticsManager.shared.selection()
+                    showDeleteConfirmation = true
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Delete", systemImage: "trash.fill")
                 }
-                .disabled(palette.sortedColors.isEmpty)
+                .tint(.red)
             }
         }
-    }
-    
-    @ViewBuilder
-    private func shareSheet(image: UIImage?) -> some View {
-        EmptyView()
-            .background(
-                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: exportPDFURL, isPresented: $isShowingPDFShareSheet)
-            )
     }
 }
 

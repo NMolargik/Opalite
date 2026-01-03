@@ -142,6 +142,7 @@ struct PaletteImportConfirmationSheet: View {
                         HapticsManager.shared.impact()
                         dismiss()
                     }
+                    .tint(.red)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {

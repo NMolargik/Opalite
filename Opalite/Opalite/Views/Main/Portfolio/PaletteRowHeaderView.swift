@@ -14,22 +14,12 @@ struct PaletteRowHeaderView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
-
     private let paletteMenuTip = PaletteMenuTip()
 
     @State private var showDeleteConfirmation = false
     @State private var showRenameAlert = false
     @State private var renameText: String = ""
-    @State private var shareImage: UIImage?
-    @State private var shareImageTitle: String = "Shared from Opalite"
-    @State private var isShowingShareSheet = false
     @State private var isShowingColorEditor = false
-    @State private var shareFileURL: URL?
-    @State private var isShowingFileShareSheet = false
-    @State private var isShowingPaywall: Bool = false
-    @State private var exportPDFURL: URL?
-    @State private var isShowingPDFShareSheet = false
     @State private var isShowingExportSheet: Bool = false
 
     let palette: OpalitePalette
@@ -65,22 +55,9 @@ struct PaletteRowHeaderView: View {
 
                 Button {
                     HapticsManager.shared.selection()
-                    do {
-                        exportPDFURL = try PortfolioPDFExporter.exportPalette(palette, userName: userName)
-                        isShowingPDFShareSheet = true
-                    } catch {
-                        toastManager.show(error: .pdfExportFailed)
-                    }
-                } label: {
-                    Label("Share As PDF", systemImage: "doc.richtext")
-                }
-                .disabled(palette.sortedColors.isEmpty)
-
-                Button {
-                    HapticsManager.shared.selection()
                     isShowingExportSheet = true
                 } label: {
-                    Label("Export...", systemImage: "square.and.arrow.up")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
                 .disabled(palette.sortedColors.isEmpty)
 
@@ -90,7 +67,7 @@ struct PaletteRowHeaderView: View {
                     HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
-                    Label("Delete Palette", systemImage: "trash")
+                    Label("Delete Palette", systemImage: "trash.fill")
                 }
             } label: {
                 Image(systemName: "ellipsis")
@@ -185,10 +162,6 @@ struct PaletteRowHeaderView: View {
         } message: {
             Text("Enter a new name for this palette.")
         }
-        .background(shareSheet(image: shareImage))
-        .sheet(isPresented: $isShowingPaywall) {
-            PaywallView(featureContext: "Data file export requires Onyx")
-        }
         .sheet(isPresented: $isShowingExportSheet) {
             PaletteExportSheet(palette: palette)
         }
@@ -211,20 +184,6 @@ struct PaletteRowHeaderView: View {
                 }
             )
         }
-    }
-    
-    @ViewBuilder
-    private func shareSheet(image: UIImage?) -> some View {
-        EmptyView()
-            .background(
-                ShareSheetPresenter(image: image, title: shareImageTitle, isPresented: $isShowingShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingFileShareSheet)
-            )
-            .background(
-                FileShareSheetPresenter(fileURL: exportPDFURL, isPresented: $isShowingPDFShareSheet)
-            )
     }
 }
 

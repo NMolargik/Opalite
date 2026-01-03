@@ -127,24 +127,6 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: paywallContext)
         }
-        .alert(
-            "Hex Code Format",
-            isPresented: Binding(
-                get: { hexCopyManager.showPreferenceAlert },
-                set: { hexCopyManager.showPreferenceAlert = $0 }
-            )
-        ) {
-            Button("Include #") {
-                HapticsManager.shared.selection()
-                hexCopyManager.userChoseIncludePrefix()
-            }
-            Button("Exclude #") {
-                HapticsManager.shared.selection()
-                hexCopyManager.userChoseExcludePrefix()
-            }
-        } message: {
-            Text("Would you like to include the \"#\" symbol when copying hex codes?\n\nYou can change this later in Settings.")
-        }
     }
     
     private func prepareApp() async {

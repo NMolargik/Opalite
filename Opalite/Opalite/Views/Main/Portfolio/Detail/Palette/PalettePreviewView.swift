@@ -82,27 +82,16 @@ struct PalettePreviewView: View {
                         }
                     }
                 }
-
-                // Name badge (top left)
-                VStack {
-                    HStack {
-                        nameBadge
-                        Spacer()
-                    }
-                    Spacer()
-                }
-                .padding(10)
-
-                // Background picker button (bottom right)
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        backgroundPickerButton
-                    }
-                }
-                .padding(10)
             }
+        }
+        .overlay(alignment: .topLeading) {
+            nameBadge
+                .frame(maxWidth: 350, alignment: .leading)
+                .padding(10)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            backgroundPickerButton
+                .padding(10)
         }
         .frame(height: totalHeight)
         .onChange(of: isEditingName) { _, newValue in
@@ -161,6 +150,7 @@ struct PalettePreviewView: View {
         .glassIfAvailable(
             GlassConfiguration(style: .clear)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .contentTransition(.interpolate)
         .animation(.bouncy, value: isEditingName)
     }
