@@ -585,7 +585,7 @@ enum SharingService {
     private static func generatePaletteImage(for palette: OpalitePalette) -> Data? {
         let size = CGSize(width: 1200, height: 600)
         let view = PaletteExportImageView(palette: palette, size: size)
-        return ColorImageRenderer.renderViewAsPNGData(view, size: size, opaque: true)
+        return ColorImageRenderer.renderViewAsPNGData(view, size: size, opaque: false)
     }
 
     /// Generates Adobe Swatch Exchange (ASE) format for a palette
