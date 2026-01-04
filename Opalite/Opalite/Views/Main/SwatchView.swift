@@ -405,9 +405,9 @@ struct SwatchView: View {
 
     // MARK: - Drag Support
 
-    /// Creates a cache key based on color and badge text
+    /// Creates a cache key based on color values
     private var dragImageCacheKey: String {
-        return "\(color.id)-\(color.red)-\(color.green)-\(color.blue)-\(color.alpha)|\(badgeText)|\(showOverlays)"
+        return "\(color.id)-\(color.red)-\(color.green)-\(color.blue)-\(color.alpha)"
     }
 
     private func provideDragItem() -> NSItemProvider {
@@ -434,6 +434,17 @@ struct SwatchView: View {
 
         let provider = NSItemProvider(item: imageData as NSData, typeIdentifier: UTType.png.identifier)
 
+        // Set filename to color name if available, otherwise use hex code
+        let filename: String
+        if let name = color.name, !name.isEmpty {
+            filename = "\(name).png"
+        } else {
+            // Remove the # prefix from hex string for cleaner filename
+            let hex = color.hexString.hasPrefix("#") ? String(color.hexString.dropFirst()) : color.hexString
+            filename = "\(hex).png"
+        }
+        provider.suggestedName = filename
+
         // Include full JSON data for cross-device drops and ID for same-device palette management
         // Register full JSON color data (works cross-device via Universal Control)
         provider.registerDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier, visibility: .all) { completion in
@@ -459,34 +470,15 @@ struct SwatchView: View {
 
     /// Renders the swatch as PNG image data for drag and drop or sharing.
     ///
-    /// Creates a solid color image with an optional badge overlay
-    /// showing the color name or hex code.
+    /// Creates a solid color rectangle without any badge or overlay,
+    /// providing a clean color swatch for external use.
     ///
     /// - Parameter size: The size of the output image
     /// - Returns: PNG data of the rendered swatch, or nil if rendering fails
     private func renderSwatchImage(size: CGSize) -> Data? {
-        let badgeOverlay = Group {
-            if showOverlays {
-                Text(badgeText)
-                    .foregroundStyle(displayColor.idealTextColor())
-                    .bold()
-                    .frame(height: 20)
-                    .padding(8)
-                    .glassIfAvailable(
-                        GlassConfiguration(style: .clear)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .padding(8)
-            }
-        }
-
         let swatchView = Rectangle()
             .fill(displayColor.swiftUIColor)
             .frame(width: size.width, height: size.height)
-            .overlay(alignment: .topLeading) {
-                badgeOverlay
-                    .frame(maxWidth: 500, alignment: .leading)
-            }
 
         return ColorImageRenderer.renderViewAsPNGData(swatchView, size: size, opaque: false)
     }
