@@ -14,6 +14,7 @@ import AppKit
 #endif
 
 struct ColorCodesPickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Binding var color: OpaliteColor
 
@@ -26,6 +27,10 @@ struct ColorCodesPickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if horizontalSizeClass == .regular {
+                Spacer(minLength: 0)
+            }
+
             // Header
             HStack(spacing: 8) {
                 Image(systemName: "chevron.left.slash.chevron.right")

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PaletteImportConfirmationSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(ColorManager.self) private var colorManager
 
     let preview: PaletteImportPreview
@@ -26,32 +27,16 @@ struct PaletteImportConfirmationSheet: View {
         !preview.willUpdate || !preview.newColors.isEmpty
     }
 
+    private var currentBackground: PreviewBackground {
+        preview.palette.previewBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     // Palette Preview
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: allColors.map { $0.swiftUIColor }),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(height: 180)
-                        .overlay(alignment: .topLeading) {
-                            Text(preview.palette.name)
-                                .bold()
-                                .foregroundStyle(allColors.first?.idealTextColor() ?? .black)
-                                .padding(12)
-                                .glassIfAvailable(GlassConfiguration(style: .clear))
-                                .padding(8)
-                        }
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(.thinMaterial, lineWidth: 3)
-                        )
+                    palettePreview
 
                     // Metadata
                     GroupBox {
@@ -156,7 +141,7 @@ struct PaletteImportConfirmationSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 
@@ -184,6 +169,8 @@ struct PaletteImportConfirmationSheet: View {
                     tags: preview.palette.tags,
                     colors: preview.newColors
                 )
+                // Preserve the preview background setting
+                paletteToImport.previewBackgroundRaw = preview.palette.previewBackgroundRaw
                 _ = try colorManager.createPalette(existing: paletteToImport)
             }
 
@@ -193,5 +180,131 @@ struct PaletteImportConfirmationSheet: View {
             errorMessage = error.localizedDescription
             isImporting = false
         }
+    }
+
+    // MARK: - Palette Preview
+
+    private let previewHeight: CGFloat = 180
+    private let previewPadding: CGFloat = 12
+
+    @ViewBuilder
+    private var palettePreview: some View {
+        GeometryReader { geometry in
+            let availableWidth = geometry.size.width - (previewPadding * 2)
+            let availableHeight = previewHeight - (previewPadding * 2) - 44 // Account for name badge
+            let colors = preview.palette.sortedColors
+            let layout = calculatePreviewLayout(
+                colorCount: colors.count,
+                availableWidth: availableWidth,
+                availableHeight: availableHeight
+            )
+
+            ZStack {
+                // Background
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(currentBackground.color)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(.thinMaterial, lineWidth: 3)
+                    )
+
+                // Color swatches grid
+                if colors.isEmpty {
+                    Text("This palette is empty")
+                        .foregroundStyle(currentBackground.idealTextColor.opacity(0.6))
+                        .font(.subheadline)
+                } else {
+                    VStack(spacing: layout.verticalSpacing) {
+                        ForEach(0..<layout.rows, id: \.self) { row in
+                            HStack(spacing: layout.horizontalSpacing) {
+                                ForEach(0..<layout.columns, id: \.self) { col in
+                                    let index = row * layout.columns + col
+                                    if index < colors.count {
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(colors[index].swiftUIColor)
+                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .strokeBorder(.black.opacity(0.1), lineWidth: 1)
+                                            )
+                                    } else {
+                                        Color.clear
+                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .overlay(alignment: .topLeading) {
+            Text(preview.palette.name)
+                .bold()
+                .foregroundStyle(currentBackground.idealTextColor)
+                .padding(8)
+                .glassIfAvailable(GlassConfiguration(style: .clear))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .padding(8)
+        }
+        .frame(height: previewHeight)
+    }
+
+    private struct PreviewLayoutInfo {
+        let rows: Int
+        let columns: Int
+        let swatchSize: CGFloat
+        let horizontalSpacing: CGFloat
+        let verticalSpacing: CGFloat
+    }
+
+    private func calculatePreviewLayout(
+        colorCount: Int,
+        availableWidth: CGFloat,
+        availableHeight: CGFloat
+    ) -> PreviewLayoutInfo {
+        guard colorCount > 0 else {
+            return PreviewLayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+        }
+
+        let minSpacing: CGFloat = 6
+        let maxSpacing: CGFloat = 12
+
+        var bestLayout = PreviewLayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+
+        // Try different row configurations (1 or 2 rows for the compact preview)
+        for rows in 1...2 {
+            let columns = Int(ceil(Double(colorCount) / Double(rows)))
+
+            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
+            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
+
+            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
+            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
+
+            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
+            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
+
+            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
+
+            var actualHorizontalSpacing = horizontalSpacing
+            if columns > 1 {
+                let usedWidth = CGFloat(columns) * swatchSize
+                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
+                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
+            }
+
+            if swatchSize > bestLayout.swatchSize {
+                bestLayout = PreviewLayoutInfo(
+                    rows: rows,
+                    columns: columns,
+                    swatchSize: swatchSize,
+                    horizontalSpacing: actualHorizontalSpacing,
+                    verticalSpacing: verticalSpacing
+                )
+            }
+        }
+
+        return bestLayout
     }
 }

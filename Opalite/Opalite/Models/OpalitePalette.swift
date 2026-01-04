@@ -73,7 +73,7 @@ final class OpalitePalette {
 extension OpalitePalette {
     /// Dictionary representation for flexible exporting / sharing
     var dictionaryRepresentation: [String: Any] {
-        [
+        var dict: [String: Any] = [
             "id": id.uuidString,
             "name": name,
             "createdAt": createdAt.timeIntervalSince1970,
@@ -83,6 +83,10 @@ extension OpalitePalette {
             "tags": tags,
             "colors": (colors ?? []).map { $0.dictionaryRepresentation }
         ]
+        if let previewBackgroundRaw {
+            dict["previewBackground"] = previewBackgroundRaw
+        }
+        return dict
     }
 
     /// JSON representation of the entire palette, including all colors

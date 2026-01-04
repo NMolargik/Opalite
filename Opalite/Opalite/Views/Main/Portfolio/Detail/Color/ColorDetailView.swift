@@ -33,8 +33,6 @@ struct ColorDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var isShowingColorEditor = false
     @State private var isEditingName: Bool? = false
-    @State private var isShowingPaletteSelection: Bool = false
-    @State private var showDetachConfirmation: Bool = false
     @State private var didCopyHex: Bool = false
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingContrastChecker: Bool = false
@@ -166,21 +164,6 @@ struct ColorDetailView: View {
         } message: {
             Text("This action cannot be undone.")
         }
-        .alert("Remove from Palette?", isPresented: $showDetachConfirmation) {
-            Button("Cancel", role: .cancel) {
-                HapticsManager.shared.selection()
-            }
-            Button("Remove", role: .destructive) {
-                HapticsManager.shared.selection()
-                viewModel.detachFromPalette(using: colorManager)
-            }
-        } message: {
-            Text("This color will be removed from its palette.")
-        }
-        .sheet(isPresented: $isShowingPaletteSelection) {
-            PaletteSelectionSheet(color: color)
-                .environment(colorManager)
-        }
         .fullScreenCover(isPresented: $isShowingColorEditor) {
             ColorEditorView(
                 color: color,
@@ -225,7 +208,7 @@ struct ColorDetailView: View {
                     HapticsManager.shared.selection()
                     isShowingColorEditor = true
                 } label: {
-                    Text("Edit")
+                    Label("Edit", systemImage: "slider.horizontal.below.square.and.square.filled")
                 }
                 .toolbarButtonTint()
             }
@@ -244,22 +227,6 @@ struct ColorDetailView: View {
 
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.selection()
-                    if color.palette != nil {
-                        showDetachConfirmation = true
-                    } else {
-                        isShowingPaletteSelection = true
-                    }
-                } label: {
-                    Label("Palette", systemImage: (color.palette != nil) ? "swatchpalette.fill" : "swatchpalette")
-                        .foregroundStyle(.purple, .orange, .red)
-                }
-                .accessibilityLabel(color.palette != nil ? "Remove from palette" : "Add to palette")
-                .accessibilityHint(color.palette != nil ? "Removes this color from its current palette" : "Opens palette selection to add this color")
             }
 
             ToolbarItem(placement: .topBarTrailing) {
@@ -318,22 +285,6 @@ struct ColorDetailView: View {
             if newValue != nil {
                 colorManager.editColorTrigger = nil
                 isShowingColorEditor = true
-            }
-        }
-        .onChange(of: colorManager.addToPaletteTrigger) { _, newValue in
-            if newValue != nil {
-                colorManager.addToPaletteTrigger = nil
-                if color.palette == nil {
-                    isShowingPaletteSelection = true
-                }
-            }
-        }
-        .onChange(of: colorManager.removeFromPaletteTrigger) { _, newValue in
-            if newValue != nil {
-                colorManager.removeFromPaletteTrigger = nil
-                if color.palette != nil {
-                    showDetachConfirmation = true
-                }
             }
         }
     }

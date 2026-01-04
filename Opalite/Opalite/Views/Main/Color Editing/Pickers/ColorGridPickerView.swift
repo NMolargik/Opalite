@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ColorGridPickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var color: OpaliteColor
 
     private let rows: Int = 13      // 1 grayscale row + 12 color rows
@@ -31,40 +32,48 @@ struct ColorGridPickerView: View {
 
             // Card container
             VStack(alignment: .leading, spacing: 12) {
-                LazyVGrid(columns: gridItems, spacing: 4) {
-                    ForEach(0..<(rows * columns), id: \.self) { index in
-                        let row = index / columns
-                        let column = index % columns
+                GeometryReader { geometry in
+                    let availableHeight = geometry.size.height
+                    let totalSpacing = CGFloat(rows - 1) * 4
+                    let itemHeight = max(28, (availableHeight - totalSpacing) / CGFloat(rows))
 
-                        let swatchColor: Color = colorFor(row: row, column: column, rows: rows, columns: columns)
-                        let selected: Bool = isColorSelected(swatchColor)
+                    LazyVGrid(columns: gridItems, spacing: 4) {
+                        ForEach(0..<(rows * columns), id: \.self) { index in
+                            let row = index / columns
+                            let column = index % columns
 
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(swatchColor)
-                            .frame(height: 28)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .strokeBorder(
-                                        selected ? Color.white : Color.black.opacity(0.15),
-                                        lineWidth: selected ? 2 : 1
-                                    )
-                            )
-                            .shadow(color: selected ? Color.black.opacity(0.25) : .clear,
-                                    radius: selected ? 2 : 0,
-                                    x: 0, y: 0)
-                            .onTapGesture {
-                                if let rgba = swatchColor.rgbaComponents {
-                                    color.red = rgba.red
-                                    color.green = rgba.green
-                                    color.blue = rgba.blue
-                                    color.alpha = rgba.alpha
+                            let swatchColor: Color = colorFor(row: row, column: column, rows: rows, columns: columns)
+                            let selected: Bool = isColorSelected(swatchColor)
+
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(swatchColor)
+                                .frame(height: itemHeight)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .strokeBorder(
+                                            selected ? Color.white : Color.black.opacity(0.15),
+                                            lineWidth: selected ? 2 : 1
+                                        )
+                                )
+                                .shadow(color: selected ? Color.black.opacity(0.25) : .clear,
+                                        radius: selected ? 2 : 0,
+                                        x: 0, y: 0)
+                                .onTapGesture {
+                                    if let rgba = swatchColor.rgbaComponents {
+                                        color.red = rgba.red
+                                        color.green = rgba.green
+                                        color.blue = rgba.blue
+                                        color.alpha = rgba.alpha
+                                    }
                                 }
-                            }
-                            .accessibilityLabel(accessibilityLabelFor(row: row, column: column, rows: rows, columns: columns))
-                            .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-                            .accessibilityHint("Double tap to select this color")
+                                .accessibilityLabel(accessibilityLabelFor(row: row, column: column, rows: rows, columns: columns))
+                                .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+                                .accessibilityHint("Double tap to select this color")
+                        }
                     }
                 }
+                .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
+                .frame(minHeight: horizontalSizeClass == .compact ? CGFloat(rows) * 28 + CGFloat(rows - 1) * 4 : nil)
 
                 // Opacity control, similar to system Grid picker
                 VStack(alignment: .leading, spacing: 8) {
@@ -86,6 +95,7 @@ struct ColorGridPickerView: View {
                 }
             }
             .padding(12)
+            .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(.ultraThinMaterial)
@@ -95,6 +105,7 @@ struct ColorGridPickerView: View {
                     .strokeBorder(.white.opacity(0.12), lineWidth: 1)
             )
         }
+        .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
     }
 
     private func colorFor(row: Int, column: Int, rows: Int, columns: Int) -> Color {

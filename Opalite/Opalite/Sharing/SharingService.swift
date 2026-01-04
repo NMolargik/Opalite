@@ -958,6 +958,7 @@ enum SharingService {
         let notes = json["notes"] as? String
         let tags = json["tags"] as? [String] ?? []
         let createdByDisplayName = json["createdByDisplayName"] as? String
+        let previewBackgroundRaw = json["previewBackground"] as? String
 
         let createdAt: Date
         if let timestamp = json["createdAt"] as? Double {
@@ -993,6 +994,9 @@ enum SharingService {
             tags: tags,
             colors: colors
         )
+
+        // Set preview background if present
+        palette.previewBackgroundRaw = previewBackgroundRaw
 
         // Set back-references
         colors.forEach { $0.palette = palette }

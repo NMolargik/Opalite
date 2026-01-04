@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct ColorChannelsPickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var color: OpaliteColor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if horizontalSizeClass == .regular {
+                Spacer(minLength: 0)
+            }
+
             // Header
             HStack(spacing: 8) {
                 Image(systemName: "slider.horizontal.3")

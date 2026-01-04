@@ -11,6 +11,7 @@ import SwiftUI
 import UIKit
 
 struct ColorImagePickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var color: OpaliteColor
 
     @State private var selectedImage: UIImage?
@@ -20,6 +21,10 @@ struct ColorImagePickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if horizontalSizeClass == .regular {
+                Spacer(minLength: 0)
+            }
+
             // Header
             HStack(spacing: 8) {
                 Image(systemName: "eyedropper.halffull")
@@ -298,10 +303,15 @@ import AppKit
 
 /// macOS placeholder: image-based color picking is not available here.
 struct ColorImagePickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var color: OpaliteColor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if horizontalSizeClass == .regular {
+                Spacer(minLength: 0)
+            }
+
             HStack(spacing: 8) {
                 Image(systemName: "eyedropper.halffull")
                     .imageScale(.medium)

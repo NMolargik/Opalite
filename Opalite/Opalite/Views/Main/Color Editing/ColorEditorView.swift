@@ -104,9 +104,8 @@ struct ColorEditorView: View {
 
                         if !viewModel.isColorExpanded {
                             VStack {
-                                Spacer()
-
                                 modeContentView
+                                    .frame(maxHeight: .infinity)
                                 modePickerView
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -130,7 +129,6 @@ struct ColorEditorView: View {
                             }
                         } label: {
                             Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                                .foregroundStyle(.purple, .orange, .red)
                         }
                         .accessibilityLabel(viewModel.isShowingPaletteStrip ? "Hide palette colors" : "Show palette colors")
                     }
@@ -223,7 +221,6 @@ struct ColorEditorView: View {
                             }
                         } label: {
                             Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                                .foregroundStyle(.purple, .orange, .red)
                         }
                     }
                 }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ColorSpectrumPickerView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var color: OpaliteColor
     @State private var dragLocation: CGPoint = CGPoint(x: 0.5, y: 0.5)
     @State private var hasInitialized: Bool = false
@@ -70,7 +71,8 @@ struct ColorSpectrumPickerView: View {
                             )
                     }
                 }
-                .frame(height: 200)
+                .frame(minHeight: 200)
+                .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : 200)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Color spectrum picker")
@@ -101,6 +103,7 @@ struct ColorSpectrumPickerView: View {
 
             }
             .padding(12)
+            .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(.ultraThinMaterial)
@@ -110,6 +113,7 @@ struct ColorSpectrumPickerView: View {
                     .strokeBorder(.white.opacity(0.12), lineWidth: 1)
             )
         }
+        .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
         .onAppear {
             guard !hasInitialized else { return }
             hasInitialized = true

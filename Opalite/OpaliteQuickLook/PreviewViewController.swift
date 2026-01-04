@@ -113,15 +113,14 @@ class PreviewViewController: UIViewController, QLPreviewingController {
     // MARK: - Palette Preview
 
     private func setupPalettePreview(colors: [UIColor], name: String) {
-        // Gradient view for palette
-        let gradientView = GradientView()
-        gradientView.colors = colors.isEmpty ? [.systemGray4, .systemGray4] : colors
-        gradientView.layer.cornerRadius = 24
-        gradientView.layer.borderWidth = 4
-        gradientView.layer.borderColor = UIColor.systemGray4.cgColor
-        gradientView.clipsToBounds = true
-        gradientView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(gradientView)
+        // Container view for the swatch grid
+        let containerView = SwatchGridView(colors: colors)
+        containerView.layer.cornerRadius = 24
+        containerView.layer.borderWidth = 4
+        containerView.layer.borderColor = UIColor.systemGray4.cgColor
+        containerView.clipsToBounds = true
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(containerView)
 
         // Name label
         let nameLabel = UILabel()
@@ -142,12 +141,12 @@ class PreviewViewController: UIViewController, QLPreviewingController {
         view.addSubview(countLabel)
 
         NSLayoutConstraint.activate([
-            gradientView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            gradientView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
-            gradientView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            gradientView.heightAnchor.constraint(equalToConstant: 180),
+            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
+            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            containerView.heightAnchor.constraint(equalToConstant: 180),
 
-            nameLabel.topAnchor.constraint(equalTo: gradientView.bottomAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 20),
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
@@ -166,44 +165,99 @@ class PreviewViewController: UIViewController, QLPreviewingController {
     }
 }
 
-// MARK: - Gradient View
+// MARK: - Swatch Grid View
 
-private class GradientView: UIView {
-    var colors: [UIColor] = [] {
-        didSet { updateGradient() }
-    }
+private class SwatchGridView: UIView {
+    private let colors: [UIColor]
+    private var swatchViews: [UIView] = []
 
-    private let gradientLayer = CAGradientLayer()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setup()
+    init(colors: [UIColor]) {
+        self.colors = colors
+        super.init(frame: .zero)
+        backgroundColor = .systemBackground
+        setupSwatches()
     }
 
     required init?(coder: NSCoder) {
+        self.colors = []
         super.init(coder: coder)
-        setup()
+        backgroundColor = .systemBackground
     }
 
-    private func setup() {
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
-        layer.addSublayer(gradientLayer)
+    private func setupSwatches() {
+        for color in colors {
+            let swatchView = UIView()
+            swatchView.backgroundColor = color
+            swatchView.layer.cornerRadius = 8
+            swatchView.layer.borderWidth = 1
+            swatchView.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+            swatchView.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(swatchView)
+            swatchViews.append(swatchView)
+        }
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = bounds
+        layoutSwatches()
     }
 
-    private func updateGradient() {
-        gradientLayer.colors = colors.map { $0.cgColor }
+    private func layoutSwatches() {
+        guard !colors.isEmpty else { return }
 
-        // Evenly distribute color stops
-        if colors.count > 1 {
-            gradientLayer.locations = colors.enumerated().map { index, _ in
-                NSNumber(value: Double(index) / Double(colors.count - 1))
+        let padding: CGFloat = 12
+        let spacing: CGFloat = 8
+        let availableWidth = bounds.width - (padding * 2)
+        let availableHeight = bounds.height - (padding * 2)
+
+        let layout = calculateLayout(colorCount: colors.count, availableWidth: availableWidth, availableHeight: availableHeight, spacing: spacing)
+
+        let totalGridWidth = CGFloat(layout.columns) * layout.swatchSize + CGFloat(layout.columns - 1) * spacing
+        let totalGridHeight = CGFloat(layout.rows) * layout.swatchSize + CGFloat(layout.rows - 1) * spacing
+        let startX = padding + (availableWidth - totalGridWidth) / 2
+        let startY = padding + (availableHeight - totalGridHeight) / 2
+
+        for (index, swatchView) in swatchViews.enumerated() {
+            let row = index / layout.columns
+            let col = index % layout.columns
+
+            let x = startX + CGFloat(col) * (layout.swatchSize + spacing)
+            let y = startY + CGFloat(row) * (layout.swatchSize + spacing)
+
+            swatchView.frame = CGRect(x: x, y: y, width: layout.swatchSize, height: layout.swatchSize)
+            swatchView.layer.cornerRadius = layout.swatchSize * 0.15
+        }
+    }
+
+    private struct LayoutInfo {
+        let rows: Int
+        let columns: Int
+        let swatchSize: CGFloat
+    }
+
+    private func calculateLayout(colorCount: Int, availableWidth: CGFloat, availableHeight: CGFloat, spacing: CGFloat) -> LayoutInfo {
+        guard colorCount > 0 else {
+            return LayoutInfo(rows: 0, columns: 0, swatchSize: 0)
+        }
+
+        var bestLayout = LayoutInfo(rows: 1, columns: 1, swatchSize: 0)
+
+        for rows in 1...3 {
+            let columns = Int(ceil(Double(colorCount) / Double(rows)))
+
+            let totalHSpacing = CGFloat(columns - 1) * spacing
+            let totalVSpacing = CGFloat(rows - 1) * spacing
+
+            let maxSwatchWidth = (availableWidth - totalHSpacing) / CGFloat(columns)
+            let maxSwatchHeight = (availableHeight - totalVSpacing) / CGFloat(rows)
+
+            let swatchSize = min(maxSwatchWidth, maxSwatchHeight)
+
+            if swatchSize > bestLayout.swatchSize {
+                bestLayout = LayoutInfo(rows: rows, columns: columns, swatchSize: swatchSize)
             }
         }
+
+        return bestLayout
     }
 }
