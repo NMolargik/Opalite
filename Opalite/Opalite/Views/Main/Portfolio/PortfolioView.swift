@@ -72,7 +72,18 @@ struct PortfolioView: View {
             return colorManager.palettes
         }
 
-        let paletteDict = Dictionary(uniqueKeysWithValues: colorManager.palettes.map { ($0.id, $0) })
+        // Remove duplicate palettes (keep most recently updated)
+        var seenIDs: [UUID: OpalitePalette] = [:]
+        for palette in colorManager.palettes {
+            if let existing = seenIDs[palette.id] {
+                let older = palette.updatedAt > existing.updatedAt ? existing : palette
+                try? colorManager.deletePalette(older)
+                seenIDs[palette.id] = palette.updatedAt > existing.updatedAt ? palette : existing
+            } else {
+                seenIDs[palette.id] = palette
+            }
+        }
+        let paletteDict = seenIDs
         var result: [OpalitePalette] = []
 
         // Add palettes in saved order
