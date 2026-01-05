@@ -22,6 +22,7 @@ struct PaletteDetailView: View {
     @State private var notesDraft: String = ""
     @State private var isSavingNotes: Bool = false
     @State private var isShowingExportSheet: Bool = false
+    @State private var isShowingColorEditor: Bool = false
 
     let palette: OpalitePalette
 
@@ -161,6 +162,16 @@ struct PaletteDetailView: View {
                 .accessibilityLabel("Export palette")
                 .accessibilityHint("Opens export options for this palette")
             }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticsManager.shared.selection()
+                    isShowingColorEditor = true
+                } label: {
+                    Label("Add Color", systemImage: "plus")
+                }
+                .tint(.blue)
+            }
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -187,6 +198,25 @@ struct PaletteDetailView: View {
                 }
                 .tint(.red)
             }
+        }
+        .fullScreenCover(isPresented: $isShowingColorEditor) {
+            ColorEditorView(
+                color: nil,
+                palette: palette,
+                onCancel: {
+                    isShowingColorEditor = false
+                },
+                onApprove: { newColor in
+                    do {
+                        let createdColor = try colorManager.createColor(existing: newColor)
+                        colorManager.attachColor(createdColor, to: palette)
+                    } catch {
+                        toastManager.show(error: .colorCreationFailed)
+                    }
+
+                    isShowingColorEditor = false
+                }
+            )
         }
     }
 }

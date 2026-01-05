@@ -109,6 +109,22 @@ struct PaletteRowHeaderView: View {
                 .hoverEffect(.lift)
             }
             .buttonStyle(.plain)
+
+            Button {
+                HapticsManager.shared.selection()
+                isShowingColorEditor = true
+            } label: {
+                Image(systemName: "plus")
+                    .imageScale(.large)
+                    .bold()
+                    .foregroundStyle(.white)
+                    .frame(height: 20)
+                    .padding(8)
+                    .background(RoundedRectangle(cornerRadius: 20.0).fill(.blue))
+                    .glassIfAvailable(GlassConfiguration(style: .regular))
+                    .hoverEffect(.lift)
+            }
+            .buttonStyle(.plain)
         }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
