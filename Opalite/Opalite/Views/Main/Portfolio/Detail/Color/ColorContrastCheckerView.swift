@@ -67,9 +67,7 @@ struct ColorContrastCheckerView: View {
                 VStack(spacing: 20) {
                     colorComparisonSection
 
-                    if let ratio = contrastRatio {
-                        contrastRatioSection(ratio: ratio)
-                    }
+                    contrastRatioSection(ratio: contrastRatio)
 
                     colorSelectionSection
                 }
@@ -162,14 +160,21 @@ struct ColorContrastCheckerView: View {
     // MARK: - Contrast Ratio Section
 
     @ViewBuilder
-    private func contrastRatioSection(ratio: Double) -> some View {
+    private func contrastRatioSection(ratio: Double?) -> some View {
         SectionCard(title: "WCAG Compliance", systemImage: "checkmark.seal") {
             VStack(spacing: 16) {
                 // Large ratio display
-                Text(String(format: "%.2f:1", ratio))
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundStyle(ratio >= 4.5 ? .green : (ratio >= 3.0 ? .orange : .red))
-                    .accessibilityLabel("Contrast ratio \(String(format: "%.2f", ratio)) to 1")
+                if let ratio = ratio {
+                    Text(String(format: "%.2f:1", ratio))
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(ratio >= 4.5 ? .green : (ratio >= 3.0 ? .orange : .red))
+                        .accessibilityLabel("Contrast ratio \(String(format: "%.2f", ratio)) to 1")
+                } else {
+                    Text("—:1")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel("No contrast ratio available")
+                }
 
                 // Compliance badges grid
                 LazyVGrid(columns: [
@@ -179,6 +184,12 @@ struct ColorContrastCheckerView: View {
                     ForEach(WCAGLevel.allCases, id: \.rawValue) { level in
                         complianceBadge(level: level)
                     }
+                }
+
+                if ratio == nil {
+                    Text("Select a comparison color below")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding(.horizontal, 16)

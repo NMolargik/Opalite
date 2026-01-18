@@ -105,13 +105,33 @@ struct PaletteSelectionSheet: View {
                                 attach(color, to: palette)
                             } label: {
                                 HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
+                                    VStack(alignment: .leading, spacing: 6) {
                                         Text(palette.name)
                                             .font(.headline)
-                                        if let count = palette.colors?.count {
-                                            Text("\(count) color\(count == 1 ? "" : "s")")
+
+                                        if palette.sortedColors.isEmpty {
+                                            Text("No colors")
                                                 .font(.caption)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(.tertiary)
+                                        } else {
+                                            HStack(spacing: 4) {
+                                                ForEach(palette.sortedColors.prefix(8)) { paletteColor in
+                                                    RoundedRectangle(cornerRadius: 4)
+                                                        .fill(paletteColor.swiftUIColor)
+                                                        .frame(width: 24, height: 24)
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 4)
+                                                                .strokeBorder(.secondary.opacity(0.2), lineWidth: 0.5)
+                                                        )
+                                                }
+
+                                                if palette.sortedColors.count > 8 {
+                                                    Text("+\(palette.sortedColors.count - 8)")
+                                                        .font(.caption2)
+                                                        .foregroundStyle(.secondary)
+                                                        .padding(.leading, 2)
+                                                }
+                                            }
                                         }
                                     }
                                     Spacer()
@@ -128,7 +148,7 @@ struct PaletteSelectionSheet: View {
                     Text("Existing Palettes")
                 }
             }
-            .navigationTitle("Add to Palette")
+            .navigationTitle("Move To Palette")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

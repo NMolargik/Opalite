@@ -159,7 +159,7 @@ struct QuickAddHexSheet: View {
                 isTextFieldFocused = true
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 

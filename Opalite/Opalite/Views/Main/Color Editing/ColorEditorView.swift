@@ -290,6 +290,7 @@ struct ColorEditorView: View {
             // Show keyboard shortcuts tip on iPad/Mac
             if horizontalSizeClass == .regular {
                 TipView(keyboardShortcutsTip)
+                    .tipCornerRadius(16)
             }
 
             Picker("Input Mode", selection: $viewModel.mode) {

@@ -13,86 +13,193 @@ import UIKit
 
 struct CanvasSwatchPickerView: View {
     @Environment(ColorManager.self) private var colorManager
+    @Environment(ToastManager.self) private var toastManager
 
     let onColorSelected: (OpaliteColor) -> Void
     private let swatchSize: CGFloat = 44
+    private let itemSpacing: CGFloat = 8
 
     // Track which color was just selected for checkmark animation
     @State private var selectedColorID: UUID? = nil
 
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                // MARK: - Loose Colors Section
-                // Colors are pre-sorted by updatedAt from ColorManager
-                if !colorManager.looseColors.isEmpty {
-                    ForEach(colorManager.looseColors, id: \.id) { color in
-                        swatchButton(for: color)
-                    }
+    /// All colors flattened for the haptic scroll view
+    private var allColors: [OpaliteColor] {
+        var colors: [OpaliteColor] = []
+        colors.append(contentsOf: colorManager.looseColors)
+        for palette in colorManager.palettes {
+            colors.append(contentsOf: palette.sortedColors)
+        }
+        return colors
+    }
 
-                    // Divider after loose colors if there are palettes
-                    if !colorManager.palettes.isEmpty {
-                        sectionDivider
-                    }
+    var body: some View {
+        HapticSwatchScrollView(
+            colors: allColors,
+            swatchSize: swatchSize,
+            itemSpacing: itemSpacing,
+            selectedColorID: selectedColorID,
+            onColorSelected: { color in
+                HapticsManager.shared.selection()
+                onColorSelected(color)
+
+                // Show toast with color name or hex
+                let colorLabel = color.name?.isEmpty == false ? color.name! : color.hexString
+                toastManager.show(ToastItem(message: colorLabel, style: .info, icon: "paintbrush.fill", duration: 1.5))
+
+                // Show checkmark briefly
+                withAnimation(.linear(duration: 0.15)) {
+                    selectedColorID = color.id
                 }
 
-                // MARK: - Palette Sections
-                // Palettes sorted by createdAt (newest first)
-                ForEach(Array(colorManager.palettes.enumerated()), id: \.element.id) { index, palette in
-                    let paletteColors = palette.sortedColors
-
-                    if !paletteColors.isEmpty {
-                        ForEach(paletteColors, id: \.id) { color in
-                            swatchButton(for: color)
-                        }
-
-                        // Divider after each palette except the last
-                        if index < colorManager.palettes.count - 1 {
-                            sectionDivider
-                        }
+                // Hide checkmark after delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.linear(duration: 0.15)) {
+                        selectedColorID = nil
                     }
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-        }
+        )
         .frame(height: swatchSize + 16)
         .background(.ultraThinMaterial)
         .clipShape(Rectangle())
     }
+}
 
-    @ViewBuilder
-    private func swatchButton(for color: OpaliteColor) -> some View {
-        PencilHapticSwatchButton(
-            color: color.swiftUIColor,
-            size: swatchSize,
-            isSelected: selectedColorID == color.id,
-            idealTextColor: color.idealTextColor()
-        ) {
-            HapticsManager.shared.selection()
-            onColorSelected(color)
+// MARK: - Haptic Scroll View
 
-            // Show checkmark briefly
-            withAnimation(.linear(duration: 0.15)) {
-                selectedColorID = color.id
+#if canImport(UIKit)
+/// A horizontal scroll view that triggers haptic feedback as items scroll past the center
+struct HapticSwatchScrollView: UIViewRepresentable {
+    let colors: [OpaliteColor]
+    let swatchSize: CGFloat
+    let itemSpacing: CGFloat
+    let selectedColorID: UUID?
+    let onColorSelected: (OpaliteColor) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    func makeUIView(context: Context) -> UIScrollView {
+        let scrollView = UIScrollView()
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceHorizontal = true
+        scrollView.delegate = context.coordinator
+
+        let contentView = UIView()
+        contentView.tag = 100
+        scrollView.addSubview(contentView)
+
+        context.coordinator.scrollView = scrollView
+        context.coordinator.contentView = contentView
+
+        return scrollView
+    }
+
+    func updateUIView(_ scrollView: UIScrollView, context: Context) {
+        context.coordinator.parent = self
+        context.coordinator.rebuildContent()
+    }
+
+    class Coordinator: NSObject, UIScrollViewDelegate {
+        var parent: HapticSwatchScrollView
+        weak var scrollView: UIScrollView?
+        weak var contentView: UIView?
+
+        private var lastFocusedIndex: Int = -1
+        private var selectionFeedback: UISelectionFeedbackGenerator?
+        private var canvasFeedback: UICanvasFeedbackGenerator?
+        private var swatchViews: [PencilHapticSwatchView] = []
+
+        init(parent: HapticSwatchScrollView) {
+            self.parent = parent
+            super.init()
+            selectionFeedback = UISelectionFeedbackGenerator()
+            selectionFeedback?.prepare()
+        }
+
+        func rebuildContent() {
+            guard let scrollView = scrollView, let contentView = contentView else { return }
+
+            // Remove old swatch views
+            swatchViews.forEach { $0.removeFromSuperview() }
+            swatchViews.removeAll()
+
+            let horizontalPadding: CGFloat = 12
+            let swatchSize = parent.swatchSize
+            let spacing = parent.itemSpacing
+
+            var xOffset: CGFloat = horizontalPadding
+
+            for (index, color) in parent.colors.enumerated() {
+                let swatchView = PencilHapticSwatchView()
+                swatchView.frame = CGRect(x: xOffset, y: 8, width: swatchSize, height: swatchSize)
+                swatchView.updateAppearance(
+                    color: UIColor(color.swiftUIColor),
+                    size: swatchSize,
+                    isSelected: parent.selectedColorID == color.id,
+                    checkmarkColor: UIColor(color.idealTextColor())
+                )
+                swatchView.tag = index
+                swatchView.onTap = { [weak self] in
+                    guard let self = self, index < self.parent.colors.count else { return }
+                    self.parent.onColorSelected(self.parent.colors[index])
+                }
+                contentView.addSubview(swatchView)
+                swatchViews.append(swatchView)
+
+                xOffset += swatchSize + spacing
             }
 
-            // Hide checkmark after delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                withAnimation(.linear(duration: 0.15)) {
-                    selectedColorID = nil
-                }
+            // Adjust final width (remove last spacing, add padding)
+            let contentWidth = xOffset - spacing + horizontalPadding
+            let contentHeight = swatchSize + 16
+
+            contentView.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
+            scrollView.contentSize = CGSize(width: contentWidth, height: contentHeight)
+
+            // Initialize canvas feedback generator if not already done
+            if canvasFeedback == nil {
+                canvasFeedback = UICanvasFeedbackGenerator(view: scrollView)
             }
         }
-        .frame(width: swatchSize, height: swatchSize)
-    }
 
-    private var sectionDivider: some View {
-        Capsule()
-            .fill(.secondary.opacity(0.4))
-            .frame(width: 2, height: swatchSize * 0.6)
+        // MARK: - UIScrollViewDelegate
+
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            let centerX = scrollView.contentOffset.x + scrollView.bounds.width / 2
+            let focusedIndex = indexOfItem(at: centerX)
+
+            if focusedIndex != lastFocusedIndex && focusedIndex >= 0 && focusedIndex < parent.colors.count {
+                lastFocusedIndex = focusedIndex
+
+                // Trigger iPhone haptic
+                selectionFeedback?.selectionChanged()
+                selectionFeedback?.prepare()
+
+                // Trigger Apple Pencil Pro haptic
+                let hapticLocation = CGPoint(x: scrollView.bounds.width / 2, y: scrollView.bounds.height / 2)
+                canvasFeedback?.alignmentOccurred(at: hapticLocation)
+            }
+        }
+
+        private func indexOfItem(at centerX: CGFloat) -> Int {
+            let horizontalPadding: CGFloat = 12
+            let swatchSize = parent.swatchSize
+            let spacing = parent.itemSpacing
+            let itemWidth = swatchSize + spacing
+
+            // Calculate which item index the centerX falls into
+            let adjustedX = centerX - horizontalPadding
+            if adjustedX < 0 { return 0 }
+
+            let index = Int(adjustedX / itemWidth)
+            return min(index, parent.colors.count - 1)
+        }
     }
 }
+#endif
 
 // MARK: - Pencil Haptic Swatch Button
 

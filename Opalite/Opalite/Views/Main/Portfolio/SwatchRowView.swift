@@ -30,6 +30,8 @@ struct SwatchRowView: View {
 
     @State private var isDropTargeted: Bool = false
     @State private var showingColorEditor: Bool = false
+    @State private var draggingColorID: UUID? = nil
+    @State private var dragResetTask: Task<Void, Never>? = nil
 
     init(
         colors: [OpaliteColor],
@@ -81,12 +83,8 @@ struct SwatchRowView: View {
                         .frame(height: 20)
                         .padding(8)
                         .multilineTextAlignment(.center)
-                        .glassIfAvailable(
-                            GlassConfiguration(style: .clear)
-                                .tint(.blue)
-                                .interactive()
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 8))
+                        .background(.blue, in: RoundedRectangle(cornerRadius: 16))
+                        .contentShape(RoundedRectangle(cornerRadius: 16))
                         .hoverEffect(.lift)
                     }
                     .accessibilityLabel("Create A New Color")
@@ -209,6 +207,23 @@ struct SwatchRowView: View {
             showCopiedFeedback: Binding(
                 get: { copiedColorID == color.id },
                 set: { if !$0 { copiedColorID = nil } }
+            ),
+            onDragStarted: {
+                draggingColorID = color.id
+                // Set up fallback reset in case drop doesn't complete normally
+                dragResetTask?.cancel()
+                dragResetTask = Task {
+                    try? await Task.sleep(for: .seconds(5))
+                    if !Task.isCancelled {
+                        await MainActor.run {
+                            draggingColorID = nil
+                        }
+                    }
+                }
+            },
+            isDragging: Binding(
+                get: { draggingColorID == color.id },
+                set: { if !$0 { draggingColorID = nil } }
             )
         )
     }
@@ -218,6 +233,10 @@ struct SwatchRowView: View {
     /// Handle a dropped color by UUID (same-device drop - color exists locally)
     private func handleDroppedColorID(_ uuid: UUID) {
         Task { @MainActor in
+            // Clear drag state
+            dragResetTask?.cancel()
+            draggingColorID = nil
+
             var droppedColor = colorManager.colors.first(where: { $0.id == uuid })
             if droppedColor == nil {
                 do {
@@ -244,6 +263,10 @@ struct SwatchRowView: View {
     /// Handle a dropped color from JSON data (cross-device drop - need to import)
     private func handleDroppedColorJSON(_ data: Data) {
         Task { @MainActor in
+            // Clear drag state
+            dragResetTask?.cancel()
+            draggingColorID = nil
+
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
 
             // Check if this color already exists by ID

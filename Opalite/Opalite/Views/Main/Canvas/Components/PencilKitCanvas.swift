@@ -49,6 +49,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
 
     func makeUIView(context: Context) -> PKCanvasView {
         let view = PKCanvasView()
+        view.overrideUserInterfaceStyle = .light
         view.drawing = drawing
         view.backgroundColor = .clear
         view.isOpaque = false

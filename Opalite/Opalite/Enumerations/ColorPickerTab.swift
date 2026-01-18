@@ -8,8 +8,8 @@
 import SwiftUI
 
 enum ColorPickerTab: String, CaseIterable, Identifiable {
-    case grid = "Grid"
     case spectrum = "Spectrum"
+    case grid = "Grid"
     case sliders = "Channels"
     case codes = "Codes"
     case image = "Image"
@@ -50,8 +50,8 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
     /// Keyboard shortcut key (1-5) for switching modes on iPad/Mac
     var keyboardShortcutKey: Character {
         switch self {
-        case .grid: return "1"
-        case .spectrum: return "2"
+        case .spectrum: return "1"
+        case .grid: return "2"
         case .sliders: return "3"
         case .codes: return "4"
         case .image: return "5"
@@ -61,8 +61,8 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
     /// Initialize from a keyboard character (1-5)
     init?(fromKey key: Character) {
         switch key {
-        case "1": self = .grid
-        case "2": self = .spectrum
+        case "1": self = .spectrum
+        case "2": self = .grid
         case "3": self = .sliders
         case "4": self = .codes
         case "5": self = .image

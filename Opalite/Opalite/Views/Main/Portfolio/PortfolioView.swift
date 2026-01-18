@@ -123,12 +123,14 @@ struct PortfolioView: View {
                         // When user dismisses tip, enable the next tip
                         ColorDetailsTip.hasSeenCreateTip = true
                     }
+                    .tipCornerRadius(16)
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
 
                     #if targetEnvironment(macCatalyst)
                     // MARK: - Screen Sampler Tip (Mac only)
                     TipView(screenSamplerTip)
+                        .tipCornerRadius(16)
                         .padding(.horizontal, 20)
                     #endif
 
@@ -148,6 +150,7 @@ struct PortfolioView: View {
 
                     // Color details tip - shown after create content tip is dismissed
                     TipView(colorDetailsTip)
+                        .tipCornerRadius(16)
                         .padding(.horizontal, 20)
 
                     SwatchRowView(
@@ -225,11 +228,7 @@ struct PortfolioView: View {
                                 .frame(height: 20)
                                 .padding(8)
                                 .multilineTextAlignment(.center)
-                                .glassIfAvailable(
-                                    GlassConfiguration(style: .clear)
-                                        .tint(.blue)
-                                        .interactive()
-                                )
+                                .background(.blue, in: RoundedRectangle(cornerRadius: 16))
                                 .contentShape(RoundedRectangle(cornerRadius: 16))
                                 .hoverEffect(.lift)
                             }
@@ -242,6 +241,7 @@ struct PortfolioView: View {
                     } else {
                         // Drag and drop tip - shown after first palette
                         TipView(dragAndDropTip)
+                            .tipCornerRadius(16)
                             .padding(.horizontal, 20)
 
                         // Palettes ordered by user's custom order (or default order)
@@ -608,6 +608,7 @@ struct PortfolioView: View {
                     .labelStyle(.titleAndIcon)
                 }
             }
+            .toolbarRole(isCompact ? .automatic : .editor)
         }
     }
     
@@ -693,7 +694,7 @@ struct PortfolioView: View {
                         HapticsManager.shared.selection()
                         paletteSelectionColor = color
                     } label: {
-                        Label("Add To Palette", systemImage: "swatchpalette.fill")
+                        Label("Move To Palette", systemImage: "swatchpalette.fill")
                     }
                 }
 

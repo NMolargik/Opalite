@@ -86,6 +86,122 @@ struct SearchView: View {
                     )
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+
+                    // MARK: - Suggestions
+
+                    if !colorManager.colors.isEmpty {
+                        Section {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(colorManager.colors.prefix(8)) { color in
+                                        NavigationLink {
+                                            ColorDetailView(color: color)
+                                                .tint(.none)
+                                        } label: {
+                                            VStack(spacing: 6) {
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(color.swiftUIColor)
+                                                    .frame(width: 56, height: 56)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 8)
+                                                            .stroke(.secondary.opacity(0.3), lineWidth: 1)
+                                                    )
+
+                                                Text(color.name ?? color.hexString)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.secondary)
+                                                    .lineLimit(1)
+                                                    .frame(width: 56)
+                                            }
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        } header: {
+                            Label("Recent Colors", systemImage: "clock.fill")
+                                .foregroundStyle(.blue)
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    }
+
+                    if !colorManager.palettes.isEmpty {
+                        Section {
+                            ForEach(colorManager.palettes.prefix(3)) { palette in
+                                NavigationLink {
+                                    PaletteDetailView(palette: palette)
+                                        .tint(.none)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        // Mini palette preview
+                                        HStack(spacing: 0) {
+                                            ForEach(Array(palette.sortedColors.prefix(4)), id: \.id) { color in
+                                                Rectangle()
+                                                    .fill(color.swiftUIColor)
+                                            }
+                                        }
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .stroke(.secondary.opacity(0.3), lineWidth: 1)
+                                        )
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(palette.name)
+                                                .font(.body)
+                                            Text("\(palette.colors?.count ?? 0) colors")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
+                        } header: {
+                            Label("Palettes", systemImage: "swatchpalette.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.purple, .orange, .red)
+                        }
+                    }
+
+                    if !canvasManager.canvases.isEmpty {
+                        Section {
+                            ForEach(canvasManager.canvases.prefix(3)) { canvas in
+                                Button {
+                                    HapticsManager.shared.selection()
+                                    openCanvas(canvas)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "scribble.variable")
+                                            .font(.title2)
+                                            .foregroundStyle(.red)
+                                            .frame(width: 32, height: 32)
+
+                                        Text(canvas.title)
+                                            .font(.body)
+                                            .foregroundStyle(.primary)
+
+                                        Spacer()
+
+                                        if !subscriptionManager.hasOnyxEntitlement {
+                                            Image(systemName: "lock.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.red)
+                                        }
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.red)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        } header: {
+                            Label("Canvases", systemImage: "pencil.and.scribble")
+                                .foregroundStyle(.red)
+                        }
+                    }
                 } else if !hasResults {
                     ContentUnavailableView.search(text: searchText)
                         .listRowBackground(Color.clear)
@@ -190,16 +306,9 @@ struct SearchView: View {
                                             .foregroundStyle(.red)
                                             .frame(width: 32, height: 32)
 
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(canvas.title)
-                                                .font(.body)
-                                                .foregroundStyle(.primary)
-                                            Text(canvas.updatedAt, style: .relative)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        .foregroundStyle(.inverseTheme)
-
+                                        Text(canvas.title)
+                                            .font(.body)
+                                            .foregroundStyle(.primary)
 
                                         Spacer()
 
@@ -214,6 +323,7 @@ struct SearchView: View {
                                             .foregroundStyle(.red)
                                     }
                                 }
+                                .buttonStyle(.plain)
                             }
                         } header: {
                             Label("Canvases", systemImage: "pencil.and.scribble")

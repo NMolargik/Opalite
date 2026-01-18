@@ -25,67 +25,71 @@ struct PaletteRowHeaderView: View {
     let palette: OpalitePalette
     
     var body: some View {
-        HStack {
-            Menu {
-                if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                    Button(role: .confirm) {
-                        HapticsManager.shared.selection()
-                        isShowingColorEditor.toggle()
-                    } label: {
-                        Label("New Color", systemImage: "plus.square.dashed")
+        VStack(alignment: .leading, spacing: 8) {
+            TipView(paletteMenuTip)
+                .tipCornerRadius(16)
+                .padding(.horizontal, 20)
+
+            HStack {
+                Menu {
+                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                        Button(role: .confirm) {
+                            HapticsManager.shared.selection()
+                            isShowingColorEditor.toggle()
+                        } label: {
+                            Label("Add Color", systemImage: "plus.square.dashed")
+                        }
+                    } else {
+                        Button() {
+                            HapticsManager.shared.selection()
+                            isShowingColorEditor.toggle()
+                        } label: {
+                            Label("Add Color", systemImage: "plus.square.dashed")
+                        }
                     }
-                } else {
-                    Button() {
+
+                    Button {
                         HapticsManager.shared.selection()
-                        isShowingColorEditor.toggle()
+                        renameText = palette.name
+                        showRenameAlert = true
                     } label: {
-                        Label("New Color", systemImage: "plus.square.dashed")
+                        Label("Rename Palette", systemImage: "pencil")
                     }
-                }
 
-                Button {
-                    HapticsManager.shared.selection()
-                    renameText = palette.name
-                    showRenameAlert = true
+                    Divider()
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        isShowingExportSheet = true
+                    } label: {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(palette.sortedColors.isEmpty)
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete Palette", systemImage: "trash.fill")
+                    }
                 } label: {
-                    Label("Rename Palette", systemImage: "pencil")
+                    Image(systemName: "ellipsis")
+                        .imageScale(.large)
+                        .foregroundStyle(.inverseTheme)
+                        .frame(height: 20)
+                        .padding(8)
+                        .background(
+                            Circle().fill(.clear)
+                        )
+                        .glassIfAvailable(
+                            GlassConfiguration(style: .regular)
+                        )
+                        .contentShape(Circle())
+                        .hoverEffect(.lift)
                 }
-
-                Divider()
-
-                Button {
-                    HapticsManager.shared.selection()
-                    isShowingExportSheet = true
-                } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
-                }
-                .disabled(palette.sortedColors.isEmpty)
-
-                Divider()
-
-                Button(role: .destructive) {
-                    HapticsManager.shared.selection()
-                    showDeleteConfirmation = true
-                } label: {
-                    Label("Delete Palette", systemImage: "trash.fill")
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .imageScale(.large)
-                    .foregroundStyle(.inverseTheme)
-                    .frame(height: 20)
-                    .padding(8)
-                    .background(
-                        Circle().fill(.clear)
-                    )
-                    .glassIfAvailable(
-                        GlassConfiguration(style: .regular)
-                    )
-                    .contentShape(Circle())
-                    .hoverEffect(.lift)
-            }
-            .popoverTip(paletteMenuTip, arrowEdge: .leading)
-            .padding(.leading)
+                .padding(.leading)
 
             NavigationLink {
                 PaletteDetailView(palette: palette)
@@ -118,13 +122,14 @@ struct PaletteRowHeaderView: View {
                     .imageScale(.large)
                     .bold()
                     .foregroundStyle(.white)
-                    .frame(height: 20)
-                    .padding(8)
-                    .background(RoundedRectangle(cornerRadius: 20.0).fill(.blue))
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(.blue))
                     .glassIfAvailable(GlassConfiguration(style: .regular))
+                    .contentShape(Circle())
                     .hoverEffect(.lift)
             }
             .buttonStyle(.plain)
+            }
         }
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {

@@ -66,7 +66,7 @@ struct ContentView: View {
                 OnboardingView(
                     onContinue: {
                         withAnimation {
-                            appStage = .main
+                            appStage = .syncing
                         }
                     }
                 )
@@ -77,6 +77,21 @@ struct ContentView: View {
                 .zIndex(1)
                 .preferredColorScheme(preferredColorScheme)
                 .accessibilityIdentifier("onboardingView")
+            case .syncing:
+                SyncingView(
+                    onComplete: {
+                        withAnimation {
+                            appStage = .main
+                        }
+                    }
+                )
+                .environment(colorManager)
+                .environment(canvasManager)
+                .id("syncing")
+                .transition(leadingTransition)
+                .zIndex(1)
+                .preferredColorScheme(preferredColorScheme)
+                .accessibilityIdentifier("syncingView")
             case .main:
                 MainView()
                 .environment(colorManager)
@@ -130,9 +145,9 @@ struct ContentView: View {
     }
     
     private func prepareApp() async {
-        await colorManager.refreshAll()
-        await canvasManager.refreshAll()
-        appStage = isOnboardingComplete ? .main : .splash
+        // For returning users, go to syncing view to check for iCloud data
+        // For new users, go to splash/onboarding first
+        appStage = isOnboardingComplete ? .syncing : .splash
     }
 }
 

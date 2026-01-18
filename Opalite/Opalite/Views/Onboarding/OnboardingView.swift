@@ -62,7 +62,7 @@ struct OnboardingView: View {
         ),
         OnboardingPage(
             icon: "pencil.and.scribble",
-            iconColors: [.red, .orange],
+            iconColors: [.primary, .orange],
             title: "Draw & Design",
             subtitle: "Bring your colors to life on a creative canvas",
             features: [
@@ -160,11 +160,7 @@ struct OnboardingView: View {
                                     .foregroundStyle(.white)
                                     .padding(.horizontal, 24)
                                     .padding(.vertical, 14)
-                                    .glassIfAvailable(
-                                        GlassConfiguration(style: .clear)
-                                            .tint(.red)
-                                            .interactive()
-                                    )
+                                    .background(.red, in: RoundedRectangle(cornerRadius: 16))
                                 }
                                 .accessibilityLabel("Back")
                                 .accessibilityHint("Goes to the previous page")
@@ -208,11 +204,7 @@ struct OnboardingView: View {
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 28)
                                 .padding(.vertical, 14)
-                                .glassIfAvailable(
-                                    GlassConfiguration(style: .clear)
-                                        .tint(.blue)
-                                        .interactive()
-                                )
+                                .background(.blue, in: RoundedRectangle(cornerRadius: 16))
                             }
                             .accessibilityLabel(currentPage < pages.count - 1 ? "Next" : "Get Started")
                             .accessibilityHint(currentPage < pages.count - 1 ? "Goes to the next page" : "Completes introduction and enters the app")

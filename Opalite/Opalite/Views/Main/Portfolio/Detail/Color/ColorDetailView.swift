@@ -37,9 +37,27 @@ struct ColorDetailView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingContrastChecker: Bool = false
     @State private var isShowingExportSheet: Bool = false
+    @State private var isShowingPaletteSheet: Bool = false
+
+    // Tabbed content selection
+    @State private var selectedTab: ColorDetailTab = .harmonies
 
     // Smart color naming
     @State private var nameSuggestionService = ColorNameSuggestionService()
+
+    private enum ColorDetailTab: String, CaseIterable {
+        case harmonies = "Harmonies"
+        case info = "Info"
+        case notes = "Notes"
+
+        var icon: String {
+            switch self {
+            case .harmonies: return "paintpalette"
+            case .info: return "info.circle"
+            case .notes: return "note.text"
+            }
+        }
+    }
 
     let color: OpaliteColor
     
@@ -50,10 +68,11 @@ struct ColorDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(spacing: 0) {
+                // MARK: - Hero Swatch
                 SwatchView(
                     color: color,
-                    height: 260,
+                    height: 220,
                     badgeText: viewModel.badgeText,
                     showOverlays: true,
                     isEditingBadge: $isEditingName,
@@ -76,6 +95,8 @@ struct ColorDetailView: View {
                         }
                     }
                 )
+                .padding(.horizontal)
+                .padding(.top)
                 .onChange(of: isEditingName) { _, newValue in
                     if newValue == true && nameSuggestionService.isAvailable {
                         Task {
@@ -85,67 +106,16 @@ struct ColorDetailView: View {
                         nameSuggestionService.clearSuggestions()
                     }
                 }
-                
-                if horizontalSizeClass == .regular {
-                    HStack(alignment: .top, spacing: 16) {
-                        ColorDetailsSectionView(color: color)
-                            .frame(maxWidth: .infinity, alignment: .top)
 
-                        VStack(alignment: .leading, spacing: 16) {
-                            ColorRecommendedColorsView(
-                                baseColor: color,
-                                onCreateColor: { suggested in
-                                    do {
-                                        let _ = try colorManager.createColor(
-                                            name: nil,
-                                            notes: suggested.notes,
-                                            device: nil,
-                                            red: suggested.red,
-                                            green: suggested.green,
-                                            blue: suggested.blue,
-                                            alpha: suggested.alpha,
-                                            palette: color.palette
-                                        )
-                                    } catch {
-                                        toastManager.show(error: .colorCreationFailed)
-                                    }
-                                }
-                            )
+                // MARK: - Tab Selector
+                tabSelector
+                    .padding(.top, 16)
 
-                            notesSection
-                        }
-                        .frame(maxWidth: .infinity, alignment: .top)
-                    }
-                } else {
-                    VStack(alignment: .leading, spacing: 16) {
-                        ColorRecommendedColorsView(
-                            baseColor: color,
-                            onCreateColor: { suggested in
-                                do {
-                                    _ = try colorManager.createColor(
-                                        name: nil,
-                                        notes: suggested.notes,
-                                        device: nil,
-                                        red: suggested.red,
-                                        green: suggested.green,
-                                        blue: suggested.blue,
-                                        alpha: suggested.alpha,
-                                        palette: color.palette
-                                    )
-                                } catch {
-                                    toastManager.show(error: .colorCreationFailed)
-                                }
-                            }
-                        )
-                        
-                        notesSection
-                        
-                        ColorDetailsSectionView(color: color)
-
-                    }
-                }
+                // MARK: - Tab Content
+                tabContent
+                    .padding(.top, 16)
+                    .padding(.bottom, 24)
             }
-            .padding()
         }
         .navigationBarTitleDisplayMode(.inline)
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
@@ -188,6 +158,9 @@ struct ColorDetailView: View {
         }
         .sheet(isPresented: $isShowingExportSheet) {
             ColorExportSheet(color: color)
+        }
+        .sheet(isPresented: $isShowingPaletteSheet) {
+            PaletteSelectionSheet(color: color)
         }
         .toolbar {
             // Primary actions - stay visible
@@ -256,6 +229,16 @@ struct ColorDetailView: View {
             ToolbarItem(placement: .secondaryAction) {
                 Button {
                     HapticsManager.shared.selection()
+                    isShowingPaletteSheet = true
+                } label: {
+                    Label("Move to Palette", systemImage: "swatchpalette.fill")
+                }
+                .toolbarButtonTint()
+            }
+
+            ToolbarItem(placement: .secondaryAction) {
+                Button {
+                    HapticsManager.shared.selection()
                     withAnimation {
                         isEditingName = true
                     }
@@ -275,6 +258,7 @@ struct ColorDetailView: View {
                 .tint(.red)
             }
         }
+        .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
         .onAppear {
             colorManager.activeColor = color
         }
@@ -289,17 +273,186 @@ struct ColorDetailView: View {
         }
     }
 
+    // MARK: - Tab Selector
+
     @ViewBuilder
-    private var notesSection: some View {
-        NotesSectionView(
-            notes: $viewModel.notesDraft,
-            isSaving: $viewModel.isSavingNotes,
-            onSave: {
-                viewModel.saveNotes(using: colorManager) { error in
-                    toastManager.show(error: error)
+    private var tabSelector: some View {
+        HStack(spacing: 0) {
+            ForEach(ColorDetailTab.allCases, id: \.self) { tab in
+                Button {
+                    HapticsManager.shared.selection()
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        selectedTab = tab
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: tab.icon)
+                            .font(.subheadline)
+                        Text(tab.rawValue)
+                            .font(.subheadline.bold())
+                    }
+                    .foregroundStyle(selectedTab == tab ? .white : .secondary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background {
+                        if selectedTab == tab {
+                            Capsule()
+                                .fill(color.swiftUIColor.opacity(0.9))
+                                .shadow(color: color.swiftUIColor.opacity(0.3), radius: 8, y: 4)
+                        }
+                    }
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.plain)
             }
-        )
+        }
+        .padding(4)
+        .background(.fill.tertiary, in: Capsule())
+        .padding(.horizontal)
+    }
+
+    // MARK: - Tab Content
+
+    @ViewBuilder
+    private var tabContent: some View {
+        switch selectedTab {
+        case .harmonies:
+            harmoniesTab
+                .transition(.asymmetric(
+                    insertion: .move(edge: .leading).combined(with: .opacity),
+                    removal: .move(edge: .trailing).combined(with: .opacity)
+                ))
+        case .info:
+            infoTab
+                .transition(.opacity)
+        case .notes:
+            notesTab
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+        }
+    }
+
+    // MARK: - Harmonies Tab
+
+    @ViewBuilder
+    private var harmoniesTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ColorRecommendedColorsView(
+                baseColor: color,
+                onCreateColor: { suggested in
+                    do {
+                        _ = try colorManager.createColor(
+                            name: nil,
+                            notes: suggested.notes,
+                            device: nil,
+                            red: suggested.red,
+                            green: suggested.green,
+                            blue: suggested.blue,
+                            alpha: suggested.alpha,
+                            palette: color.palette
+                        )
+                    } catch {
+                        toastManager.show(error: .colorCreationFailed)
+                    }
+                }
+            )
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Info Tab
+
+    @ViewBuilder
+    private var infoTab: some View {
+        VStack(spacing: 16) {
+            // Color values card
+            VStack(spacing: 0) {
+                infoRow(icon: "number", label: "Hex", value: color.hexString, showDivider: true)
+                infoRow(icon: "slider.horizontal.3", label: "RGB", value: color.rgbString, showDivider: true)
+                infoRow(icon: "circle.lefthalf.filled", label: "HSL", value: color.hslString, showDivider: false)
+            }
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
+
+            // Metadata card
+            VStack(spacing: 0) {
+                infoRow(icon: "person", label: "Created By", value: color.createdByDisplayName ?? "—", showDivider: true)
+                infoRow(icon: DeviceKind.from(color.createdOnDeviceName).symbolName, label: "Device", value: color.createdOnDeviceName ?? "—", showDivider: true)
+                infoRow(icon: "calendar", label: "Created", value: formatted(color.createdAt), showDivider: true)
+                infoRow(icon: "clock.arrow.circlepath", label: "Updated", value: formatted(color.updatedAt), showDivider: false)
+            }
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
+
+            if let palette = color.palette {
+                // Palette membership card
+                VStack(spacing: 0) {
+                    HStack {
+                        Image(systemName: "swatchpalette.fill")
+                            .foregroundStyle(.purple)
+                            .frame(width: 24)
+                        Text("In Palette")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(palette.name)
+                            .fontWeight(.medium)
+                    }
+                    .padding()
+                }
+                .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func infoRow(icon: String, label: String, value: String, showDivider: Bool) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 24)
+                Text(label)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(value)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+            }
+            .padding()
+
+            if showDivider {
+                Divider()
+                    .padding(.leading, 48)
+            }
+        }
+    }
+
+    private func formatted(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f.string(from: date)
+    }
+
+    // MARK: - Notes Tab
+
+    @ViewBuilder
+    private var notesTab: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            NotesSectionView(
+                notes: $viewModel.notesDraft,
+                isSaving: $viewModel.isSavingNotes,
+                onSave: {
+                    viewModel.saveNotes(using: colorManager) { error in
+                        toastManager.show(error: error)
+                    }
+                }
+            )
+        }
+        .padding(.horizontal)
     }
 }
 

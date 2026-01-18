@@ -133,34 +133,26 @@ struct PhotoColorPickerSheet: View {
 
     // MARK: - Image Content
 
-    private func calculateImageDisplaySize(for uiImage: UIImage) -> CGSize {
-        let maxWidth: CGFloat = 350
-        let maxHeight: CGFloat = 300
+    private func calculateImageDisplayHeight(for uiImage: UIImage, availableWidth: CGFloat) -> CGFloat {
         let aspectRatio = uiImage.size.width / uiImage.size.height
-
-        let widthFromHeight = maxHeight * aspectRatio
-        let heightFromWidth = maxWidth / aspectRatio
-
-        if heightFromWidth <= maxHeight {
-            return CGSize(width: maxWidth, height: heightFromWidth)
-        } else {
-            return CGSize(width: widthFromHeight, height: maxHeight)
-        }
+        let maxHeight: CGFloat = 400
+        let calculatedHeight = availableWidth / aspectRatio
+        return min(calculatedHeight, maxHeight)
     }
 
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
-        let displaySize = calculateImageDisplaySize(for: uiImage)
-
         VStack(spacing: 8) {
             GeometryReader { geometry in
-                let imageRect = CGRect(x: 0, y: 0, width: geometry.size.width, height: geometry.size.height)
+                let availableWidth = geometry.size.width
+                let displayHeight = calculateImageDisplayHeight(for: uiImage, availableWidth: availableWidth)
+                let imageRect = CGRect(x: 0, y: 0, width: availableWidth, height: displayHeight)
 
                 ZStack {
                     Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .frame(width: availableWidth, height: displayHeight)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
@@ -190,8 +182,7 @@ struct PhotoColorPickerSheet: View {
                         }
                 )
             }
-            .frame(width: displaySize.width, height: displaySize.height)
-            .frame(maxWidth: .infinity)
+            .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: UIScreen.main.bounds.width - 32))
 
             Text("Tap or drag on the image to pick a color")
                 .font(.footnote)

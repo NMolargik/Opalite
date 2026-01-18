@@ -30,6 +30,11 @@ struct CanvasView: View {
     @State private var showToolPickerTrigger: UUID = UUID()
     @State private var externalTool: PKTool? = nil
 
+    // Color sampling state
+    @State private var isColorSamplingMode: Bool = false
+    @State private var colorSampleLocation: CGPoint? = nil
+    @State private var sampledColor: OpaliteColor? = nil
+
     // Mac Catalyst custom tool picker state
     #if targetEnvironment(macCatalyst)
     @State private var selectedTool: PKTool = PKInkingTool(.pen, color: .label, width: 4)
@@ -101,6 +106,94 @@ struct CanvasView: View {
                     )
                 }
             }
+
+            // Color sampling overlay
+            if isColorSamplingMode {
+                ZStack {
+                    Color.black.opacity(0.1)
+                        .ignoresSafeArea()
+
+                    // Color preview at hover location
+                    if let location = colorSampleLocation, let color = sampledColor {
+                        VStack(spacing: 8) {
+                            Circle()
+                                .fill(color.swiftUIColor)
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    Circle()
+                                        .strokeBorder(.white, lineWidth: 3)
+                                )
+                                .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
+
+                            Text(color.hexString)
+                                .font(.caption.monospaced())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.ultraThinMaterial, in: Capsule())
+                        }
+                        .position(x: location.x, y: location.y - 60)
+                        .allowsHitTesting(false)
+                    }
+                }
+                .overlay(alignment: .top) {
+                    VStack(spacing: 8) {
+                        Text("Tap to sample color")
+                            .font(.headline)
+                        Text("Touch and drag to preview colors")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .padding(.top, 80)
+                }
+                .overlay {
+                    colorSamplingGestureOverlay
+                }
+                .overlay(alignment: .bottom) {
+                    HStack(spacing: 16) {
+                        Button {
+                            HapticsManager.shared.selection()
+                            isColorSamplingMode = false
+                            colorSampleLocation = nil
+                            sampledColor = nil
+                        } label: {
+                            Text("Cancel")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 12)
+                                .background(.red, in: RoundedRectangle(cornerRadius: 12))
+                        }
+
+                        if let color = sampledColor {
+                            Button {
+                                HapticsManager.shared.impact()
+                                saveColorFromSample(color)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(color.swiftUIColor)
+                                        .frame(width: 24, height: 24)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .strokeBorder(.white.opacity(0.5), lineWidth: 1)
+                                        )
+                                    Text("Save Color")
+                                        .font(.headline)
+                                }
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 12)
+                                .background(.blue, in: RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .padding(.bottom, 100)
+                }
+            }
         }
         .environment(\.colorScheme, .light)
         .id(canvasFile.id)
@@ -157,11 +250,17 @@ struct CanvasView: View {
         #endif
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Text(canvasFile.title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .frame(width: 180)
+                Button {
+                    HapticsManager.shared.impact()
+                    editedTitle = canvasFile.title
+                    showRenameTitleAlert = true
+                } label: {
+                    Text(canvasFile.title)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .frame(width: 180)
+                }
             }
 
             ToolbarItem(placement: .topBarTrailing) {
@@ -185,6 +284,15 @@ struct CanvasView: View {
                             } label: {
                                 Label(shape.displayName, systemImage: shape.systemImage)
                             }
+                        }
+                    }
+
+                    Section("Tools") {
+                        Button {
+                            HapticsManager.shared.impact()
+                            isColorSamplingMode = true
+                        } label: {
+                            Label("Sample Color From Canvas", systemImage: "eyedropper")
                         }
                     }
 
@@ -350,6 +458,147 @@ struct CanvasView: View {
             updatedDrawing.strokes.append(stroke)
         }
         drawing = updatedDrawing
+    }
+
+    // MARK: - Color Sampling
+
+    /// Gesture overlay for sampling colors from the canvas
+    @ViewBuilder
+    private var colorSamplingGestureOverlay: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            sampleColorAt(value.location, in: geometry.size)
+                        }
+                        .onEnded { value in
+                            sampleColorAt(value.location, in: geometry.size)
+                        }
+                )
+        }
+    }
+
+    /// Samples the color at the given view location
+    private func sampleColorAt(_ location: CGPoint, in viewSize: CGSize) {
+        colorSampleLocation = location
+
+        // Transform view coordinates to canvas content coordinates
+        let canvasPoint = CGPoint(
+            x: canvasContentOffset.x + (location.x / canvasZoomScale),
+            y: canvasContentOffset.y + (location.y / canvasZoomScale)
+        )
+
+        // Render the drawing to an image with white background
+        guard let canvasSize = effectiveCanvasSize else {
+            // Fall back to white if no canvas size
+            sampledColor = OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
+            return
+        }
+
+        // Create image from drawing with white background
+        let bounds = CGRect(origin: .zero, size: canvasSize)
+        let scale: CGFloat = 1.0
+
+        // Render drawing to image
+        let drawingImage = drawing.image(from: bounds, scale: scale)
+
+        // Sample the color from the rendered image
+        if let color = samplePixelColor(from: drawingImage, at: canvasPoint, canvasSize: canvasSize) {
+            sampledColor = color
+            HapticsManager.shared.selection()
+        } else {
+            // Default to white (canvas background) if sampling fails
+            sampledColor = OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
+        }
+    }
+
+    /// Extracts the pixel color at the given point from an image
+    private func samplePixelColor(from image: UIImage, at point: CGPoint, canvasSize: CGSize) -> OpaliteColor? {
+        // Ensure point is within bounds
+        guard point.x >= 0 && point.x < canvasSize.width &&
+              point.y >= 0 && point.y < canvasSize.height else {
+            return OpaliteColor(name: nil, red: 1, green: 1, blue: 1) // White for out of bounds
+        }
+
+        guard let cgImage = image.cgImage else { return nil }
+
+        let width = cgImage.width
+        let height = cgImage.height
+
+        // Scale point to image pixel coordinates
+        let pixelX = Int(point.x * CGFloat(width) / canvasSize.width)
+        let pixelY = Int(point.y * CGFloat(height) / canvasSize.height)
+
+        // Ensure pixel is within image bounds
+        guard pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height else {
+            return OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
+        }
+
+        // Create a 1x1 bitmap context to sample the pixel
+        let bytesPerPixel = 4
+        let bytesPerRow = bytesPerPixel
+        var pixelData = [UInt8](repeating: 0, count: 4)
+
+        guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                data: &pixelData,
+                width: 1,
+                height: 1,
+                bitsPerComponent: 8,
+                bytesPerRow: bytesPerRow,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+              ) else {
+            return nil
+        }
+
+        // Draw the specific pixel into our 1x1 context
+        context.draw(cgImage, in: CGRect(x: -pixelX, y: -(height - pixelY - 1), width: width, height: height))
+
+        // Extract RGBA values
+        let r = CGFloat(pixelData[0]) / 255.0
+        let g = CGFloat(pixelData[1]) / 255.0
+        let b = CGFloat(pixelData[2]) / 255.0
+        let a = CGFloat(pixelData[3]) / 255.0
+
+        // Handle premultiplied alpha
+        let red: Double
+        let green: Double
+        let blue: Double
+
+        if a > 0 {
+            red = Double(r / a)
+            green = Double(g / a)
+            blue = Double(b / a)
+        } else {
+            // Transparent pixel - return white (canvas background)
+            red = 1.0
+            green = 1.0
+            blue = 1.0
+        }
+
+        return OpaliteColor(
+            name: nil,
+            red: min(1, red),
+            green: min(1, green),
+            blue: min(1, blue)
+        )
+    }
+
+    /// Saves the sampled color to the color manager
+    private func saveColorFromSample(_ color: OpaliteColor) {
+        do {
+            _ = try colorManager.createColor(existing: color)
+            toastManager.showSuccess("Color saved: \(color.hexString)")
+        } catch {
+            toastManager.show(error: .colorCreationFailed)
+        }
+
+        isColorSamplingMode = false
+        colorSampleLocation = nil
+        sampledColor = nil
     }
 }
 

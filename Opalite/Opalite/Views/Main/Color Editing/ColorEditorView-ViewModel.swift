@@ -13,7 +13,7 @@ extension ColorEditorView {
         var originalColor: OpaliteColor?
 
         var tempColor: OpaliteColor
-        var mode: ColorPickerTab = .grid
+        var mode: ColorPickerTab = .spectrum
         var isShowingPaletteStrip: Bool = false
         var isColorExpanded: Bool = false
         var didCopyHex: Bool = false

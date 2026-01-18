@@ -53,6 +53,7 @@ final class CanvasManager {
     /// - Parameter context: The SwiftData model context to use for persistence
     init(context: ModelContext) {
         self.context = context
+        reloadCache()
     }
 
     // MARK: - Cached Data

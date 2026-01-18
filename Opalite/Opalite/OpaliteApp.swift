@@ -317,7 +317,7 @@ struct OpaliteApp: App {
                         HapticsManager.shared.selection()
                         colorManager.addToPaletteTrigger = UUID()
                     } label: {
-                        Label("Add to Palette", systemImage: "swatchpalette")
+                        Label("Move To Palette", systemImage: "swatchpalette")
                     }
                     .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette != nil)
 

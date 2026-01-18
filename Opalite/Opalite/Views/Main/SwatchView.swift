@@ -51,6 +51,10 @@ struct SwatchView: View {
     private var isLoadingSuggestions: Bool
     private var onSuggestionSelected: ((String) -> Void)?
 
+    // Drag state
+    private var onDragStarted: (() -> Void)?
+    @Binding var isDragging: Bool
+
     @State private var editedBadgeText: String = ""
     @FocusState private var badgeFocused: Bool
 
@@ -75,7 +79,9 @@ struct SwatchView: View {
         showCopiedFeedback: Binding<Bool> = .constant(false),
         nameSuggestions: [String] = [],
         isLoadingSuggestions: Bool = false,
-        onSuggestionSelected: ((String) -> Void)? = nil
+        onSuggestionSelected: ((String) -> Void)? = nil,
+        onDragStarted: (() -> Void)? = nil,
+        isDragging: Binding<Bool> = .constant(false)
     ) {
         self.color = color
         self.width = width
@@ -94,6 +100,8 @@ struct SwatchView: View {
         self.nameSuggestions = nameSuggestions
         self.isLoadingSuggestions = isLoadingSuggestions
         self.onSuggestionSelected = onSuggestionSelected
+        self.onDragStarted = onDragStarted
+        self._isDragging = isDragging
     }
 
     init<MenuContent: View>(
@@ -112,6 +120,8 @@ struct SwatchView: View {
         nameSuggestions: [String] = [],
         isLoadingSuggestions: Bool = false,
         onSuggestionSelected: ((String) -> Void)? = nil,
+        onDragStarted: (() -> Void)? = nil,
+        isDragging: Binding<Bool> = .constant(false),
         @ViewBuilder menu: @escaping () -> MenuContent
     ) {
         self.init(
@@ -130,7 +140,9 @@ struct SwatchView: View {
             showCopiedFeedback: showCopiedFeedback,
             nameSuggestions: nameSuggestions,
             isLoadingSuggestions: isLoadingSuggestions,
-            onSuggestionSelected: onSuggestionSelected
+            onSuggestionSelected: onSuggestionSelected,
+            onDragStarted: onDragStarted,
+            isDragging: isDragging
         )
     }
 
@@ -150,6 +162,8 @@ struct SwatchView: View {
         nameSuggestions: [String] = [],
         isLoadingSuggestions: Bool = false,
         onSuggestionSelected: ((String) -> Void)? = nil,
+        onDragStarted: (() -> Void)? = nil,
+        isDragging: Binding<Bool> = .constant(false),
         @ViewBuilder contextMenu: @escaping () -> ContextMenuContent
     ) {
         self.init(
@@ -169,47 +183,69 @@ struct SwatchView: View {
             showCopiedFeedback: showCopiedFeedback,
             nameSuggestions: nameSuggestions,
             isLoadingSuggestions: isLoadingSuggestions,
-            onSuggestionSelected: onSuggestionSelected
+            onSuggestionSelected: onSuggestionSelected,
+            onDragStarted: onDragStarted,
+            isDragging: isDragging
         )
     }
     
     // MARK: - The View
     var body: some View {
-        return RoundedRectangle(cornerRadius: 16)
-            .fill(displayColor.swiftUIColor)
-            .overlay(
+        Group {
+            if isDragging {
+                // Placeholder shown while this swatch is being dragged
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(.thinMaterial, lineWidth: 5)
-            )
-            .frame(width: width)
-            .frame(minHeight: height)
-            .overlay(alignment: .topLeading) {
-                badgeContent
-                    .frame(maxWidth: 500, alignment: .leading)
-            }
-            .overlay(alignment: .bottomTrailing) {
-                menuContent
-            }
-            .overlay(
+                    .fill(.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(.secondary, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                    )
+                    .frame(width: width)
+                    .frame(minHeight: height)
+            } else {
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
-                    .opacity(isDropTargeted ? 1 : 0)
-            )
-            .contextMenu {
-                contextMenuContent
+                    .fill(displayColor.swiftUIColor)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(.thinMaterial, lineWidth: 5)
+                    )
+                    .frame(width: width)
+                    .frame(minHeight: height)
+                    .overlay(alignment: .topLeading) {
+                        badgeContent
+                            .frame(maxWidth: 500, alignment: .leading)
+                    }
+                    .overlay(alignment: .bottomTrailing) {
+                        menuContent
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
+                            .opacity(isDropTargeted ? 1 : 0)
+                    )
+                    .contextMenu {
+                        contextMenuContent
+                    }
+                    .if(matchedNamespace != nil && matchedID != nil) { view in
+                        view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
+                    }
+                    .zIndex(2)
+                    .if(isEditingBadge != true) { view in
+                        view.onDrag {
+                            onDragStarted?()
+                            return provideDragItem()
+                        } preview: {
+                            // Clean preview without material overlay that doesn't render well during drag
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(displayColor.swiftUIColor)
+                                .frame(width: width ?? 100, height: height ?? 100)
+                        }
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(accessibilityDescription)
+                    .accessibilityAddTraits(.isButton)
             }
-            .if(matchedNamespace != nil && matchedID != nil) { view in
-                view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
-            }
-            .zIndex(2)
-            .if(isEditingBadge != true) { view in
-                view.onDrag {
-                    provideDragItem()
-                }
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(accessibilityDescription)
-            .accessibilityAddTraits(.isButton)
+        }
     }
 
     private var accessibilityDescription: String {

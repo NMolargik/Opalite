@@ -123,7 +123,7 @@ struct PaletteMenuTip: Tip {
     }
 
     var message: Text? {
-        Text("Use this menu to rename, share, export, or delete your palette.")
+        Text("Use this menu to rename, share, export, or delete a palette.")
     }
 
     var image: Image? {

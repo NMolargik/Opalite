@@ -31,6 +31,11 @@ final class CanvasFile {
     @Attribute(.externalStorage)
     var drawingData: Data? = nil
 
+    // MARK: - Placed Images
+    // Store placed images as JSON-encoded array of CanvasPlacedImage
+    @Attribute(.externalStorage)
+    var placedImagesData: Data? = nil
+
     // Optional lightweight preview for lists/grids
     @Attribute(.externalStorage)
     var thumbnailData: Data? = nil

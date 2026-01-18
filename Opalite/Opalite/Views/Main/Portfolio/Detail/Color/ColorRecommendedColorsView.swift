@@ -76,7 +76,7 @@ struct ColorRecommendedColorsView: View {
                         actionFeedbackColorID = color.id
                     }
                 } label: {
-                    Label(baseColor.palette != nil ? "Add To Palette" : "Save To Colors", systemImage: "plus")
+                    Label(baseColor.palette != nil ? "Move To Palette" : "Save To Colors", systemImage: "plus")
                 }
             }
         )
