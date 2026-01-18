@@ -1,0 +1,121 @@
+{
+  "identifier" : "com.molargiksoftware.Opalite",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : true,
+      "internalID" : "onyx_lifetime_001",
+      "localizations" : [
+        {
+          "description" : "Lifetime access to all Onyx features",
+          "displayName" : "Onyx Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "onyx_lifetime_20",
+      "referenceName" : "Onyx Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "1",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : null,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "onyx_group",
+      "localizations" : [
+
+      ],
+      "name" : "Onyx",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "onyx_annual_001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Annual access to all Onyx features - Save 58%",
+              "displayName" : "Onyx Annual",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "onyx_1yr_4.99",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Onyx Annual",
+          "subscriptionGroupID" : "onyx_group",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

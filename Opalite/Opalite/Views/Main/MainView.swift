@@ -15,6 +15,9 @@ struct MainView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
+    // MARK: - Intent Navigation
+    private var intentNavigationManager = IntentNavigationManager.shared
+
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
 
     @State private var selectedTab: Tabs = .portfolio
@@ -228,6 +231,18 @@ struct MainView: View {
         }
         .onChange(of: canvasManager.canvases) { _, newCanvases in
             handleCanvasListChange(newCanvases)
+        }
+        .onChange(of: intentNavigationManager.pendingColorID) { _, colorID in
+            // Switch to Portfolio tab when intent requests color navigation
+            if colorID != nil {
+                selectedTab = .portfolio
+            }
+        }
+        .onChange(of: intentNavigationManager.pendingPaletteID) { _, paletteID in
+            // Switch to Portfolio tab when intent requests palette navigation
+            if paletteID != nil {
+                selectedTab = .portfolio
+            }
         }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Canvas access requires Onyx")

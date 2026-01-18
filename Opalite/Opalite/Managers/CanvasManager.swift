@@ -7,7 +7,9 @@
 
 import SwiftData
 import SwiftUI
+#if canImport(PencilKit)
 import PencilKit
+#endif
 #if canImport(DeviceKit)
 import DeviceKit
 #endif
@@ -70,11 +72,13 @@ final class CanvasManager {
     /// The UI layer should observe this and clear it after handling.
     var pendingCanvasToOpen: CanvasFile? = nil
 
+    #if canImport(PencilKit)
     /// Shape waiting to be placed on the active canvas.
     ///
     /// Set from menu bar commands. The active CanvasView should observe
     /// this property and enter shape placement mode when set.
     var pendingShape: CanvasShape? = nil
+    #endif
 
     // MARK: - Sorting
 
@@ -147,6 +151,7 @@ final class CanvasManager {
 
     // MARK: - Creating
 
+    #if canImport(PencilKit)
     /// Creates a new canvas file with the specified properties.
     ///
     /// The canvas is inserted into the persistent store immediately.
@@ -181,6 +186,27 @@ final class CanvasManager {
         // Return the canvas from the cache to avoid returning a detached object
         return canvases.first { $0.id == canvasID } ?? canvas
     }
+    #else
+    /// Creates a new canvas file with the specified title (tvOS version).
+    ///
+    /// - Parameters:
+    ///   - title: Display title for the canvas
+    /// - Returns: The newly created and persisted canvas file
+    /// - Throws: SwiftData save errors
+    @discardableResult
+    func createCanvas(title: String = "Untitled Canvas") throws -> CanvasFile {
+        let canvas = CanvasFile(title: title)
+
+        canvas.createdAt = .now
+        canvas.updatedAt = .now
+
+        let canvasID = canvas.id
+        context.insert(canvas)
+        try saveContext()
+        reloadCache()
+        return canvases.first { $0.id == canvasID } ?? canvas
+    }
+    #endif
 
     /// Inserts an existing canvas file (e.g., from import) into the store.
     ///
@@ -226,28 +252,81 @@ final class CanvasManager {
         reloadCache()
     }
 
+    #if canImport(PencilKit)
     /// Saves a PencilKit drawing to a canvas file.
     ///
     /// The drawing is serialized and stored externally (not in SwiftData).
-    /// Optionally updates the thumbnail for list display.
+    /// Automatically generates a thumbnail for list display and tvOS preview.
     ///
     /// - Parameters:
     ///   - drawing: The PencilKit drawing to save
     ///   - canvas: The canvas file to save to
-    ///   - thumbnailData: Optional updated thumbnail PNG data
+    ///   - thumbnailData: Optional custom thumbnail PNG data (if nil, one is generated)
     /// - Throws: SwiftData save errors
     func saveDrawing(_ drawing: PKDrawing, to canvas: CanvasFile, thumbnailData: Data? = nil) throws {
         // Use fresh canvas from cache to avoid detached object crashes with external storage
         guard let freshCanvas = freshCanvas(for: canvas) else { return }
         freshCanvas.saveDrawing(drawing)
+
+        // Generate thumbnail if not provided
         if let thumbnailData {
             freshCanvas.thumbnailData = thumbnailData
+        } else {
+            freshCanvas.thumbnailData = generateThumbnail(from: drawing, canvasSize: freshCanvas.canvasSize)
         }
+
         #if canImport(DeviceKit)
         freshCanvas.lastEditedDeviceName = Device.current.safeDescription
         #endif
         try saveContext()
         reloadCache()
+    }
+
+    // MARK: - Thumbnail Generation
+
+    /// Generates a PNG thumbnail from a PencilKit drawing.
+    ///
+    /// The thumbnail is rendered at a maximum size of 400x400 points while maintaining
+    /// the drawing's aspect ratio. This is used for list display and tvOS previews.
+    ///
+    /// - Parameters:
+    ///   - drawing: The PencilKit drawing to render
+    ///   - canvasSize: The canvas dimensions (optional, defaults to drawing bounds)
+    /// - Returns: PNG data for the thumbnail, or nil if generation fails
+    func generateThumbnail(from drawing: PKDrawing, canvasSize: CGSize? = nil) -> Data? {
+        #if canImport(UIKit)
+        let maxThumbnailSize: CGFloat = 400
+
+        // Use canvas size if available, otherwise use drawing bounds
+        let sourceSize = canvasSize ?? drawing.bounds.size
+        guard sourceSize.width > 0 && sourceSize.height > 0 else { return nil }
+
+        // Calculate scale to fit within maxThumbnailSize while preserving aspect ratio
+        let scale = min(maxThumbnailSize / sourceSize.width, maxThumbnailSize / sourceSize.height, 1.0)
+        let thumbnailSize = CGSize(
+            width: sourceSize.width * scale,
+            height: sourceSize.height * scale
+        )
+
+        // Render the drawing to an image with white background
+        let bounds = CGRect(origin: .zero, size: sourceSize)
+        let drawingImage = drawing.image(from: bounds, scale: 1.0)
+
+        // Create a new image with white background
+        let renderer = UIGraphicsImageRenderer(size: thumbnailSize)
+        let thumbnailImage = renderer.image { context in
+            // White background
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: thumbnailSize))
+
+            // Draw the PencilKit image scaled to fit
+            drawingImage.draw(in: CGRect(origin: .zero, size: thumbnailSize))
+        }
+
+        return thumbnailImage.pngData()
+        #else
+        return nil
+        #endif
     }
 
     // MARK: - Loading
@@ -264,6 +343,7 @@ final class CanvasManager {
         guard let freshCanvas = freshCanvas(for: canvas) else { return PKDrawing() }
         return freshCanvas.loadDrawing()
     }
+    #endif
 
     // MARK: - Helpers
 
@@ -307,9 +387,15 @@ final class CanvasManager {
     func loadSamples() throws {
         self.canvases = []
 
+        #if canImport(PencilKit)
         let a = CanvasFile(title: "Sketch", drawing: PKDrawing())
         let b = CanvasFile(title: "Ideas", drawing: PKDrawing())
         let c = CanvasFile(title: "Storyboard", drawing: PKDrawing())
+        #else
+        let a = CanvasFile(title: "Sketch")
+        let b = CanvasFile(title: "Ideas")
+        let c = CanvasFile(title: "Storyboard")
+        #endif
 
         #if canImport(DeviceKit)
         let device = Device.current.safeDescription

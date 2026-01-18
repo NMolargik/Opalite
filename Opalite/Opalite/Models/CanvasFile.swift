@@ -7,13 +7,15 @@
 
 import Foundation
 import SwiftData
+#if canImport(PencilKit)
 import PencilKit
+#endif
 
 @Model
 final class CanvasFile {
     // MARK: - Identity & Metadata (CloudKit-friendly)
     var id: UUID = UUID()
-    
+
     var title: String = "Untitled Canvas"
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
@@ -41,14 +43,25 @@ final class CanvasFile {
     var thumbnailData: Data? = nil
 
     // MARK: - Init
+
+    /// Basic initializer for platforms without PencilKit (tvOS)
+    init(title: String = "Untitled Canvas") {
+        self.id = UUID()
+        self.title = title
+        self.drawingData = nil
+    }
+
+    #if canImport(PencilKit)
+    /// Full initializer with PencilKit drawing support
     init(
         title: String = "Untitled Canvas",
-        drawing: PKDrawing = PKDrawing()
+        drawing: PKDrawing
     ) {
         self.id = UUID()
         self.title = title
         self.drawingData = drawing.dataRepresentation()
     }
+    #endif
 }
 
 // MARK: - Constants
@@ -59,7 +72,8 @@ extension CanvasFile {
     static let defaultCanvasSize = CGSize(width: 4096, height: 4096)
 }
 
-// MARK: - Convenience Helpers
+// MARK: - PencilKit Helpers
+#if canImport(PencilKit)
 extension CanvasFile {
     /// Reconstruct a PKDrawing for editing/display
     func loadDrawing() -> PKDrawing {
@@ -81,7 +95,11 @@ extension CanvasFile {
         self.drawingData = drawing.dataRepresentation()
         self.updatedAt = Date()
     }
+}
+#endif
 
+// MARK: - Convenience Helpers
+extension CanvasFile {
     /// Get the canvas size, or nil if not yet set
     var canvasSize: CGSize? {
         guard canvasWidth > 0 && canvasHeight > 0 else { return nil }

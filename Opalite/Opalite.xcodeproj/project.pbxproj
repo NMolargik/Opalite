@@ -13,6 +13,11 @@
 		EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB3BCAF02EF8B7F40059764A /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */; };
 		EB3BCAF72EF8B7F40059764A /* OpaliteThumbnail.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB92BF9F2F1D565200305170 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */; };
+		EB92BFA02F1D565200305170 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */; };
+		EB92BFAB2F1D565300305170 /* OpaliteWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB92BFC52F1D5CEF00305170 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB92BFC42F1D5CEF00305170 /* Messages.framework */; };
+		EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EBAD2C2A2F06D37800EB94EB /* OpaliteShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -51,6 +56,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = EB3BCAED2EF8B7F40059764A;
 			remoteInfo = OpaliteThumbnail;
+		};
+		EB92BFA92F1D565300305170 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBD4AD142EE48DF300012D16 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EB92BF9D2F1D565200305170;
+			remoteInfo = OpaliteWidgetsExtension;
+		};
+		EB92BFCF2F1D5CF000305170 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBD4AD142EE48DF300012D16 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EB92BFC22F1D5CEF00305170;
+			remoteInfo = OpaliteMessages;
 		};
 		EBAD2C282F06D37800EB94EB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -95,7 +114,9 @@
 			files = (
 				EB3BCAF72EF8B7F40059764A /* OpaliteThumbnail.appex in Embed Foundation Extensions */,
 				EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */,
+				EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */,
 				EBAD2C2A2F06D37800EB94EB /* OpaliteShareExtension.appex in Embed Foundation Extensions */,
+				EB92BFAB2F1D565300305170 /* OpaliteWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -112,6 +133,12 @@
 		EB3BCAD52EF8B58F0059764A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteThumbnail.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookThumbnailing.framework; path = System/Library/Frameworks/QuickLookThumbnailing.framework; sourceTree = SDKROOT; };
+		EB92BF2F2F1D1F1C00305170 /* OpaliteTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpaliteTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB92BF952F1D550600305170 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB92BFB02F1D56DC00305170 /* OpaliteWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpaliteWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteMessages.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB92BFC42F1D5CEF00305170 /* Messages.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Messages.framework; path = Library/Frameworks/Messages.framework; sourceTree = DEVELOPER_DIR; };
 		EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBD4AD1C2EE48DF300012D16 /* Opalite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Opalite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBD4AD2D2EE48DF400012D16 /* OpaliteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpaliteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,6 +168,50 @@
 				Info.plist,
 			);
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
+		};
+		EB92BF3B2F1D1F1D00305170 /* Exceptions for "OpaliteTV" folder in "OpaliteTV" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EB92BF2E2F1D1F1C00305170 /* OpaliteTV */;
+		};
+		EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppStorageKeys.swift,
+				Enumerations/ColorBlindnessMode.swift,
+				Enumerations/OnyxSubscription.swift,
+				Enumerations/PreviewBackground.swift,
+				Enumerations/SwatchSize.swift,
+				Enumerations/ToastStyle.swift,
+				Errors/OpaliteError.swift,
+				Managers/CanvasManager.swift,
+				Managers/ColorManager.swift,
+				Managers/HapticsManager.swift,
+				Managers/HexCopyManager.swift,
+				Managers/SubscriptionManager.swift,
+				Managers/ToastManager.swift,
+				Models/CanvasFile.swift,
+				Models/CanvasPlacedImage.swift,
+				Models/OpaliteColor.swift,
+				Models/OpalitePalette.swift,
+			);
+			target = EB92BF2E2F1D1F1C00305170 /* OpaliteTV */;
+		};
+		EB92BFAF2F1D565300305170 /* Exceptions for "OpaliteWidgets" folder in "OpaliteWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */;
+		};
+		EB92BFD52F1D5CF000305170 /* Exceptions for "OpaliteMessages" folder in "OpaliteMessages" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EB92BFC22F1D5CEF00305170 /* OpaliteMessages */;
 		};
 		EBAD2C2E2F06D37800EB94EB /* Exceptions for "OpaliteShareExtension" folder in "OpaliteShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -204,6 +275,30 @@
 			path = OpaliteThumbnail;
 			sourceTree = "<group>";
 		};
+		EB92BF302F1D1F1C00305170 /* OpaliteTV */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB92BF3B2F1D1F1D00305170 /* Exceptions for "OpaliteTV" folder in "OpaliteTV" target */,
+			);
+			path = OpaliteTV;
+			sourceTree = "<group>";
+		};
+		EB92BFA12F1D565200305170 /* OpaliteWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB92BFAF2F1D565300305170 /* Exceptions for "OpaliteWidgets" folder in "OpaliteWidgetsExtension" target */,
+			);
+			path = OpaliteWidgets;
+			sourceTree = "<group>";
+		};
+		EB92BFC62F1D5CEF00305170 /* OpaliteMessages */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB92BFD52F1D5CF000305170 /* Exceptions for "OpaliteMessages" folder in "OpaliteMessages" target */,
+			);
+			path = OpaliteMessages;
+			sourceTree = "<group>";
+		};
 		EBAD2C212F06D37800EB94EB /* OpaliteShareExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -216,9 +311,10 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
+				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
+				EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */,
 				EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
 				EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
-				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";
@@ -273,6 +369,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB92BF2C2F1D1F1C00305170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BF9B2F1D565200305170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB92BFA02F1D565200305170 /* SwiftUI.framework in Frameworks */,
+				EB92BF9F2F1D565200305170 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BFC02F1D5CEF00305170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB92BFC52F1D5CEF00305170 /* Messages.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EBAD2C1D2F06D37800EB94EB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -308,10 +428,12 @@
 		EB224D012EF38D9B00F350D4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EB92BF952F1D550600305170 /* AppIntents.framework */,
 				EB3BCAD52EF8B58F0059764A /* QuickLook.framework */,
 				EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */,
 				EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */,
 				EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */,
+				EB92BFC42F1D5CEF00305170 /* Messages.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -319,6 +441,7 @@
 		EBD4AD132EE48DF300012D16 = {
 			isa = PBXGroup;
 			children = (
+				EB92BFB02F1D56DC00305170 /* OpaliteWidgetsExtension.entitlements */,
 				EBD4AD1E2EE48DF300012D16 /* Opalite */,
 				EBD4AD302EE48DF400012D16 /* OpaliteTests */,
 				EBD4AD3A2EE48DF400012D16 /* OpaliteUITests */,
@@ -328,6 +451,9 @@
 				EB17AA002F02F88800D00D03 /* OpaliteWatch Watch AppTests */,
 				EB17AA0A2F02F88800D00D03 /* OpaliteWatch Watch AppUITests */,
 				EBAD2C212F06D37800EB94EB /* OpaliteShareExtension */,
+				EB92BF302F1D1F1C00305170 /* OpaliteTV */,
+				EB92BFA12F1D565200305170 /* OpaliteWidgets */,
+				EB92BFC62F1D5CEF00305170 /* OpaliteMessages */,
 				EB224D012EF38D9B00F350D4 /* Frameworks */,
 				EBD4AD1D2EE48DF300012D16 /* Products */,
 			);
@@ -345,6 +471,9 @@
 				EB17A9FD2F02F88800D00D03 /* OpaliteWatch Watch AppTests.xctest */,
 				EB17AA072F02F88800D00D03 /* OpaliteWatch Watch AppUITests.xctest */,
 				EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */,
+				EB92BF2F2F1D1F1C00305170 /* OpaliteTV.app */,
+				EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */,
+				EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -464,6 +593,72 @@
 			productReference = EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		EB92BF2E2F1D1F1C00305170 /* OpaliteTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB92BF3C2F1D1F1D00305170 /* Build configuration list for PBXNativeTarget "OpaliteTV" */;
+			buildPhases = (
+				EB92BF2B2F1D1F1C00305170 /* Sources */,
+				EB92BF2C2F1D1F1C00305170 /* Frameworks */,
+				EB92BF2D2F1D1F1C00305170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EB92BF302F1D1F1C00305170 /* OpaliteTV */,
+			);
+			name = OpaliteTV;
+			packageProductDependencies = (
+			);
+			productName = OpaliteTV;
+			productReference = EB92BF2F2F1D1F1C00305170 /* OpaliteTV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB92BFAC2F1D565300305170 /* Build configuration list for PBXNativeTarget "OpaliteWidgetsExtension" */;
+			buildPhases = (
+				EB92BF9A2F1D565200305170 /* Sources */,
+				EB92BF9B2F1D565200305170 /* Frameworks */,
+				EB92BF9C2F1D565200305170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EB92BFA12F1D565200305170 /* OpaliteWidgets */,
+			);
+			name = OpaliteWidgetsExtension;
+			packageProductDependencies = (
+			);
+			productName = OpaliteWidgetsExtension;
+			productReference = EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		EB92BFC22F1D5CEF00305170 /* OpaliteMessages */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB92BFD22F1D5CF000305170 /* Build configuration list for PBXNativeTarget "OpaliteMessages" */;
+			buildPhases = (
+				EB92BFBF2F1D5CEF00305170 /* Sources */,
+				EB92BFC02F1D5CEF00305170 /* Frameworks */,
+				EB92BFC12F1D5CEF00305170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EB92BFC62F1D5CEF00305170 /* OpaliteMessages */,
+			);
+			name = OpaliteMessages;
+			packageProductDependencies = (
+			);
+			productName = OpaliteMessages;
+			productReference = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */;
+			productType = "com.apple.product-type.app-extension.messages";
+		};
 		EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EBAD2C2D2F06D37800EB94EB /* Build configuration list for PBXNativeTarget "OpaliteShareExtension" */;
@@ -503,6 +698,8 @@
 				EB3BCAF62EF8B7F40059764A /* PBXTargetDependency */,
 				EB17AA102F02F88800D00D03 /* PBXTargetDependency */,
 				EBAD2C292F06D37800EB94EB /* PBXTargetDependency */,
+				EB92BFAA2F1D565300305170 /* PBXTargetDependency */,
+				EB92BFD02F1D5CF000305170 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				EBD4AD1E2EE48DF300012D16 /* Opalite */,
@@ -589,6 +786,15 @@
 						CreatedOnToolsVersion = 26.2;
 						LastSwiftMigration = 2620;
 					};
+					EB92BF2E2F1D1F1C00305170 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					EB92BF9D2F1D565200305170 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					EB92BFC22F1D5CEF00305170 = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					EBAD2C1F2F06D37800EB94EB = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -623,14 +829,17 @@
 			projectRoot = "";
 			targets = (
 				EBD4AD1B2EE48DF300012D16 /* Opalite */,
+				EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */,
+				EB92BF2E2F1D1F1C00305170 /* OpaliteTV */,
 				EBD4AD2C2EE48DF400012D16 /* OpaliteTests */,
+				EB17A9FC2F02F88800D00D03 /* OpaliteWatch Watch AppTests */,
 				EBD4AD362EE48DF400012D16 /* OpaliteUITests */,
+				EB17AA062F02F88800D00D03 /* OpaliteWatch Watch AppUITests */,
+				EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */,
+				EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */,
 				EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */,
 				EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */,
-				EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */,
-				EB17A9FC2F02F88800D00D03 /* OpaliteWatch Watch AppTests */,
-				EB17AA062F02F88800D00D03 /* OpaliteWatch Watch AppUITests */,
-				EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */,
+				EB92BFC22F1D5CEF00305170 /* OpaliteMessages */,
 			);
 		};
 /* End PBXProject section */
@@ -665,6 +874,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		EB3BCAEC2EF8B7F40059764A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BF2D2F1D1F1C00305170 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BF9C2F1D565200305170 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BFC12F1D5CEF00305170 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -737,6 +967,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB92BF2B2F1D1F1C00305170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BF9A2F1D565200305170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB92BFBF2F1D5CEF00305170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EBAD2C1C2F06D37800EB94EB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -792,6 +1043,16 @@
 			isa = PBXTargetDependency;
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
 			targetProxy = EB3BCAF52EF8B7F40059764A /* PBXContainerItemProxy */;
+		};
+		EB92BFAA2F1D565300305170 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */;
+			targetProxy = EB92BFA92F1D565300305170 /* PBXContainerItemProxy */;
+		};
+		EB92BFD02F1D5CF000305170 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EB92BFC22F1D5CEF00305170 /* OpaliteMessages */;
+			targetProxy = EB92BFCF2F1D5CF000305170 /* PBXContainerItemProxy */;
 		};
 		EBAD2C292F06D37800EB94EB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1097,6 +1358,238 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "OpaliteThumbnail/OpaliteThumbnail-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EB92BF3D2F1D1F1D00305170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpaliteTV/OpaliteTV.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteTV/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Debug;
+		};
+		EB92BF3E2F1D1F1D00305170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpaliteTV/OpaliteTV.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteTV/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EB92BFAD2F1D565300305170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = OpaliteWidgetsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		EB92BFAE2F1D565300305170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = OpaliteWidgetsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		EB92BFD32F1D5CF000305170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = OpaliteMessages/OpaliteMessages.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteMessages/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteMessages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EB92BFD42F1D5CF000305170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = OpaliteMessages/OpaliteMessages.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteMessages/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Opalite;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteMessages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1545,6 +2038,33 @@
 			buildConfigurations = (
 				EB3BCAF92EF8B7F40059764A /* Debug */,
 				EB3BCAFA2EF8B7F40059764A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB92BF3C2F1D1F1D00305170 /* Build configuration list for PBXNativeTarget "OpaliteTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB92BF3D2F1D1F1D00305170 /* Debug */,
+				EB92BF3E2F1D1F1D00305170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB92BFAC2F1D565300305170 /* Build configuration list for PBXNativeTarget "OpaliteWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB92BFAD2F1D565300305170 /* Debug */,
+				EB92BFAE2F1D565300305170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB92BFD22F1D5CF000305170 /* Build configuration list for PBXNativeTarget "OpaliteMessages" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB92BFD32F1D5CF000305170 /* Debug */,
+				EB92BFD42F1D5CF000305170 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

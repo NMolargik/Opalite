@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import Observation
 import TipKit
+import WidgetKit
 
 @main
 @MainActor
@@ -70,6 +71,9 @@ struct OpaliteApp: App {
                     Task { @MainActor in
                         await colorManager.refreshAll()
                         await canvasManager.refreshAll()
+
+                        // Sync colors to widget storage for the widget extension
+                        syncColorsToWidgetStorage()
                     }
 
                     #if os(iOS)
@@ -87,6 +91,8 @@ struct OpaliteApp: App {
                 }
                 .task {
                     colorManager.author = userName
+                    // Sync colors to widget on initial launch
+                    syncColorsToWidgetStorage()
                 }
                 .onChange(of: userName) { _, newName in
                     colorManager.author = newName
@@ -112,6 +118,16 @@ struct OpaliteApp: App {
                     if url.scheme == "opalite" && url.host == "sharedImage" {
                         // The PortfolioView will automatically detect and open the shared image
                         // when it becomes active (via scenePhase observer)
+                        return
+                    }
+
+                    // Handle color deep link from widget (opalite://color/<uuid>)
+                    if url.scheme == "opalite" && url.host == "color" {
+                        let pathComponents = url.pathComponents
+                        if pathComponents.count >= 2,
+                           let colorID = UUID(uuidString: pathComponents[1]) {
+                            IntentNavigationManager.shared.navigateToColor(id: colorID)
+                        }
                         return
                     }
 
@@ -480,5 +496,30 @@ struct OpaliteApp: App {
         if let encoded = try? JSONEncoder().encode(currentOrder) {
             paletteOrderData = encoded
         }
+    }
+
+    /// Syncs colors to the shared App Group storage for the widget extension
+    private func syncColorsToWidgetStorage() {
+        let widgetColors = colorManager.colors.map { color in
+            WidgetColor(
+                id: color.id,
+                name: color.name,
+                red: color.red,
+                green: color.green,
+                blue: color.blue,
+                alpha: color.alpha
+            )
+        }
+
+        guard let defaults = UserDefaults(suiteName: "group.com.molargiksoftware.Opalite"),
+              let data = try? JSONEncoder().encode(widgetColors) else {
+            return
+        }
+        defaults.set(data, forKey: "widgetColors")
+
+        // Tell WidgetKit to reload the widget timeline
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+        #endif
     }
 }

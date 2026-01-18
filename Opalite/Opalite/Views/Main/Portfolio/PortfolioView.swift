@@ -25,6 +25,9 @@ struct PortfolioView: View {
     @Environment(QuickActionManager.self) private var quickActionManager
     @Environment(HexCopyManager.self) private var hexCopyManager
 
+    // MARK: - Intent Navigation
+    private var intentNavigationManager = IntentNavigationManager.shared
+
     // MARK: - Tips
     private let createContentTip = CreateContentTip()
     private let dragAndDropTip = DragAndDropTip()
@@ -114,7 +117,7 @@ struct PortfolioView: View {
     }
     
     var body: some View {
-        NavigationStack() {
+        NavigationStack(path: $navigationPath) {
             ScrollView {
                 VStack(alignment: .leading, spacing: isCompact ? 16 : 20) {
 
@@ -609,9 +612,35 @@ struct PortfolioView: View {
                 }
             }
             .toolbarRole(isCompact ? .automatic : .editor)
+            .navigationDestination(for: PortfolioNavigationNode.self) { node in
+                switch node {
+                case .color(let color):
+                    ColorDetailView(color: color)
+                        .tint(.none)
+                case .palette(let palette):
+                    PaletteDetailView(palette: palette)
+                        .tint(.none)
+                }
+            }
+            .onChange(of: intentNavigationManager.pendingColorID) { _, colorID in
+                guard let colorID else { return }
+                // Find the color and navigate to it
+                if let color = colorManager.colors.first(where: { $0.id == colorID }) {
+                    navigationPath = [.color(color)]
+                    intentNavigationManager.clearNavigation()
+                }
+            }
+            .onChange(of: intentNavigationManager.pendingPaletteID) { _, paletteID in
+                guard let paletteID else { return }
+                // Find the palette and navigate to it
+                if let palette = colorManager.palettes.first(where: { $0.id == paletteID }) {
+                    navigationPath = [.palette(palette)]
+                    intentNavigationManager.clearNavigation()
+                }
+            }
         }
     }
-    
+
     private func handleFileImport(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):

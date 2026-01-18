@@ -182,7 +182,6 @@ struct CanvasPlacedImageView: View {
             newPosition.x = image.position.x + (newSize.width - resizeStartSize.width) / 2
             newPosition.y = image.position.y - (newSize.height - resizeStartSize.height) / 2
         case .bottomLeft:
-            let deltaSize = max(-delta.width, delta.height * aspectRatio)
             newSize.width = max(50, resizeStartSize.width - (-delta.width))
             newSize.height = newSize.width / aspectRatio
             newPosition.x = image.position.x - (newSize.width - resizeStartSize.width) / 2

@@ -6,6 +6,8 @@
 //
 
 import Foundation
+
+#if canImport(UIKit) && !os(tvOS)
 import UIKit
 
 final class HapticsManager {
@@ -37,3 +39,20 @@ final class HapticsManager {
         generator.notificationOccurred(type)
     }
 }
+
+#else
+
+// MARK: - tvOS / Fallback (No-Op)
+
+/// No-op HapticsManager for platforms without haptic feedback (tvOS, etc.)
+final class HapticsManager {
+
+    static let shared = HapticsManager()
+    private init() {}
+
+    func impact() {}
+    func selection() {}
+    func notification() {}
+}
+
+#endif
