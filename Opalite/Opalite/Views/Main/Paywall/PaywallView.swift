@@ -239,6 +239,9 @@ struct PaywallView: View {
 
             Link("Privacy Policy", destination: URL(string: "https://molargiksoftware.com/#/privacy")!)
                 .font(.caption)
+            
+            Link("Terms Of Use (EULA)", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                .font(.caption)
         }
         .padding(.top, 8)
     }
