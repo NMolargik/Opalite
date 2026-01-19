@@ -397,4 +397,57 @@ extension OpaliteColor {
         blue: 0.50,
         alpha: 1.0
     )
+
+    static let sample3: OpaliteColor = OpaliteColor(
+        id: UUID(),
+        name: "Sample Green",
+        notes: "A fresh green color",
+        createdByDisplayName: "Nick Molargik",
+        createdOnDeviceName: "iPhone 17 Pro",
+        updatedOnDeviceName: "iPhone 17 Pro",
+        createdAt: Date(),
+        updatedAt: Date(),
+        red: 0.20,
+        green: 0.70,
+        blue: 0.30,
+        alpha: 1.0
+    )
+
+    static let sample4: OpaliteColor = OpaliteColor(
+        id: UUID(),
+        name: "Sample Yellow",
+        notes: "A vibrant yellow color",
+        createdByDisplayName: "Nick Molargik",
+        createdOnDeviceName: "iPhone 17 Pro",
+        updatedOnDeviceName: "iPhone 17 Pro",
+        createdAt: Date(),
+        updatedAt: Date(),
+        red: 0.95,
+        green: 0.82,
+        blue: 0.20,
+        alpha: 1.0
+    )
+
+    static let sample5: OpaliteColor = OpaliteColor(
+        id: UUID(),
+        name: "Sample Purple",
+        notes: "A rich purple color",
+        createdByDisplayName: "Nick Molargik",
+        createdOnDeviceName: "iPhone 17 Pro",
+        updatedOnDeviceName: "iPhone 17 Pro",
+        createdAt: Date(),
+        updatedAt: Date(),
+        red: 0.55,
+        green: 0.30,
+        blue: 0.75,
+        alpha: 1.0
+    )
+
+    static let samples: [OpaliteColor] = [
+        sample,
+        sample2,
+        sample3,
+        sample4,
+        sample5
+    ]
 }

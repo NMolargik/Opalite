@@ -84,6 +84,14 @@ extension OpaliteColor {
             rSim = 0.95 * rLin + 0.05 * gLin + 0.0 * bLin
             gSim = 0.0 * rLin + 0.43333 * gLin + 0.56667 * bLin
             bSim = 0.0 * rLin + 0.475 * gLin + 0.525 * bLin
+
+        case .achromatopsia:
+            // Achromatopsia (monochromacy) - complete color blindness
+            // Convert to grayscale using Rec. 709 luminance coefficients
+            let luminance = 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin
+            rSim = luminance
+            gSim = luminance
+            bSim = luminance
         }
 
         // Convert back to sRGB and clamp to valid range

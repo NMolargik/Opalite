@@ -39,25 +39,8 @@ struct ColorDetailView: View {
     @State private var isShowingExportSheet: Bool = false
     @State private var isShowingPaletteSheet: Bool = false
 
-    // Tabbed content selection
-    @State private var selectedTab: ColorDetailTab = .harmonies
-
     // Smart color naming
     @State private var nameSuggestionService = ColorNameSuggestionService()
-
-    private enum ColorDetailTab: String, CaseIterable {
-        case harmonies = "Harmonies"
-        case info = "Info"
-        case notes = "Notes"
-
-        var icon: String {
-            switch self {
-            case .harmonies: return "paintpalette"
-            case .info: return "info.circle"
-            case .notes: return "note.text"
-            }
-        }
-    }
 
     let color: OpaliteColor
 
@@ -106,15 +89,50 @@ struct ColorDetailView: View {
                         nameSuggestionService.clearSuggestions()
                     }
                 }
+                .overlay(alignment: .bottom) {
+                    InfoTilesRow(color: color)
+                        .padding(.horizontal, 30)
+                        .offset(y: 45)
+                        .zIndex(1)
+                }
+                
+                Spacer(minLength: 80)
 
-                // MARK: - Tab Selector
-                tabSelector
-                    .padding(.top, 16)
+                // MARK: - Content Sections
+                VStack(spacing: 20) {
+                    HarmoniesRow(
+                        baseColor: color,
+                        onCreateColor: { suggested in
+                            do {
+                                _ = try colorManager.createColor(
+                                    name: nil,
+                                    notes: suggested.notes,
+                                    device: nil,
+                                    red: suggested.red,
+                                    green: suggested.green,
+                                    blue: suggested.blue,
+                                    alpha: suggested.alpha,
+                                    palette: color.palette
+                                )
+                            } catch {
+                                toastManager.show(error: .colorCreationFailed)
+                            }
+                        }
+                    )
 
-                // MARK: - Tab Content
-                tabContent
-                    .padding(.top, 16)
-                    .padding(.bottom, 24)
+                    NotesSectionView(
+                        notes: $viewModel.notesDraft,
+                        isSaving: $viewModel.isSavingNotes,
+                        onSave: {
+                            viewModel.saveNotes(using: colorManager) { error in
+                                toastManager.show(error: error)
+                            }
+                        }
+                    )
+                }
+                .padding(.horizontal)
+                .padding(.top, -20)
+                .padding(.bottom, 24)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -175,34 +193,8 @@ struct ColorDetailView: View {
                 .accessibilityLabel("Export color")
                 .accessibilityHint("Opens export options for this color")
             }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.selection()
-                    isShowingColorEditor = true
-                } label: {
-                    Label("Edit", systemImage: "slider.horizontal.below.square.and.square.filled")
-                }
-                .toolbarButtonTint()
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.selection()
-                    isShowingContrastChecker = true
-                } label: {
-                    Label("Contrast", systemImage: "circle.righthalf.filled")
-                }
-                .toolbarButtonTint()
-                .accessibilityLabel("Check WCAG contrast")
-                .accessibilityHint("Opens contrast checker to compare this color against others")
-            }
-
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
+            
+            ToolbarItem(placement:.topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
                     hexCopyManager.copyHex(for: color)
@@ -224,38 +216,84 @@ struct ColorDetailView: View {
                 .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")
                 .accessibilityValue(hexCopyManager.formattedHex(for: color))
             }
-
-            // Secondary actions - collapse first
-            ToolbarItem(placement: .secondaryAction) {
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticsManager.shared.selection()
+                    isShowingColorEditor = true
+                } label: {
+                    Label("Edit Color", systemImage: "slider.horizontal.below.square.and.square.filled")
+                }
+                .toolbarButtonTint()
+                
                 Button {
                     HapticsManager.shared.selection()
                     isShowingPaletteSheet = true
                 } label: {
                     Label("Move to Palette", systemImage: "swatchpalette.fill")
                 }
-                .toolbarButtonTint()
             }
 
-            ToolbarItem(placement: .secondaryAction) {
-                Button {
-                    HapticsManager.shared.selection()
-                    withAnimation {
-                        isEditingName = true
+            // Info menu with color values and actions
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        HapticsManager.shared.selection()
+                        isShowingContrastChecker = true
+                    } label: {
+                        Label("Check Contrast", systemImage: "circle.righthalf.filled")
+                    }
+                    .toolbarButtonTint()
+                    .accessibilityLabel("Check WCAG contrast")
+                    .accessibilityHint("Opens contrast checker to compare this color against others")
+                    
+                    // Color values section - copyable
+                    Section("Color Values") {
+                        Button {
+                            HapticsManager.shared.selection()
+                            hexCopyManager.copyHex(for: color)
+                        } label: {
+                            Label(color.hexString, systemImage: "number")
+                        }
+
+                        Button {
+                            HapticsManager.shared.selection()
+                            copyToClipboard(color.rgbString)
+                        } label: {
+                            Label(color.rgbString, systemImage: "slider.horizontal.3")
+                        }
+
+                        Button {
+                            HapticsManager.shared.selection()
+                            copyToClipboard(color.hslString)
+                        } label: {
+                            Label(color.hslString, systemImage: "circle.lefthalf.filled")
+                        }
+                    }
+
+                    Section {
+                        Button {
+                            HapticsManager.shared.selection()
+                            withAnimation {
+                                isEditingName = true
+                            }
+                        } label: {
+                            Label("Rename", systemImage: "character.cursor.ibeam")
+                        }
+                    }
+
+                    Section {
+                        Button(role: .destructive) {
+                            HapticsManager.shared.selection()
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
                     }
                 } label: {
-                    Label("Rename", systemImage: "character.cursor.ibeam")
+                    Label("More", systemImage: "ellipsis")
                 }
                 .toolbarButtonTint()
-            }
-
-            ToolbarItem(placement: .secondaryAction) {
-                Button(role: .destructive) {
-                    HapticsManager.shared.selection()
-                    showDeleteConfirmation = true
-                } label: {
-                    Label("Delete", systemImage: "trash.fill")
-                }
-                .tint(.red)
             }
         }
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
@@ -273,186 +311,316 @@ struct ColorDetailView: View {
         }
     }
 
-    // MARK: - Tab Selector
+    // MARK: - Helper Functions
 
-    @ViewBuilder
-    private var tabSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(ColorDetailTab.allCases, id: \.self) { tab in
+    private func copyToClipboard(_ text: String) {
+        #if canImport(UIKit)
+        UIPasteboard.general.string = text
+        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #endif
+    }
+}
+
+// MARK: - Info Tile View
+
+private struct InfoTileView: View {
+    let icon: String
+    let iconColor: Color
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(iconColor)
+                .frame(height: 30)
+
+            Text(value)
+                .font(.subheadline.bold())
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(12)
+        .frame(maxWidth: 200, maxHeight: 85)
+        .modifier(GlassTileBackground())
+    }
+}
+
+private struct GlassTileBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+            content
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .shadow(radius: 5)
+
+        } else {
+            content
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.white)
+                        .shadow(radius: 5)
+                )
+        }
+    }
+}
+
+// MARK: - Info Tiles Row
+
+private struct InfoTilesRow: View {
+    let color: OpaliteColor
+
+    var body: some View {
+        HStack(spacing: 12) {
+            InfoTileView(
+                icon: "person.fill",
+                iconColor: .orange,
+                value: color.createdByDisplayName ?? "Unknown",
+                label: "Created By"
+            )
+
+            InfoTileView(
+                icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
+                iconColor: .secondary,
+                value: shortDeviceName(color.createdOnDeviceName),
+                label: "Created On"
+            )
+
+            InfoTileView(
+                icon: "clock.fill",
+                iconColor: .indigo,
+                value: formattedShortDate(color.updatedAt),
+                label: "Updated On"
+            )
+        }
+    }
+
+    private func shortDeviceName(_ name: String?) -> String {
+        guard let name = name else { return "—" }
+        // Shorten common device names
+        if name.lowercased().contains("iphone") {
+            return "iPhone"
+        } else if name.lowercased().contains("ipad") {
+            return "iPad"
+        } else if name.lowercased().contains("mac") {
+            return "Mac"
+        }
+        return name
+    }
+
+    private func formattedShortDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+}
+
+// MARK: - Harmonies Row
+
+private struct HarmoniesRow: View {
+    @Environment(HexCopyManager.self) private var hexCopyManager
+
+    let baseColor: OpaliteColor
+    let onCreateColor: (OpaliteColor) -> Void
+
+    @State private var isShowingInfo = false
+    @State private var actionFeedbackColorID: UUID?
+    @State private var harmonyColors: [OpaliteColor] = []
+
+    var body: some View {
+        SectionCard(title: "Harmonies", systemImage: "paintpalette") {
+            SwatchRowView(
+                colors: harmonyColors,
+                palette: nil,
+                swatchWidth: 180,
+                swatchHeight: 150,
+                showOverlays: true,
+                showsNavigation: false,
+                acceptsDrops: false,
+                menuContent: { color in
+                    harmonyMenuContent(for: color)
+                },
+                contextMenuContent: { color in
+                    harmonyMenuContent(for: color)
+                },
+                copiedColorID: $actionFeedbackColorID
+            )
+            .clipped()
+        } trailing: {
+            Button {
+                HapticsManager.shared.selection()
+                isShowingInfo = true
+            } label: {
+                Image(systemName: "questionmark.circle")
+                    .foregroundStyle(.gray)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Learn about color harmonies")
+        }
+        .sheet(isPresented: $isShowingInfo) {
+            ColorHarmoniesInfoSheet()
+        }
+        .onAppear {
+            if harmonyColors.isEmpty {
+                harmonyColors = buildHarmonyColors()
+            }
+        }
+    }
+
+    private func harmonyMenuContent(for color: OpaliteColor) -> AnyView {
+        AnyView(
+            Group {
                 Button {
                     HapticsManager.shared.selection()
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        selectedTab = tab
+                    hexCopyManager.copyHex(for: color)
+                    withAnimation {
+                        actionFeedbackColorID = color.id
                     }
                 } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: tab.icon)
-                            .font(.subheadline)
-                        Text(tab.rawValue)
-                            .font(.subheadline.bold())
-                    }
-                    .foregroundStyle(selectedTab == tab ? .white : .secondary)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background {
-                        if selectedTab == tab {
-                            Capsule()
-                                .fill(color.swiftUIColor.opacity(0.9))
-                                .shadow(color: color.swiftUIColor.opacity(0.3), radius: 8, y: 4)
-                        }
-                    }
-                    .contentShape(Capsule())
+                    Label("Copy Hex", systemImage: "number")
                 }
-                .buttonStyle(.plain)
+
+                Button {
+                    HapticsManager.shared.selection()
+                    onCreateColor(color)
+                    withAnimation {
+                        actionFeedbackColorID = color.id
+                    }
+                } label: {
+                    Label(
+                        baseColor.palette != nil ? "Add to Palette" : "Save to Colors",
+                        systemImage: "plus"
+                    )
+                }
             }
-        }
-        .padding(4)
-        .background(.fill.tertiary, in: Capsule())
-        .padding(.horizontal)
+        )
     }
 
-    // MARK: - Tab Content
+    private func buildHarmonyColors() -> [OpaliteColor] {
+        var colors: [OpaliteColor] = []
 
-    @ViewBuilder
-    private var tabContent: some View {
-        switch selectedTab {
-        case .harmonies:
-            harmoniesTab
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-        case .info:
-            infoTab
-                .transition(.opacity)
-        case .notes:
-            notesTab
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
-        }
+        // Complementary (1)
+        colors.append(baseColor.complementaryColor())
+
+        // Analogous (2)
+        colors.append(contentsOf: baseColor.analogousColors())
+
+        // Triadic (2)
+        colors.append(contentsOf: baseColor.triadicColors())
+
+        // Split-Complementary (2)
+        colors.append(contentsOf: baseColor.splitComplementaryColors())
+
+        // Tetradic (3)
+        colors.append(contentsOf: baseColor.tetradicColors())
+
+        return colors
     }
+}
 
-    // MARK: - Harmonies Tab
+// MARK: - Color Harmonies Info Sheet
 
-    @ViewBuilder
-    private var harmoniesTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            ColorRecommendedColorsView(
-                baseColor: color,
-                onCreateColor: { suggested in
-                    do {
-                        _ = try colorManager.createColor(
-                            name: nil,
-                            notes: suggested.notes,
-                            device: nil,
-                            red: suggested.red,
-                            green: suggested.green,
-                            blue: suggested.blue,
-                            alpha: suggested.alpha,
-                            palette: color.palette
-                        )
-                    } catch {
-                        toastManager.show(error: .colorCreationFailed)
+private struct ColorHarmoniesInfoSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text("Color harmonies are combinations of colors that are aesthetically pleasing and work well together. They're based on the position of colors on the color wheel.")
+                        .foregroundStyle(.secondary)
+
+                    harmonySection(
+                        name: "Complementary",
+                        icon: "circle.lefthalf.filled",
+                        color: .red,
+                        description: "Colors directly opposite each other on the color wheel (180° apart). Creates high contrast and visual tension.",
+                        example: "Red & Green, Blue & Orange"
+                    )
+
+                    harmonySection(
+                        name: "Analogous",
+                        icon: "circle.and.line.horizontal",
+                        color: .orange,
+                        description: "Colors adjacent to each other on the wheel (±30°). Creates a harmonious, cohesive feel with low contrast.",
+                        example: "Blue, Blue-Green, Green"
+                    )
+
+                    harmonySection(
+                        name: "Triadic",
+                        icon: "triangle",
+                        color: .yellow,
+                        description: "Three colors evenly spaced on the wheel (120° apart). Offers strong visual contrast while retaining balance.",
+                        example: "Red, Yellow, Blue"
+                    )
+
+                    harmonySection(
+                        name: "Split-Complementary",
+                        icon: "arrow.triangle.branch",
+                        color: .green,
+                        description: "A base color plus the two colors adjacent to its complement (150° & 210°). High contrast but less tension than complementary.",
+                        example: "Blue, Yellow-Orange, Red-Orange"
+                    )
+
+                    harmonySection(
+                        name: "Tetradic (Square)",
+                        icon: "square",
+                        color: .blue,
+                        description: "Four colors evenly spaced on the wheel (90° apart). Rich color palette that works best when one color dominates.",
+                        example: "Red, Yellow, Green, Blue"
+                    )
+                }
+                .padding()
+            }
+            .navigationTitle("Color Harmonies")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
                     }
                 }
-            )
-        }
-        .padding(.horizontal)
-    }
-
-    // MARK: - Info Tab
-
-    @ViewBuilder
-    private var infoTab: some View {
-        VStack(spacing: 16) {
-            // Color values card
-            VStack(spacing: 0) {
-                infoRow(icon: "number", label: "Hex", value: color.hexString, showDivider: true)
-                infoRow(icon: "slider.horizontal.3", label: "RGB", value: color.rgbString, showDivider: true)
-                infoRow(icon: "circle.lefthalf.filled", label: "HSL", value: color.hslString, showDivider: false)
-            }
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
-
-            // Metadata card
-            VStack(spacing: 0) {
-                infoRow(icon: "person", label: "Created By", value: color.createdByDisplayName ?? "—", showDivider: true)
-                infoRow(icon: DeviceKind.from(color.createdOnDeviceName).symbolName, label: "Device", value: color.createdOnDeviceName ?? "—", showDivider: true)
-                infoRow(icon: "calendar", label: "Created", value: formatted(color.createdAt), showDivider: true)
-                infoRow(icon: "clock.arrow.circlepath", label: "Updated", value: formatted(color.updatedAt), showDivider: false)
-            }
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
-
-            if let palette = color.palette {
-                // Palette membership card
-                VStack(spacing: 0) {
-                    HStack {
-                        Image(systemName: "swatchpalette.fill")
-                            .foregroundStyle(.purple)
-                            .frame(width: 24)
-                        Text("In Palette")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(palette.name)
-                            .fontWeight(.medium)
-                    }
-                    .padding()
-                }
-                .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
-                .padding(.horizontal)
             }
         }
     }
 
     @ViewBuilder
-    private func infoRow(icon: String, label: String, value: String, showDivider: Bool) -> some View {
-        VStack(spacing: 0) {
-            HStack {
+    private func harmonySection(
+        name: String,
+        icon: String,
+        color: Color,
+        description: String,
+        example: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
                 Image(systemName: icon)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 24)
-                Text(label)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text(value)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 30)
+
+                Text(name)
+                    .font(.headline)
             }
-            .padding()
 
-            if showDivider {
-                Divider()
-                    .padding(.leading, 48)
-            }
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+
+            Text("Example: \(example)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
-    }
-
-    private func formatted(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        f.timeStyle = .short
-        return f.string(from: date)
-    }
-
-    // MARK: - Notes Tab
-
-    @ViewBuilder
-    private var notesTab: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            NotesSectionView(
-                notes: $viewModel.notesDraft,
-                isSaving: $viewModel.isSavingNotes,
-                onSave: {
-                    viewModel.saveNotes(using: colorManager) { error in
-                        toastManager.show(error: error)
-                    }
-                }
-            )
-        }
-        .padding(.horizontal)
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

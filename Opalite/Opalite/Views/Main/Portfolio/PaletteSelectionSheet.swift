@@ -13,11 +13,21 @@ struct PaletteSelectionSheet: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    let color: OpaliteColor
+    let colors: [OpaliteColor]
 
     @State private var newPaletteName: String = ""
     @State private var isCreating: Bool = false
     @State private var isShowingPaywall: Bool = false
+
+    /// Convenience initializer for a single color
+    init(color: OpaliteColor) {
+        self.colors = [color]
+    }
+
+    /// Initializer for multiple colors
+    init(colors: [OpaliteColor]) {
+        self.colors = colors
+    }
 
     private var canCreate: Bool {
         !newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isCreating
@@ -25,6 +35,10 @@ struct PaletteSelectionSheet: View {
 
     private var canCreatePalette: Bool {
         subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count)
+    }
+
+    private var navigationTitle: String {
+        colors.count == 1 ? "Move To Palette" : "Add \(colors.count) Colors to Palette"
     }
 
     var body: some View {
@@ -102,7 +116,7 @@ struct PaletteSelectionSheet: View {
                         ForEach(colorManager.palettes) { palette in
                             Button {
                                 HapticsManager.shared.selection()
-                                attach(color, to: palette)
+                                attachColors(to: palette)
                             } label: {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 6) {
@@ -148,7 +162,7 @@ struct PaletteSelectionSheet: View {
                     Text("Existing Palettes")
                 }
             }
-            .navigationTitle("Move To Palette")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -174,7 +188,9 @@ struct PaletteSelectionSheet: View {
 
             do {
                 let palette = try colorManager.createPalette(name: name)
-                colorManager.attachColor(color, to: palette)
+                for color in colors {
+                    colorManager.attachColor(color, to: palette)
+                }
                 dismiss()
             } catch {
 #if DEBUG
@@ -184,19 +200,21 @@ struct PaletteSelectionSheet: View {
         }
     }
 
-    private func attach(_ color: OpaliteColor, to palette: OpalitePalette) {
+    private func attachColors(to palette: OpalitePalette) {
         withAnimation {
             isCreating = true
             defer { isCreating = false }
 
             do {
-                colorManager.attachColor(color, to: palette)
+                for color in colors {
+                    colorManager.attachColor(color, to: palette)
+                }
                 try colorManager.saveContext()
                 Task { await colorManager.refreshAll() }
                 dismiss()
             } catch {
 #if DEBUG
-                print("[PaletteSelectionSheet] attach error: \(error)")
+                print("[PaletteSelectionSheet] attachColors error: \(error)")
 #endif
             }
         }

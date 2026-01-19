@@ -144,15 +144,15 @@ struct PhotoColorPickerSheet: View {
     private func imagePickerContent(for uiImage: UIImage) -> some View {
         VStack(spacing: 8) {
             GeometryReader { geometry in
-                let availableWidth = geometry.size.width
-                let displayHeight = calculateImageDisplayHeight(for: uiImage, availableWidth: availableWidth)
-                let imageRect = CGRect(x: 0, y: 0, width: availableWidth, height: displayHeight)
+                let viewSize = geometry.size
+                // Calculate where the image actually appears within the view when using scaledToFit
+                let imageRect = calculateImageRect(for: uiImage, in: viewSize)
 
                 ZStack {
                     Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: availableWidth, height: displayHeight)
+                        .frame(width: viewSize.width, height: viewSize.height)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)

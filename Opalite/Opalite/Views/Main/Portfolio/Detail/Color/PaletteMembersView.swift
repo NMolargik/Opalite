@@ -16,24 +16,22 @@ struct PaletteMembersView: View {
     @State private var copiedColorID: UUID?
 
     var body: some View {
-        SectionCard(title: "Components", systemImage: "swatchpalette") {
-            SwatchRowView(
-                colors: palette.sortedColors,
-                palette: palette,
-                swatchWidth: 180,
-                swatchHeight: 150,
-                showOverlays: true,
-                showsNavigation: true,
-                menuContent: { color in
-                    componentMenuContent(for: color)
-                },
-                contextMenuContent: { color in
-                    componentMenuContent(for: color)
-                },
-                copiedColorID: $copiedColorID
-            )
-            .clipped()
-        }
+        SwatchRowView(
+            colors: palette.sortedColors,
+            palette: palette,
+            swatchWidth: 180,
+            swatchHeight: 150,
+            showOverlays: true,
+            showsNavigation: true,
+            menuContent: { color in
+                componentMenuContent(for: color)
+            },
+            contextMenuContent: { color in
+                componentMenuContent(for: color)
+            },
+            copiedColorID: $copiedColorID
+        )
+        .clipped()
     }
 
     private func componentMenuContent(for color: OpaliteColor) -> AnyView {

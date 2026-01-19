@@ -252,7 +252,7 @@ struct OpaliteApp: App {
                 } label: {
                     Label("SwatchBar", systemImage: "square.stack.fill")
                 }
-                .keyboardShortcut("b", modifiers: [.command, .shift])
+                .keyboardShortcut("s", modifiers: [.command, .shift])
 
                 Divider()
 

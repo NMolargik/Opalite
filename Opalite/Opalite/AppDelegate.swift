@@ -21,45 +21,47 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     static weak var mainSceneSession: UISceneSession?
 
     func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
-        // Forward to SceneDelegate via static storage; this is called when app is running on older setups
-        AppDelegate.pendingShortcutType = shortcutItem.type
+        let shortcutType = shortcutItem.type
+
+        // Handle the action immediately - this is called when app is in background
+        // and user triggers a shortcut (e.g., from macOS dock menu)
+        Task { @MainActor in
+            if shortcutType == "OpenSwatchBarAction" {
+                AppDelegate.openSwatchBarWindow()
+            } else if shortcutType == "CreateNewColorAction" {
+                IntentNavigationManager.shared.showColorEditor()
+            }
+        }
+
+        // Also set pending type as fallback for cold launch scenarios
+        AppDelegate.pendingShortcutType = shortcutType
         completionHandler(true)
     }
 
-    func applicationDidFinishLaunching(_ application: UIApplication) {
-        // Define dynamic quick actions at launch
-        let createColorIcon = UIApplicationShortcutIcon(systemImageName: "paintpalette.fill")
-        let createColor = UIApplicationShortcutItem(
-            type: "CreateNewColorAction",
-            localizedTitle: "Create New Color",
-            localizedSubtitle: nil,
-            icon: createColorIcon,
-            userInfo: nil
-        )
-
-        let openSwatchIcon = UIApplicationShortcutIcon(systemImageName: "square.stack")
-        let openSwatch = UIApplicationShortcutItem(
-            type: "OpenSwatchBarAction",
-            localizedTitle: "Open SwatchBar",
-            localizedSubtitle: nil,
-            icon: openSwatchIcon,
-            userInfo: nil
-        )
-
-        application.shortcutItems = [createColor, openSwatch]
-    }
 
     func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
-        // Check if launched via quick action
+        // Check if launched via quick action (from options)
         if let shortcutItem = options.shortcutItem {
             AppDelegate.pendingShortcutType = shortcutItem.type
         }
 
-        // Check for SwatchBar scene request
+        // Check if we should open SwatchBar (either from options or pending type set earlier)
+        let shouldOpenSwatchBar = options.shortcutItem?.type == "OpenSwatchBarAction" ||
+                                   AppDelegate.pendingShortcutType == "OpenSwatchBarAction"
+
+        if shouldOpenSwatchBar {
+            // Clear the pending type since we're handling it now
+            AppDelegate.pendingShortcutType = nil
+            let config = UISceneConfiguration(name: "SwatchBar", sessionRole: connectingSceneSession.role)
+            config.delegateClass = SceneDelegate.self
+            return config
+        }
+
+        // Check for SwatchBar scene request via user activity
         if let targetContentIdentifier = options.userActivities.first?.targetContentIdentifier,
            targetContentIdentifier == "swatchBar" {
             let config = UISceneConfiguration(name: "SwatchBar", sessionRole: connectingSceneSession.role)
@@ -101,10 +103,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     /// Opens the SwatchBar window or brings an existing one to the foreground.
     ///
     /// This checks for an existing SwatchBar scene and activates it.
-    /// If no SwatchBar window exists, it opens a new one via URL scheme.
+    /// If no SwatchBar window exists, it opens a new one via user activity.
     @MainActor
     static func openSwatchBarWindow() {
-        // Check if we have a stored SwatchBar scene session
+        // If we have an existing SwatchBar session, activate it
         if let session = swatchBarSceneSession {
             UIApplication.shared.requestSceneSessionActivation(
                 session,
@@ -115,14 +117,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             return
         }
 
-        // No existing SwatchBar window, open a new one via URL scheme
-        if let url = URL(string: "opalite://swatchBar") {
-            UIApplication.shared.open(url, options: [:]) { success in
-                if !success {
-                    print("Failed to open SwatchBar window via URL")
-                }
+        // Create a user activity that will trigger SwatchBar scene configuration
+        let activity = NSUserActivity(activityType: "com.molargiksoftware.Opalite.openSwatchBar")
+        activity.targetContentIdentifier = "swatchBar"
+
+        // Request a new scene with this activity - configurationForConnecting will see it
+        UIApplication.shared.requestSceneSessionActivation(
+            nil,
+            userActivity: activity,
+            options: nil,
+            errorHandler: { error in
+                print("[Opalite] Failed to open SwatchBar: \(error.localizedDescription)")
             }
-        }
+        )
     }
 
     /// Registers a scene session as the main window session.

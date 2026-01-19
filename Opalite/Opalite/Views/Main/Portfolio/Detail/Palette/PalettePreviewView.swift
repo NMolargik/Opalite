@@ -21,13 +21,18 @@ struct PalettePreviewView: View {
     @FocusState private var nameFocused: Bool
     @State private var isShowingBackgroundPicker: Bool = false
 
+    // Cached values to survive context resets
+    @State private var cachedBackground: PreviewBackground?
+    @State private var cachedColors: [OpaliteColor] = []
+    @State private var cachedName: String = ""
+
     private let totalHeight: CGFloat = 300
     private let padding: CGFloat = 16
     private let spacing: CGFloat = 8
 
     /// The current background, falling back to theme-appropriate default
     private var currentBackground: PreviewBackground {
-        palette.previewBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
+        cachedBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
     }
 
     private let extraVerticalPadding: CGFloat = 44
@@ -36,7 +41,7 @@ struct PalettePreviewView: View {
         GeometryReader { geometry in
             let availableWidth = geometry.size.width - (padding * 2)
             let availableHeight = totalHeight - (padding * 2) - (extraVerticalPadding * 2)
-            let colors = palette.sortedColors
+            let colors = cachedColors
             let layout = calculateLayout(
                 colorCount: colors.count,
                 availableWidth: availableWidth,
@@ -65,14 +70,19 @@ struct PalettePreviewView: View {
                                     let index = row * layout.columns + col
                                     if index < colors.count {
                                         let color = colors[index]
-                                        SwatchView(
-                                            color: color,
-                                            width: layout.swatchSize,
-                                            height: layout.swatchSize,
-                                            badgeText: layout.showHexBadges ? (color.name ?? color.hexString) : "",
-                                            showOverlays: layout.showHexBadges
-                                        )
-                                        .frame(width: layout.swatchSize, height: layout.swatchSize)
+                                        NavigationLink {
+                                            ColorDetailView(color: color)
+                                        } label: {
+                                            SwatchView(
+                                                color: color,
+                                                width: layout.swatchSize,
+                                                height: layout.swatchSize,
+                                                badgeText: layout.showHexBadges ? (color.name ?? color.hexString) : "",
+                                                showOverlays: layout.showHexBadges
+                                            )
+                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
+                                        }
+                                        .buttonStyle(.plain)
                                     } else {
                                         Color.clear
                                             .frame(width: layout.swatchSize, height: layout.swatchSize)
@@ -85,23 +95,36 @@ struct PalettePreviewView: View {
             }
         }
         .overlay(alignment: .topLeading) {
-            nameBadge
-                .frame(maxWidth: 350, alignment: .leading)
-                .padding(10)
-        }
-        .overlay(alignment: .bottomTrailing) {
-            backgroundPickerButton
-                .padding(10)
+            HStack {
+                nameBadge
+                    .frame(maxWidth: 350, alignment: .leading)
+                    .padding(10)
+                
+                Spacer()
+                
+                backgroundPickerButton
+                    .padding(10)
+            }
         }
         .frame(height: totalHeight)
+        .onAppear {
+            syncCache()
+        }
         .onChange(of: isEditingName) { _, newValue in
             if newValue == true {
-                editedName = palette.name
+                editedName = cachedName
                 DispatchQueue.main.async {
                     nameFocused = true
                 }
             }
         }
+    }
+
+    private func syncCache() {
+        // Safely sync from the palette - this is only called on appear
+        cachedBackground = palette.previewBackground
+        cachedColors = palette.sortedColors
+        cachedName = palette.name
     }
 
     // MARK: - Name Badge
@@ -111,7 +134,7 @@ struct PalettePreviewView: View {
         ZStack(alignment: .trailing) {
             if isEditingName != true {
                 // Read-only state
-                Text(palette.name)
+                Text(cachedName)
                     .foregroundStyle(currentBackground.idealTextColor)
                     .bold()
                     .onTapGesture {
@@ -157,7 +180,9 @@ struct PalettePreviewView: View {
 
     private func saveName() {
         let finalName = editedName.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !finalName.isEmpty && finalName != palette.name {
+        if !finalName.isEmpty && finalName != cachedName {
+            // Update cache immediately for UI responsiveness
+            cachedName = finalName
             do {
                 try colorManager.updatePalette(palette) { pal in
                     pal.name = finalName
@@ -189,7 +214,7 @@ struct PalettePreviewView: View {
                 }
             }
         } label: {
-            Image(systemName: "paintbrush.fill")
+            Image(systemName: "square.2.layers.3d.bottom.filled")
                 .imageScale(.medium)
                 .foregroundStyle(currentBackground.idealTextColor)
                 .frame(width: 8, height: 8)
@@ -203,6 +228,8 @@ struct PalettePreviewView: View {
     }
 
     private func setBackground(_ background: PreviewBackground) {
+        // Update cache immediately before the save to prevent crashes if context resets
+        cachedBackground = background
         do {
             try colorManager.updatePalette(palette) { pal in
                 pal.previewBackground = background

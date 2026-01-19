@@ -24,23 +24,6 @@ struct PaletteDetailView: View {
     @State private var isShowingExportSheet: Bool = false
     @State private var isShowingColorEditor: Bool = false
 
-    // Tabbed content selection
-    @State private var selectedTab: PaletteDetailTab = .colors
-
-    private enum PaletteDetailTab: String, CaseIterable {
-        case colors = "Components"
-        case info = "Info"
-        case notes = "Notes"
-
-        var icon: String {
-            switch self {
-            case .colors: return "swatchpalette"
-            case .info: return "info.circle"
-            case .notes: return "note.text"
-            }
-        }
-    }
-
     let palette: OpalitePalette
 
     var body: some View {
@@ -53,15 +36,48 @@ struct PaletteDetailView: View {
                 )
                 .padding(.horizontal)
                 .padding(.top)
+                .overlay(alignment: .bottom) {
+                    PaletteInfoTilesRow(palette: palette)
+                        .padding(.horizontal, 30)
+                        .offset(y: 45)
+                        .zIndex(1)
+                }
 
-                // MARK: - Tab Selector
-                tabSelector
-                    .padding(.top, 16)
+                Spacer(minLength: 80)
 
-                // MARK: - Tab Content
-                tabContent
-                    .padding(.top, 16)
-                    .padding(.bottom, 24)
+                // MARK: - Content Sections
+                VStack(spacing: 20) {
+                    // Colors section
+                    SectionCard(title: "Components", systemImage: "swatchpalette") {
+                        PaletteMembersView(palette: palette, onRemoveColor: { color in
+                            withAnimation {
+                                colorManager.detachColorFromPalette(color)
+                            }
+                        })
+                    }
+
+                    // Notes section
+                    NotesSectionView(
+                        notes: $notesDraft,
+                        isSaving: $isSavingNotes,
+                        onSave: {
+                            isSavingNotes = true
+                            defer { isSavingNotes = false }
+
+                            do {
+                                try colorManager.updatePalette(palette) { pal in
+                                    let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    pal.notes = trimmed.isEmpty ? nil : trimmed
+                                }
+                            } catch {
+                                toastManager.show(error: .paletteUpdateFailed)
+                            }
+                        }
+                    )
+                }
+                .padding(.horizontal)
+                .padding(.top, -20)
+                .padding(.bottom, 24)
             }
         }
         .onAppear {
@@ -137,33 +153,55 @@ struct PaletteDetailView: View {
                 } label: {
                     Label("Add Color", systemImage: "plus.square.dashed")
                 }
-                .tint(.blue)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.selection()
-                    withAnimation {
-                        isEditingName = true
-                    }
-                } label: {
-                    Label("Rename", systemImage: "character.cursor.ibeam")
-                }
-                .toolbarButtonTint()
             }
 
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
 
+            // Ellipsis menu with palette info and actions
             ToolbarItem(placement: .topBarTrailing) {
-                Button(role: .destructive) {
-                    HapticsManager.shared.selection()
-                    showDeleteConfirmation = true
+                Menu {
+                    // Palette info section
+                    Section("Palette Info") {
+                        Label("\(palette.sortedColors.count) colors", systemImage: "swatchpalette")
+                        Label("Created \(formattedDate(palette.createdAt))", systemImage: "calendar")
+                        Label("Updated \(formattedDate(palette.updatedAt))", systemImage: "clock.arrow.circlepath")
+                        if let creator = palette.createdByDisplayName {
+                            Label("By \(creator)", systemImage: "person")
+                        }
+                    }
+
+                    Section {
+                        Button {
+                            HapticsManager.shared.selection()
+                            withAnimation {
+                                isEditingName = true
+                            }
+                        } label: {
+                            Label("Rename", systemImage: "character.cursor.ibeam")
+                        }
+
+                        Button {
+                            HapticsManager.shared.selection()
+                            duplicatePalette()
+                        } label: {
+                            Label("Duplicate Palette", systemImage: "plus.square.on.square")
+                        }
+                    }
+
+                    Section {
+                        Button(role: .destructive) {
+                            HapticsManager.shared.selection()
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
+                    }
                 } label: {
-                    Label("Delete", systemImage: "trash.fill")
+                    Label("More", systemImage: "ellipsis")
                 }
-                .tint(.red)
+                .toolbarButtonTint()
             }
         }
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
@@ -188,179 +226,120 @@ struct PaletteDetailView: View {
         }
     }
 
-    // MARK: - Tab Selector
+    // MARK: - Helper Functions
 
-    @ViewBuilder
-    private var tabSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(PaletteDetailTab.allCases, id: \.self) { tab in
-                Button {
-                    HapticsManager.shared.selection()
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        selectedTab = tab
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: tab.icon)
-                            .font(.subheadline)
-                        Text(tab.rawValue)
-                            .font(.subheadline.bold())
-                    }
-                    .foregroundStyle(selectedTab == tab ? .white : .secondary)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background {
-                        if selectedTab == tab {
-                            Capsule()
-                                .fill(.purple.opacity(0.9))
-                                .shadow(color: .purple.opacity(0.3), radius: 8, y: 4)
-                        }
-                    }
-                    .contentShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(4)
-        .background(.fill.tertiary, in: Capsule())
-        .padding(.horizontal)
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 
-    // MARK: - Tab Content
-
-    @ViewBuilder
-    private var tabContent: some View {
-        switch selectedTab {
-        case .colors:
-            colorsTab
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-        case .info:
-            infoTab
-                .transition(.opacity)
-        case .notes:
-            notesTab
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
+    private func duplicatePalette() {
+        do {
+            let newPalette = try colorManager.createPalette(name: "\(palette.name) Copy")
+            // Copy colors to the new palette
+            for color in palette.sortedColors {
+                let newColor = try colorManager.createColor(
+                    name: color.name,
+                    notes: color.notes,
+                    device: color.createdOnDeviceName,
+                    red: color.red,
+                    green: color.green,
+                    blue: color.blue,
+                    alpha: color.alpha,
+                    palette: newPalette
+                )
+                colorManager.attachColor(newColor, to: newPalette)
+            }
+        } catch {
+            toastManager.show(error: .paletteCreationFailed)
         }
     }
+}
 
-    // MARK: - Colors Tab
+// MARK: - Palette Info Tile View
 
-    @ViewBuilder
-    private var colorsTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            PaletteMembersView(palette: palette, onRemoveColor: { color in
-                withAnimation {
-                    colorManager.detachColorFromPalette(color)
-                }
-            })
+private struct PaletteInfoTileView: View {
+    let icon: String
+    let iconColor: Color
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(iconColor)
+                .frame(height: 30)
+
+            Text(value)
+                .font(.subheadline.bold())
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
-        .padding(.horizontal)
+        .padding(12)
+        .frame(maxWidth: 200, maxHeight: 85)
+        .modifier(PaletteGlassTileBackground())
     }
+}
 
-    // MARK: - Info Tab
-
-    @ViewBuilder
-    private var infoTab: some View {
-        VStack(spacing: 16) {
-            // Palette stats card
-            VStack(spacing: 0) {
-                infoRow(icon: "swatchpalette", label: "Colors", value: "\(palette.sortedColors.count)", showDivider: true)
-                infoRow(icon: "person", label: "Created By", value: palette.createdByDisplayName ?? "—", showDivider: false)
-            }
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
-
-            // Metadata card
-            VStack(spacing: 0) {
-                infoRow(icon: "calendar", label: "Created", value: formatted(palette.createdAt), showDivider: true)
-                infoRow(icon: "clock.arrow.circlepath", label: "Updated", value: formatted(palette.updatedAt), showDivider: false)
-            }
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
-
-            // Color breakdown if there are colors
-            if !palette.sortedColors.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Color Distribution")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-
-                    // Mini color bar showing all colors
-                    HStack(spacing: 2) {
-                        ForEach(palette.sortedColors) { color in
-                            Rectangle()
-                                .fill(color.swiftUIColor)
-                        }
-                    }
-                    .frame(height: 32)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.horizontal)
-                }
-            }
+private struct PaletteGlassTileBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+            content
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .shadow(radius: 5)
+        } else {
+            content
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.white)
+                        .shadow(radius: 5)
+                )
         }
     }
+}
 
-    @ViewBuilder
-    private func infoRow(icon: String, label: String, value: String, showDivider: Bool) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 24)
-                Text(label)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text(value)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-            }
-            .padding()
+// MARK: - Palette Info Tiles Row
 
-            if showDivider {
-                Divider()
-                    .padding(.leading, 48)
-            }
-        }
-    }
+private struct PaletteInfoTilesRow: View {
+    let palette: OpalitePalette
 
-    private func formatted(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        f.timeStyle = .short
-        return f.string(from: date)
-    }
+    var body: some View {
+        HStack(spacing: 12) {
+            PaletteInfoTileView(
+                icon: "swatchpalette.fill",
+                iconColor: .purple,
+                value: "\(palette.sortedColors.count)",
+                label: "Colors"
+            )
 
-    // MARK: - Notes Tab
+            PaletteInfoTileView(
+                icon: "person.fill",
+                iconColor: .orange,
+                value: palette.createdByDisplayName ?? "Unknown",
+                label: "Created By"
+            )
 
-    @ViewBuilder
-    private var notesTab: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            NotesSectionView(
-                notes: $notesDraft,
-                isSaving: $isSavingNotes,
-                onSave: {
-                    isSavingNotes = true
-                    defer { isSavingNotes = false }
-
-                    do {
-                        try colorManager.updatePalette(palette) { pal in
-                            let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                            pal.notes = trimmed.isEmpty ? nil : trimmed
-                        }
-                    } catch {
-                        toastManager.show(error: .paletteUpdateFailed)
-                    }
-                }
+            PaletteInfoTileView(
+                icon: "clock.fill",
+                iconColor: .indigo,
+                value: formattedShortDate(palette.updatedAt),
+                label: "Updated On"
             )
         }
-        .padding(.horizontal)
+    }
+
+    private func formattedShortDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
     }
 }
 
@@ -385,5 +364,6 @@ struct PaletteDetailView: View {
             .environment(manager)
             .environment(ToastManager())
             .environment(SubscriptionManager())
+            .environment(HexCopyManager())
     }
 }

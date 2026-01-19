@@ -30,7 +30,14 @@ final class OpalitePalette {
 
     /// Colors sorted by creation date (newest first)
     var sortedColors: [OpaliteColor] {
-        (colors ?? []).sorted { $0.createdAt > $1.createdAt }
+        guard let colors = colors, !colors.isEmpty else { return [] }
+        // Create a stable copy with captured dates to avoid sorting issues during SwiftData mutations
+        let snapshot = colors.compactMap { color -> (color: OpaliteColor, date: Date, id: UUID)? in
+            return (color: color, date: color.createdAt, id: color.id)
+        }
+        return snapshot
+            .sorted { $0.date > $1.date || ($0.date == $1.date && $0.id.uuidString > $1.id.uuidString) }
+            .map(\.color)
     }
 
     #if !os(watchOS)
@@ -123,7 +130,7 @@ extension OpalitePalette {
             createdByDisplayName: "Nick Molargik",
             notes: "Example palette for SwiftUI previews.",
             tags: ["preview", "sample"],
-            colors: [color, OpaliteColor.sample, OpaliteColor.sample2]
+            colors: [color, OpaliteColor.sample, OpaliteColor.sample2, OpaliteColor.sample3, OpaliteColor.sample4, OpaliteColor.sample5]
         )
 
         return palette

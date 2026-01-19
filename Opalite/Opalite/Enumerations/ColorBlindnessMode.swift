@@ -17,6 +17,7 @@ enum ColorBlindnessMode: String, CaseIterable, Identifiable {
     case protanopia    // Red-blind (~1% of males)
     case deuteranopia  // Green-blind (~1% of males)
     case tritanopia    // Blue-blind (~0.01% of population)
+    case achromatopsia // Complete color blindness (monochromacy)
 
     var id: String { rawValue }
 
@@ -26,6 +27,7 @@ enum ColorBlindnessMode: String, CaseIterable, Identifiable {
         case .protanopia: return "Protanopia (Red-blind)"
         case .deuteranopia: return "Deuteranopia (Green-blind)"
         case .tritanopia: return "Tritanopia (Blue-blind)"
+        case .achromatopsia: return "Achromatopsia (No Color)"
         }
     }
 
@@ -35,6 +37,7 @@ enum ColorBlindnessMode: String, CaseIterable, Identifiable {
         case .protanopia: return "Protanopia"
         case .deuteranopia: return "Deuteranopia"
         case .tritanopia: return "Tritanopia"
+        case .achromatopsia: return "Achromatopsia"
         }
     }
 
@@ -48,6 +51,8 @@ enum ColorBlindnessMode: String, CaseIterable, Identifiable {
             return "Difficulty distinguishing green from red; most common form"
         case .tritanopia:
             return "Difficulty distinguishing blue from yellow; rare form"
+        case .achromatopsia:
+            return "Complete color blindness; sees only in grayscale (monochromacy)"
         }
     }
 }

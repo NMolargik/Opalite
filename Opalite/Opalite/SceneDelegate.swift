@@ -16,8 +16,21 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
         performActionFor shortcutItem: UIApplicationShortcutItem,
         completionHandler: @escaping (Bool) -> Void
     ) {
-        // Set pending type so SwiftUI can handle it
-        AppDelegate.pendingShortcutType = shortcutItem.type
+        let shortcutType = shortcutItem.type
+
+        // Handle the action immediately - this is required for macOS dock menu
+        // since scenePhase doesn't change when the app is already active
+        Task { @MainActor in
+            if shortcutType == "OpenSwatchBarAction" {
+                AppDelegate.openSwatchBarWindow()
+            } else if shortcutType == "CreateNewColorAction" {
+                // Use IntentNavigationManager - PortfolioView already observes this
+                IntentNavigationManager.shared.showColorEditor()
+            }
+        }
+
+        // Also set pending type as fallback for cold launch scenarios
+        AppDelegate.pendingShortcutType = shortcutType
         completionHandler(true)
     }
 
