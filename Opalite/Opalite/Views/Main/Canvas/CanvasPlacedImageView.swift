@@ -23,7 +23,7 @@ struct CanvasPlacedImageView: View {
     @State private var dragOffset: CGSize = .zero
     @State private var isResizing: Bool = false
     @State private var resizeStartSize: CGSize = .zero
-    @State private var activeHandle: ResizeHandle? = nil
+    @State private var activeHandle: ResizeHandle?
 
     private enum ResizeHandle {
         case topLeft, topRight, bottomLeft, bottomRight

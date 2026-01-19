@@ -69,7 +69,7 @@ struct OnboardingView: View {
                 OnboardingFeature(icon: "pencil.tip", iconColor: .blue, text: "Sketch with your colors", requiresOnyx: true),
                 OnboardingFeature(icon: "square.on.square.dashed", iconColor: .purple, text: "Draw shapes and outlines", requiresOnyx: true),
                 OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Draw precisely with Apple Pencil", requiresOnyx: true),
-                OnboardingFeature(icon: "doc.fill.badge.plus", iconColor: .green, text: "Create multiple canvases", requiresOnyx: true),
+                OnboardingFeature(icon: "doc.fill.badge.plus", iconColor: .green, text: "Create multiple canvases", requiresOnyx: true)
             ]
         ),
         OnboardingPage(
@@ -81,7 +81,7 @@ struct OnboardingView: View {
                 OnboardingFeature(icon: "photo.fill", iconColor: .blue, text: "Share colors as flat images"),
                 OnboardingFeature(icon: "arrow.down.doc.fill", iconColor: .purple, text: "Import colors and palettes", requiresOnyx: true),
                 OnboardingFeature(icon: "arrow.up.doc.fill", iconColor: .indigo, text: "Export colors and palettes", requiresOnyx: true),
-                OnboardingFeature(icon: "doc.richtext.fill", iconColor: .red, text: "Generate detailed PDFs", requiresOnyx: true),
+                OnboardingFeature(icon: "doc.richtext.fill", iconColor: .red, text: "Generate detailed PDFs", requiresOnyx: true)
             ]
         ),
         OnboardingPage(
@@ -168,7 +168,7 @@ struct OnboardingView: View {
                             }
 
                             Spacer()
-                            
+
                             // Page indicator
                             HStack(spacing: 4) {
                                 ForEach(0..<pages.count, id: \.self) { index in
@@ -181,7 +181,7 @@ struct OnboardingView: View {
                             .padding(.bottom, 8)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel("Page \(currentPage + 1) of \(pages.count)")
-                            
+
                             Spacer()
 
                             // Next / Get Started button

@@ -30,9 +30,9 @@ struct SettingsView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var isRestoringPurchases: Bool = false
 
-    @State private var exportPDFURL: IdentifiableURL? = nil
+    @State private var exportPDFURL: IdentifiableURL?
     @State private var isShowingExportSelection: Bool = false
-    
+
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String ?? "—"
@@ -51,7 +51,7 @@ struct SettingsView: View {
                         HStack {
                             Label("Display Name", systemImage: "person")
                                 .foregroundStyle(.primary)
-                            
+
                             Spacer()
                             TextField("Your name", text: $userName)
                                 .multilineTextAlignment(.trailing)
@@ -105,6 +105,20 @@ struct SettingsView: View {
                     Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
                 }
 
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom != .phone {
+                    Section {
+                        Toggle(isOn: $skipSwatchBarConfirmation) {
+                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                                .foregroundStyle(.primary)
+                        }
+                    } header: {
+                        Text("SwatchBar")
+                    } footer: {
+                        Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
+                    }
+                }
+                #else
                 Section {
                     Toggle(isOn: $skipSwatchBarConfirmation) {
                         Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
@@ -115,13 +129,14 @@ struct SettingsView: View {
                 } footer: {
                     Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
                 }
+                #endif
 
                 Section {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
                             Label("Onyx", systemImage: "inset.filled.oval")
                                 .foregroundStyle(colorScheme == .dark ? .gray : .black)
-                            
+
                             Spacer()
                             if let subscription = subscriptionManager.currentSubscription {
                                 Text(subscription.displayName)
@@ -240,7 +255,7 @@ struct SettingsView: View {
                 } header: {
                     Text("iPad Tip")
                 }
-                
+
                 Section("Opalite") {
                     LabeledContent("Version") {
                         Text(appVersion)
@@ -250,7 +265,7 @@ struct SettingsView: View {
                         Link("Nick Molargik", destination: URL(string: "https://www.linkedin.com/in/nicholas-molargik/")!)
                             .foregroundStyle(.blue)
                     }
-                    
+
                     LabeledContent("Publisher") {
                         Link("Molargik Software LLC", destination: URL(string: "https://www.molargiksoftware.com")!)
                             .foregroundStyle(.blue)

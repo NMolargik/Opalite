@@ -78,7 +78,7 @@ struct ColorCodesPickerView: View {
                             .frame(minWidth: 100)
                             .accessibilityLabel("Hex color code")
                             .accessibilityHint("Enter a 6 or 8 character hex code")
-                        
+
                         Spacer()
 
                         Button {
@@ -110,13 +110,12 @@ struct ColorCodesPickerView: View {
                         .controlSize(.small)
                         #endif
 
-
                         Button("Apply") {
                             HapticsManager.shared.impact()
                             applyHexInput()
                         }
                         .bold()
-                        
+
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)
@@ -174,7 +173,7 @@ struct ColorCodesPickerView: View {
                             #endif
 
                         Spacer()
-                        
+
                         Button("Apply") {
                             HapticsManager.shared.impact()
                             applyRGBInput()
@@ -401,4 +400,3 @@ private struct ColorCodesPickerPreviewContainer: View {
     ColorCodesPickerPreviewContainer()
         .environment(HexCopyManager())
 }
-

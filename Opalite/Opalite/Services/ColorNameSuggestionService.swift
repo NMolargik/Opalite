@@ -137,11 +137,9 @@ final class ColorNameSuggestionService {
 
         // Add modifiers
         var modifiers: [String] = []
-        if lightness < 30 { modifiers.append("dark") }
-        else if lightness > 70 { modifiers.append("light") }
+        if lightness < 30 { modifiers.append("dark") } else if lightness > 70 { modifiers.append("light") }
 
-        if saturation < 40 { modifiers.append("muted") }
-        else if saturation > 80 { modifiers.append("vibrant") }
+        if saturation < 40 { modifiers.append("muted") } else if saturation > 80 { modifiers.append("vibrant") }
 
         if modifiers.isEmpty {
             return hueFamily

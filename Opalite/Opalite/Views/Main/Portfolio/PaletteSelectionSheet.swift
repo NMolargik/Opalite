@@ -168,10 +168,10 @@ struct PaletteSelectionSheet: View {
         withAnimation {
             let name = newPaletteName.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !name.isEmpty else { return }
-            
+
             isCreating = true
             defer { isCreating = false }
-            
+
             do {
                 let palette = try colorManager.createPalette(name: name)
                 colorManager.attachColor(color, to: palette)
@@ -188,7 +188,7 @@ struct PaletteSelectionSheet: View {
         withAnimation {
             isCreating = true
             defer { isCreating = false }
-            
+
             do {
                 colorManager.attachColor(color, to: palette)
                 try colorManager.saveContext()

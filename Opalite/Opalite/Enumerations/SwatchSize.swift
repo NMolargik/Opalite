@@ -19,7 +19,7 @@ enum SwatchSize: String, CaseIterable, Equatable {
         case .large: return 250
         }
     }
-    
+
     var showOverlays: Bool {
         switch self {
             case .small: return false

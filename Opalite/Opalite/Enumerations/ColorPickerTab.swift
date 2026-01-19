@@ -13,9 +13,9 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
     case sliders = "Channels"
     case codes = "Codes"
     case image = "Image"
-    
+
     var id: String { rawValue }
-    
+
     /// SF Symbol representing this mode. Not yet used in the UI, but ready for future enhancements.
     var symbol: Image {
         switch self {

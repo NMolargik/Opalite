@@ -21,7 +21,7 @@ final class CanvasFile {
     var updatedAt: Date = Date()
 
     // Optional bookkeeping for future conflict/debug use
-    var lastEditedDeviceName: String? = nil
+    var lastEditedDeviceName: String?
 
     // MARK: - Canvas Dimensions
     // Store the canvas size to maintain consistency across devices
@@ -31,16 +31,16 @@ final class CanvasFile {
     // MARK: - PencilKit Drawing Data
     // Store rich, editable drawing data (PKDrawing.dataRepresentation())
     @Attribute(.externalStorage)
-    var drawingData: Data? = nil
+    var drawingData: Data?
 
     // MARK: - Placed Images
     // Store placed images as JSON-encoded array of CanvasPlacedImage
     @Attribute(.externalStorage)
-    var placedImagesData: Data? = nil
+    var placedImagesData: Data?
 
     // Optional lightweight preview for lists/grids
     @Attribute(.externalStorage)
-    var thumbnailData: Data? = nil
+    var thumbnailData: Data?
 
     // MARK: - Init
 

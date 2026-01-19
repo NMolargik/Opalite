@@ -39,7 +39,7 @@ struct PortfolioView: View {
     @State private var paletteSelectionColor: OpaliteColor?
     @State private var isShowingPaywall: Bool = false
     @State private var isShowingColorEditor = false
-    @State private var pendingPaletteToAddTo: OpalitePalette? = nil
+    @State private var pendingPaletteToAddTo: OpalitePalette?
     @AppStorage(AppStorageKeys.swatchSize) private var swatchSizeRaw: String = SwatchSize.medium.rawValue
     @State private var swatchSize: SwatchSize = .medium
     @State private var navigationPath = [PortfolioNavigationNode]()
@@ -49,11 +49,11 @@ struct PortfolioView: View {
     @State private var colorToExport: OpaliteColor?
     @State private var importError: String?
     @State private var isShowingImportError = false
-    @State private var quickActionTrigger: UUID? = nil
-    @State private var copiedColorID: UUID? = nil
+    @State private var quickActionTrigger: UUID?
+    @State private var copiedColorID: UUID?
     @State private var isShowingPhotoColorPicker = false
 #if os(iOS) && !targetEnvironment(macCatalyst)
-    @State private var droppedImageItem: DroppedImageItem? = nil
+    @State private var droppedImageItem: DroppedImageItem?
 #endif
     @State private var colorToDelete: OpaliteColor?
     @State private var isEditingColors: Bool = false
@@ -68,7 +68,7 @@ struct PortfolioView: View {
 
     @Namespace private var namespace
     @Namespace private var swatchNS
-    
+
     var isCompact: Bool { hSizeClass == .compact }
 
     /// Title for batch delete confirmation alert
@@ -129,14 +129,14 @@ struct PortfolioView: View {
         return UIDevice.current.userInterfaceIdiom == .pad
 #endif
     }
-    
+
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ScrollView {
                 VStack(alignment: .leading, spacing: isCompact ? 16 : 20) {
 
                     // MARK: - Create Content Tip (shown first to new users)
-                    TipView(createContentTip) { action in
+                    TipView(createContentTip) { _ in
                         // When user dismisses tip, enable the next tip
                         ColorDetailsTip.hasSeenCreateTip = true
                     }
@@ -191,7 +191,7 @@ struct PortfolioView: View {
                     )
                     .zIndex(1)
                     .padding(.bottom, 5)
-                    
+
                     // MARK: - Palette Rows
                     HStack {
                         Image(systemName: "swatchpalette.fill")
@@ -205,8 +205,8 @@ struct PortfolioView: View {
                     .padding(.leading, 20)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Palettes, \(colorManager.palettes.count) items")
-                    
-                    if (colorManager.palettes.isEmpty) {
+
+                    if colorManager.palettes.isEmpty {
                         HStack(spacing: 10) {
                             Image(systemName: "arrow.turn.down.right")
                                 .bold()
@@ -274,7 +274,7 @@ struct PortfolioView: View {
                                     swatchHeight: swatchSize.size,
                                     showOverlays: swatchSize.showOverlays,
                                     menuContent: { color in
-                                        if (swatchSize.showOverlays) {
+                                        if swatchSize.showOverlays {
                                             return menuContent(color: color, palette: palette)
                                         } else {
                                             return AnyView(EmptyView())
@@ -522,7 +522,7 @@ struct PortfolioView: View {
                         .toolbarButtonTint()
                     }
                 }
-                
+
                 if colorManager.palettes.count >= 3 {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -553,7 +553,7 @@ struct PortfolioView: View {
                         .accessibilityValue(swatchSize.accessibilityName)
                     }
                 }
-                
+
                 if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
                     ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 }
@@ -886,7 +886,7 @@ struct PortfolioView: View {
                 }
 
                 Divider()
-                
+
                 if let _ = palette {
                     Button(role: .destructive) {
                         HapticsManager.shared.selection()
@@ -897,7 +897,7 @@ struct PortfolioView: View {
                         Label("Remove From Palette", systemImage: "minus.circle")
                     }
                 }
-                
+
                 Button(role: .destructive) {
                     HapticsManager.shared.selection()
                     colorToDelete = color
@@ -938,7 +938,7 @@ struct PortfolioView: View {
             return false
         }
 
-        provider.loadObject(ofClass: UIImage.self) { image, error in
+        provider.loadObject(ofClass: UIImage.self) { image, _ in
             Task { @MainActor in
                 if let uiImage = image as? UIImage {
                     HapticsManager.shared.impact()
@@ -1038,4 +1038,3 @@ private struct DroppedImageItem: Identifiable {
         .environment(HexCopyManager())
         .modelContainer(container)
 }
-

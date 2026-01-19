@@ -41,7 +41,7 @@ extension Color {
         return nil
         #endif
     }
-    
+
     #if canImport(UIKit)
     var uiColor: UIColor {
         UIColor(self)

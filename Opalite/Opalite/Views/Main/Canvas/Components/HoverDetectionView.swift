@@ -189,4 +189,3 @@ class HoverDetectionView: NSView {
 }
 
 #endif
-

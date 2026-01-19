@@ -16,7 +16,7 @@ struct SwatchBarView: View {
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.openWindow) private var openWindow
 
-    @State private var copiedColorID: UUID? = nil
+    @State private var copiedColorID: UUID?
     @State private var expandedPalettes: Set<UUID> = []
     @State private var showingSwatchBarInfo: Bool = false
 
@@ -25,7 +25,7 @@ struct SwatchBarView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if (colorManager.colors.isEmpty) {
+                if colorManager.colors.isEmpty {
                     ContentUnavailableView("No Colors Created", systemImage: "questionmark.square.dashed")
                 } else {
                     ScrollView {
@@ -48,7 +48,7 @@ struct SwatchBarView: View {
                                     }
                                 }
                             }
-                            
+
                             // MARK: - Loose Colors Section
                             // Colors are pre-sorted by updatedAt from ColorManager
                             if !colorManager.looseColors.isEmpty {

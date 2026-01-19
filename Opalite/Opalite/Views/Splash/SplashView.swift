@@ -35,7 +35,7 @@ struct SplashView: View {
 
                 // Scrolling swatch rows
                 VStack(spacing: 12) {
-                    ForEach(Array(rowConfigs.enumerated()), id: \.offset) { index, config in
+                    ForEach(Array(rowConfigs.enumerated()), id: \.offset) { _, config in
                         InfiniteSwatchRow(
                             colors: config.colors,
                             scrollsRight: config.scrollsRight,
@@ -358,4 +358,3 @@ private struct InfiniteSwatchRow: View {
         onContinue: {}
     )
 }
-

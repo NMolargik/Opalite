@@ -60,7 +60,7 @@ struct ColorDetailView: View {
     }
 
     let color: OpaliteColor
-    
+
     init(color: OpaliteColor) {
         self.color = color
         _viewModel = State(wrappedValue: ColorDetailView.ViewModel.init(color: color))
@@ -249,7 +249,7 @@ struct ColorDetailView: View {
             }
 
             ToolbarItem(placement: .secondaryAction) {
-                Button(role: .destructive){
+                Button(role: .destructive) {
                     HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {

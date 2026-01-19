@@ -17,11 +17,11 @@ struct CanvasListView: View {
 
     @State private var path = NavigationPath()
     @State private var searchText = ""
-    @State private var selectedCanvasFile: CanvasFile? = nil
+    @State private var selectedCanvasFile: CanvasFile?
     @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
-    @State private var canvasToRename: CanvasFile? = nil
+    @State private var canvasToRename: CanvasFile?
     @State private var renameText: String = ""
 
     private var filteredCanvases: [CanvasFile] {
@@ -30,7 +30,7 @@ struct CanvasListView: View {
         guard !trimmedSearch.isEmpty else { return canvasManager.canvases }
         return canvasManager.canvases.filter { $0.title.localizedCaseInsensitiveContains(trimmedSearch) }
     }
-    
+
     var body: some View {
         NavigationStack(path: $path) {
             List {
@@ -147,7 +147,7 @@ struct CanvasListView: View {
                     canvasToRename = nil
                 }
                 .tint(.red)
-                
+
                 Button("Rename") {
                     HapticsManager.shared.impact()
                     if let canvas = canvasToRename {
@@ -169,7 +169,7 @@ struct CanvasListView: View {
             }
         }
     }
-    
+
     private func delete(at offsets: IndexSet) {
         let items = filteredCanvases
         for index in offsets {

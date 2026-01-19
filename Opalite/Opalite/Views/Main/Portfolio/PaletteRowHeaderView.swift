@@ -23,7 +23,7 @@ struct PaletteRowHeaderView: View {
     @State private var isShowingExportSheet: Bool = false
 
     let palette: OpalitePalette
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             TipView(paletteMenuTip)
@@ -40,7 +40,7 @@ struct PaletteRowHeaderView: View {
                             Label("Add Color", systemImage: "plus.square.dashed")
                         }
                     } else {
-                        Button() {
+                        Button {
                             HapticsManager.shared.selection()
                             isShowingColorEditor.toggle()
                         } label: {
@@ -147,7 +147,7 @@ struct PaletteRowHeaderView: View {
                 }
             }
 
-            if (!(palette.colors?.isEmpty ?? false)) {
+            if !(palette.colors?.isEmpty ?? false) {
                 Button("Delete Palette and Colors", role: .destructive) {
                     HapticsManager.shared.selection()
                     withAnimation {

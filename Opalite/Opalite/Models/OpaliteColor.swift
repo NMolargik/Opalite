@@ -18,38 +18,38 @@ import AppKit
 final class OpaliteColor {
     // MARK: - Identity
     var id: UUID = UUID()
-    
+
     // MARK: - Display
     var name: String?
     var notes: String?
-    
+
     // MARK: - Author
     var createdByDisplayName: String?
     var createdOnDeviceName: String?
-    
+
     // MARK: - Timestamps
     var createdAt: Date = Date.now
     var updatedAt: Date = Date.now
     var updatedOnDeviceName: String?
-    
+
     // MARK: - Color (sRGB 0...1)
     var red: Double = 0.0
     var green: Double = 0.0
     var blue: Double = 0.0
     var alpha: Double = 1.0
-    
+
     // MARK: - Relationships
     @Relationship(inverse: \OpalitePalette.colors)
     var palette: OpalitePalette?
-    
+
     // MARK: - Transient / Computed
-    
+
     /// SwiftUI Color for rendering (not persisted)
     @Transient
     var swiftUIColor: Color {
         Color(red: red, green: green, blue: blue, opacity: alpha)
     }
-    
+
     /// UIColor version (useful for UIKit integrations). Only available when UIKit can be imported.
     #if canImport(UIKit)
     @Transient
@@ -65,9 +65,9 @@ final class OpaliteColor {
         NSColor(srgbRed: red, green: green, blue: blue, alpha: alpha)
     }
     #endif
-    
+
     // MARK: - Init
-    
+
     init(
         id: UUID = UUID(),
         name: String? = nil,
@@ -109,7 +109,7 @@ extension OpaliteColor {
         let b = Int(round(blue * 255))
         return String(format: "#%02X%02X%02X", r, g, b)
     }
-    
+
     /// Hex string including alpha (e.g., #RRGGBBAA)
     var hexWithAlphaString: String {
         let r = Int(round(red * 255))
@@ -171,7 +171,7 @@ extension OpaliteColor {
     }
 
     // MARK: - HSL Helpers
-    
+
     static func rgbToHSL(r: Double, g: Double, b: Double) -> (h: Double, s: Double, l: Double) {
         let maxVal = max(r, max(g, b))
         let minVal = min(r, min(g, b))
@@ -286,15 +286,15 @@ extension OpaliteColor {
             // sRGB → linear
             return c <= 0.03928 ? (c / 12.92) : pow((c + 0.055) / 1.055, 2.4)
         }
-        
+
         let rLin = channel(red)
         let gLin = channel(green)
         let bLin = channel(blue)
-        
+
         // Rec. 709 / WCAG coefficients
         return 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin
     }
-    
+
     /// Contrast ratio vs another color (1.0–21.0 per WCAG)
     func contrastRatio(against other: OpaliteColor) -> Double {
         let l1 = relativeLuminance
@@ -303,18 +303,18 @@ extension OpaliteColor {
         let darker = min(l1, l2)
         return (lighter + 0.05) / (darker + 0.05)
     }
-    
+
     /// Returns black or white depending on which has better contrast on this color
     func idealTextColor() -> Color {
         let black = OpaliteColor(name: "Black", red: 0, green: 0, blue: 0, alpha: 1)
         let white = OpaliteColor(name: "White", red: 1, green: 1, blue: 1, alpha: 1)
-        
+
         let blackContrast = black.contrastRatio(against: self)
         let whiteContrast = white.contrastRatio(against: self)
-        
+
         return blackContrast >= whiteContrast ? Color.black : Color.white
     }
-    
+
     /// Returns a copy of this color with a different alpha
     func withAlpha(_ newAlpha: Double) -> OpaliteColor {
         let clampedAlpha = max(0, min(1, newAlpha))
@@ -382,7 +382,7 @@ extension OpaliteColor {
         blue: 0.80,
         alpha: 1.0
     )
-    
+
     static let sample2: OpaliteColor = OpaliteColor(
         id: UUID(),
         name: "Sample Red",

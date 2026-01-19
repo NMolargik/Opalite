@@ -70,4 +70,3 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
     #endif
 }
 #endif
-

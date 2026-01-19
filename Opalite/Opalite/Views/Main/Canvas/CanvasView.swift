@@ -20,20 +20,20 @@ struct CanvasView: View {
     @State private var selectedInkColor: UIColor = .label
     @State private var forceColorUpdate: UUID = UUID()
     @State private var appearTrigger: UUID = UUID()
-    @State private var pendingShape: CanvasShape? = nil
-    @State private var shapePreviewLocation: CGPoint? = nil
+    @State private var pendingShape: CanvasShape?
+    @State private var shapePreviewLocation: CGPoint?
     @State private var shapeRotation: Angle = .zero
     @State private var editedTitle: String = ""
     @State private var showRenameTitleAlert: Bool = false
     @State private var showClearConfirmation: Bool = false
     @State private var showDeleteConfirmation: Bool = false
     @State private var showToolPickerTrigger: UUID = UUID()
-    @State private var externalTool: PKTool? = nil
+    @State private var externalTool: PKTool?
 
     // Color sampling state
     @State private var isColorSamplingMode: Bool = false
-    @State private var colorSampleLocation: CGPoint? = nil
-    @State private var sampledColor: OpaliteColor? = nil
+    @State private var colorSampleLocation: CGPoint?
+    @State private var sampledColor: OpaliteColor?
 
     // Mac Catalyst custom tool picker state
     #if targetEnvironment(macCatalyst)
@@ -42,7 +42,7 @@ struct CanvasView: View {
     #endif
 
     // MARK: - Canvas Size & Scroll State
-    @State private var effectiveCanvasSize: CGSize? = nil
+    @State private var effectiveCanvasSize: CGSize?
     @State private var canvasContentOffset: CGPoint = .zero
     @State private var canvasZoomScale: CGFloat = 1.0
 

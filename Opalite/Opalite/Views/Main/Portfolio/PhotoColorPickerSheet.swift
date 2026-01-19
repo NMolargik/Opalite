@@ -312,7 +312,7 @@ struct PhotoColorPickerSheet: View {
     private func importStagedColors() {
         withAnimation {
             var successCount = 0
-            
+
             for color in stagedColors {
                 do {
                     _ = try colorManager.createColor(existing: color)
@@ -321,7 +321,7 @@ struct PhotoColorPickerSheet: View {
                     // Continue importing other colors
                 }
             }
-            
+
             if successCount > 0 {
                 OpaliteTipActions.advanceTipsAfterContentCreation()
             }

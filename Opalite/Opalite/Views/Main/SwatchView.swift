@@ -17,10 +17,10 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct SwatchView: View {
-    private var palette: OpalitePalette? = nil
+    private var palette: OpalitePalette?
     @State private var isDropTargeted: Bool = false
-    private var matchedNamespace: Namespace.ID? = nil
-    private var matchedID: AnyHashable? = nil
+    private var matchedNamespace: Namespace.ID?
+    private var matchedID: AnyHashable?
 
     // Color blindness simulation
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
@@ -59,7 +59,7 @@ struct SwatchView: View {
     @FocusState private var badgeFocused: Bool
 
     // Cached drag image to avoid regenerating on every drag
-    @State private var cachedDragImage: Data? = nil
+    @State private var cachedDragImage: Data?
     @State private var cachedDragImageKey: String = ""
 
     init(
@@ -188,7 +188,7 @@ struct SwatchView: View {
             isDragging: isDragging
         )
     }
-    
+
     // MARK: - The View
     var body: some View {
         Group {
@@ -252,7 +252,7 @@ struct SwatchView: View {
         let name = color.name ?? "Unnamed color"
         return "\(name), \(color.hexString)"
     }
-    
+
     // MARK: - Badge Content
     @ViewBuilder
     private var badgeContent: some View {
@@ -363,7 +363,7 @@ struct SwatchView: View {
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
             } else if !nameSuggestions.isEmpty {
                 FlowLayout(spacing: 6) {
-                    ForEach(Array(nameSuggestions.enumerated()), id: \.element) { index, suggestion in
+                    ForEach(Array(nameSuggestions.enumerated()), id: \.element) { _, suggestion in
                         Button {
                             HapticsManager.shared.selection()
                             onSuggestionSelected?(suggestion)
@@ -387,7 +387,7 @@ struct SwatchView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isLoadingSuggestions)
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: nameSuggestions)
     }
-    
+
     // MARK: - Menu Content
     @ViewBuilder
     private var menuContent: some View {
@@ -605,4 +605,3 @@ private struct StatefulPreview: View {
         .padding()
     }
 }
-

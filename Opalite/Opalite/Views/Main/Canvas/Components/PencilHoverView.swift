@@ -80,4 +80,3 @@ struct PencilHoverView: View {
 }
 
 #endif
-

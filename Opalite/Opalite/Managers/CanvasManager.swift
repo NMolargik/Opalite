@@ -70,14 +70,14 @@ final class CanvasManager {
     ///
     /// Set this property to trigger navigation to a specific canvas.
     /// The UI layer should observe this and clear it after handling.
-    var pendingCanvasToOpen: CanvasFile? = nil
+    var pendingCanvasToOpen: CanvasFile?
 
     #if canImport(PencilKit)
     /// Shape waiting to be placed on the active canvas.
     ///
     /// Set from menu bar commands. The active CanvasView should observe
     /// this property and enter shape placement mode when set.
-    var pendingShape: CanvasShape? = nil
+    var pendingShape: CanvasShape?
     #endif
 
     // MARK: - Sorting

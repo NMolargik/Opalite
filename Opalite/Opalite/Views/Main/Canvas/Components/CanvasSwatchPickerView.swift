@@ -20,7 +20,7 @@ struct CanvasSwatchPickerView: View {
     private let itemSpacing: CGFloat = 8
 
     // Track which color was just selected for checkmark animation
-    @State private var selectedColorID: UUID? = nil
+    @State private var selectedColorID: UUID?
 
     /// All colors flattened for the haptic scroll view
     private var allColors: [OpaliteColor] {

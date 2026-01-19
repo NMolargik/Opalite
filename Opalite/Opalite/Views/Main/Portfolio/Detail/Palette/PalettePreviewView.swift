@@ -314,4 +314,3 @@ struct PalettePreviewView: View {
     .environment(manager)
     .environment(ToastManager())
 }
-

@@ -22,7 +22,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
         case .settings: 2003
         case .search: 2004
         case .swatchBar: 2005
-        case .canvasBody(_): 2006
+        case .canvasBody: 2006
         }
     }
 
@@ -33,7 +33,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
         case .settings: String(localized: "Settings", comment: "Tab title")
         case .search: String(localized: "Search", comment: "Tab title")
         case .swatchBar: String(localized: "SwatchBar", comment: "Tab title")
-        case .canvasBody(_): String(localized: "Canvas", comment: "Tab title")
+        case .canvasBody: String(localized: "Canvas", comment: "Tab title")
         }
     }
 
@@ -44,7 +44,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
         case .settings: "gear"
         case .search: "magnifyingglass"
         case .swatchBar: "square.stack"
-        case .canvasBody(_): "scribble.variable"
+        case .canvasBody: "scribble.variable"
         }
     }
 
@@ -60,7 +60,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
             return .green
         case .swatchBar:
             return .purple
-        case .canvasBody(_):
+        case .canvasBody:
             return .red
         }
     }
@@ -69,7 +69,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
         switch self {
         case .portfolio, .canvas, .settings, .search, .swatchBar:
             false
-        case .canvasBody(_):
+        case .canvasBody:
             true
         }
     }

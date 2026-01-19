@@ -245,7 +245,7 @@ struct OpaliteColorTests {
             (1.0, 1.0, 1.0),
             (0.5, 0.5, 0.5),
             (0.2, 0.4, 0.8),
-            (0.9, 0.1, 0.5),
+            (0.9, 0.1, 0.5)
         ]
 
         for (originalR, originalG, originalB) in testCases {
@@ -537,7 +537,7 @@ struct ColorBlindnessSimulationTests {
     @Test func arraySimulationOffReturnsOriginal() {
         let colors = [
             OpaliteColor(red: 1, green: 0, blue: 0),
-            OpaliteColor(red: 0, green: 1, blue: 0),
+            OpaliteColor(red: 0, green: 1, blue: 0)
         ]
         let simulated = colors.simulatingColorBlindness(.off)
 
@@ -548,7 +548,7 @@ struct ColorBlindnessSimulationTests {
     @Test func arraySimulationAppliesMode() {
         let colors = [
             OpaliteColor(red: 1, green: 0, blue: 0),
-            OpaliteColor(red: 0, green: 1, blue: 0),
+            OpaliteColor(red: 0, green: 1, blue: 0)
         ]
         let simulated = colors.simulatingColorBlindness(.protanopia)
 

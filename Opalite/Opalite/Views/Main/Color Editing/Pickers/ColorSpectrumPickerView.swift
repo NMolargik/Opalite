@@ -172,25 +172,25 @@ struct ColorSpectrumPickerView: View {
         // y (brightness): 0..1 maps to top..bottom (1 - brightness because top is bright)
         dragLocation = CGPoint(x: hue, y: 1.0 - brightness)
     }
-    
+
     private func updateColor(with location: CGPoint, in size: CGSize) {
         let clampedX = max(0, min(size.width, location.x))
         let clampedY = max(0, min(size.height, location.y))
-        
+
         let u = clampedX / max(size.width, 1)
         let v = clampedY / max(size.height, 1)
-        
+
         // Map horizontal position to hue, vertical to brightness
         let hue = Double(u)
         let saturation = 1.0
         let brightness = Double(1.0 - v)
-        
+
         let newSwiftUIColor = Color(hue: hue,
                                     saturation: saturation,
                                     brightness: brightness)
-        
+
         dragLocation = CGPoint(x: u, y: v)
-        
+
         if let rgba = newSwiftUIColor.rgbaComponents {
             color.red = rgba.red
             color.green = rgba.green

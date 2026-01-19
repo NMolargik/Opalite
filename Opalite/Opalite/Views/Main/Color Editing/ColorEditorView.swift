@@ -44,7 +44,7 @@ struct ColorEditorView: View {
     let palette: OpalitePalette?
 
     private let keyboardShortcutsTip = ColorEditorKeyboardShortcutsTip()
-    
+
     private var paletteColors: [OpaliteColor] {
         palette?.colors ?? []
     }
@@ -62,7 +62,7 @@ struct ColorEditorView: View {
     private var canShowPaletteStripToggle: Bool {
         !paletteStripColors.isEmpty
     }
-    
+
     init(
         color: OpaliteColor? = nil,
         palette: OpalitePalette? = nil,
@@ -77,7 +77,7 @@ struct ColorEditorView: View {
         self.onCancel = onCancel
         self.onApprove = onApprove
     }
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -133,7 +133,7 @@ struct ColorEditorView: View {
                         .accessibilityLabel(viewModel.isShowingPaletteStrip ? "Hide palette colors" : "Show palette colors")
                     }
                 }
-                
+
                 #if os(iOS) || os(visionOS)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -304,7 +304,7 @@ struct ColorEditorView: View {
             .accessibilityLabel("Color picker mode")
         }
     }
-    
+
     @ViewBuilder
     private var modeContentView: some View {
         Group {

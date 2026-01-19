@@ -17,7 +17,7 @@ class WatchSessionManager: NSObject {
     private var session: WCSession?
 
     var isReachable: Bool = false
-    var lastCopySucceeded: Bool? = nil
+    var lastCopySucceeded: Bool?
 
     override init() {
         super.init()

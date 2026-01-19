@@ -106,7 +106,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
 
             hexLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
             hexLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            hexLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            hexLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
 
@@ -152,7 +152,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
 
             countLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
             countLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            countLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            countLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
 

@@ -10,7 +10,7 @@ import SwiftUI
 enum PortfolioNavigationNode: Equatable, Hashable, Identifiable {
     case palette(OpalitePalette)
     case color(OpaliteColor)
-    
+
     var id: UUID {
         switch self {
         case .palette(let palette): palette.id

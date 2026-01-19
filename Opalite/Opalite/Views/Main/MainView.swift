@@ -25,10 +25,9 @@ struct MainView: View {
     @State private var isShowingSwatchBarInfo: Bool = false
 
     // Rename canvas state
-    @State private var canvasToRename: CanvasFile? = nil
+    @State private var canvasToRename: CanvasFile?
     @State private var renameText: String = ""
 
-    
     var body: some View {
         TabView(selection: $selectedTab) {
             // MARK: - Portfolio Tab - All screens
@@ -36,20 +35,20 @@ struct MainView: View {
                 PortfolioView()
                     .tint(.none)
             }
-            
+
             // MARK: - Canvas Tab - Compact Only, "regular" has a TabSection
             Tab(Tabs.canvas.name, systemImage: Tabs.canvas.symbol, value: .canvas) {
                 CanvasListView()
                     .tint(.none)
             }
             .hidden(horizontalSizeClass == .regular)
-            
+
             // MARK: - Search Tab - All screens
             Tab(Tabs.search.name, systemImage: Tabs.search.symbol, value: .search, role: .search) {
                 SearchView(selectedTab: $selectedTab)
                     .tint(.none)
             }
-            
+
             // MARK: - SwatchBar Tab - Regular size class only (iPad/Mac), hidden when already open
             Tab(Tabs.swatchBar.name, systemImage: Tabs.swatchBar.symbol, value: .swatchBar) {
                 // Empty view - this tab just opens the window
@@ -57,7 +56,7 @@ struct MainView: View {
             }
             .hidden(horizontalSizeClass == .compact || colorManager.isSwatchBarOpen)
             .defaultVisibility(.hidden, for: .tabBar)
-            
+
             // MARK: - Settings Tab - All screens
             Tab(Tabs.settings.name, systemImage: Tabs.settings.symbol, value: .settings) {
                 SettingsView()
@@ -189,7 +188,7 @@ struct MainView: View {
         }
         .onChange(of: selectedTab) { oldTab, newTab in
             // Check if user is trying to open a canvas without entitlement
-            if case .canvasBody(_) = newTab {
+            if case .canvasBody = newTab {
                 if !subscriptionManager.hasOnyxEntitlement {
                     // Block access and show paywall
                     HapticsManager.shared.selection()

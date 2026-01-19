@@ -67,7 +67,7 @@ struct NotesSectionView: View {
     private var isDirty: Bool {
         notes.trimmingCharacters(in: .whitespacesAndNewlines) != originalNotes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    
+
     private func scheduleAutosaveIfNeeded() {
         debounceTask?.cancel()
 

@@ -35,7 +35,7 @@ struct OpaliteApp: App {
         let schema = Schema([
             OpaliteColor.self,
             OpalitePalette.self,
-            CanvasFile.self,
+            CanvasFile.self
         ])
 
         let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"
@@ -67,7 +67,7 @@ struct OpaliteApp: App {
         WindowGroup(id: "main") {
             ContentView()
                 .toastContainer()
-                .onChange(of: scenePhase) { oldPhase, newPhase in
+                .onChange(of: scenePhase) { _, newPhase in
                     Task { @MainActor in
                         await colorManager.refreshAll()
                         await canvasManager.refreshAll()
@@ -484,7 +484,7 @@ struct OpaliteApp: App {
         .defaultSize(width: 250, height: 1000)
 #endif
     }
-    
+
     private func prependPaletteToOrder(_ paletteID: UUID) {
         var currentOrder: [UUID] = []
         if !paletteOrderData.isEmpty,

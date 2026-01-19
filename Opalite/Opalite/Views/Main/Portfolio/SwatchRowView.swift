@@ -13,7 +13,7 @@ struct SwatchRowView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
-    
+
     let colors: [OpaliteColor]
     let palette: OpalitePalette?
     let swatchWidth: CGFloat
@@ -21,10 +21,10 @@ struct SwatchRowView: View {
     var showOverlays: Bool = false
     var showsNavigation: Bool = true
     var acceptsDrops: Bool = true
-    var onTap: ((OpaliteColor) -> Void)? = nil
-    var menuContent: ((OpaliteColor) -> AnyView)? = nil
-    var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
-    var matchedNamespace: Namespace.ID? = nil
+    var onTap: ((OpaliteColor) -> Void)?
+    var menuContent: ((OpaliteColor) -> AnyView)?
+    var contextMenuContent: ((OpaliteColor) -> AnyView)?
+    var matchedNamespace: Namespace.ID?
     var selectedIDs: Set<UUID> = []
     @Binding var copiedColorID: UUID?
 
@@ -32,8 +32,8 @@ struct SwatchRowView: View {
 
     @State private var isDropTargeted: Bool = false
     @State private var showingColorEditor: Bool = false
-    @State private var draggingColorID: UUID? = nil
-    @State private var dragResetTask: Task<Void, Never>? = nil
+    @State private var draggingColorID: UUID?
+    @State private var dragResetTask: Task<Void, Never>?
 
     init(
         colors: [OpaliteColor],
@@ -64,10 +64,10 @@ struct SwatchRowView: View {
         self.selectedIDs = selectedIDs
         self._copiedColorID = copiedColorID
     }
-    
+
     var body: some View {
         HStack {
-            if (colors.isEmpty) {
+            if colors.isEmpty {
                 HStack(spacing: 10) {
                     Image(systemName: "arrow.turn.down.right")
                         .bold()
@@ -196,7 +196,7 @@ struct SwatchRowView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private func swatchCell(for color: OpaliteColor) -> some View {
         SwatchView(
@@ -371,7 +371,7 @@ struct SwatchRowView: View {
     )
 
     let manager = ColorManager(context: container.mainContext)
-    
+
     return VStack {
         SwatchRowView(
             colors: [OpaliteColor.sample, OpaliteColor.sample2],
@@ -379,7 +379,7 @@ struct SwatchRowView: View {
             swatchWidth: 75,
             swatchHeight: 75
         )
-        
+
         SwatchRowView(
             colors: [OpaliteColor.sample, OpaliteColor.sample2],
             palette: nil,
@@ -401,7 +401,7 @@ struct SwatchRowView: View {
                 )
             }
         )
-        
+
         SwatchRowView(
             colors: [OpaliteColor.sample, OpaliteColor.sample2],
             palette: nil,

@@ -11,13 +11,13 @@ import SwiftData
 @Model
 final class OpalitePalette {
     var id: UUID = UUID()
-    
+
     // Core fields
     var name: String = ""
     var createdAt: Date = Date.now
     var updatedAt: Date = Date.now
     var createdByDisplayName: String?
-    
+
     // User-facing metadata
     var notes: String?
     var tags: [String] = []
@@ -45,7 +45,7 @@ final class OpalitePalette {
         }
     }
     #endif
-    
+
     // Init
     init(
         id: UUID = UUID(),
@@ -100,7 +100,7 @@ extension OpalitePalette {
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "[^A-Za-z0-9_-]+", with: "-", options: .regularExpression)
             .lowercased()
-        
+
         return sanitizedName.isEmpty ? "opalite-palette.json" : "\(sanitizedName).opalite-palette.json"
     }
 }

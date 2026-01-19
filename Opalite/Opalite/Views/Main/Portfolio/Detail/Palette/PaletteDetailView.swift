@@ -100,7 +100,7 @@ struct PaletteDetailView: View {
                 }
             }
 
-            if (!(palette.colors?.isEmpty ?? false)) {
+            if !(palette.colors?.isEmpty ?? false) {
                 Button("Delete Palette and Colors", role: .destructive) {
                     HapticsManager.shared.selection()
                     dismiss()
@@ -129,7 +129,7 @@ struct PaletteDetailView: View {
                 .accessibilityLabel("Export palette")
                 .accessibilityHint("Opens export options for this palette")
             }
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
@@ -157,7 +157,7 @@ struct PaletteDetailView: View {
             }
 
             ToolbarItem(placement: .topBarTrailing) {
-                Button(role: .destructive){
+                Button(role: .destructive) {
                     HapticsManager.shared.selection()
                     showDeleteConfirmation = true
                 } label: {
@@ -372,14 +372,14 @@ struct PaletteDetailView: View {
         OpaliteColor.self,
         configurations: config
     )
-    
+
     let manager = ColorManager(context: container.mainContext)
     do {
         try manager.loadSamples()
     } catch {
         print("Failed to load samples into context")
     }
-    
+
     return NavigationStack {
         PaletteDetailView(palette: OpalitePalette.sample)
             .environment(manager)

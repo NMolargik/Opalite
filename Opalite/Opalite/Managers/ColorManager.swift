@@ -22,11 +22,11 @@ import AppKit
 class ColorManager {
     @ObservationIgnored
     let context: ModelContext
-    
+
     init(context: ModelContext) {
         self.context = context
     }
-    
+
     // MARK: - Cached data for views to consume
     /// Palettes sorted by createdAt (most recently created first)
     var palettes: [OpalitePalette] = []
@@ -40,7 +40,7 @@ class ColorManager {
 
     /// Color selected from SwatchBar to apply to canvas drawing tool.
     /// CanvasView observes this to update the current ink color.
-    var selectedCanvasColor: OpaliteColor? = nil
+    var selectedCanvasColor: OpaliteColor?
 
     /// Tracks whether the SwatchBar window is currently open (iOS only, for single-instance enforcement).
     var isSwatchBarOpen: Bool = false
@@ -51,27 +51,27 @@ class ColorManager {
     /// The currently active/viewed color in a detail view.
     /// Set by ColorDetailView on appear, cleared on disappear.
     /// Used by menu bar commands to provide context-aware actions.
-    var activeColor: OpaliteColor? = nil
+    var activeColor: OpaliteColor?
 
     /// The currently active/viewed palette in a detail view.
     /// Set by PaletteDetailView on appear, cleared on disappear.
     /// Used by menu bar commands to provide context-aware actions.
-    var activePalette: OpalitePalette? = nil
+    var activePalette: OpalitePalette?
 
     /// Triggers the color editor for the active color from menu bar.
-    var editColorTrigger: UUID? = nil
+    var editColorTrigger: UUID?
 
     /// Triggers the palette selection sheet for the active color from menu bar.
-    var addToPaletteTrigger: UUID? = nil
+    var addToPaletteTrigger: UUID?
 
     /// Triggers removing the active color from its palette from menu bar.
-    var removeFromPaletteTrigger: UUID? = nil
+    var removeFromPaletteTrigger: UUID?
 
     /// Triggers renaming the active palette from menu bar.
-    var renamePaletteTrigger: UUID? = nil
+    var renamePaletteTrigger: UUID?
 
     var author: String = "User"
-    
+
     // MARK: - Fetch Helpers
     private var paletteSort: [SortDescriptor<OpalitePalette>] {
         [
@@ -84,7 +84,7 @@ class ColorManager {
             SortDescriptor(\OpaliteColor.createdAt, order: .reverse)
         ]
     }
-    
+
     private func reloadCache() {
         do {
             let paletteDescriptor = FetchDescriptor<OpalitePalette>(sortBy: paletteSort)
@@ -128,7 +128,7 @@ class ColorManager {
     private func resortColorsCache() {
         colors.sort { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
     }
-    
+
     // MARK: - Private helpers: Relationship management
     /// Attaches a color to the given palette, keeping both sides of the relationship in sync
     /// and updating timestamps/device metadata. Optionally accepts an error handler.
@@ -200,14 +200,14 @@ class ColorManager {
         #endif
         color.updatedAt = .now
     }
-    
+
     // MARK: - Public API: Refresh
     /// Refreshes in-memory caches by fetching the latest data from the ModelContext.
     /// Marked async to align with call sites that await this work, even though the fetches are synchronous.
     func refreshAll() async {
         reloadCache()
     }
-    
+
     // MARK: - Public API: Fetching
     /// Fetches all palettes and updates the cache.
     @discardableResult
@@ -237,7 +237,7 @@ class ColorManager {
         let descriptor = FetchDescriptor<OpaliteColor>(predicate: predicate, sortBy: colorSort)
         return try context.fetch(descriptor)
     }
-    
+
     // MARK: - Saving
     /// Persists any pending changes in the context.
     func saveContext() throws {
@@ -245,7 +245,7 @@ class ColorManager {
             try context.save()
         }
     }
-    
+
     // MARK: - Creating / Inserting
     /// Creates, inserts, and saves a new palette.
     @discardableResult
@@ -287,7 +287,7 @@ class ColorManager {
         palette.colors?.forEach { insertColorIntoCache($0) }
         return palette
     }
-    
+
     /// Creates, inserts, and saves a new color
     @discardableResult
     func createColor(
@@ -510,7 +510,7 @@ class ColorManager {
                 makeColor("Snow", 0.97, 0.98, 0.99)
             ]
         )
-        
+
         let looseColors = [
             makeColor("Moss", 0.35, 0.55, 0.30),
             makeColor("Pine", 0.10, 0.35, 0.20),
@@ -540,7 +540,7 @@ class ColorManager {
                 context.insert(c)
             }
         }
-        
+
         for c in looseColors {
             context.insert(c)
         }
@@ -549,4 +549,3 @@ class ColorManager {
         reloadCache()
     }
 }
-

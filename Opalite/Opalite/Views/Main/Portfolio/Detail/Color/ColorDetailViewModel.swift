@@ -13,12 +13,12 @@ extension ColorDetailView {
         var notesDraft: String
         var isSavingNotes: Bool = false
         let color: OpaliteColor
-        
+
         init(color: OpaliteColor) {
             self.color = color
             self.notesDraft = color.notes ?? ""
         }
-        
+
         func saveNotes(using colorManager: ColorManager, onError: ((OpaliteError) -> Void)? = nil) {
             isSavingNotes = true
             defer { isSavingNotes = false }
@@ -56,15 +56,15 @@ extension ColorDetailView {
                 onError?(.colorUpdateFailed)
             }
         }
-        
+
         func deleteColor(using colorManager: ColorManager) throws {
             try colorManager.deleteColor(color)
         }
-        
+
         func detachFromPalette(using colorManager: ColorManager) {
             colorManager.detachColorFromPalette(color)
         }
-        
+
         var badgeText: String {
             color.name ?? color.hexString
         }

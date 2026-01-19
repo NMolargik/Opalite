@@ -10,11 +10,11 @@ import SwiftData
 
 struct ColorsView: View {
     @Environment(ColorManager.self) private var colorManager
-    var matchedNamespace: Namespace.ID? = nil
+    var matchedNamespace: Namespace.ID?
 
     var body: some View {
         NavigationStack {
-            ScrollView() {
+            ScrollView {
                 VStack(spacing: 12) {
                     ForEach(colorManager.colors.filter( { $0.palette == nil }), id: \.self) { color in
                         NavigationLink {

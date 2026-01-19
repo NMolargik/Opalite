@@ -16,7 +16,7 @@ struct OpaliteWatchApp: App {
     init() {
         let schema = Schema([
             OpaliteColor.self,
-            OpalitePalette.self,
+            OpalitePalette.self
         ])
 
         let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"

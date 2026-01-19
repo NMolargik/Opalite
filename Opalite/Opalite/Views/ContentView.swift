@@ -38,14 +38,14 @@ struct ContentView: View {
             return .dark
         }
     }
-    
+
     var leadingTransition: AnyTransition {
         .asymmetric(
             insertion: .move(edge: .trailing).combined(with: .opacity),
             removal: .move(edge: .leading).combined(with: .opacity)
         )
     }
-    
+
     var body: some View {
         ZStack {
             switch appStage {
@@ -110,7 +110,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .onChange(of: colorBlindnessMode) { oldValue, newValue in
+                .onChange(of: colorBlindnessMode) { _, newValue in
                     if newValue != .off {
                         isColorBlindnessBannerVisible = true
                     }
@@ -143,7 +143,7 @@ struct ContentView: View {
             PaywallView(featureContext: paywallContext)
         }
     }
-    
+
     private func prepareApp() async {
         // For returning users, go to syncing view to check for iCloud data
         // For new users, go to splash/onboarding first
@@ -169,4 +169,3 @@ struct ContentView: View {
         .environment(QuickActionManager())
         .environment(HexCopyManager())
 }
-

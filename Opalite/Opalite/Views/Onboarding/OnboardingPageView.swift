@@ -30,7 +30,7 @@ struct OnboardingPageView: View {
         ScrollView {
             VStack(spacing: 12) {
                 Spacer()
-                
+
                 // Animated icon
                 ZStack {
                     // Glow effect
@@ -38,8 +38,7 @@ struct OnboardingPageView: View {
                         .blur(radius: 5)
                         .opacity(iconAnimated ? 0.6 : 0)
                         .accessibilityHidden(true)
-                    
-                    
+
                     // Main icon
                     iconImage(size: 72)
                         .symbolEffect(.bounce, options: .nonRepeating.speed(1.1), value: mainIconBounce)
@@ -47,7 +46,7 @@ struct OnboardingPageView: View {
                 }
                 .scaleEffect(iconAnimated ? 1 : 0.5)
                 .opacity(iconAnimated ? 1 : 0)
-                
+
                 // Title and subtitle
                 VStack(spacing: 12) {
                     Text(page.title)
@@ -55,7 +54,7 @@ struct OnboardingPageView: View {
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.center)
                         .accessibilityAddTraits(.isHeader)
-                    
+
                     Text(page.subtitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -66,9 +65,9 @@ struct OnboardingPageView: View {
                 .offset(y: titleAnimated ? 0 : 20)
                 .opacity(titleAnimated ? 1 : 0)
                 .accessibilityElement(children: .combine)
-                
+
                 Spacer()
-                
+
                 // Features list
                 VStack(spacing: 6) {
                     ForEach(Array(page.features.enumerated()), id: \.element.id) { index, feature in
@@ -79,7 +78,7 @@ struct OnboardingPageView: View {
                 }
                 .padding(.horizontal, 24)
                 .frame(maxWidth: 400)
-                
+
                 Spacer()
             }
             .onChange(of: isActive) { _, newValue in
