@@ -158,40 +158,10 @@ struct PortfolioView: View {
                             .accessibilityHidden(true)
 
                         Text("Colors")
-
-                        Spacer()
-
-                        if !colorManager.looseColors.isEmpty {
-                            Button {
-                                HapticsManager.shared.selection()
-                                withAnimation {
-                                    isEditingColors.toggle()
-                                    if !isEditingColors {
-                                        selectedColorIDs.removeAll()
-                                    }
-                                }
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: isEditingColors ? "checkmark" : "pencil")
-                                        .font(.caption.weight(.semibold))
-                                    Text(isEditingColors ? "Done" : "Edit")
-                                }
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(isEditingColors ? .white : .blue)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(isEditingColors ? .blue : .blue.opacity(0.12))
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
                     }
                     .font(.title)
                     .bold()
                     .padding(.leading, 20)
-                    .padding(.trailing, 20)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Colors, \(colorManager.looseColors.count) items")
 
@@ -523,6 +493,24 @@ struct PortfolioView: View {
                 PaletteOrderSheet(isForExport: false)
             }
             .toolbar {
+                // Edit/Done button for multi-select color deletion (show when 5+ colors)
+                if colorManager.looseColors.count >= 5 {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            HapticsManager.shared.selection()
+                            withAnimation {
+                                isEditingColors.toggle()
+                                if !isEditingColors {
+                                    selectedColorIDs.removeAll()
+                                }
+                            }
+                        } label: {
+                            Image(systemName: isEditingColors ? "checkmark" : "pencil")
+                        }
+                        .toolbarButtonTint()
+                    }
+                }
+
                 if isIPadOrMac {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -535,7 +523,7 @@ struct PortfolioView: View {
                     }
                 }
                 
-                if !colorManager.palettes.isEmpty {
+                if colorManager.palettes.count >= 3 {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             HapticsManager.shared.selection()
