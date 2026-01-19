@@ -20,10 +20,12 @@ struct SwatchRowView: View {
     let swatchHeight: CGFloat
     var showOverlays: Bool = false
     var showsNavigation: Bool = true
+    var acceptsDrops: Bool = true
     var onTap: ((OpaliteColor) -> Void)? = nil
     var menuContent: ((OpaliteColor) -> AnyView)? = nil
     var contextMenuContent: ((OpaliteColor) -> AnyView)? = nil
     var matchedNamespace: Namespace.ID? = nil
+    var selectedIDs: Set<UUID> = []
     @Binding var copiedColorID: UUID?
 
     var isCompact: Bool { horizontalSizeClass == .compact }
@@ -40,10 +42,12 @@ struct SwatchRowView: View {
         swatchHeight: CGFloat,
         showOverlays: Bool = false,
         showsNavigation: Bool = true,
+        acceptsDrops: Bool = true,
         onTap: ((OpaliteColor) -> Void)? = nil,
         menuContent: ((OpaliteColor) -> AnyView)? = nil,
         contextMenuContent: ((OpaliteColor) -> AnyView)? = nil,
         matchedNamespace: Namespace.ID? = nil,
+        selectedIDs: Set<UUID> = [],
         copiedColorID: Binding<UUID?> = .constant(nil)
     ) {
         self.colors = colors
@@ -52,10 +56,12 @@ struct SwatchRowView: View {
         self.swatchHeight = swatchHeight
         self.showOverlays = showOverlays
         self.showsNavigation = showsNavigation
+        self.acceptsDrops = acceptsDrops
         self.onTap = onTap
         self.menuContent = menuContent
         self.contextMenuContent = contextMenuContent
         self.matchedNamespace = matchedNamespace
+        self.selectedIDs = selectedIDs
         self._copiedColorID = copiedColorID
     }
     
@@ -126,46 +132,48 @@ struct SwatchRowView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .onDrop(of: [UTType.opaliteColor, UTType.opaliteColorID], isTargeted: $isDropTargeted) { providers in
-            // Try to handle full JSON color data first (cross-device drops)
-            if let jsonProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColor.identifier) }) {
-                jsonProvider.loadDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier) { data, _ in
-                    guard let data else { return }
-                    handleDroppedColorJSON(data)
+        .if(acceptsDrops) { view in
+            view.onDrop(of: [UTType.opaliteColor, UTType.opaliteColorID], isTargeted: $isDropTargeted) { providers in
+                // Try to handle full JSON color data first (cross-device drops)
+                if let jsonProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColor.identifier) }) {
+                    jsonProvider.loadDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier) { data, _ in
+                        guard let data else { return }
+                        handleDroppedColorJSON(data)
+                    }
+                    return true
                 }
+
+                // Fall back to color ID (same-device drops)
+                guard let idProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColorID.identifier) }) else {
+                    return false
+                }
+
+                idProvider.loadItem(forTypeIdentifier: UTType.opaliteColorID.identifier, options: nil) { item, _ in
+                    var idString: String?
+                    if let data = item as? Data {
+                        idString = String(data: data, encoding: .utf8)
+                    } else if let str = item as? String {
+                        idString = str
+                    } else if let url = item as? URL {
+                        idString = url.lastPathComponent
+                    } else if let nsData = item as? NSData {
+                        idString = String(data: nsData as Data, encoding: .utf8)
+                    }
+
+                    guard let idString, let uuid = UUID(uuidString: idString) else { return }
+                    handleDroppedColorID(uuid)
+                }
+
                 return true
             }
-
-            // Fall back to color ID (same-device drops)
-            guard let idProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColorID.identifier) }) else {
-                return false
-            }
-
-            idProvider.loadItem(forTypeIdentifier: UTType.opaliteColorID.identifier, options: nil) { item, _ in
-                var idString: String?
-                if let data = item as? Data {
-                    idString = String(data: data, encoding: .utf8)
-                } else if let str = item as? String {
-                    idString = str
-                } else if let url = item as? URL {
-                    idString = url.lastPathComponent
-                } else if let nsData = item as? NSData {
-                    idString = String(data: nsData as Data, encoding: .utf8)
-                }
-
-                guard let idString, let uuid = UUID(uuidString: idString) else { return }
-                handleDroppedColorID(uuid)
-            }
-
-            return true
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(colors.isEmpty ? .inverseTheme : .blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
+                    .opacity(isDropTargeted ? 1 : 0)
+                    .padding(.leading, colors.isEmpty ? 65 : 10)
+                    .padding(.trailing, colors.isEmpty ? 0 : -20) // bleed past trailing edge
+            )
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(colors.isEmpty ? .inverseTheme : .blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
-                .opacity(isDropTargeted ? 1 : 0)
-                .padding(.leading, colors.isEmpty ? 65 : 10)
-                .padding(.trailing, colors.isEmpty ? 0 : -20) // bleed past trailing edge
-        )
         .fullScreenCover(isPresented: $showingColorEditor) {
             ColorEditorView(
                 color: nil,
@@ -226,6 +234,19 @@ struct SwatchRowView: View {
                 set: { if !$0 { draggingColorID = nil } }
             )
         )
+        .overlay(alignment: .topTrailing) {
+            if selectedIDs.contains(color.id) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.white)
+                    .background(
+                        Circle()
+                            .fill(.blue)
+                            .padding(-2)
+                    )
+                    .padding(6)
+            }
+        }
     }
 
     // MARK: - Drop Handlers
@@ -304,9 +325,15 @@ struct SwatchRowView: View {
                   let blue = json["blue"] as? Double else { return }
 
             let alpha = json["alpha"] as? Double ?? 1.0
-            let name = json["name"] as? String
             let notes = json["notes"] as? String
             let createdByDisplayName = json["createdByDisplayName"] as? String
+
+            // Clear harmony names - these are generated names that shouldn't be persisted
+            let harmonyNames = ["Complementary", "Analogous", "Triadic", "Tetradic", "Split-Comp"]
+            var name = json["name"] as? String
+            if let n = name, harmonyNames.contains(n) {
+                name = nil
+            }
 
             let newColor = OpaliteColor(
                 name: name,

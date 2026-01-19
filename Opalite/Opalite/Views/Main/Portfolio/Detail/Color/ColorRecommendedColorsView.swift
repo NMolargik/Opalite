@@ -26,6 +26,7 @@ struct ColorRecommendedColorsView: View {
                 swatchHeight: 150,
                 showOverlays: true,
                 showsNavigation: false,
+                acceptsDrops: false,
                 menuContent: { color in
                     harmonyMenuContent(for: color)
                 },

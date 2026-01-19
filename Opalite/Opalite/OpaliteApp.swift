@@ -131,6 +131,12 @@ struct OpaliteApp: App {
                         return
                     }
 
+                    // Handle createColor deep link (opalite://createColor) - opens color editor
+                    if url.scheme == "opalite" && url.host == "createColor" {
+                        IntentNavigationManager.shared.showColorEditor()
+                        return
+                    }
+
                     importCoordinator.handleIncomingURL(url, colorManager: colorManager)
                 }
                 .sheet(isPresented: Binding(

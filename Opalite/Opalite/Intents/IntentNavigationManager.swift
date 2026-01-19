@@ -20,6 +20,9 @@ final class IntentNavigationManager {
     /// Pending palette to navigate to (set by ShowPaletteIntent)
     var pendingPaletteID: UUID?
 
+    /// Trigger to show the color editor for creating a new color (set by deep link)
+    var shouldShowColorEditor: Bool = false
+
     private init() {}
 
     func navigateToColor(id: UUID) {
@@ -30,8 +33,14 @@ final class IntentNavigationManager {
         pendingPaletteID = id
     }
 
+    /// Triggers the color editor to create a new color
+    func showColorEditor() {
+        shouldShowColorEditor = true
+    }
+
     func clearNavigation() {
         pendingColorID = nil
         pendingPaletteID = nil
+        shouldShowColorEditor = false
     }
 }

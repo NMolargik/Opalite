@@ -56,6 +56,9 @@ struct PortfolioView: View {
     @State private var droppedImageItem: DroppedImageItem? = nil
 #endif
     @State private var colorToDelete: OpaliteColor?
+    @State private var isEditingColors: Bool = false
+    @State private var selectedColorIDs: Set<UUID> = []
+    @State private var colorsToDelete: [OpaliteColor] = []
     @State private var isShowingSwatchBarInfo = false
     @State private var isShowingQuickAddHex = false
     @State private var isShowingPaletteOrder = false
@@ -67,6 +70,17 @@ struct PortfolioView: View {
     @Namespace private var swatchNS
     
     var isCompact: Bool { hSizeClass == .compact }
+
+    /// Title for batch delete confirmation alert
+    private var batchDeleteAlertTitle: String {
+        let count = colorsToDelete.count
+        return "Delete \(count) Color\(count == 1 ? "" : "s")?"
+    }
+
+    /// Whether all loose colors are selected
+    private var allColorsSelected: Bool {
+        selectedColorIDs.count == colorManager.looseColors.count
+    }
 
     /// Palettes ordered according to user's custom order
     private var orderedPalettes: [OpalitePalette] {
@@ -144,10 +158,40 @@ struct PortfolioView: View {
                             .accessibilityHidden(true)
 
                         Text("Colors")
+
+                        Spacer()
+
+                        if !colorManager.looseColors.isEmpty {
+                            Button {
+                                HapticsManager.shared.selection()
+                                withAnimation {
+                                    isEditingColors.toggle()
+                                    if !isEditingColors {
+                                        selectedColorIDs.removeAll()
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: isEditingColors ? "checkmark" : "pencil")
+                                        .font(.caption.weight(.semibold))
+                                    Text(isEditingColors ? "Done" : "Edit")
+                                }
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(isEditingColors ? .white : .blue)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(isEditingColors ? .blue : .blue.opacity(0.12))
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     .font(.title)
                     .bold()
                     .padding(.leading, 20)
+                    .padding(.trailing, 20)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Colors, \(colorManager.looseColors.count) items")
 
@@ -156,24 +200,23 @@ struct PortfolioView: View {
                         .tipCornerRadius(16)
                         .padding(.horizontal, 20)
 
+                    // Edit mode toolbar
+                    if isEditingColors {
+                        editModeToolbar
+                    }
+
                     SwatchRowView(
                         colors: colorManager.looseColors,
                         palette: pendingPaletteToAddTo,
                         swatchWidth: swatchSize.size,
                         swatchHeight: swatchSize.size,
-                        showOverlays: swatchSize.showOverlays,
-                        menuContent: { color in
-                            if (swatchSize.showOverlays) {
-                                return menuContent(color: color)
-                            } else {
-                                return AnyView(EmptyView())
-                            }
-                        },
-                        contextMenuContent: { color in
-                            // Always provide context menu for right-click support
-                            return menuContent(color: color)
-                        },
+                        showOverlays: looseColorShowOverlays,
+                        showsNavigation: looseColorShowsNavigation,
+                        onTap: looseColorOnTap,
+                        menuContent: looseColorMenuContent,
+                        contextMenuContent: looseColorContextMenuContent,
                         matchedNamespace: swatchNS,
+                        selectedIDs: selectedColorIDs,
                         copiedColorID: $copiedColorID
                     )
                     .zIndex(1)
@@ -339,13 +382,14 @@ struct PortfolioView: View {
                 PaletteSelectionSheet(color: color)
                     .environment(colorManager)
             }
-            .fullScreenCover(isPresented: $isShowingColorEditor) {
+            .fullScreenCover(isPresented: showColorEditorBinding) {
                 ColorEditorView(
                     color: nil,
                     palette: pendingPaletteToAddTo,
                     onCancel: {
                         pendingPaletteToAddTo = nil
                         isShowingColorEditor = false
+                        intentNavigationManager.shouldShowColorEditor = false
                     },
                     onApprove: { newColor in
                         do {
@@ -356,7 +400,8 @@ struct PortfolioView: View {
                             toastManager.show(error: .colorCreationFailed)
                         }
 
-                        isShowingColorEditor.toggle()
+                        isShowingColorEditor = false
+                        intentNavigationManager.shouldShowColorEditor = false
                     }
                 )
             }
@@ -397,6 +442,31 @@ struct PortfolioView: View {
                         }
                     }
                     colorToDelete = nil
+                }
+            } message: {
+                Text("This action cannot be undone.")
+            }
+            .alert(
+                batchDeleteAlertTitle,
+                isPresented: Binding(
+                    get: { !colorsToDelete.isEmpty },
+                    set: { if !$0 { colorsToDelete = [] } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) {
+                    HapticsManager.shared.selection()
+                    colorsToDelete = []
+                }
+                Button("Delete", role: .destructive) {
+                    HapticsManager.shared.selection()
+                    withAnimation {
+                        for color in colorsToDelete {
+                            try? colorManager.deleteColor(color)
+                        }
+                    }
+                    colorsToDelete = []
+                    selectedColorIDs.removeAll()
+                    isEditingColors = false
                 }
             } message: {
                 Text("This action cannot be undone.")
@@ -641,6 +711,26 @@ struct PortfolioView: View {
         }
     }
 
+    /// Binding that shows the color editor (from user action OR deep link)
+    private var showColorEditorBinding: Binding<Bool> {
+        Binding(
+            get: {
+                // Check both local state and intent navigation trigger
+                if intentNavigationManager.shouldShowColorEditor {
+                    return true
+                }
+                return isShowingColorEditor
+            },
+            set: { newValue in
+                isShowingColorEditor = newValue
+                // Clear the intent trigger when dismissing
+                if !newValue {
+                    intentNavigationManager.shouldShowColorEditor = false
+                }
+            }
+        )
+    }
+
     private func handleFileImport(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
@@ -696,6 +786,77 @@ struct PortfolioView: View {
             importError = error.localizedDescription
             isShowingImportError = true
         }
+    }
+
+    // MARK: - Edit Mode Helpers
+
+    /// Whether to show overlays on loose colors (hide when editing)
+    private var looseColorShowOverlays: Bool {
+        swatchSize.showOverlays && !isEditingColors
+    }
+
+    /// Whether loose colors should show navigation (disable when editing)
+    private var looseColorShowsNavigation: Bool {
+        !isEditingColors
+    }
+
+    /// Handler for tapping a color swatch in edit mode (nil when not editing)
+    private var looseColorOnTap: ((OpaliteColor) -> Void)? {
+        guard isEditingColors else { return nil }
+        return { [self] color in
+            HapticsManager.shared.selection()
+            if selectedColorIDs.contains(color.id) {
+                selectedColorIDs.remove(color.id)
+            } else {
+                selectedColorIDs.insert(color.id)
+            }
+        }
+    }
+
+    /// Menu content for loose colors (respects edit mode)
+    private func looseColorMenuContent(_ color: OpaliteColor) -> AnyView {
+        if swatchSize.showOverlays && !isEditingColors {
+            return menuContent(color: color)
+        } else {
+            return AnyView(EmptyView())
+        }
+    }
+
+    /// Context menu content for loose colors (respects edit mode)
+    private func looseColorContextMenuContent(_ color: OpaliteColor) -> AnyView {
+        if !isEditingColors {
+            return menuContent(color: color)
+        } else {
+            return AnyView(EmptyView())
+        }
+    }
+
+    // MARK: - Edit Mode Toolbar
+
+    @ViewBuilder
+    private var editModeToolbar: some View {
+        HStack {
+            Button(allColorsSelected ? "Deselect All" : "Select All") {
+                HapticsManager.shared.selection()
+                if allColorsSelected {
+                    selectedColorIDs.removeAll()
+                } else {
+                    selectedColorIDs = Set(colorManager.looseColors.map(\.id))
+                }
+            }
+
+            Spacer()
+
+            Button(role: .destructive) {
+                HapticsManager.shared.notification(.warning)
+                colorsToDelete = colorManager.looseColors.filter { selectedColorIDs.contains($0.id) }
+            } label: {
+                Label("Delete (\(selectedColorIDs.count))", systemImage: "trash")
+            }
+            .disabled(selectedColorIDs.isEmpty)
+        }
+        .padding(.horizontal, 20)
+        .font(.subheadline)
     }
 
     @ViewBuilder
