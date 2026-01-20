@@ -44,7 +44,7 @@ struct ColorSpectrumPickerView: View {
                         )
                         .overlay(
                             LinearGradient(
-                                colors: [.clear, .black],
+                                colors: [.white, .black],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )

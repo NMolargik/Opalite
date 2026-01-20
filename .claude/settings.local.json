@@ -12,7 +12,9 @@
       "Bash(brew list:*)",
       "Bash(brew install:*)",
       "Bash(swiftlint lint:*)",
-      "Bash(swiftlint:*)"
+      "Bash(swiftlint:*)",
+      "Bash(xargs -I {} find {} -name \"StatusMenuBundle.bundle\")",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

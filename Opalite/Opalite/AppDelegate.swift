@@ -20,6 +20,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     /// Reference to the Main scene session for single-instance management
     static weak var mainSceneSession: UISceneSession?
 
+    #if targetEnvironment(macCatalyst)
+    /// Reference to the status menu controller from the AppKit bundle
+    private var statusMenuController: NSObject?
+    #endif
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        #if targetEnvironment(macCatalyst)
+        setupStatusMenu()
+        #endif
+        return true
+    }
+
     func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
         let shortcutType = shortcutItem.type
 
@@ -172,5 +184,52 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         builder.remove(menu: .newScene)
         #endif
     }
+
+    // MARK: - Status Menu (Mac Catalyst)
+
+    #if targetEnvironment(macCatalyst)
+    /// Sets up the macOS menu bar status item by loading the AppKit bundle
+    private func setupStatusMenu() {
+        // Find the bundle in the app's PlugIns directory
+        guard let plugInsURL = Bundle.main.builtInPlugInsURL else {
+            return
+        }
+
+        let bundleURL = plugInsURL.appendingPathComponent("StatusMenuBundle.bundle")
+
+        guard let bundle = Bundle(url: bundleURL), bundle.load() else {
+            return
+        }
+
+        // Get the StatusMenuController class (try with and without module prefix)
+        let controllerClass: NSObject.Type? =
+            bundle.classNamed("StatusMenuBundle.StatusMenuController") as? NSObject.Type ??
+            bundle.classNamed("StatusMenuController") as? NSObject.Type
+
+        guard let controllerClass else {
+            return
+        }
+
+        // Get the shared instance
+        let sharedSelector = NSSelectorFromString("shared")
+        guard controllerClass.responds(to: sharedSelector),
+              let controller = controllerClass.perform(sharedSelector)?.takeUnretainedValue() as? NSObject else {
+            return
+        }
+
+        // Setup with callback
+        let setupSelector = NSSelectorFromString("setupWithOpenSwatchBarHandler:")
+        if controller.responds(to: setupSelector) {
+            let handler: @convention(block) () -> Void = {
+                Task { @MainActor in
+                    AppDelegate.openSwatchBarWindow()
+                }
+            }
+            controller.perform(setupSelector, with: handler)
+        }
+
+        statusMenuController = controller
+    }
+    #endif
 }
 #endif

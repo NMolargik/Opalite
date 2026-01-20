@@ -68,7 +68,7 @@ struct SwatchBarView: View {
             }
             .padding(.bottom)
             .background(.ultraThinMaterial)
-            .navigationTitle("SwatchBar")
+            .navigationTitle("Opalite")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.automatic)
             #endif
@@ -92,55 +92,13 @@ struct SwatchBarView: View {
                         HapticsManager.shared.selection()
                         showingSwatchBarInfo = true
                     } label: {
-                        Label("Info", systemImage: "info")
+                        Label("Info", systemImage: "info.circle")
                     }
                     .tint(.blue)
                 }
             }
             .sheet(isPresented: $showingSwatchBarInfo) {
-                NavigationStack {
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            Image(systemName: "swatchpalette")
-                                .font(.system(size: 36, weight: .semibold))
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.purple, .orange, .red)
-
-                            Text("SwatchBar")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-
-                            Text("SwatchBar is intended for creators to quickly reference their colors and palettes. Colors can be sampled, or tapped / clicked to copy their color code.")
-                                .font(.body)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                            Divider()
-                                .padding(.vertical, 4)
-
-                            HStack(spacing: 16) {
-                                Label("Tap/Click a swatch to copy its hex code", systemImage: "hand.tap")
-                            }
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 24)
-                        .padding(.bottom, 16)
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") {
-                                showingSwatchBarInfo = false
-                            }
-                        }
-                    }
-                }
-                .frame(maxWidth: 480)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .presentationDetents([.fraction(0.5)])
-                .presentationDragIndicator(.visible)
+                swatchBarInfoSheet
             }
         }
         .frame(minWidth: 250)
@@ -230,6 +188,111 @@ struct SwatchBarView: View {
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background(.regularMaterial)
+    }
+
+    // MARK: - Info Sheet
+
+    private var swatchBarInfoSheet: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Spacer()
+                Button("Done") {
+                    showingSwatchBarInfo = false
+                }
+                .fontWeight(.medium)
+            }
+            .padding(.horizontal)
+            .padding(.top, 16)
+            .padding(.bottom, 8)
+
+            // Content
+            VStack(spacing: 20) {
+                // Icon and title
+                VStack(spacing: 8) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.purple.opacity(0.2), .orange.opacity(0.2)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 64, height: 64)
+
+                        Image(systemName: "swatchpalette.fill")
+                            .font(.system(size: 28, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.purple)
+                    }
+
+                    Text("SwatchBar")
+                        .font(.title3)
+                        .fontWeight(.bold)
+
+                    Text("Quick access to your colors")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                // Feature rows
+                VStack(spacing: 12) {
+                    infoRow(
+                        icon: "hand.tap.fill",
+                        iconColor: .blue,
+                        title: "Copy Color Code",
+                        description: "Tap any swatch to copy its hex code"
+                    )
+
+                    infoRow(
+                        icon: "line.3.horizontal.decrease.circle.fill",
+                        iconColor: .orange,
+                        title: "Organized by Palette",
+                        description: "Tap headers to expand or collapse"
+                    )
+
+                    infoRow(
+                        icon: "macwindow.badge.plus",
+                        iconColor: .green,
+                        title: "Always Available",
+                        description: "Keep SwatchBar open while you work"
+                    )
+                }
+                .padding(.horizontal, 4)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 24)
+
+            Spacer()
+        }
+        .presentationDetents([.height(340)])
+        .presentationDragIndicator(.visible)
+        .presentationCornerRadius(20)
+    }
+
+    private func infoRow(icon: String, iconColor: Color, title: String, description: String) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundStyle(iconColor)
+                .frame(width: 32)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 
     @ViewBuilder
