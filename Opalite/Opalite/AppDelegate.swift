@@ -190,12 +190,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     #if targetEnvironment(macCatalyst)
     /// Sets up the macOS menu bar status item by loading the AppKit bundle
     private func setupStatusMenu() {
-        // Find the bundle in the app's PlugIns directory
-        guard let plugInsURL = Bundle.main.builtInPlugInsURL else {
+        // Find the bundle in the app's Resources directory
+        guard let resourcesURL = Bundle.main.resourceURL else {
             return
         }
 
-        let bundleURL = plugInsURL.appendingPathComponent("StatusMenuBundle.bundle")
+        let bundleURL = resourcesURL.appendingPathComponent("StatusMenuBundle.bundle")
 
         guard let bundle = Bundle(url: bundleURL), bundle.load() else {
             return
