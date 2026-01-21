@@ -13,34 +13,46 @@ import UIKit
 struct PencilHoverView: UIViewRepresentable {
     @Binding var hoverLocation: CGPoint?
     @Binding var rollAngle: Angle
+    @Binding var shapeScale: CGFloat
+    @Binding var aspectRatio: CGFloat
+    var useNonUniformScale: Bool = false
     let onTap: (CGPoint) -> Void
 
     func makeUIView(context: Context) -> HoverDetectionView {
         let view = HoverDetectionView()
-        // Transparent background
         view.backgroundColor = .clear
-        view.onHoverUpdate = { location, relativeAngle in
-            DispatchQueue.main.async {
-                self.hoverLocation = location
-                if let angle = relativeAngle {
-                    self.rollAngle = Angle(radians: Double(angle))
-                }
+        view.isMultipleTouchEnabled = true
+        view.useNonUniformScale = useNonUniformScale
+        view.onHoverUpdate = { [self] location, relativeAngle in
+            hoverLocation = location
+            if let angle = relativeAngle {
+                rollAngle = Angle(radians: Double(angle))
             }
         }
-        view.onHoverEnd = {
-            DispatchQueue.main.async {
-                self.hoverLocation = nil
-            }
+        view.onHoverEnd = { [self] in
+            hoverLocation = nil
         }
-        view.onTap = { location in
-            self.onTap(location)
+        view.onTap = { [self] location in
+            onTap(location)
+        }
+        view.onScaleUpdate = { [self] scale in
+            shapeScale = scale
+        }
+        view.onRotationUpdate = { [self] rotation in
+            rollAngle = Angle(radians: Double(rotation))
+        }
+        view.onAspectRatioUpdate = { [self] ratio in
+            aspectRatio = ratio
         }
         return view
     }
 
     func updateUIView(_ uiView: HoverDetectionView, context: Context) {
-        // Reset baseline when rollAngle is reset to zero (new placement session)
-        if rollAngle == .zero && uiView.baselineRollAngle != nil {
+        // Update non-uniform scale mode if it changes
+        uiView.useNonUniformScale = useNonUniformScale
+
+        // Reset baseline when starting a new placement session
+        if rollAngle == .zero && shapeScale == 1.0 && aspectRatio == 1.0 && uiView.baselineRollAngle != nil {
             uiView.resetBaseline()
         }
     }
@@ -53,6 +65,9 @@ import AppKit
 struct PencilHoverView: View {
     @Binding var hoverLocation: CGPoint?
     @Binding var rollAngle: Angle
+    @Binding var shapeScale: CGFloat
+    @Binding var aspectRatio: CGFloat
+    var useNonUniformScale: Bool = false
     let onTap: (CGPoint) -> Void
 
     var body: some View {

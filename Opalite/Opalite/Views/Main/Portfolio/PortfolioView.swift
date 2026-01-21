@@ -73,7 +73,7 @@ struct PortfolioView: View {
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
             mainScrollContent
-                .navigationTitle("Opalite")
+                .navigationTitle(isCompact ? "Opalite" : "")
                 .toolbarBackground(.hidden)
                 .toolbar { toolbarContent }
                 .toolbarRole(isCompact ? .automatic : .editor)
@@ -225,7 +225,10 @@ private extension PortfolioView {
 
     var colorsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            colorsSectionHeader
+            ColorRowHeaderView(
+                isEditingColors: $viewModel.isEditingColors,
+                selectedColorIDs: $viewModel.selectedColorIDs
+            )
 
             TipView(colorDetailsTip)
                 .tipCornerRadius(16)
@@ -239,21 +242,6 @@ private extension PortfolioView {
                 .zIndex(1)
                 .padding(.bottom, 5)
         }
-    }
-
-    var colorsSectionHeader: some View {
-        HStack {
-            Image(systemName: "paintpalette.fill")
-                .foregroundStyle(.blue.gradient)
-                .accessibilityHidden(true)
-
-            Text("Colors")
-        }
-        .font(.title)
-        .bold()
-        .padding(.leading, 20)
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityLabel("Colors, \(colorManager.looseColors.count) items")
     }
 
     var looseColorsRow: some View {
@@ -274,7 +262,7 @@ private extension PortfolioView {
     }
 
     var palettesSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading) {
             palettesSectionHeader
 
             if colorManager.palettes.isEmpty {
@@ -398,7 +386,7 @@ private extension PortfolioView {
                 HapticsManager.shared.selection()
                 viewModel.isShowingBatchPaletteSelection = true
             } label: {
-                Label("Add to Palette", systemImage: "swatchpalette")
+                Label("Move To Palette", systemImage: "swatchpalette")
             }
             .disabled(viewModel.selectedColorIDs.isEmpty)
 
@@ -499,17 +487,6 @@ private extension PortfolioView {
 private extension PortfolioView {
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
-        if colorManager.looseColors.count >= 5 {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    viewModel.toggleEditMode()
-                } label: {
-                    Image(systemName: viewModel.isEditingColors ? "checkmark" : "pencil")
-                }
-                .toolbarButtonTint()
-            }
-        }
-
         if isIPadOrMac {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -666,6 +643,7 @@ private extension PortfolioView {
                 .imageScale(.large)
                 .bold()
         }
+        .tint(.blue)
         .labelStyle(.titleAndIcon)
     }
 }

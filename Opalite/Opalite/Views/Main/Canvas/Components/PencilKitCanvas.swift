@@ -304,6 +304,23 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             }
         }
 
+        func toolPickerVisibilityDidChange(_ toolPicker: PKToolPicker) {
+            // If the tool picker became hidden unexpectedly, try to re-show it
+            guard let canvasView = canvasView else { return }
+
+            if !toolPicker.isVisible {
+                // Delay slightly to avoid interfering with intentional dismissals
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak canvasView, weak toolPicker] in
+                    guard let canvasView, let toolPicker else { return }
+                    // Only re-show if the canvas is still in the window hierarchy
+                    if canvasView.window != nil {
+                        toolPicker.setVisible(true, forFirstResponder: canvasView)
+                        _ = canvasView.becomeFirstResponder()
+                    }
+                }
+            }
+        }
+
         func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
             drawing = canvasView.drawing
         }

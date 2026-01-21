@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import SwiftData
 import WatchKit
 
 struct WatchSwatchView: View {
-    let color: OpaliteColor
+    let color: WatchColor
     let badgeText: String
 
     @Environment(WatchColorManager.self) private var colorManager
@@ -18,11 +17,11 @@ struct WatchSwatchView: View {
 
     private let sessionManager = WatchSessionManager.shared
 
-    init(color: OpaliteColor) {
+    init(color: WatchColor) {
         self.color = color
         // Show name if available, otherwise hex
         if let name = color.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
-            self.badgeText = "\(name) - \(color.hexString)"
+            self.badgeText = name
         } else {
             self.badgeText = color.hexString
         }
@@ -36,13 +35,11 @@ struct WatchSwatchView: View {
                 Text(badgeText)
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundStyle(color.idealTextColor())
+                    .foregroundStyle(.white)
                     .lineLimit(1)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .glassIfAvailable(
-                        GlassConfiguration(style: .clear)
-                    )
+                    .background(.ultraThinMaterial, in: Capsule())
                     .padding(6)
             }
             .overlay {
@@ -86,14 +83,6 @@ struct WatchSwatchView: View {
 }
 
 #Preview {
-    WatchSwatchView(color: OpaliteColor(
-        name: "Ocean Blue",
-        red: 0.2,
-        green: 0.5,
-        blue: 0.8
-    ))
-    .environment(WatchColorManager(context: try! ModelContainer(
-        for: OpaliteColor.self, OpalitePalette.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    ).mainContext))
+    WatchSwatchView(color: WatchColor.sample)
+        .environment(WatchColorManager())
 }

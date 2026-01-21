@@ -210,13 +210,23 @@ struct PaywallView: View {
         Button {
             Task {
                 await subscriptionManager.restorePurchases()
-                if subscriptionManager.hasOnyxEntitlement {
+
+                if let error = subscriptionManager.error {
+                    // Restore failed - show error
+                    toastManager.show(error: error)
+                } else if subscriptionManager.hasOnyxEntitlement {
+                    // Restore succeeded and found purchases
+                    toastManager.showSuccess("Purchases restored")
                     dismiss()
+                } else {
+                    // Restore succeeded but no purchases found
+                    toastManager.show(message: "No purchases to restore", style: .info, icon: "info.circle.fill")
                 }
             }
         } label: {
             Text("Restore Purchases")
                 .font(.subheadline)
+                .foregroundStyle(.inverseTheme)
         }
         .disabled(subscriptionManager.isLoading)
         .accessibilityHint("Restores previously purchased subscriptions")
@@ -239,9 +249,13 @@ struct PaywallView: View {
 
             Link("Privacy Policy", destination: URL(string: "https://molargiksoftware.com/#/privacy")!)
                 .font(.caption)
+                .foregroundStyle(.inverseTheme)
+
 
             Link("Terms Of Use (EULA)", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                 .font(.caption)
+                .foregroundStyle(.inverseTheme)
+
         }
         .padding(.top, 8)
     }

@@ -47,4 +47,7 @@ enum AppStorageKeys {
     /// Custom order of palette UUIDs for display in PortfolioView.
     /// Stored as a JSON-encoded array of UUID strings.
     static let paletteOrder = "paletteOrder"
+
+    /// The selected app icon variant (dark or light).
+    static let appIcon = "appIcon"
 }

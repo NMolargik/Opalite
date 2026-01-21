@@ -6,28 +6,35 @@
 //
 
 import SwiftUI
-import SwiftData
 import WatchKit
 
 @MainActor
 @Observable
 class WatchColorManager {
-    @ObservationIgnored
-    let context: ModelContext
+    // MARK: - Cached data for views
+    var colors: [WatchColor] = []
+    var palettes: [WatchPalette] = []
 
-    init(context: ModelContext) {
-        self.context = context
+    /// Whether the initial sync has completed
+    var hasCompletedInitialSync: Bool = false
+
+    /// Whether a sync is in progress
+    var isSyncing: Bool = false
+
+    /// Last successful sync timestamp
+    var lastSyncTimestamp: Date? {
+        WatchSessionManager.shared.lastSyncTimestamp
     }
 
-    // MARK: - Cached data for views to consume
-    /// Palettes sorted by createdAt (most recently created first)
-    var palettes: [OpalitePalette] = []
-    /// Colors sorted by updatedAt (most recently edited first)
-    var colors: [OpaliteColor] = []
-
     /// Colors not assigned to any palette
-    var looseColors: [OpaliteColor] {
-        colors.filter { $0.palette == nil }
+    var looseColors: [WatchColor] {
+        colors.filter { $0.paletteId == nil }
+    }
+
+    /// Returns colors belonging to a specific palette
+    func colors(for palette: WatchPalette) -> [WatchColor] {
+        colors.filter { $0.paletteId == palette.id }
+            .sorted { $0.createdAt > $1.createdAt }
     }
 
     // MARK: - User Preferences
@@ -38,42 +45,89 @@ class WatchColorManager {
         set { UserDefaults.standard.set(newValue, forKey: "includeHexPrefix") }
     }
 
-    // MARK: - Fetch Helpers
-    private var paletteSort: [SortDescriptor<OpalitePalette>] {
-        [
-            SortDescriptor(\OpalitePalette.createdAt, order: .reverse)
-        ]
+    // MARK: - Init
+
+    init() {
+        // Set up callback for when data is received from iPhone
+        WatchSessionManager.shared.onDataReceived = { [weak self] colors, palettes in
+            self?.colors = colors.sorted { $0.createdAt > $1.createdAt }
+            self?.palettes = palettes.sorted { $0.createdAt > $1.createdAt }
+            self?.hasCompletedInitialSync = true
+            self?.isSyncing = false
+        }
+
+        // Load any cached data from local storage
+        loadFromCache()
     }
 
-    private var colorSort: [SortDescriptor<OpaliteColor>] {
-        [
-            SortDescriptor(\OpaliteColor.createdAt, order: .reverse)
-        ]
-    }
+    // MARK: - Data Loading
 
-    private func reloadCache() {
-        do {
-            let paletteDescriptor = FetchDescriptor<OpalitePalette>(sortBy: paletteSort)
-            let colorDescriptor = FetchDescriptor<OpaliteColor>(sortBy: colorSort)
-            self.palettes = try context.fetch(paletteDescriptor)
-            self.colors = try context.fetch(colorDescriptor)
-        } catch {
-            #if DEBUG
-            print("[WatchColorManager] reloadCache error: \(error)")
-            #endif
+    /// Loads cached data from UserDefaults
+    private func loadFromCache() {
+        let cached = WatchSessionManager.shared.loadFromLocalStorage()
+        colors = cached.colors.sorted { $0.createdAt > $1.createdAt }
+        palettes = cached.palettes.sorted { $0.createdAt > $1.createdAt }
+
+        // If we have cached data, consider initial sync complete
+        if !colors.isEmpty || !palettes.isEmpty {
+            hasCompletedInitialSync = true
         }
     }
 
-    // MARK: - Public API: Refresh
-    /// Refreshes in-memory caches by fetching the latest data from the ModelContext.
+    // MARK: - Sync
+
+    /// Performs the initial sync from iPhone
+    func performInitialSync(timeout: TimeInterval = 10) async {
+        guard !hasCompletedInitialSync else { return }
+
+        isSyncing = true
+
+        // Start timeout task
+        let timeoutTask = Task {
+            try? await Task.sleep(for: .seconds(timeout))
+            if !Task.isCancelled {
+                await MainActor.run {
+                    // Even if sync times out, mark as complete so user can use the app
+                    self.hasCompletedInitialSync = true
+                    self.isSyncing = false
+                }
+            }
+        }
+
+        // Request sync from iPhone
+        WatchSessionManager.shared.requestSync()
+
+        // Wait a bit for the response
+        try? await Task.sleep(for: .seconds(2))
+
+        // If we received data, the callback will have set hasCompletedInitialSync
+        if hasCompletedInitialSync {
+            timeoutTask.cancel()
+            return
+        }
+
+        // Keep waiting up to timeout
+        try? await Task.sleep(for: .seconds(timeout - 2))
+
+        timeoutTask.cancel()
+        hasCompletedInitialSync = true
+        isSyncing = false
+    }
+
+    /// Manually requests a refresh from iPhone
     func refreshAll() async {
-        reloadCache()
+        isSyncing = true
+        WatchSessionManager.shared.requestSync()
+
+        // Give it a moment to receive data
+        try? await Task.sleep(for: .seconds(2))
+        isSyncing = false
     }
 
     // MARK: - Hex Formatting
 
     /// Returns the hex string formatted according to user preference.
-    func formattedHex(for color: OpaliteColor) -> String {
+    func formattedHex(for color: WatchColor) -> String {
         let baseHex = color.hexString
         if includeHexPrefix {
             return baseHex
@@ -84,12 +138,10 @@ class WatchColorManager {
 
     // MARK: - Haptic Feedback
 
-    /// Plays a click haptic for tap interactions.
     func playTapHaptic() {
         WKInterfaceDevice.current().play(.click)
     }
 
-    /// Plays a success haptic for long-press interactions.
     func playSuccessHaptic() {
         WKInterfaceDevice.current().play(.success)
     }

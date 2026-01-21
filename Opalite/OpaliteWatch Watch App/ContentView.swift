@@ -6,12 +6,23 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
     @Environment(WatchColorManager.self) private var colorManager
 
     var body: some View {
+        Group {
+            if !colorManager.hasCompletedInitialSync {
+                // Show syncing screen on first launch
+                WatchSyncingView()
+            } else {
+                mainContent
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
         NavigationStack {
             Group {
                 if colorManager.colors.isEmpty && colorManager.palettes.isEmpty {
@@ -49,7 +60,7 @@ struct ContentView: View {
                         if !colorManager.palettes.isEmpty {
                             Section("Palettes") {
                                 ForEach(colorManager.palettes) { palette in
-                                    let paletteColors = palette.sortedColors
+                                    let paletteColors = colorManager.colors(for: palette)
                                     NavigationLink {
                                         ColorListView(
                                             title: palette.name,
@@ -100,8 +111,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(WatchColorManager(context: try! ModelContainer(
-            for: OpaliteColor.self, OpalitePalette.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        ).mainContext))
+        .environment(WatchColorManager())
 }

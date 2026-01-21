@@ -29,67 +29,81 @@ struct PaletteRowHeaderView: View {
             TipView(paletteMenuTip)
                 .tipCornerRadius(16)
                 .padding(.horizontal, 20)
-
-            HStack {
-                Menu {
-                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                        Button(role: .confirm) {
-                            HapticsManager.shared.selection()
-                            isShowingColorEditor.toggle()
-                        } label: {
-                            Label("Add Color", systemImage: "plus.square.dashed")
-                        }
-                    } else {
-                        Button {
-                            HapticsManager.shared.selection()
-                            isShowingColorEditor.toggle()
-                        } label: {
-                            Label("Add Color", systemImage: "plus.square.dashed")
-                        }
+            
+            HStack(alignment: .center, spacing: 8) {
+            Menu {
+                if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                    Button(role: .confirm) {
+                        HapticsManager.shared.selection()
+                        isShowingColorEditor.toggle()
+                    } label: {
+                        Label("Add Color", systemImage: "plus.square.dashed")
                     }
-
+                } else {
                     Button {
                         HapticsManager.shared.selection()
-                        renameText = palette.name
-                        showRenameAlert = true
+                        isShowingColorEditor.toggle()
                     } label: {
-                        Label("Rename Palette", systemImage: "pencil")
+                        Label("Add Color", systemImage: "plus.square.dashed")
                     }
-
-                    Divider()
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        isShowingExportSheet = true
-                    } label: {
-                        Label("Export", systemImage: "square.and.arrow.up")
-                    }
-                    .disabled(palette.sortedColors.isEmpty)
-
-                    Divider()
-
-                    Button(role: .destructive) {
-                        HapticsManager.shared.selection()
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("Delete Palette", systemImage: "trash.fill")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .imageScale(.large)
-                        .foregroundStyle(.inverseTheme)
-                        .frame(height: 20)
-                        .padding(8)
-                        .background(
-                            Circle().fill(.clear)
-                        )
-                        .glassIfAvailable(
-                            GlassConfiguration(style: .regular)
-                        )
-                        .contentShape(Circle())
-                        .hoverEffect(.lift)
                 }
-                .padding(.leading)
+                
+                Button {
+                    HapticsManager.shared.selection()
+                    renameText = palette.name
+                    showRenameAlert = true
+                } label: {
+                    Label("Rename Palette", systemImage: "pencil")
+                }
+                
+                Divider()
+                
+                Button {
+                    HapticsManager.shared.selection()
+                    isShowingExportSheet = true
+                } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+                .disabled(palette.sortedColors.isEmpty)
+                
+                Divider()
+                
+                Button(role: .destructive) {
+                    HapticsManager.shared.selection()
+                    showDeleteConfirmation = true
+                } label: {
+                    Label("Delete Palette", systemImage: "trash.fill")
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .imageScale(.large)
+                    .foregroundStyle(.inverseTheme)
+                    .frame(height: 20)
+                    .padding(8)
+                    .background(
+                        Circle().fill(.clear)
+                    )
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .regular)
+                    )
+                    .contentShape(Circle())
+                    .hoverEffect(.lift)
+            }
+            //
+            //                Button {
+            //                    HapticsManager.shared.selection()
+            //                    isShowingColorEditor = true
+            //                } label: {
+            //                    Image(systemName: "plus")
+            //                        .imageScale(.large)
+            //                        .bold()
+            //                        .foregroundStyle(.white)
+            //                        .frame(width: 36, height: 36)
+            //                        .background(Circle().fill(.blue))
+            //                        .glassIfAvailable(GlassConfiguration(style: .regular))
+            //                        .contentShape(Circle())
+            //                        .hoverEffect(.lift)
+            //                }
 
             NavigationLink {
                 PaletteDetailView(palette: palette)
@@ -99,7 +113,7 @@ struct PaletteRowHeaderView: View {
                     Text(palette.name)
                         .bold()
                         .padding()
-
+                    
                     Image(systemName: "chevron.right")
                         .imageScale(.small)
                         .foregroundStyle(.blue)
@@ -113,24 +127,9 @@ struct PaletteRowHeaderView: View {
                 .hoverEffect(.lift)
             }
             .buttonStyle(.plain)
-
-            Button {
-                HapticsManager.shared.selection()
-                isShowingColorEditor = true
-            } label: {
-                Image(systemName: "plus")
-                    .imageScale(.large)
-                    .bold()
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(.blue))
-                    .glassIfAvailable(GlassConfiguration(style: .regular))
-                    .contentShape(Circle())
-                    .hoverEffect(.lift)
-            }
-            .buttonStyle(.plain)
             }
         }
+        .padding(.horizontal)
         .alert("Delete \(palette.name)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
                 HapticsManager.shared.selection()

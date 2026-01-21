@@ -90,11 +90,12 @@ struct OnboardingView: View {
             title: "iCloud Sync",
             subtitle: "Your colors, palettes, and canvases follow you across Apple devices",
             features: [
+                OnboardingFeature(icon: "exclamationmark.icloud.fill", iconColor: .orange, text: "Requires available iCloud storage"),
                 OnboardingFeature(icon: "lock.shield.fill", iconColor: .green, text: "Private storage within iCloud"),
                 OnboardingFeature(icon: "iphone", iconColor: .blue, text: "Access on iPhone"),
                 OnboardingFeature(icon: "ipad", iconColor: .purple, text: "Access on iPad"),
                 OnboardingFeature(icon: "macbook", iconColor: .gray, text: "Access on Mac"),
-                OnboardingFeature(icon: "arrow.triangle.2.circlepath", iconColor: .orange, text: "Automatic sync")
+                OnboardingFeature(icon: "arrow.triangle.2.circlepath", iconColor: .cyan, text: "Automatic sync")
             ]
         )
     ]
