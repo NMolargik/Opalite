@@ -56,6 +56,11 @@ struct OpaliteApp: App {
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
         canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
 
+        #if os(iOS)
+        // Set up PhoneSessionManager with ColorManager for Watch sync
+        phoneSessionManager.colorManager = colorManager
+        #endif
+
         // Configure TipKit for user onboarding tips
         try? Tips.configure([
             .displayFrequency(.immediate),
@@ -74,25 +79,41 @@ struct OpaliteApp: App {
 
                         // Sync colors to widget storage for the widget extension
                         syncColorsToWidgetStorage()
+
+                        #if os(iOS)
+                        // Sync colors and palettes to Apple Watch
+                        phoneSessionManager.syncToWatch()
+                        #endif
                     }
 
                     #if os(iOS)
                     // Handle pending quick action when app becomes active
-                    if newPhase == .active, let shortcutType = AppDelegate.pendingShortcutType {
-                        AppDelegate.pendingShortcutType = nil
-                        if shortcutType == "OpenSwatchBarAction" {
-                            AppDelegate.openSwatchBarWindow()
-                        } else if shortcutType == "CreateNewColorAction" {
-                            quickActionManager.requestCreateNewColor()
+                    if newPhase == .active {
+                        // Process any pending hex copy from Watch
+                        if let copiedHex = phoneSessionManager.processPendingHexCopy() {
+                            toastManager.showSuccess("Copied \(copiedHex) from Watch")
+                        }
+
+                        if let shortcutType = AppDelegate.pendingShortcutType {
+                            AppDelegate.pendingShortcutType = nil
+                            if shortcutType == "OpenSwatchBarAction" {
+                                AppDelegate.openSwatchBarWindow()
+                            } else if shortcutType == "CreateNewColorAction" {
+                                quickActionManager.requestCreateNewColor()
+                            }
                         }
                     }
-
                     #endif
                 }
                 .task {
                     colorManager.author = userName
                     // Sync colors to widget on initial launch
                     syncColorsToWidgetStorage()
+
+                    #if os(iOS)
+                    // Sync colors and palettes to Apple Watch on launch
+                    phoneSessionManager.syncToWatch()
+                    #endif
                 }
                 .onChange(of: userName) { _, newName in
                     colorManager.author = newName
@@ -200,12 +221,14 @@ struct OpaliteApp: App {
                         openWindow(id: "main")
                     }
                     if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-                        do {
-                            let newPalette = try colorManager.createPalette(name: "New Palette")
-                            prependPaletteToOrder(newPalette.id)
-                            OpaliteTipActions.advanceTipsAfterContentCreation()
-                        } catch {
-                            toastManager.show(error: .paletteCreationFailed)
+                        withAnimation {
+                            do {
+                                let newPalette = try colorManager.createPalette(name: "New Palette")
+                                prependPaletteToOrder(newPalette.id)
+                                OpaliteTipActions.advanceTipsAfterContentCreation()
+                            } catch {
+                                toastManager.show(error: .paletteCreationFailed)
+                            }
                         }
                     } else {
                         quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")

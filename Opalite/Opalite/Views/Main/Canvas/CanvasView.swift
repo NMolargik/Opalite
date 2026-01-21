@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import PencilKit
+import UniformTypeIdentifiers
 
 struct CanvasView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
@@ -21,8 +22,6 @@ struct CanvasView: View {
     @State private var forceColorUpdate: UUID = UUID()
     @State private var appearTrigger: UUID = UUID()
     @State private var pendingShape: CanvasShape?
-    @State private var shapePreviewLocation: CGPoint?
-    @State private var shapeRotation: Angle = .zero
     @State private var editedTitle: String = ""
     @State private var showRenameTitleAlert: Bool = false
     @State private var showClearConfirmation: Bool = false
@@ -32,8 +31,15 @@ struct CanvasView: View {
 
     // Color sampling state
     @State private var isColorSamplingMode: Bool = false
-    @State private var colorSampleLocation: CGPoint?
-    @State private var sampledColor: OpaliteColor?
+
+    // SVG placement state
+    @State private var isShowingSVGImporter: Bool = false
+    @State private var pendingSVGPaths: [CGPath]?
+    @State private var pendingSVGBounds: CGRect?
+
+    // Export state
+    @State private var exportedImage: UIImage?
+    @State private var showShareSheet: Bool = false
 
     // Mac Catalyst custom tool picker state
     #if targetEnvironment(macCatalyst)
@@ -65,134 +71,51 @@ struct CanvasView: View {
                 externalTool: $externalTool
             )
 
-            // Shape placement overlay
+            // Shape placement overlay - isolated to prevent parent re-renders
             if let shape = pendingShape {
-                ZStack {
-                    Color.black.opacity(0.1)
-                        .ignoresSafeArea()
-
-                    // Shape preview at hover location
-                    if let location = shapePreviewLocation {
-                        ShapePreviewView(shape: shape)
-                            .rotationEffect(shapeRotation)
-                            .position(location)
-                            .allowsHitTesting(false)
+                ShapePlacementOverlay(
+                    shape: shape,
+                    onPlace: { location, rotation, scale, aspectRatio in
+                        placeShape(shape, at: location, rotation: rotation, scale: scale, aspectRatio: aspectRatio)
+                        pendingShape = nil
+                    },
+                    onCancel: {
+                        pendingShape = nil
                     }
-                }
-                .overlay(alignment: .top) {
-                    VStack(spacing: 8) {
-                        Text("Tap to place \(shape.displayName)")
-                            .font(.headline)
-                        if shapeRotation != .zero {
-                            Text("Rotation: \(Int(shapeRotation.degrees))°")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                    .padding(.top, 80)
-                }
-                .overlay {
-                    PencilHoverView(
-                        hoverLocation: $shapePreviewLocation,
-                        rollAngle: $shapeRotation,
-                        onTap: { location in
-                            placeShape(shape, at: location, rotation: shapeRotation)
-                            pendingShape = nil
-                            shapePreviewLocation = nil
-                            shapeRotation = .zero
-                        }
-                    )
-                }
+                )
             }
 
-            // Color sampling overlay
+            // SVG placement overlay
+            if let paths = pendingSVGPaths, let bounds = pendingSVGBounds {
+                SVGPlacementOverlay(
+                    paths: paths,
+                    svgBounds: bounds,
+                    onPlace: { location, rotation, scale in
+                        placeSVG(paths: paths, bounds: bounds, at: location, rotation: rotation, scale: scale)
+                        pendingSVGPaths = nil
+                        pendingSVGBounds = nil
+                    },
+                    onCancel: {
+                        pendingSVGPaths = nil
+                        pendingSVGBounds = nil
+                    }
+                )
+            }
+
+            // Color sampling overlay - isolated view for performance
             if isColorSamplingMode {
-                ZStack {
-                    Color.black.opacity(0.1)
-                        .ignoresSafeArea()
-
-                    // Color preview at hover location
-                    if let location = colorSampleLocation, let color = sampledColor {
-                        VStack(spacing: 8) {
-                            Circle()
-                                .fill(color.swiftUIColor)
-                                .frame(width: 60, height: 60)
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(.white, lineWidth: 3)
-                                )
-                                .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
-
-                            Text(color.hexString)
-                                .font(.caption.monospaced())
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(.ultraThinMaterial, in: Capsule())
-                        }
-                        .position(x: location.x, y: location.y - 60)
-                        .allowsHitTesting(false)
+                ColorSamplingOverlay(
+                    drawing: drawing,
+                    canvasSize: effectiveCanvasSize,
+                    canvasContentOffset: canvasContentOffset,
+                    canvasZoomScale: canvasZoomScale,
+                    onSave: { color in
+                        saveColorFromSample(color)
+                    },
+                    onCancel: {
+                        isColorSamplingMode = false
                     }
-                }
-                .overlay(alignment: .top) {
-                    VStack(spacing: 8) {
-                        Text("Tap to sample color")
-                            .font(.headline)
-                        Text("Touch and drag to preview colors")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                    .padding(.top, 80)
-                }
-                .overlay {
-                    colorSamplingGestureOverlay
-                }
-                .overlay(alignment: .bottom) {
-                    HStack(spacing: 16) {
-                        Button {
-                            HapticsManager.shared.selection()
-                            isColorSamplingMode = false
-                            colorSampleLocation = nil
-                            sampledColor = nil
-                        } label: {
-                            Text("Cancel")
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(.red, in: RoundedRectangle(cornerRadius: 12))
-                        }
-
-                        if let color = sampledColor {
-                            Button {
-                                HapticsManager.shared.impact()
-                                saveColorFromSample(color)
-                            } label: {
-                                HStack(spacing: 8) {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(color.swiftUIColor)
-                                        .frame(width: 24, height: 24)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .strokeBorder(.white.opacity(0.5), lineWidth: 1)
-                                        )
-                                    Text("Save Color")
-                                        .font(.headline)
-                                }
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(.blue, in: RoundedRectangle(cornerRadius: 12))
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    .padding(.bottom, 100)
-                }
+                )
             }
         }
         .environment(\.colorScheme, .light)
@@ -220,6 +143,8 @@ struct CanvasView: View {
             CanvasSwatchPickerView { color in
                 selectedInkColor = color.uiColor
                 forceColorUpdate = UUID()
+                // Force tool picker to reappear after selecting a swatch
+                showToolPickerTrigger = UUID()
                 #if targetEnvironment(macCatalyst)
                 // Update the selected tool color, switching from eraser to pen if needed
                 if let inkTool = selectedTool as? PKInkingTool {
@@ -290,9 +215,23 @@ struct CanvasView: View {
                     Section("Tools") {
                         Button {
                             HapticsManager.shared.impact()
+                            isShowingSVGImporter = true
+                        } label: {
+                            Label("Place SVG Shape", systemImage: "square.on.circle")
+                        }
+
+                        Button {
+                            HapticsManager.shared.impact()
                             isColorSamplingMode = true
                         } label: {
                             Label("Sample Color From Canvas", systemImage: "eyedropper")
+                        }
+
+                        Button {
+                            HapticsManager.shared.impact()
+                            exportCanvasAsImage()
+                        } label: {
+                            Label("Export as Image", systemImage: "square.and.arrow.up")
                         }
                     }
 
@@ -379,6 +318,20 @@ struct CanvasView: View {
         } message: {
             Text("Enter a new title for this canvas.")
         }
+        .fileImporter(
+            isPresented: $isShowingSVGImporter,
+            allowedContentTypes: [.svg],
+            allowsMultipleSelection: false
+        ) { result in
+            handleSVGImport(result)
+        }
+        .background {
+            ShareSheetPresenter(
+                image: exportedImage,
+                title: canvasFile.title,
+                isPresented: $showShareSheet
+            )
+        }
     }
 
     // MARK: - Title Editing
@@ -428,8 +381,10 @@ struct CanvasView: View {
     /// - Parameters:
     ///   - shape: The type of shape to place
     ///   - center: The tap location in view coordinates
-    ///   - rotation: Optional rotation angle from Apple Pencil roll
-    private func placeShape(_ shape: CanvasShape, at center: CGPoint, rotation: Angle = .zero) {
+    ///   - rotation: Optional rotation angle from Apple Pencil roll or two-finger gesture
+    ///   - scale: Optional scale factor from pinch gesture (1.0 = 100pt base size)
+    ///   - aspectRatio: Optional aspect ratio (width/height) for shapes that support non-uniform scaling
+    private func placeShape(_ shape: CanvasShape, at center: CGPoint, rotation: Angle = .zero, scale: CGFloat = 1.0, aspectRatio: CGFloat = 1.0) {
         // Transform from view coordinates to canvas content coordinates:
         // contentOffset is where the visible area starts in content space
         // center / zoomScale converts screen distance to content distance
@@ -438,12 +393,89 @@ struct CanvasView: View {
             y: canvasContentOffset.y + (center.y / canvasZoomScale)
         )
 
-        let shapeSize: CGFloat = 100
+        // Base size is 100pt, scale factor adjusts this
+        let shapeSize: CGFloat = 100 * scale
         let ink = PKInk(.pen, color: .black)
         let shapeGenerator = CanvasShapeGenerator()
 
         let newStrokes = shapeGenerator.generateStrokes(
             for: shape,
+            center: canvasCenter,
+            size: shapeSize,
+            ink: ink,
+            rotation: rotation,
+            aspectRatio: aspectRatio
+        )
+
+        guard !newStrokes.isEmpty else { return }
+
+        // Add strokes to existing drawing
+        var updatedDrawing = drawing
+        for stroke in newStrokes {
+            updatedDrawing.strokes.append(stroke)
+        }
+        drawing = updatedDrawing
+    }
+
+    // MARK: - SVG Placement
+
+    /// Handles the result of the SVG file importer
+    private func handleSVGImport(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+
+            // Gain security-scoped access
+            guard url.startAccessingSecurityScopedResource() else {
+                toastManager.show(message: "Unable to access the selected file.", style: .error)
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+
+            do {
+                let parser = SVGPathParser()
+                let parseResult = try parser.parse(from: url)
+
+                // Store paths and bounds for placement
+                pendingSVGPaths = parseResult.paths
+                pendingSVGBounds = parseResult.bounds
+
+                // Log any warnings
+                for warning in parseResult.warnings {
+                    print("[SVG Parser] \(warning)")
+                }
+            } catch {
+                toastManager.show(message: "Failed to parse SVG: \(error.localizedDescription)", style: .error)
+            }
+
+        case .failure(let error):
+            toastManager.show(message: "Failed to import SVG: \(error.localizedDescription)", style: .error)
+        }
+    }
+
+    /// Places an SVG shape on the canvas at the specified location.
+    ///
+    /// - Parameters:
+    ///   - paths: The CGPath objects from the parsed SVG
+    ///   - bounds: The bounds of the original SVG
+    ///   - center: The placement location in view coordinates
+    ///   - rotation: The rotation angle
+    ///   - scale: The scale factor
+    private func placeSVG(paths: [CGPath], bounds: CGRect, at center: CGPoint, rotation: Angle, scale: CGFloat) {
+        // Transform from view coordinates to canvas content coordinates
+        let canvasCenter = CGPoint(
+            x: canvasContentOffset.x + (center.x / canvasZoomScale),
+            y: canvasContentOffset.y + (center.y / canvasZoomScale)
+        )
+
+        // Base size is 100pt, scale factor adjusts this
+        let shapeSize: CGFloat = 100 * scale
+        let ink = PKInk(.pen, color: .black)
+        let shapeGenerator = CanvasShapeGenerator()
+
+        let newStrokes = shapeGenerator.generateSVGStrokes(
+            from: paths,
+            svgBounds: bounds,
             center: canvasCenter,
             size: shapeSize,
             ink: ink,
@@ -462,27 +494,221 @@ struct CanvasView: View {
 
     // MARK: - Color Sampling
 
-    /// Gesture overlay for sampling colors from the canvas
+    /// Saves the sampled color to the color manager
+    private func saveColorFromSample(_ color: OpaliteColor) {
+        do {
+            _ = try colorManager.createColor(existing: color)
+            toastManager.showSuccess("Color saved: \(color.hexString)")
+        } catch {
+            toastManager.show(error: .colorCreationFailed)
+        }
+
+        isColorSamplingMode = false
+    }
+
+    // MARK: - Export
+
+    /// Exports the canvas drawing as an image and presents the share sheet.
+    /// The image is cropped to fit the actual content with padding and has a white background.
+    private func exportCanvasAsImage() {
+        // Get the bounds of the actual drawing content
+        let contentBounds = drawing.bounds
+
+        // If the drawing is empty, show an error
+        guard !contentBounds.isEmpty else {
+            toastManager.show(message: "Canvas is empty.", style: .error)
+            return
+        }
+
+        // Add padding around the content
+        let padding: CGFloat = 40
+        let exportBounds = contentBounds.insetBy(dx: -padding, dy: -padding)
+
+        // Render the drawing
+        let scale = UIScreen.main.scale
+        let drawingImage = drawing.image(from: exportBounds, scale: scale)
+
+        // Create a new image with white background
+        let size = exportBounds.size
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let finalImage = renderer.image { context in
+            // Fill with white background
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+
+            // Draw the PencilKit content on top
+            drawingImage.draw(at: .zero)
+        }
+
+        exportedImage = finalImage
+        showShareSheet = true
+    }
+}
+
+// MARK: - Color Sampling Overlay
+
+/// Isolated view for color sampling to prevent parent re-renders during drag gestures.
+/// Caches the rendered drawing image for efficient pixel sampling.
+private struct ColorSamplingOverlay: View {
+    let drawing: PKDrawing
+    let canvasSize: CGSize?
+    let canvasContentOffset: CGPoint
+    let canvasZoomScale: CGFloat
+    let onSave: (OpaliteColor) -> Void
+    let onCancel: () -> Void
+
+    // Local state - isolated from parent
+    @State private var sampleLocation: CGPoint?
+    @State private var sampledColor: OpaliteColor?
+    @State private var cachedImage: UIImage?
+    @State private var viewHeight: CGFloat = 0
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.1)
+                .ignoresSafeArea()
+
+            // Color preview at hover location
+            if let location = sampleLocation, let color = sampledColor {
+                colorPreview(color: color, at: location)
+            }
+        }
+        .background(
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        viewHeight = geometry.size.height
+                    }
+                    .onChange(of: geometry.size.height) { _, newHeight in
+                        viewHeight = newHeight
+                    }
+            }
+        )
+        .overlay(alignment: .top) {
+            instructionsView
+        }
+        .overlay {
+            gestureOverlay
+        }
+        .overlay(alignment: .bottom) {
+            buttonsView
+        }
+        .onAppear {
+            cacheDrawingImage()
+        }
+    }
+
+    // MARK: - Subviews
+
     @ViewBuilder
-    private var colorSamplingGestureOverlay: some View {
-        GeometryReader { geometry in
+    private func colorPreview(color: OpaliteColor, at location: CGPoint) -> some View {
+        // If touching the top half, show preview below finger; otherwise show above
+        let isInTopHalf = location.y < viewHeight / 2
+        let previewOffset: CGFloat = isInTopHalf ? 140 : -140
+
+        VStack(spacing: 12) {
+            Circle()
+                .fill(color.swiftUIColor)
+                .frame(width: 180, height: 180)
+                .overlay(
+                    Circle()
+                        .strokeBorder(.white, lineWidth: 4)
+                )
+                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+
+            Text(color.hexString)
+                .font(.headline.monospaced())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+        }
+        .position(x: location.x, y: location.y + previewOffset)
+        .allowsHitTesting(false)
+    }
+
+    private var instructionsView: some View {
+        VStack(spacing: 8) {
+            Text("Tap to sample color")
+                .font(.headline)
+            Text("Touch and drag to preview colors")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .padding(.top, 80)
+    }
+
+    private var gestureOverlay: some View {
+        GeometryReader { _ in
             Color.clear
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
-                            sampleColorAt(value.location, in: geometry.size)
+                            sampleColorAt(value.location)
                         }
                         .onEnded { value in
-                            sampleColorAt(value.location, in: geometry.size)
+                            sampleColorAt(value.location)
                         }
                 )
         }
     }
 
-    /// Samples the color at the given view location
-    private func sampleColorAt(_ location: CGPoint, in viewSize: CGSize) {
-        colorSampleLocation = location
+    private var buttonsView: some View {
+        HStack(spacing: 16) {
+            Button {
+                HapticsManager.shared.selection()
+                onCancel()
+            } label: {
+                Text("Cancel")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(.red, in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            if let color = sampledColor {
+                Button {
+                    HapticsManager.shared.impact()
+                    onSave(color)
+                } label: {
+                    HStack(spacing: 8) {
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(color.swiftUIColor)
+                            .frame(width: 24, height: 24)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .strokeBorder(.white.opacity(0.5), lineWidth: 1)
+                            )
+                        Text("Save Color")
+                            .font(.headline)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(.blue, in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(.bottom, 100)
+    }
+
+    // MARK: - Color Sampling Logic
+
+    /// Caches the drawing as an image once when overlay appears
+    private func cacheDrawingImage() {
+        guard let canvasSize else { return }
+        let bounds = CGRect(origin: .zero, size: canvasSize)
+        cachedImage = drawing.image(from: bounds, scale: 1.0)
+    }
+
+    /// Samples color from the cached image at the given view location
+    private func sampleColorAt(_ location: CGPoint) {
+        sampleLocation = location
 
         // Transform view coordinates to canvas content coordinates
         let canvasPoint = CGPoint(
@@ -490,26 +716,25 @@ struct CanvasView: View {
             y: canvasContentOffset.y + (location.y / canvasZoomScale)
         )
 
-        // Render the drawing to an image with white background
-        guard let canvasSize = effectiveCanvasSize else {
-            // Fall back to white if no canvas size
+        guard let canvasSize, let image = cachedImage else {
             sampledColor = OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
             return
         }
 
-        // Create image from drawing with white background
-        let bounds = CGRect(origin: .zero, size: canvasSize)
-        let scale: CGFloat = 1.0
-
-        // Render drawing to image
-        let drawingImage = drawing.image(from: bounds, scale: scale)
-
-        // Sample the color from the rendered image
-        if let color = samplePixelColor(from: drawingImage, at: canvasPoint, canvasSize: canvasSize) {
+        if let color = samplePixelColor(from: image, at: canvasPoint, canvasSize: canvasSize) {
+            // Only trigger haptic if color changed significantly
+            if let previous = sampledColor {
+                let colorChanged = abs(color.red - previous.red) > 0.05 ||
+                                   abs(color.green - previous.green) > 0.05 ||
+                                   abs(color.blue - previous.blue) > 0.05
+                if colorChanged {
+                    HapticsManager.shared.selection()
+                }
+            } else {
+                HapticsManager.shared.selection()
+            }
             sampledColor = color
-            HapticsManager.shared.selection()
         } else {
-            // Default to white (canvas background) if sampling fails
             sampledColor = OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
         }
     }
@@ -519,7 +744,7 @@ struct CanvasView: View {
         // Ensure point is within bounds
         guard point.x >= 0 && point.x < canvasSize.width &&
               point.y >= 0 && point.y < canvasSize.height else {
-            return OpaliteColor(name: nil, red: 1, green: 1, blue: 1) // White for out of bounds
+            return OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
         }
 
         guard let cgImage = image.cgImage else { return nil }
@@ -531,14 +756,11 @@ struct CanvasView: View {
         let pixelX = Int(point.x * CGFloat(width) / canvasSize.width)
         let pixelY = Int(point.y * CGFloat(height) / canvasSize.height)
 
-        // Ensure pixel is within image bounds
         guard pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height else {
             return OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
         }
 
         // Create a 1x1 bitmap context to sample the pixel
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel
         var pixelData = [UInt8](repeating: 0, count: 4)
 
         guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
@@ -547,7 +769,7 @@ struct CanvasView: View {
                 width: 1,
                 height: 1,
                 bitsPerComponent: 8,
-                bytesPerRow: bytesPerRow,
+                bytesPerRow: 4,
                 space: colorSpace,
                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
               ) else {
@@ -574,9 +796,7 @@ struct CanvasView: View {
             blue = Double(b / a)
         } else {
             // Transparent pixel - return white (canvas background)
-            red = 1.0
-            green = 1.0
-            blue = 1.0
+            return OpaliteColor(name: nil, red: 1, green: 1, blue: 1)
         }
 
         return OpaliteColor(
@@ -585,20 +805,6 @@ struct CanvasView: View {
             green: min(1, green),
             blue: min(1, blue)
         )
-    }
-
-    /// Saves the sampled color to the color manager
-    private func saveColorFromSample(_ color: OpaliteColor) {
-        do {
-            _ = try colorManager.createColor(existing: color)
-            toastManager.showSuccess("Color saved: \(color.hexString)")
-        } catch {
-            toastManager.show(error: .colorCreationFailed)
-        }
-
-        isColorSamplingMode = false
-        colorSampleLocation = nil
-        sampledColor = nil
     }
 }
 

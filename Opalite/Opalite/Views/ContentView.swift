@@ -60,7 +60,6 @@ struct ContentView: View {
                 .id("splash")
                 .transition(leadingTransition)
                 .zIndex(1)
-                .preferredColorScheme(.dark)
                 .accessibilityIdentifier("splashView")
             case .onboarding:
                 OnboardingView(

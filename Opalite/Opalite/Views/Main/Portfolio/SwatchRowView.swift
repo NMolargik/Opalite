@@ -99,6 +99,7 @@ struct SwatchRowView: View {
                     Spacer()
                 }
                 .padding(.leading, 35)
+                .padding(.top, 5)
             } else {
                 ScrollView(.horizontal) {
                     HStack(spacing: 12) {

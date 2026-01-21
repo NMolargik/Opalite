@@ -1,13 +1,13 @@
 //
-//  SwatchBarInfoSheet.swift
+//  WatchAppInfoSheet.swift
 //  Opalite
 //
-//  Created by Nick Molargik on 12/26/25.
+//  Created by Nick Molargik on 1/21/26.
 //
 
 import SwiftUI
 
-struct SwatchBarInfoSheet: View {
+struct WatchAppInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @State private var appearAnimation = false
@@ -17,11 +17,10 @@ struct SwatchBarInfoSheet: View {
             VStack(spacing: 0) {
                 // Header with gradient background
                 ZStack {
-                    // Gradient background
                     LinearGradient(
                         colors: [
-                            .purple.opacity(0.8),
-                            .purple.opacity(0.4),
+                            .blue.opacity(0.8),
+                            .blue.opacity(0.4),
                             .clear
                         ],
                         startPoint: .top,
@@ -33,30 +32,29 @@ struct SwatchBarInfoSheet: View {
                     VStack(spacing: 16) {
                         // Icon with glow
                         ZStack {
-                            // Glow effect
-                            Image(systemName: "square.stack.fill")
+                            Image(systemName: "applewatch")
                                 .font(.system(size: 70))
-                                .foregroundStyle(.purple)
+                                .foregroundStyle(.blue)
                                 .blur(radius: 20)
                                 .opacity(0.6)
 
-                            Image(systemName: "square.stack.fill")
+                            Image(systemName: "applewatch")
                                 .font(.system(size: 70))
                                 .foregroundStyle(.white)
-                                .shadow(color: .purple.opacity(0.5), radius: 10)
+                                .shadow(color: .blue.opacity(0.5), radius: 10)
                         }
                         .scaleEffect(appearAnimation ? 1 : 0.5)
                         .opacity(appearAnimation ? 1 : 0)
                         .accessibilityHidden(true)
 
-                        Text("SwatchBar")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                        Text("Opalite for Apple Watch")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(.inverseTheme)
                             .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
                             .opacity(appearAnimation ? 1 : 0)
                             .offset(y: appearAnimation ? 0 : 10)
 
-                        Text("Your colors, always within reach")
+                        Text("Your colors, on your wrist")
                             .font(.subheadline)
                             .foregroundStyle(.inverseTheme)
                             .opacity(appearAnimation ? 1 : 0)
@@ -85,50 +83,50 @@ struct SwatchBarInfoSheet: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 24)
 
-                // Launch button
-                Button {
-                    HapticsManager.shared.impact(.medium)
-                    AppDelegate.openSwatchBarWindow()
-                    dismiss()
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "arrow.up.forward.square")
-                            .font(.headline)
-                        Text("Launch SwatchBar")
-                            .font(.headline)
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [.purple, .purple.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        in: RoundedRectangle(cornerRadius: 14)
-                    )
-                    .shadow(color: .purple.opacity(0.4), radius: 8, y: 4)
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 28)
-                .opacity(appearAnimation ? 1 : 0)
-                .scaleEffect(appearAnimation ? 1 : 0.9)
-                .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.5), value: appearAnimation)
+                // How it works section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("How Syncing Works")
+                        .font(.headline)
+                        .padding(.horizontal, 20)
 
-                // Cancel link
+                    VStack(spacing: 8) {
+                        syncInfoRow(
+                            number: "1",
+                            text: "Colors and palettes sync automatically when your iPhone app is active"
+                        )
+                        syncInfoRow(
+                            number: "2",
+                            text: "Your Watch requests the latest data when the Watch app opens"
+                        )
+                        syncInfoRow(
+                            number: "3",
+                            text: "Pull to refresh on the Watch to manually sync anytime"
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.top, 24)
+                .opacity(appearAnimation ? 1 : 0)
+                .animation(.easeOut.delay(0.5), value: appearAnimation)
+
+                // Done button
                 Button {
                     HapticsManager.shared.selection()
                     dismiss()
                 } label: {
-                    Text("Not now")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Text("Got It")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(.blue, in: RoundedRectangle(cornerRadius: 14))
                 }
-                .padding(.top, 16)
+                .padding(.horizontal, 20)
+                .padding(.top, 28)
                 .padding(.bottom, 30)
                 .opacity(appearAnimation ? 1 : 0)
-                .animation(.easeOut.delay(0.6), value: appearAnimation)
+                .scaleEffect(appearAnimation ? 1 : 0.9)
+                .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.6), value: appearAnimation)
             }
         }
         .background(colorScheme == .dark ? Color.black : Color(.systemGroupedBackground))
@@ -145,24 +143,24 @@ struct SwatchBarInfoSheet: View {
     private var features: [(icon: String, title: String, description: String)] {
         [
             (
-                icon: "rectangle.on.rectangle",
-                title: "Minimal Footprint",
-                description: "A compact window for fast color reference. Resize it as narrow as you need."
+                icon: "paintpalette.fill",
+                title: "Browse Your Colors",
+                description: "Access all your colors and palettes right from your wrist."
             ),
             (
                 icon: "doc.on.clipboard",
-                title: "Quick Copy",
-                description: "Tap any swatch to instantly copy its hex value to your clipboard."
+                title: "Copy Hex Codes",
+                description: "Tap any color to copy its hex code to your iPhone's clipboard."
             ),
             (
-                icon: "eyedropper.halffull",
-                title: "Color Sampling",
-                description: "Use any app's color picker to sample directly from SwatchBar."
+                icon: "arrow.triangle.2.circlepath",
+                title: "Automatic Sync",
+                description: "Colors sync directly from your iPhone for fast, reliable access."
             ),
             (
-                icon: "macwindow.on.rectangle",
-                title: "Always Accessible",
-                description: "Position it anywhere on screen while you work in other apps."
+                icon: "iphone.and.arrow.forward",
+                title: "Works Offline",
+                description: "Once synced, your colors are cached on the Watch for offline use."
             )
         ]
     }
@@ -174,12 +172,12 @@ struct SwatchBarInfoSheet: View {
         HStack(alignment: .top, spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(.purple.opacity(0.15))
+                    .fill(.blue.opacity(0.15))
                     .frame(width: 44, height: 44)
 
                 Image(systemName: icon)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.purple)
+                    .foregroundStyle(.blue)
             }
             .accessibilityHidden(true)
 
@@ -203,8 +201,29 @@ struct SwatchBarInfoSheet: View {
                 .shadow(color: .black.opacity(colorScheme == .dark ? 0.3 : 0.06), radius: 8, y: 2)
         )
     }
+
+    // MARK: - Sync Info Row
+
+    @ViewBuilder
+    private func syncInfoRow(number: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(number)
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(.blue))
+
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
 }
 
 #Preview {
-    SwatchBarInfoSheet()
+    WatchAppInfoSheet()
 }

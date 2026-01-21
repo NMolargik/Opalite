@@ -110,12 +110,12 @@ final class SubscriptionManager {
     /// Restores previously purchased subscriptions.
     func restorePurchases() async {
         isLoading = true
+        error = nil  // Clear any previous error
         defer { isLoading = false }
 
         do {
             try await AppStore.sync()
             await updatePurchasedProducts()
-            error = nil
         } catch {
             self.error = .subscriptionRestoreFailed
         }

@@ -398,7 +398,7 @@ struct SwatchView: View {
                 } label: {
                     Image(systemName: showCopiedFeedback ? "checkmark" : "ellipsis")
                         .imageScale(.large)
-                        .foregroundStyle(displayColor.idealTextColor())
+                        .foregroundStyle(showCopiedFeedback ? .green : displayColor.idealTextColor())
                         .frame(width: 8, height: 8)
                         .padding(12)
                         .background(

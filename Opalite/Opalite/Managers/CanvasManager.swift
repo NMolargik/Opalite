@@ -96,10 +96,36 @@ final class CanvasManager {
     ///
     /// Called automatically after mutations. In case of fetch errors,
     /// the cache is cleared to prevent stale data.
+    ///
+    /// This method also deduplicates canvases that may have been created
+    /// during iCloud sync race conditions (same UUID appearing twice).
     private func reloadCache() {
         do {
             let descriptor = FetchDescriptor<CanvasFile>(sortBy: canvasSort)
-            self.canvases = try context.fetch(descriptor)
+            let fetched = try context.fetch(descriptor)
+
+            // Deduplicate by ID (keep most recently updated)
+            // This handles race conditions during iCloud sync where the same
+            // canvas may arrive as two separate SwiftData objects
+            var seenIDs: [UUID: CanvasFile] = [:]
+            for canvas in fetched {
+                if let existing = seenIDs[canvas.id] {
+                    // Keep the more recently updated one, delete the older
+                    let older = canvas.updatedAt > existing.updatedAt ? existing : canvas
+                    context.delete(older)
+                    seenIDs[canvas.id] = canvas.updatedAt > existing.updatedAt ? canvas : existing
+                } else {
+                    seenIDs[canvas.id] = canvas
+                }
+            }
+
+            // Save if we deleted any duplicates
+            if context.hasChanges {
+                try context.save()
+            }
+
+            // Sort by most recently updated
+            self.canvases = Array(seenIDs.values).sorted { $0.updatedAt > $1.updatedAt }
         } catch {
             #if DEBUG
             print("[CanvasManager] reloadCache error: \(error)")

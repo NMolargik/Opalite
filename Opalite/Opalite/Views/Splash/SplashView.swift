@@ -16,15 +16,28 @@ struct SplashView: View {
     @State private var showContent: Bool = false
     @State private var showButton: Bool = false
     @State private var pulse: Bool = false
+    @State private var glowRotation: Double = 0
+    @State private var startAnimations: Bool = false  // Delay heavy animations
 
     // Generate row configurations once
-    private let rowConfigs: [SwatchRowConfig] = (0..<7).map { index in
-        SwatchRowConfig(
-            colors: generateRowColors(seed: index),
-            scrollsRight: Bool.random(),
-            speed: Double.random(in: 18...35),
-            swatchHeight: CGFloat.random(in: 60...90)
-        )
+    private static let rowConfigs: [SwatchRowConfig] = makeRowConfigs()
+
+    private static func makeRowConfigs() -> [SwatchRowConfig] {
+        var result: [SwatchRowConfig] = []
+        for index in 0..<7 {
+            let colors: [OpaliteColor] = generateRowColors(seed: index)
+            let scrollsRight: Bool = index.isMultiple(of: 2)
+            let speed: Double = Double(18 + (index * 3))
+            let swatchHeight: CGFloat = CGFloat(60 + (index % 3) * 15)
+            let config = SwatchRowConfig(
+                colors: colors,
+                scrollsRight: scrollsRight,
+                speed: speed,
+                swatchHeight: swatchHeight
+            )
+            result.append(config)
+        }
+        return result
     }
 
     var body: some View {
@@ -33,15 +46,15 @@ struct SplashView: View {
                 // Background
                 Color.black.ignoresSafeArea()
 
-                // Scrolling swatch rows
+                // Scrolling swatch rows - delayed start for performance
                 VStack(spacing: 12) {
-                    ForEach(Array(rowConfigs.enumerated()), id: \.offset) { _, config in
+                    ForEach(Array(Self.rowConfigs.enumerated()), id: \.offset) { _, config in
                         InfiniteSwatchRow(
                             colors: config.colors,
                             scrollsRight: config.scrollsRight,
                             speed: config.speed,
                             swatchHeight: config.swatchHeight,
-                            isAnimating: hasAppeared
+                            isAnimating: startAnimations
                         )
                         .frame(height: config.swatchHeight)
                     }
@@ -63,19 +76,16 @@ struct SplashView: View {
 
                     // App icon / logo area
                     ZStack {
-                        // Glow
-                        RoundedRectangle(cornerRadius: 32, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [.purple, .blue, .green, .yellow, .red],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 200, height: 200)
-                            .blur(radius: 40)
-                            .opacity(showContent ? 0.8 : 0)
-                            .accessibilityHidden(true)
+                        // Rotating rainbow glow - opal shimmer effect
+                        AngularGradient(
+                            colors: [.purple, .blue, .cyan, .green, .yellow, .orange, .red, .purple],
+                            center: .center,
+                            angle: .degrees(glowRotation)
+                        )
+                        .frame(width: 220, height: 220)
+                        .blur(radius: 50)
+                        .opacity(showContent ? 0.85 : 0)
+                        .accessibilityHidden(true)
 
                         // Gem icon
                         Image("gemstone")
@@ -93,13 +103,7 @@ struct SplashView: View {
                     VStack(spacing: 12) {
                         Text("Opalite")
                             .font(.system(size: 48, weight: .bold, design: .rounded))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.white, .white.opacity(0.9)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
+                            .foregroundStyle(.white)
                             .accessibilityAddTraits(.isHeader)
 
                         Text("Color management for all")
@@ -161,109 +165,124 @@ struct SplashView: View {
             }
         }
         .onAppear {
-            // Start scrolling animation
-            withAnimation(.easeOut(duration: 0.8)) {
+            // Fade in the static background first
+            withAnimation(.easeOut(duration: 0.6)) {
                 hasAppeared = true
             }
 
+            // Delay heavy swatch animations to avoid launch stutter
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                startAnimations = true
+            }
+
             // Show content with delay
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.4)) {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.3)) {
                 showContent = true
             }
 
             // Show button last
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.75).delay(0.8)) {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.75).delay(0.7)) {
                 showButton = true
             }
 
-            // Start pulsing the gemstone once content is shown
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            // Start pulsing the gemstone and rotating glow
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 pulse = true
+
+                // Continuous glow rotation
+                withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
+                    glowRotation = 360
+                }
             }
         }
     }
 
-    // Generate diverse colors for a row with wide variety
+    // Generate colors for a row with theme based on row index
     private static func generateRowColors(seed: Int) -> [OpaliteColor] {
         var colors: [OpaliteColor] = []
 
-        for _ in 0..<12 {
-            let color = generateRandomColor()
+        // Each row gets a different color theme for variety
+        let theme = RowColorTheme(rawValue: seed % RowColorTheme.allCases.count) ?? .vibrant
+
+        for i in 0..<16 {
+            let color = generateThemedColor(theme: theme, index: i)
             colors.append(color)
         }
 
         return colors.shuffled()
     }
 
-    private static func generateRandomColor() -> OpaliteColor {
-        // Pick a random color style
-        let style = Int.random(in: 0..<10)
+    private enum RowColorTheme: Int, CaseIterable {
+        case vibrant      // Bright, saturated rainbow
+        case pastel       // Soft, light colors
+        case warm         // Reds, oranges, yellows
+        case cool         // Blues, greens, purples
+        case earth        // Browns, tans, olives
+        case jewel        // Deep, rich gemstone colors
+        case neutral      // Grays and muted tones
+    }
 
-        switch style {
-        case 0:
-            // Neon / Electric - high saturation, high brightness
-            let hue = Double.random(in: 0...1)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.9...1.0), b: Double.random(in: 0.95...1.0))
+    private static func generateThemedColor(theme: RowColorTheme, index: Int) -> OpaliteColor {
+        // Use index to spread hues evenly, with some randomness
+        let baseHue = Double(index) / 16.0
+        let hueVariation = Double.random(in: -0.05...0.05)
+
+        switch theme {
+        case .vibrant:
+            // Full spectrum, high saturation
+            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
+            let (r, g, b) = hsbToRGB(h: abs(hue), s: Double.random(in: 0.75...1.0), b: Double.random(in: 0.85...1.0))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        case 1:
-            // Pastel / Light - low saturation, high brightness
-            let hue = Double.random(in: 0...1)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.15...0.35), b: Double.random(in: 0.9...1.0))
+        case .pastel:
+            // Full spectrum, low saturation, high brightness
+            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
+            let (r, g, b) = hsbToRGB(h: abs(hue), s: Double.random(in: 0.2...0.4), b: Double.random(in: 0.9...1.0))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        case 2:
-            // Dark / Deep - high saturation, low brightness
-            let hue = Double.random(in: 0...1)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.6...0.9), b: Double.random(in: 0.25...0.45))
+        case .warm:
+            // Reds, oranges, yellows (hue 0.0 - 0.15)
+            let hue = Double.random(in: 0.0...0.12)
+            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.6...1.0), b: Double.random(in: 0.7...1.0))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        case 3:
-            // Earth tones - browns, tans, olives
-            let earthHues: [Double] = [0.05, 0.08, 0.1, 0.12, 0.15, 0.25, 0.3] // oranges, yellows, greens
-            let hue = earthHues.randomElement()!
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.3...0.6), b: Double.random(in: 0.3...0.6))
+        case .cool:
+            // Blues, teals, purples (hue 0.5 - 0.85)
+            let hue = Double.random(in: 0.5...0.85)
+            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.5...0.9), b: Double.random(in: 0.6...1.0))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        case 4:
-            // Jewel tones - rich, deep saturated colors
-            let jewelHues: [Double] = [0.0, 0.08, 0.45, 0.55, 0.75, 0.85] // ruby, amber, emerald, teal, amethyst, magenta
-            let hue = jewelHues.randomElement()!
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.7...0.9), b: Double.random(in: 0.5...0.7))
+        case .earth:
+            // Browns, tans, olives, greens
+            let earthHues: [Double] = [0.05, 0.08, 0.1, 0.12, 0.2, 0.25, 0.3, 0.35]
+            let hue = earthHues[index % earthHues.count]
+            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.3...0.7), b: Double.random(in: 0.25...0.65))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        case 5:
-            // Grayscale - pure neutrals
-            let gray = Double.random(in: 0.1...0.9)
-            return OpaliteColor(red: gray, green: gray, blue: gray, alpha: 1.0)
-
-        case 6:
-            // Warm neutrals - off-whites, creams, taupes
-            let base = Double.random(in: 0.7...0.95)
-            let r = base
-            let g = base - Double.random(in: 0.02...0.08)
-            let b = base - Double.random(in: 0.05...0.15)
-            return OpaliteColor(red: r, green: max(0, g), blue: max(0, b), alpha: 1.0)
-
-        case 7:
-            // Cool neutrals - blue-grays, slate
-            let base = Double.random(in: 0.3...0.7)
-            let r = base - Double.random(in: 0.02...0.08)
-            let g = base
-            let b = base + Double.random(in: 0.02...0.1)
-            return OpaliteColor(red: max(0, r), green: g, blue: min(1, b), alpha: 1.0)
-
-        case 8:
-            // Muted / Dusty - medium saturation, medium brightness
-            let hue = Double.random(in: 0...1)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.25...0.45), b: Double.random(in: 0.5...0.7))
+        case .jewel:
+            // Deep, rich colors - ruby, emerald, sapphire, amethyst
+            let jewelHues: [Double] = [0.0, 0.08, 0.33, 0.45, 0.55, 0.65, 0.75, 0.85]
+            let hue = jewelHues[index % jewelHues.count]
+            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.7...0.95), b: Double.random(in: 0.4...0.7))
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
 
-        default:
-            // Vivid / Standard - good saturation and brightness
-            let hue = Double.random(in: 0...1)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.6...0.85), b: Double.random(in: 0.7...0.9))
-            return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
+        case .neutral:
+            // Grays, warm grays, cool grays
+            let style = index % 3
+            switch style {
+            case 0:
+                // Pure gray
+                let gray = Double.random(in: 0.2...0.85)
+                return OpaliteColor(red: gray, green: gray, blue: gray, alpha: 1.0)
+            case 1:
+                // Warm gray
+                let base = Double.random(in: 0.3...0.8)
+                return OpaliteColor(red: base + 0.05, green: base, blue: base - 0.05, alpha: 1.0)
+            default:
+                // Cool gray
+                let base = Double.random(in: 0.3...0.8)
+                return OpaliteColor(red: base - 0.03, green: base, blue: base + 0.06, alpha: 1.0)
+            }
         }
     }
 
@@ -306,7 +325,7 @@ private struct InfiniteSwatchRow: View {
     let isAnimating: Bool
 
     // Calculate dimensions
-    private var swatchWidth: CGFloat { swatchHeight * 1.3 }
+    private var swatchWidth: CGFloat { swatchHeight }
     private var spacing: CGFloat { 12 }
     private var setWidth: CGFloat {
         CGFloat(colors.count) * (swatchWidth + spacing)
@@ -319,37 +338,55 @@ private struct InfiniteSwatchRow: View {
             // We need enough sets to cover screen + buffer on both sides
             let setsNeeded = Int(ceil(screenWidth / setWidth)) + 3
 
-            TimelineView(.animation) { context in
-                // Calculate offset based on elapsed time
-                let elapsed = context.date.timeIntervalSinceReferenceDate
-                let pixelsPerSecond = setWidth / speed
-                let totalOffset = elapsed * pixelsPerSecond
+            if isAnimating {
+                // Animated version with TimelineView
+                TimelineView(.animation) { context in
+                    let elapsed = context.date.timeIntervalSinceReferenceDate
+                    let pixelsPerSecond = setWidth / speed
+                    let totalOffset = elapsed * pixelsPerSecond
 
-                // Use modulo to create seamless loop
-                let normalizedOffset = totalOffset.truncatingRemainder(dividingBy: Double(setWidth))
-                let offset: CGFloat = scrollsRight
-                    ? CGFloat(normalizedOffset) - setWidth
-                    : -CGFloat(normalizedOffset)
+                    let normalizedOffset = totalOffset.truncatingRemainder(dividingBy: Double(setWidth))
+                    let offset: CGFloat = scrollsRight
+                        ? CGFloat(normalizedOffset) - setWidth
+                        : -CGFloat(normalizedOffset)
 
-                HStack(spacing: spacing) {
-                    ForEach(0..<setsNeeded, id: \.self) { _ in
-                        HStack(spacing: spacing) {
-                            ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
-                                SwatchView(
-                                    color: color,
-                                    width: swatchWidth,
-                                    height: swatchHeight,
-                                    badgeText: "",
-                                    showOverlays: false
-                                )
-                            }
-                        }
-                    }
+                    rowContent(setsNeeded: setsNeeded)
+                        .offset(x: offset)
                 }
-                .offset(x: offset)
+            } else {
+                // Static version for initial render - no expensive TimelineView
+                rowContent(setsNeeded: setsNeeded)
             }
         }
-        .clipped()
+        // Use contentShape to define hit area without clipping visuals
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private func rowContent(setsNeeded: Int) -> some View {
+        // Use LazyHStack for better performance with many swatches
+        LazyHStack(spacing: spacing) {
+            ForEach(0..<setsNeeded, id: \.self) { setIndex in
+                ForEach(Array(colors.enumerated()), id: \.offset) { colorIndex, color in
+                    SimpleSwatch(color: color, size: swatchHeight)
+                        .id("\(setIndex)-\(colorIndex)")
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Simple Swatch (Lightweight for Splash)
+
+/// Lightweight swatch for splash screen - avoids full SwatchView overhead
+private struct SimpleSwatch: View {
+    let color: OpaliteColor
+    let size: CGFloat
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: size * 0.2, style: .continuous)
+            .fill(Color(red: color.red, green: color.green, blue: color.blue))
+            .frame(width: size, height: size)
     }
 }
 

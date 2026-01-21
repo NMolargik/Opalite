@@ -20,6 +20,7 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
+    @AppStorage(AppStorageKeys.appIcon) private var appIconRaw: String = AppIconOption.dark.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
@@ -29,6 +30,7 @@ struct SettingsView: View {
     @State private var isShowingInsertSamplesAlert: Bool = false
     @State private var isShowingPaywall: Bool = false
     @State private var isRestoringPurchases: Bool = false
+    @State private var isShowingWatchAppInfo: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL?
     @State private var isShowingExportSelection: Bool = false
@@ -74,63 +76,28 @@ struct SettingsView: View {
                         Label("App Theme", systemImage: "circle.lefthalf.filled")
                             .foregroundStyle(.primary)
                     }
-                }
 
-                Section {
-                    Picker(selection: Binding<ColorBlindnessMode>(
-                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
-                        set: { colorBlindnessModeRaw = $0.rawValue }
-                    )) {
-                        ForEach(ColorBlindnessMode.allCases) { option in
-                            Text(option.title).tag(option)
+                    #if canImport(UIKit) && !os(visionOS)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("App Icon", systemImage: "app")
+                            .foregroundStyle(.primary)
+
+                        Picker("App Icon", selection: Binding<AppIconOption>(
+                            get: { AppIconOption(rawValue: appIconRaw) ?? .dark },
+                            set: { newValue in
+                                appIconRaw = newValue.rawValue
+                                setAppIcon(newValue)
+                            }
+                        )) {
+                            ForEach(AppIconOption.allCases) { option in
+                                Text(option.title).tag(option)
+                            }
                         }
-                    } label: {
-                        Label("Color Vision", systemImage: "eye")
-                            .foregroundStyle(.primary)
+                        .pickerStyle(.segmented)
                     }
-                } header: {
-                    Text("Accessibility")
-                } footer: {
-                    Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
+                    #endif
                 }
-
-                Section {
-                    Toggle(isOn: $includeHexPrefix) {
-                        Label("Include # in Copied Codes", systemImage: "number")
-                            .foregroundStyle(.primary)
-                    }
-                } header: {
-                    Text("Copying")
-                } footer: {
-                    Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
-                }
-
-                #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom != .phone {
-                    Section {
-                        Toggle(isOn: $skipSwatchBarConfirmation) {
-                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                                .foregroundStyle(.primary)
-                        }
-                    } header: {
-                        Text("SwatchBar")
-                    } footer: {
-                        Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
-                    }
-                }
-                #else
-                Section {
-                    Toggle(isOn: $skipSwatchBarConfirmation) {
-                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                            .foregroundStyle(.primary)
-                    }
-                } header: {
-                    Text("SwatchBar")
-                } footer: {
-                    Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
-                }
-                #endif
-
+                
                 Section {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
@@ -200,6 +167,140 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Picker(selection: Binding<ColorBlindnessMode>(
+                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
+                        set: { colorBlindnessModeRaw = $0.rawValue }
+                    )) {
+                        ForEach(ColorBlindnessMode.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    } label: {
+                        Label("Color Vision", systemImage: "eye")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("Accessibility")
+                } footer: {
+                    Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
+                }
+
+                Section {
+                    Toggle(isOn: $includeHexPrefix) {
+                        Label("Include # in Copied Codes", systemImage: "number")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("Copying")
+                } footer: {
+                    Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
+                }
+
+                #if os(iOS)
+                // Apple Watch section - iPhone only
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    Section {
+                        // Sync status
+                        HStack {
+                            Label("Watch Paired", systemImage: "applewatch")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if PhoneSessionManager.shared.isPaired {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                            } else {
+                                Text("No")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        if PhoneSessionManager.shared.isPaired {
+                            HStack {
+                                Label("Watch App Installed", systemImage: "app.badge.checkmark")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if PhoneSessionManager.shared.isWatchAppInstalled {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                } else {
+                                    Text("No")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+
+                        if PhoneSessionManager.shared.isWatchAppInstalled {
+                            if let lastSync = PhoneSessionManager.shared.lastSyncToWatch {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
+                                            .foregroundStyle(.primary)
+                                        Spacer()
+                                        Text(lastSync, style: .relative)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Text("\(PhoneSessionManager.shared.lastSyncColorCount) colors, \(PhoneSessionManager.shared.lastSyncPaletteCount) palettes")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            } else {
+                                HStack {
+                                    Label("Last Synced", systemImage: "arrow.triangle.2.circlepath")
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    Text("Never")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+
+                        Button {
+                            HapticsManager.shared.selection()
+                            isShowingWatchAppInfo = true
+                        } label: {
+                            Label("About the Watch App", systemImage: "info.circle")
+                                .foregroundStyle(.blue)
+                        }
+                    } header: {
+                        Text("Apple Watch")
+                    } footer: {
+                        if PhoneSessionManager.shared.isPaired && PhoneSessionManager.shared.isWatchAppInstalled {
+                            Text("Colors and palettes sync automatically when the app is active.")
+                        } else if PhoneSessionManager.shared.isPaired {
+                            Text("Install the Opalite Watch app from the Watch app on your iPhone.")
+                        } else {
+                            Text("Pair an Apple Watch to sync your colors to your wrist.")
+                        }
+                    }
+                }
+                #endif
+
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom != .phone {
+                    Section {
+                        Toggle(isOn: $skipSwatchBarConfirmation) {
+                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                                .foregroundStyle(.primary)
+                        }
+                    } header: {
+                        Text("SwatchBar")
+                    } footer: {
+                        Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
+                    }
+                }
+                #else
+                Section {
+                    Toggle(isOn: $skipSwatchBarConfirmation) {
+                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("SwatchBar")
+                } footer: {
+                    Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
+                }
+                #endif
+
+                Section {
                     Button {
                         HapticsManager.shared.selection()
                         isShowingInsertSamplesAlert = true
@@ -248,13 +349,17 @@ struct SettingsView: View {
                     Text("These actions cannot be undone.")
                 }
 
-                Section {
-                    Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                } header: {
-                    Text("iPad Tip")
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    Section {
+                        Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        Text("iPad Tip")
+                    }
                 }
+                #endif
 
                 Section("Opalite") {
                     LabeledContent("Version") {
@@ -335,9 +440,26 @@ struct SettingsView: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Loads of additional features!")
         }
+        .sheet(isPresented: $isShowingWatchAppInfo) {
+            WatchAppInfoSheet()
+        }
     }
 
     // MARK: - Actions
+
+    #if canImport(UIKit) && !os(visionOS)
+    private func setAppIcon(_ option: AppIconOption) {
+        let iconName: String? = option == .dark ? nil : "AppIcon-Light"
+
+        guard UIApplication.shared.supportsAlternateIcons else { return }
+
+        UIApplication.shared.setAlternateIconName(iconName) { error in
+            if let error {
+                print("Failed to set app icon: \(error.localizedDescription)")
+            }
+        }
+    }
+    #endif
 
     private func deleteAllColorsAndPalettes() {
         do {

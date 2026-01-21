@@ -229,11 +229,10 @@ extension PortfolioView {
             }
 
             provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-                Task { @MainActor in
-                    if let uiImage = image as? UIImage {
-                        HapticsManager.shared.impact()
-                        self?.droppedImageItem = DroppedImageItem(image: uiImage)
-                    }
+                guard let self = self, let uiImage = image as? UIImage else { return }
+                Task { @MainActor [weak self] in
+                    HapticsManager.shared.impact()
+                    self?.droppedImageItem = DroppedImageItem(image: uiImage)
                 }
             }
 
@@ -326,10 +325,10 @@ extension PortfolioView {
                 for color in colorsToDelete {
                     try? colorManager.deleteColor(color)
                 }
+                colorsToDelete = []
+                selectedColorIDs.removeAll()
+                isEditingColors = false
             }
-            colorsToDelete = []
-            selectedColorIDs.removeAll()
-            isEditingColors = false
         }
 
         func deleteColor(_ color: OpaliteColor, colorManager: ColorManager, toastManager: ToastManager) {

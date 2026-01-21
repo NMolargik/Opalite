@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ColorListView: View {
     let title: String
-    let colors: [OpaliteColor]
+    let colors: [WatchColor]
 
     var body: some View {
         Group {
@@ -39,25 +38,15 @@ struct ColorListView: View {
     NavigationStack {
         ColorListView(
             title: "Ocean",
-            colors: [
-                OpaliteColor(name: "Deep Blue", red: 0.05, green: 0.20, blue: 0.45),
-                OpaliteColor(name: "Sea", red: 0.00, green: 0.55, blue: 0.65),
-                OpaliteColor(name: "Foam", red: 0.80, green: 0.95, blue: 0.95)
-            ]
+            colors: WatchColor.samples
         )
-        .environment(WatchColorManager(context: try! ModelContainer(
-            for: OpaliteColor.self, OpalitePalette.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        ).mainContext))
+        .environment(WatchColorManager())
     }
 }
 
 #Preview("Empty") {
     NavigationStack {
         ColorListView(title: "Empty Palette", colors: [])
-            .environment(WatchColorManager(context: try! ModelContainer(
-                for: OpaliteColor.self, OpalitePalette.self,
-                configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-            ).mainContext))
+            .environment(WatchColorManager())
     }
 }

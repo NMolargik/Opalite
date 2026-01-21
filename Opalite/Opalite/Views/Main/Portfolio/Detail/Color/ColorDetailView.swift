@@ -230,7 +230,7 @@ struct ColorDetailView: View {
                     HapticsManager.shared.selection()
                     isShowingPaletteSheet = true
                 } label: {
-                    Label("Move to Palette", systemImage: "swatchpalette.fill")
+                    Label("Move To Palette", systemImage: "swatchpalette.fill")
                 }
             }
 
@@ -495,7 +495,7 @@ private struct HarmoniesRow: View {
                     }
                 } label: {
                     Label(
-                        baseColor.palette != nil ? "Add to Palette" : "Save to Colors",
+                        baseColor.palette != nil ? "Add To Palette" : "Save to Colors",
                         systemImage: "plus"
                     )
                 }
