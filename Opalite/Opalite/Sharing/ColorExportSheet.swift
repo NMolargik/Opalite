@@ -18,6 +18,7 @@ private typealias PlatformImage = NSImage
 struct ColorExportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(CommunityManager.self) private var communityManager
 
     let color: OpaliteColor
 
@@ -27,6 +28,7 @@ struct ColorExportSheet: View {
     @State private var shareFileURL: URL?
     @State private var isShowingShareSheet = false
     @State private var isShowingPaywall = false
+    @State private var isShowingPublishSheet = false
 
     var body: some View {
         NavigationStack {
@@ -41,11 +43,17 @@ struct ColorExportSheet: View {
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                    Text("Choose Export Format")
+                    Text("Choose Share Format")
                         .font(.headline)
                         .padding(.top, 8)
 
                     VStack(spacing: 12) {
+                        // Publish to Community option
+                        publishToCommunityButton
+
+                        Divider()
+                            .padding(.vertical, 4)
+
                         ForEach(ColorExportFormat.allCases) { format in
                             formatButton(for: format)
                         }
@@ -60,11 +68,11 @@ struct ColorExportSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Export Color")
+            .navigationTitle("Share Color")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("Close") {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
@@ -84,6 +92,48 @@ struct ColorExportSheet: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Data file export requires Onyx")
         }
+        .sheet(isPresented: $isShowingPublishSheet) {
+            PublishColorSheet(color: color)
+        }
+    }
+
+    // MARK: - Publish to Community Button
+
+    @ViewBuilder
+    private var publishToCommunityButton: some View {
+        let isOffline = !communityManager.isConnectedToNetwork
+
+        Button {
+            HapticsManager.shared.selection()
+            isShowingPublishSheet = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: isOffline ? "wifi.slash" : "person.2")
+                    .font(.title2)
+                    .frame(width: 32)
+                    .foregroundStyle(isOffline ? Color.secondary : Color.teal)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Publish to Community")
+                        .font(.headline)
+                        .foregroundStyle(isOffline ? Color.secondary : Color.primary)
+
+                    Text(isOffline ? "Requires internet connection" : "Share with the Opalite community")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            .padding()
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(isOffline)
     }
 
     @ViewBuilder
@@ -190,4 +240,5 @@ struct ColorExportSheet: View {
         )
     )
     .environment(SubscriptionManager())
+    .environment(CommunityManager())
 }

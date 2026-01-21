@@ -9,6 +9,7 @@ import SwiftUI
 
 enum Tabs: Equatable, Hashable, Identifiable {
     case portfolio
+    case community
     case canvas
     case settings
     case search
@@ -18,6 +19,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
     var id: Int {
         switch self {
         case .portfolio: 2001
+        case .community: 2007
         case .canvas: 2002
         case .settings: 2003
         case .search: 2004
@@ -29,6 +31,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
     var name: String {
         switch self {
         case .portfolio: String(localized: "Portfolio", comment: "Tab title")
+        case .community: String(localized: "Community", comment: "Tab title")
         case .canvas: String(localized: "Canvas", comment: "Tab title")
         case .settings: String(localized: "Settings", comment: "Tab title")
         case .search: String(localized: "Search", comment: "Tab title")
@@ -40,6 +43,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
     var symbol: String {
         switch self {
         case .portfolio: "paintpalette.fill"
+        case .community: "person.2"
         case .canvas: "pencil.and.scribble"
         case .settings: "gear"
         case .search: "magnifyingglass"
@@ -52,6 +56,8 @@ enum Tabs: Equatable, Hashable, Identifiable {
         switch self {
         case .portfolio:
             return .blue
+        case .community:
+            return .teal
         case .canvas:
             return .red
         case .settings:
@@ -67,7 +73,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
 
     var isSecondary: Bool {
         switch self {
-        case .portfolio, .canvas, .settings, .search, .swatchBar:
+        case .portfolio, .community, .canvas, .settings, .search, .swatchBar:
             false
         case .canvasBody:
             true

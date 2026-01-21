@@ -80,7 +80,7 @@ struct SearchView: View {
             List {
                 if searchText.isEmpty {
                     ContentUnavailableView(
-                        "Search Opalite",
+                        "Search Your Portfolio",
                         systemImage: "magnifyingglass",
                         description: Text("Search for colors, palettes, or canvases")
                     )

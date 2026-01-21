@@ -61,15 +61,15 @@ struct WatchSyncingView: View {
         }
     }
 
-    /// Animates the loading dots
+    /// Animates the loading dots using async/await instead of Timer
     private func startDotAnimation() {
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
-            if colorManager.hasCompletedInitialSync {
-                timer.invalidate()
-                return
-            }
-            withAnimation {
-                dotCount = (dotCount + 1) % 4
+        Task { @MainActor in
+            while !colorManager.hasCompletedInitialSync {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !colorManager.hasCompletedInitialSync else { break }
+                withAnimation {
+                    dotCount = (dotCount + 1) % 4
+                }
             }
         }
     }

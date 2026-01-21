@@ -69,7 +69,7 @@ struct TVSearchView: View {
                 // Results
                 if searchText.isEmpty {
                     ContentUnavailableView(
-                        "Search Opalite",
+                        "Search Your Portfolio",
                         systemImage: "magnifyingglass",
                         description: Text("Search for colors by name or hex code or palettes by name.")
                     )

@@ -60,7 +60,7 @@ final class CanvasManager {
 
     // MARK: - Cached Data
 
-    /// All canvas files, sorted by most recently updated.
+    /// All canvas files, sorted alphabetically by title.
     ///
     /// This array is automatically refreshed after any mutation operation.
     /// Views should observe this property for reactive updates.
@@ -82,11 +82,10 @@ final class CanvasManager {
 
     // MARK: - Sorting
 
-    /// Sort descriptors for canvas queries (most recent first).
+    /// Sort descriptors for canvas queries (alphabetical by title).
     private var canvasSort: [SortDescriptor<CanvasFile>] {
         [
-            SortDescriptor(\CanvasFile.updatedAt, order: .reverse),
-            SortDescriptor(\CanvasFile.createdAt, order: .reverse)
+            SortDescriptor(\CanvasFile.title, order: .forward)
         ]
     }
 
@@ -124,8 +123,8 @@ final class CanvasManager {
                 try context.save()
             }
 
-            // Sort by most recently updated
-            self.canvases = Array(seenIDs.values).sorted { $0.updatedAt > $1.updatedAt }
+            // Sort alphabetically by title
+            self.canvases = Array(seenIDs.values).sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
         } catch {
             #if DEBUG
             print("[CanvasManager] reloadCache error: \(error)")
@@ -151,7 +150,7 @@ final class CanvasManager {
     /// This method updates the `canvases` cache and returns the fetched results.
     /// Use `refreshAll()` for async refresh without return value.
     ///
-    /// - Returns: Array of all canvas files, sorted by most recently updated
+    /// - Returns: Array of all canvas files, sorted alphabetically by title
     /// - Throws: SwiftData fetch errors
     @discardableResult
     func fetchCanvases() throws -> [CanvasFile] {

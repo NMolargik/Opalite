@@ -24,7 +24,7 @@ struct ColorEditorKeyboardShortcutsTip: Tip {
     }
 
     var message: Text? {
-        Text("Press 1-5 on your keyboard to quickly switch between color picker modes.")
+        Text("Press 1-6 on your keyboard to quickly switch between color picker modes.")
     }
 
     var image: Image? {
@@ -87,9 +87,8 @@ struct ColorEditorView: View {
 
                         if !viewModel.isColorExpanded {
                             VStack {
-                                ScrollView {
-                                    modeContentView
-                                }
+                                modeContentView
+                                    .fixedSize(horizontal: false, vertical: true)
 
                                 modePickerView
                             }
@@ -97,7 +96,7 @@ struct ColorEditorView: View {
                             .frame(maxWidth: .infinity, alignment: .topLeading)
                         }
                     }
-                    .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
+                    .frame(maxHeight: .infinity)
                 } else {
                     HStack(spacing: 16) {
                         swatchAreaRegular
@@ -313,6 +312,8 @@ struct ColorEditorView: View {
                 ColorGridPickerView(color: $viewModel.tempColor)
             case .spectrum:
                 ColorSpectrumPickerView(color: $viewModel.tempColor)
+            case .shuffle:
+                ColorShufflePickerView(color: $viewModel.tempColor)
             case .sliders:
                 ColorChannelsPickerView(color: $viewModel.tempColor)
             case .codes:
@@ -330,7 +331,7 @@ struct ColorEditorView: View {
                 HStack(spacing: 12) {
                     SwatchView(
                         color: viewModel.tempColor,
-                        height: viewModel.isColorExpanded ? nil : 60,
+                        height: nil,
                         badgeText: "",
                         showOverlays: false
                     )
@@ -341,27 +342,28 @@ struct ColorEditorView: View {
                     ForEach(paletteStripColors, id: \.self) { color in
                         SwatchView(
                             color: color,
-                            height: viewModel.isColorExpanded ? nil : 60,
+                            height: nil,
                             badgeText: "",
                             showOverlays: false
                         )
                             .transition(.scale(scale: 0.2, anchor: .bottom))
                     }
                 }
-                .frame(maxHeight: viewModel.isColorExpanded ? .infinity : nil)
             } else {
                 SwatchView(
                     color: viewModel.tempColor,
-                    height: viewModel.isColorExpanded ? nil : 60,
+                    height: nil,
                     badgeText: "",
                     showOverlays: false
                 )
                     .matchedGeometryEffect(id: "currentSwatch", in: swatchNamespace)
             }
         }
-        .frame(maxHeight: viewModel.isColorExpanded ? nil : 100)
+        .frame(maxHeight: .infinity)
         .onTapGesture {
-            viewModel.isColorExpanded.toggle()
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                viewModel.isColorExpanded.toggle()
+            }
         }
     }
 

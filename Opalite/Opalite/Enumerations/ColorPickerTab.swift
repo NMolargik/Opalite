@@ -10,6 +10,7 @@ import SwiftUI
 enum ColorPickerTab: String, CaseIterable, Identifiable {
     case spectrum = "Spectrum"
     case grid = "Grid"
+    case shuffle = "Shuffle"
     case sliders = "Channels"
     case codes = "Codes"
     case image = "Image"
@@ -23,6 +24,8 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
             return Image(systemName: "square.grid.2x2")
         case .spectrum:
             return Image(systemName: "lightspectrum.horizontal")
+        case .shuffle:
+            return Image(systemName: "shuffle")
         case .sliders:
             return Image(systemName: "slider.horizontal.3")
         case .codes:
@@ -38,6 +41,8 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
             return "Color grid"
         case .spectrum:
             return "Color spectrum"
+        case .shuffle:
+            return "Shuffle color"
         case .sliders:
             return "Channel sliders"
         case .codes:
@@ -47,25 +52,27 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Keyboard shortcut key (1-5) for switching modes on iPad/Mac
+    /// Keyboard shortcut key (1-6) for switching modes on iPad/Mac
     var keyboardShortcutKey: Character {
         switch self {
         case .spectrum: return "1"
         case .grid: return "2"
-        case .sliders: return "3"
-        case .codes: return "4"
-        case .image: return "5"
+        case .shuffle: return "3"
+        case .sliders: return "4"
+        case .codes: return "5"
+        case .image: return "6"
         }
     }
 
-    /// Initialize from a keyboard character (1-5)
+    /// Initialize from a keyboard character (1-6)
     init?(fromKey key: Character) {
         switch key {
         case "1": self = .spectrum
         case "2": self = .grid
-        case "3": self = .sliders
-        case "4": self = .codes
-        case "5": self = .image
+        case "3": self = .shuffle
+        case "4": self = .sliders
+        case "5": self = .codes
+        case "6": self = .image
         default: return nil
         }
     }

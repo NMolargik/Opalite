@@ -180,7 +180,7 @@ struct PortfolioView: View {
 private extension PortfolioView {
     var mainScrollContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: isCompact ? 16 : 20) {
+            LazyVStack(alignment: .leading, spacing: isCompact ? 16 : 20) {
                 tipsSection
                 colorsSection
                 palettesSection
@@ -331,7 +331,7 @@ private extension PortfolioView {
     }
 
     var palettesContent: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        LazyVStack(alignment: .leading, spacing: 20) {
             TipView(dragAndDropTip)
                 .tipCornerRadius(16)
                 .padding(.horizontal, 20)
@@ -455,7 +455,7 @@ private extension PortfolioView {
                     HapticsManager.shared.selection()
                     viewModel.colorToExport = color
                 } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
 
                 Divider()

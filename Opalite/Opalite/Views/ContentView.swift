@@ -11,6 +11,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(CommunityManager.self) private var communityManager: CommunityManager
     @Environment(QuickActionManager.self) private var quickActionManager: QuickActionManager
     @Environment(HexCopyManager.self) private var hexCopyManager: HexCopyManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
@@ -19,6 +20,7 @@ struct ContentView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
     @State private var isColorBlindnessBannerVisible: Bool = true
+    @State private var audioPlayer = AudioPlayer()
 
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
@@ -79,6 +81,7 @@ struct ContentView: View {
             case .syncing:
                 SyncingView(
                     onComplete: {
+                        audioPlayer.play("load")
                         withAnimation {
                             appStage = .main
                         }
@@ -118,6 +121,15 @@ struct ContentView: View {
         }
         .task {
             await prepareApp()
+        }
+        .onChange(of: appStage) { _, newStage in
+            if newStage == .main {
+                // Prefetch Community content in the background
+                Task {
+                    try? await communityManager.fetchPublishedColors()
+                    try? await communityManager.fetchPublishedPalettes()
+                }
+            }
         }
         .onAppear {
             colorManager.isMainWindowOpen = true
@@ -163,6 +175,7 @@ struct ContentView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(CommunityManager())
         .environment(SubscriptionManager())
         .environment(ToastManager())
         .environment(QuickActionManager())

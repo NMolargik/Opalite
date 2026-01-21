@@ -44,7 +44,8 @@ struct OnboardingView: View {
                 OnboardingFeature(icon: "rainbow", iconColor: .purple, text: "Select from the spectrum"),
                 OnboardingFeature(icon: "slider.horizontal.3", iconColor: .green, text: "Fine-tune with sliders"),
                 OnboardingFeature(icon: "number", iconColor: .orange, text: "Enter exact color codes"),
-                OnboardingFeature(icon: "eyedropper.halffull", iconColor: .pink, text: "Sample from images")
+                OnboardingFeature(icon: "eyedropper.halffull", iconColor: .pink, text: "Sample from images"),
+                OnboardingFeature(icon: "shuffle", iconColor: .teal, text: "Shuffle for random inspiration")
             ]
         ),
         OnboardingPage(
@@ -73,14 +74,27 @@ struct OnboardingView: View {
             ]
         ),
         OnboardingPage(
+            icon: "person.2",
+            iconColors: [.teal, .blue],
+            title: "Community",
+            subtitle: "Discover and share colors with the community",
+            features: [
+                OnboardingFeature(icon: "magnifyingglass", iconColor: .blue, text: "Browse community colors and palettes"),
+                OnboardingFeature(icon: "arrow.down.circle.fill", iconColor: .teal, text: "Save published colors and palettes to your portfolio", requiresOnyx: true),
+                OnboardingFeature(icon: "arrow.up.circle.fill", iconColor: .green, text: "Publish your creations", requiresOnyx: false),
+                OnboardingFeature(icon: "person.2.fill", iconColor: .orange, text: "View publisher profiles"),
+                OnboardingFeature(icon: "flag.fill", iconColor: .red, text: "Report inappropriate content")
+            ]
+        ),
+        OnboardingPage(
             icon: "square.and.arrow.up.fill",
             iconColors: [.green],
             title: "Share Your Work",
-            subtitle: "Export and share colors in versatile formats",
+            subtitle: "Share colors in versatile formats",
             features: [
                 OnboardingFeature(icon: "photo.fill", iconColor: .blue, text: "Share colors as flat images"),
                 OnboardingFeature(icon: "arrow.down.doc.fill", iconColor: .purple, text: "Import colors and palettes", requiresOnyx: true),
-                OnboardingFeature(icon: "arrow.up.doc.fill", iconColor: .indigo, text: "Export colors and palettes", requiresOnyx: true),
+                OnboardingFeature(icon: "arrow.up.doc.fill", iconColor: .indigo, text: "Share colors and palettes", requiresOnyx: true),
                 OnboardingFeature(icon: "doc.richtext.fill", iconColor: .red, text: "Generate detailed PDFs", requiresOnyx: true)
             ]
         ),
@@ -88,10 +102,10 @@ struct OnboardingView: View {
             icon: "icloud.fill",
             iconColors: [.blue, .gray],
             title: "iCloud Sync",
-            subtitle: "Your colors, palettes, and canvases follow you across Apple devices",
+            subtitle: "Your colors, palettes, and canvases sync privately across devices",
             features: [
-                OnboardingFeature(icon: "exclamationmark.icloud.fill", iconColor: .orange, text: "Requires available iCloud storage"),
-                OnboardingFeature(icon: "lock.shield.fill", iconColor: .green, text: "Private storage within iCloud"),
+                OnboardingFeature(icon: "lock.shield.fill", iconColor: .green, text: "Private by default"),
+                OnboardingFeature(icon: "person.2", iconColor: .orange, text: "Only Community content is public"),
                 OnboardingFeature(icon: "iphone", iconColor: .blue, text: "Access on iPhone"),
                 OnboardingFeature(icon: "ipad", iconColor: .purple, text: "Access on iPad"),
                 OnboardingFeature(icon: "macbook", iconColor: .gray, text: "Access on Mac"),

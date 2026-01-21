@@ -20,6 +20,7 @@ struct OpaliteApp: App {
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
     let canvasManager: CanvasManager
+    let communityManager = CommunityManager()
     let toastManager = ToastManager()
     let subscriptionManager = SubscriptionManager()
     let importCoordinator = ImportCoordinator()
@@ -107,6 +108,7 @@ struct OpaliteApp: App {
                 }
                 .task {
                     colorManager.author = userName
+                    communityManager.publisherName = userName
                     // Sync colors to widget on initial launch
                     syncColorsToWidgetStorage()
 
@@ -117,6 +119,7 @@ struct OpaliteApp: App {
                 }
                 .onChange(of: userName) { _, newName in
                     colorManager.author = newName
+                    communityManager.publisherName = newName
                 }
                 .onOpenURL { url in
                     // Handle swatchBar URL scheme
@@ -198,6 +201,7 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(communityManager)
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(importCoordinator)
@@ -473,6 +477,7 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(communityManager)
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(quickActionManager)
@@ -499,6 +504,7 @@ struct OpaliteApp: App {
         .modelContainer(sharedModelContainer)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(communityManager)
         .environment(toastManager)
         .environment(subscriptionManager)
         .environment(quickActionManager)

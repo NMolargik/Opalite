@@ -11,6 +11,7 @@ struct PaletteExportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(CommunityManager.self) private var communityManager
 
     let palette: OpalitePalette
 
@@ -20,6 +21,7 @@ struct PaletteExportSheet: View {
     @State private var shareFileURL: URL?
     @State private var isShowingShareSheet = false
     @State private var isShowingPaywall = false
+    @State private var isShowingPublishSheet = false
 
     private var currentBackground: PreviewBackground {
         palette.previewBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
@@ -37,11 +39,17 @@ struct PaletteExportSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    Text("Choose Export Format")
+                    Text("Choose Share Format")
                         .font(.headline)
                         .padding(.top, 8)
 
                     VStack(spacing: 12) {
+                        // Publish to Community option
+                        publishToCommunityButton
+
+                        Divider()
+                            .padding(.vertical, 4)
+
                         ForEach(PaletteExportFormat.allCases) { format in
                             formatButton(for: format)
                         }
@@ -56,11 +64,11 @@ struct PaletteExportSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Export Palette")
+            .navigationTitle("Share Palette")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("Close") {
                         HapticsManager.shared.selection()
                         dismiss()
                     }
@@ -79,6 +87,48 @@ struct PaletteExportSheet: View {
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView(featureContext: "Data file export requires Onyx")
         }
+        .sheet(isPresented: $isShowingPublishSheet) {
+            PublishPaletteSheet(palette: palette)
+        }
+    }
+
+    // MARK: - Publish to Community Button
+
+    @ViewBuilder
+    private var publishToCommunityButton: some View {
+        let isOffline = !communityManager.isConnectedToNetwork
+
+        Button {
+            HapticsManager.shared.selection()
+            isShowingPublishSheet = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: isOffline ? "wifi.slash" : "person.2")
+                    .font(.title2)
+                    .frame(width: 32)
+                    .foregroundStyle(isOffline ? Color.secondary : Color.teal)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Publish to Community")
+                        .font(.headline)
+                        .foregroundStyle(isOffline ? Color.secondary : Color.primary)
+
+                    Text(isOffline ? "Requires internet connection" : "Share with the Opalite community")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            .padding()
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(isOffline)
     }
 
     @ViewBuilder
@@ -304,4 +354,5 @@ struct PaletteExportSheet: View {
 #Preview("Export Palette Sheet") {
     PaletteExportSheet(palette: OpalitePalette.sample)
         .environment(SubscriptionManager())
+        .environment(CommunityManager())
 }

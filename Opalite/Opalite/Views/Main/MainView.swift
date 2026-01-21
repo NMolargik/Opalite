@@ -36,6 +36,12 @@ struct MainView: View {
                     .tint(.none)
             }
 
+            // MARK: - Community Tab - All screens
+            Tab(Tabs.community.name, systemImage: Tabs.community.symbol, value: .community) {
+                CommunityView()
+                    .tint(.none)
+            }
+
             // MARK: - Canvas Tab - Compact Only, "regular" has a TabSection
             Tab(Tabs.canvas.name, systemImage: Tabs.canvas.symbol, value: .canvas) {
                 CanvasListView()
@@ -285,6 +291,7 @@ struct MainView: View {
         .modelContainer(container)
         .environment(colorManager)
         .environment(canvasManager)
+        .environment(CommunityManager())
         .environment(SubscriptionManager())
         .environment(ToastManager())
 }

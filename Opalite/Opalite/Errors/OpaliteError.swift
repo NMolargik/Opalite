@@ -48,6 +48,18 @@ enum OpaliteError: LocalizedError, Equatable {
     case subscriptionRestoreFailed
     case subscriptionVerificationFailed
 
+    // MARK: - Community Operations
+    case communityFetchFailed(reason: String)
+    case communityPublishFailed(reason: String)
+    case communityDeleteFailed(reason: String)
+    case communityReportFailed(reason: String)
+    case communityRateLimited
+    case communityRequiresOnyx
+    case communityColorAlreadyExists
+    case communityPaletteAlreadyExists
+    case communityNotSignedIn
+    case communityAdminRequired
+
     // MARK: - Generic
     case unknownError(String)
 
@@ -117,6 +129,28 @@ enum OpaliteError: LocalizedError, Equatable {
         case .subscriptionVerificationFailed:
             return "Purchase verification failed"
 
+        // Community
+        case .communityFetchFailed:
+            return "Couldn't load content"
+        case .communityPublishFailed:
+            return "Publish failed"
+        case .communityDeleteFailed:
+            return "Delete failed"
+        case .communityReportFailed:
+            return "Report failed"
+        case .communityRateLimited:
+            return "Slow down, try again soon"
+        case .communityRequiresOnyx:
+            return "Onyx required"
+        case .communityColorAlreadyExists:
+            return "Color already saved"
+        case .communityPaletteAlreadyExists:
+            return "Palette already saved"
+        case .communityNotSignedIn:
+            return "Sign in to iCloud"
+        case .communityAdminRequired:
+            return "Admin required"
+
         // Generic
         case .unknownError(let message):
             return message
@@ -146,6 +180,19 @@ enum OpaliteError: LocalizedError, Equatable {
         case .subscriptionLoadFailed, .subscriptionPurchaseFailed,
              .subscriptionRestoreFailed, .subscriptionVerificationFailed:
             return "creditcard.fill"
+        case .communityFetchFailed, .communityPublishFailed, .communityDeleteFailed,
+             .communityReportFailed:
+            return "person.2"
+        case .communityRateLimited:
+            return "clock.fill"
+        case .communityRequiresOnyx:
+            return "lock.fill"
+        case .communityColorAlreadyExists, .communityPaletteAlreadyExists:
+            return "doc.on.doc.fill"
+        case .communityNotSignedIn:
+            return "icloud.slash.fill"
+        case .communityAdminRequired:
+            return "lock.shield.fill"
         case .unknownError:
             return "exclamationmark.triangle.fill"
         }

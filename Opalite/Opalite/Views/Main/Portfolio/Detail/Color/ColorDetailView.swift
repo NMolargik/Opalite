@@ -187,11 +187,11 @@ struct ColorDetailView: View {
                     HapticsManager.shared.selection()
                     isShowingExportSheet = true
                 } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
                 .tint(.blue)
-                .accessibilityLabel("Export color")
-                .accessibilityHint("Opens export options for this color")
+                .accessibilityLabel("Share color")
+                .accessibilityHint("Opens share options for this color")
             }
             
             ToolbarItem(placement:.topBarTrailing) {

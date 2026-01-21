@@ -115,7 +115,8 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 12) {
             FeatureRow(icon: "swatchpalette.fill", text: "Unlimited Palettes")
             FeatureRow(icon: "scribble", text: "Unlimited Canvas Access")
-            FeatureRow(icon: "square.and.arrow.up", text: "Export Colors and Palettes to Data Files")
+            FeatureRow(icon: "person.2", text: "Save From The Community")
+            FeatureRow(icon: "square.and.arrow.up", text: "Share Colors and Palettes to Data Files")
             FeatureRow(icon: "square.and.arrow.down", text: "Import Colors & Palettes from Files")
         }
         .padding()

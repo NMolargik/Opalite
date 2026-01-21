@@ -16,7 +16,8 @@
       "Bash(xargs -I {} find {} -name \"StatusMenuBundle.bundle\")",
       "WebFetch(domain:github.com)",
       "Bash(xcrun devicectl device install app:*)",
-      "Bash(xcrun devicectl device process launch:*)"
+      "Bash(xcrun devicectl device process launch:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

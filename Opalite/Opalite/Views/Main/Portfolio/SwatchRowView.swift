@@ -102,7 +102,7 @@ struct SwatchRowView: View {
                 .padding(.top, 5)
             } else {
                 ScrollView(.horizontal) {
-                    HStack(spacing: 12) {
+                    LazyHStack(spacing: 12) {
                         // Colors are pre-sorted by updatedAt from ColorManager
                         ForEach(colors, id: \.self) { color in
                             if let onTap = onTap {

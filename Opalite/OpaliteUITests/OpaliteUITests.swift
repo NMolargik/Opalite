@@ -134,7 +134,7 @@ final class OpaliteUITests: XCTestCase {
             sleep(1)
 
             // Look for empty state message
-            let emptyStateText = app.staticTexts["Search Opalite"]
+            let emptyStateText = app.staticTexts["Search Your Portfolio"]
             if emptyStateText.exists {
                 XCTAssertTrue(emptyStateText.exists)
             }

@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(CanvasManager.self) private var canvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(CommunityManager.self) private var communityManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.colorScheme) private var colorScheme
 
@@ -31,6 +32,7 @@ struct SettingsView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var isRestoringPurchases: Bool = false
     @State private var isShowingWatchAppInfo: Bool = false
+    @State private var isShowingCommunityAdmin: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL?
     @State private var isShowingExportSelection: Bool = false
@@ -60,7 +62,7 @@ struct SettingsView: View {
                                 .textInputAutocapitalization(.words)
                                 .disableAutocorrection(true)
                         }
-                        Text("Your display name appears in the metadata of each color you create.")
+                        Text("Your display name appears in the metadata of each color you create and on content you publish to Community.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -164,6 +166,20 @@ struct SettingsView: View {
                     .disabled(isRestoringPurchases)
                 } header: {
                     Text("Subscription")
+                }
+
+                if communityManager.isAdmin {
+                    Section {
+                        Button {
+                            HapticsManager.shared.selection()
+                            isShowingCommunityAdmin = true
+                        } label: {
+                            Label("Community Admin", systemImage: "shield.checkered")
+                                .foregroundStyle(.blue)
+                        }
+                    } header: {
+                        Text("Administration")
+                    }
                 }
 
                 Section {
@@ -361,7 +377,7 @@ struct SettingsView: View {
                 }
                 #endif
 
-                Section("Opalite") {
+                Section {
                     LabeledContent("Version") {
                         Text(appVersion)
                             .foregroundStyle(.secondary)
@@ -375,7 +391,11 @@ struct SettingsView: View {
                         Link("Molargik Software LLC", destination: URL(string: "https://www.molargiksoftware.com")!)
                             .foregroundStyle(.blue)
                     }
-                }
+                } header :{
+                    Text("Opalite")
+                } footer: {
+                   Text("Thank you to all of our amazing TestFlight testers!")
+               }
             }
             .navigationTitle("Settings")
         }
@@ -442,6 +462,12 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $isShowingWatchAppInfo) {
             WatchAppInfoSheet()
+        }
+        .sheet(isPresented: $isShowingCommunityAdmin) {
+            CommunityAdminSheet()
+        }
+        .task {
+            await communityManager.checkAdminStatus()
         }
     }
 
@@ -539,5 +565,6 @@ private struct ShareSheet: UIViewControllerRepresentable {
         .environment(ColorManager(context: context))
         .environment(CanvasManager(context: context))
         .environment(SubscriptionManager())
+        .environment(CommunityManager())
         .environment(ToastManager())
 }

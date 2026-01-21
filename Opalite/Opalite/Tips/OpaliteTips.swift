@@ -59,7 +59,7 @@ struct ColorDetailsTip: Tip {
     }
 
     var title: Text {
-        Text("Explore Color Details")
+        Text("Community Color Details")
     }
 
     var message: Text? {

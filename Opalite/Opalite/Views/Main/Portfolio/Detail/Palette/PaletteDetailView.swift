@@ -138,12 +138,12 @@ struct PaletteDetailView: View {
                     HapticsManager.shared.selection()
                     isShowingExportSheet = true
                 } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
                 .tint(.blue)
                 .disabled(palette.sortedColors.isEmpty)
-                .accessibilityLabel("Export palette")
-                .accessibilityHint("Opens export options for this palette")
+                .accessibilityLabel("Share palette")
+                .accessibilityHint("Opens share options for this palette")
             }
 
             ToolbarItem(placement: .topBarTrailing) {
