@@ -26,6 +26,12 @@ enum PortfolioPDFExporter {
     private static let colorNameFont = UIFont.systemFont(ofSize: 11, weight: .medium)
     private static let colorDetailFont = UIFont.systemFont(ofSize: 9, weight: .regular)
 
+    /// Fills the current page with white background for consistent PDF appearance
+    private static func fillWhiteBackground() {
+        UIColor.white.setFill()
+        UIRectFill(pageRect)
+    }
+
     /// Exports a single palette to PDF
     static func exportPalette(_ palette: OpalitePalette, userName: String) throws -> URL {
         let dateFormatter = DateFormatter()
@@ -43,6 +49,7 @@ enum PortfolioPDFExporter {
 
             // Title Page
             ctx.beginPage()
+            fillWhiteBackground()
             y = drawPaletteTitlePage(
                 palette: palette,
                 dateString: dateFormatter.string(from: Date()),
@@ -62,7 +69,7 @@ enum PortfolioPDFExporter {
                 y = ensureSpace(y: y, needed: 40, ctx: ctx)
                 let emptyAttrs: [NSAttributedString.Key: Any] = [
                     .font: subtitleFont,
-                    .foregroundColor: UIColor.secondaryLabel
+                    .foregroundColor: UIColor.darkGray
                 ]
                 "No colors in this palette.".draw(at: CGPoint(x: margin, y: y), withAttributes: emptyAttrs)
             }
@@ -88,6 +95,7 @@ enum PortfolioPDFExporter {
 
             // MARK: - Title Page
             ctx.beginPage()
+            fillWhiteBackground()
             y = drawTitlePage(dateString: dateFormatter.string(from: Date()),
                               paletteCount: palettes.count,
                               colorCount: looseColors.count + palettes.reduce(0) { $0 + ($1.colors?.count ?? 0) },
@@ -139,7 +147,7 @@ enum PortfolioPDFExporter {
                 y = ensureSpace(y: y, needed: 40, ctx: ctx)
                 let emptyAttrs: [NSAttributedString.Key: Any] = [
                     .font: subtitleFont,
-                    .foregroundColor: UIColor.secondaryLabel
+                    .foregroundColor: UIColor.darkGray
                 ]
                 "No colors or palettes to export.".draw(at: CGPoint(x: margin, y: y), withAttributes: emptyAttrs)
             }
@@ -157,7 +165,7 @@ enum PortfolioPDFExporter {
         // App title
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: titleFont,
-            .foregroundColor: UIColor.label
+            .foregroundColor: UIColor.black
         ]
         "Opalite Portfolio".draw(at: CGPoint(x: margin, y: y), withAttributes: titleAttrs)
         y += 36
@@ -165,7 +173,7 @@ enum PortfolioPDFExporter {
         // Subtitle with date
         let subtitleAttrs: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: UIColor.darkGray
         ]
         "Exported on \(dateString) by \(userName)".draw(at: CGPoint(x: margin, y: y), withAttributes: subtitleAttrs)
         y += 18
@@ -179,7 +187,7 @@ enum PortfolioPDFExporter {
         let dividerPath = UIBezierPath()
         dividerPath.move(to: CGPoint(x: margin, y: y))
         dividerPath.addLine(to: CGPoint(x: pageRect.width - margin, y: y))
-        UIColor.separator.setStroke()
+        UIColor.lightGray.setStroke()
         dividerPath.lineWidth = 0.5
         dividerPath.stroke()
 
@@ -193,7 +201,7 @@ enum PortfolioPDFExporter {
         // Palette name as title
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: titleFont,
-            .foregroundColor: UIColor.label
+            .foregroundColor: UIColor.black
         ]
         palette.name.draw(at: CGPoint(x: margin, y: y), withAttributes: titleAttrs)
         y += 36
@@ -201,7 +209,7 @@ enum PortfolioPDFExporter {
         // Subtitle with date
         let subtitleAttrs: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: UIColor.darkGray
         ]
         "Exported on \(dateString) by \(userName)".draw(at: CGPoint(x: margin, y: y), withAttributes: subtitleAttrs)
         y += 18
@@ -215,7 +223,7 @@ enum PortfolioPDFExporter {
         if let notes = palette.notes, !notes.isEmpty {
             let notesAttrs: [NSAttributedString.Key: Any] = [
                 .font: subtitleFont,
-                .foregroundColor: UIColor.secondaryLabel
+                .foregroundColor: UIColor.darkGray
             ]
             let truncatedNotes = truncateText(notes, toWidth: contentWidth, font: subtitleFont)
             truncatedNotes.draw(at: CGPoint(x: margin, y: y), withAttributes: notesAttrs)
@@ -228,7 +236,7 @@ enum PortfolioPDFExporter {
         let dividerPath = UIBezierPath()
         dividerPath.move(to: CGPoint(x: margin, y: y))
         dividerPath.addLine(to: CGPoint(x: pageRect.width - margin, y: y))
-        UIColor.separator.setStroke()
+        UIColor.lightGray.setStroke()
         dividerPath.lineWidth = 0.5
         dividerPath.stroke()
 
@@ -238,7 +246,7 @@ enum PortfolioPDFExporter {
     private static func drawSectionHeader(_ title: String, at y: CGFloat) -> CGFloat {
         let attrs: [NSAttributedString.Key: Any] = [
             .font: sectionFont,
-            .foregroundColor: UIColor.label
+            .foregroundColor: UIColor.black
         ]
         title.draw(at: CGPoint(x: margin, y: y), withAttributes: attrs)
         return y + 28
@@ -248,14 +256,14 @@ enum PortfolioPDFExporter {
         // Palette name
         let nameAttrs: [NSAttributedString.Key: Any] = [
             .font: paletteFont,
-            .foregroundColor: UIColor.label
+            .foregroundColor: UIColor.black
         ]
         palette.name.draw(at: CGPoint(x: margin, y: y), withAttributes: nameAttrs)
 
         // Color count badge
         let countAttrs: [NSAttributedString.Key: Any] = [
             .font: colorDetailFont,
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: UIColor.darkGray
         ]
         let countText = "\(colorCount) color\(colorCount == 1 ? "" : "s")"
         let nameSize = (palette.name as NSString).size(withAttributes: nameAttrs)
@@ -275,7 +283,7 @@ enum PortfolioPDFExporter {
         color.uiColor.setFill()
         swatchPath.fill()
 
-        UIColor.separator.setStroke()
+        UIColor.lightGray.setStroke()
         swatchPath.lineWidth = 0.5
         swatchPath.stroke()
 
@@ -286,7 +294,7 @@ enum PortfolioPDFExporter {
         // Color name (or "Untitled")
         let nameAttrs: [NSAttributedString.Key: Any] = [
             .font: colorNameFont,
-            .foregroundColor: UIColor.label
+            .foregroundColor: UIColor.black
         ]
         let displayName = color.name ?? "Untitled"
         let truncatedName = truncateText(displayName, toWidth: textWidth, font: colorNameFont)
@@ -295,7 +303,7 @@ enum PortfolioPDFExporter {
         // Color codes
         let codeAttrs: [NSAttributedString.Key: Any] = [
             .font: colorDetailFont,
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: UIColor.darkGray
         ]
 
         // HEX
@@ -325,6 +333,7 @@ enum PortfolioPDFExporter {
     private static func ensureSpace(y: CGFloat, needed: CGFloat, ctx: UIGraphicsPDFRendererContext) -> CGFloat {
         if y + needed > pageRect.height - margin {
             ctx.beginPage()
+            fillWhiteBackground()
             return margin
         }
         return y
