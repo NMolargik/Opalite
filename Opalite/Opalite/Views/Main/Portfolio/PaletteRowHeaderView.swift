@@ -23,12 +23,15 @@ struct PaletteRowHeaderView: View {
     @State private var isShowingExportSheet: Bool = false
 
     let palette: OpalitePalette
+    var showTip: Bool = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            TipView(paletteMenuTip)
-                .tipCornerRadius(16)
-                .padding(.horizontal, 20)
+            if showTip {
+                TipView(paletteMenuTip)
+                    .tipCornerRadius(16)
+                    .padding(.horizontal, 5)
+            }
             
             HStack(alignment: .center, spacing: 8) {
             Menu {

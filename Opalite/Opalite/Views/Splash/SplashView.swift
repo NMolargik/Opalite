@@ -18,7 +18,6 @@ struct SplashView: View {
     @State private var pulse: Bool = false
     @State private var glowRotation: Double = 0
     @State private var startAnimations: Bool = false  // Delay heavy animations
-    @State private var audioPlayer = AudioPlayer()
 
     // Generate row configurations once
     private static let rowConfigs: [SwatchRowConfig] = makeRowConfigs()
@@ -179,11 +178,6 @@ struct SplashView: View {
             // Show content with delay
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.3)) {
                 showContent = true
-            }
-
-            // Play launch sound when gemstone appears
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                audioPlayer.play("launch")
             }
 
             // Show button last

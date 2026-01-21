@@ -242,6 +242,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             // Ensure tool picker exists
             if toolPicker == nil {
                 toolPicker = PKToolPicker()
+                toolPicker?.overrideUserInterfaceStyle = .light
                 toolPicker?.addObserver(canvasView)
                 toolPicker?.addObserver(self)
             }
@@ -281,6 +282,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             }
             if toolPicker == nil {
                 toolPicker = PKToolPicker()
+                toolPicker?.overrideUserInterfaceStyle = .light
             }
             guard let toolPicker else { return }
             toolPicker.setVisible(true, forFirstResponder: canvasView)

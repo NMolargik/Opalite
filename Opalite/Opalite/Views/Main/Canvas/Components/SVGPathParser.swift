@@ -325,7 +325,9 @@ struct SVGPathParser {
                 }
                 tokens.append(String(char))
                 inNumber = false
-            } else if char.isNumber || char == "." || (char == "-" && !inNumber) || char == "e" || char == "E" {
+            } else if char.isNumber || char == "." || char == "-" || char == "e" || char == "E" {
+                // Handle negative numbers that immediately follow another number (e.g., "-7.87-0.021")
+                // Split the token unless it's part of scientific notation (e.g., "1e-10")
                 if char == "-" && !current.isEmpty && !current.hasSuffix("e") && !current.hasSuffix("E") {
                     tokens.append(current)
                     current = ""

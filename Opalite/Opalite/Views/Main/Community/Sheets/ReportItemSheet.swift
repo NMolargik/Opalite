@@ -38,11 +38,11 @@ struct ReportItemSheet: View {
                         } label: {
                             HStack {
                                 Image(systemName: reason.icon)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.inverseTheme)
                                     .frame(width: 24)
 
                                 Text(reason.rawValue)
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(.inverseTheme)
 
                                 Spacer()
 

@@ -14,6 +14,7 @@ struct CanvasView: View {
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     let canvasFile: CanvasFile
 
@@ -188,72 +189,147 @@ struct CanvasView: View {
                 }
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.impact()
-                    editedTitle = canvasFile.title
-                    showRenameTitleAlert = true
-                } label: {
-                    Label("Rename", systemImage: "character.cursor.ibeam")
-                }
-                .toolbarButtonTint()
-            }
+            if horizontalSizeClass == .compact {
+                // Compact: Single "Tools" menu containing everything
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            HapticsManager.shared.impact()
+                            editedTitle = canvasFile.title
+                            showRenameTitleAlert = true
+                        } label: {
+                            Label("Rename", systemImage: "character.cursor.ibeam")
+                        }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Section("Shapes") {
-                        ForEach(CanvasShape.allCases, id: \.self) { shape in
-                            Button {
-                                HapticsManager.shared.impact()
-                                pendingShape = shape
-                            } label: {
-                                Label(shape.displayName, systemImage: shape.systemImage)
+                        Section("Shapes") {
+                            ForEach(CanvasShape.allCases, id: \.self) { shape in
+                                Button {
+                                    HapticsManager.shared.impact()
+                                    pendingShape = shape
+                                } label: {
+                                    Label(shape.displayName, systemImage: shape.systemImage)
+                                }
                             }
                         }
+
+                        Section("Tools") {
+                            Button {
+                                HapticsManager.shared.impact()
+                                isShowingSVGImporter = true
+                            } label: {
+                                Label("Place SVG Shape", systemImage: "square.on.circle")
+                            }
+
+                            Button {
+                                HapticsManager.shared.impact()
+                                isColorSamplingMode = true
+                            } label: {
+                                Label("Sample Color From Canvas", systemImage: "eyedropper")
+                            }
+
+                            Button {
+                                HapticsManager.shared.impact()
+                                exportCanvasAsImage()
+                            } label: {
+                                Label("Export as Image", systemImage: "square.and.arrow.up")
+                            }
+                        }
+
+                        Section {
+                            Button(role: .destructive) {
+                                HapticsManager.shared.impact()
+                                showClearConfirmation = true
+                            } label: {
+                                Label("Clear Canvas", systemImage: "eraser")
+                            }
+
+                            Button(role: .destructive) {
+                                HapticsManager.shared.impact()
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete Canvas", systemImage: "trash.fill")
+                            }
+                        }
+                    } label: {
+                        Label("Tools", systemImage: "ellipsis.circle")
                     }
-
-                    Section("Tools") {
-                        Button {
-                            HapticsManager.shared.impact()
-                            isShowingSVGImporter = true
-                        } label: {
-                            Label("Place SVG Shape", systemImage: "square.on.circle")
-                        }
-
-                        Button {
-                            HapticsManager.shared.impact()
-                            isColorSamplingMode = true
-                        } label: {
-                            Label("Sample Color From Canvas", systemImage: "eyedropper")
-                        }
-
-                        Button {
-                            HapticsManager.shared.impact()
-                            exportCanvasAsImage()
-                        } label: {
-                            Label("Export as Image", systemImage: "square.and.arrow.up")
-                        }
-                    }
-
-                    Section {
-                        Button(role: .destructive) {
-                            HapticsManager.shared.impact()
-                            showClearConfirmation = true
-                        } label: {
-                            Label("Clear Canvas", systemImage: "eraser")
-                        }
-
-                        Button(role: .destructive) {
-                            HapticsManager.shared.impact()
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete Canvas", systemImage: "trash.fill")
-                        }
-                    }
-                } label: {
-                    Label("Options", systemImage: "ellipsis.circle")
+                    .toolbarButtonTint()
                 }
-                .toolbarButtonTint()
+            } else {
+                // Regular: Separate buttons with Export as Image in confirmationAction
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        HapticsManager.shared.impact()
+                        editedTitle = canvasFile.title
+                        showRenameTitleAlert = true
+                    } label: {
+                        Label("Rename", systemImage: "character.cursor.ibeam")
+                    }
+                    .toolbarButtonTint()
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        HapticsManager.shared.impact()
+                        isColorSamplingMode = true
+                    } label: {
+                        Label("Sample Color", systemImage: "eyedropper")
+                    }
+                    .toolbarButtonTint()
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Section("Shapes") {
+                            ForEach(CanvasShape.allCases, id: \.self) { shape in
+                                Button {
+                                    HapticsManager.shared.impact()
+                                    pendingShape = shape
+                                } label: {
+                                    Label(shape.displayName, systemImage: shape.systemImage)
+                                }
+                            }
+                        }
+
+                        Section("Tools") {
+                            Button {
+                                HapticsManager.shared.impact()
+                                isShowingSVGImporter = true
+                            } label: {
+                                Label("Place SVG Shape", systemImage: "square.on.circle")
+                            }
+                        }
+
+                        Section {
+                            Button(role: .destructive) {
+                                HapticsManager.shared.impact()
+                                showClearConfirmation = true
+                            } label: {
+                                Label("Clear Canvas", systemImage: "eraser")
+                            }
+
+                            Button(role: .destructive) {
+                                HapticsManager.shared.impact()
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete Canvas", systemImage: "trash.fill")
+                            }
+                        }
+                    } label: {
+                        Label("Options", systemImage: "ellipsis.circle")
+                    }
+                    .toolbarButtonTint()
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        HapticsManager.shared.impact()
+                        exportCanvasAsImage()
+                    } label: {
+                        Label("Export as Image", systemImage: "square.and.arrow.up")
+                    }
+                    .toolbarButtonTint()
+                }
             }
 
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {

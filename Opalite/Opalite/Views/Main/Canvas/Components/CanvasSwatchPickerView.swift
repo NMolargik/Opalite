@@ -52,7 +52,7 @@ struct CanvasSwatchPickerView: View {
                 }
 
                 // Hide checkmark after delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     withAnimation(.linear(duration: 0.15)) {
                         selectedColorID = nil
                     }

@@ -337,15 +337,15 @@ private extension PortfolioView {
                 .tipCornerRadius(16)
                 .padding(.horizontal, 20)
 
-            ForEach(orderedPalettes) { palette in
-                paletteRow(for: palette)
+            ForEach(Array(orderedPalettes.enumerated()), id: \.element.id) { index, palette in
+                paletteRow(for: palette, isFirst: index == 0)
             }
         }
     }
 
-    func paletteRow(for palette: OpalitePalette) -> some View {
+    func paletteRow(for palette: OpalitePalette, isFirst: Bool) -> some View {
         VStack(alignment: .leading, spacing: 5) {
-            PaletteRowHeaderView(palette: palette)
+            PaletteRowHeaderView(palette: palette, showTip: isFirst)
                 .zIndex(0)
 
             SwatchRowView(
@@ -388,6 +388,7 @@ private extension PortfolioView {
                 viewModel.isShowingBatchPaletteSelection = true
             } label: {
                 Label("Move To Palette", systemImage: "swatchpalette")
+                    .foregroundStyle(.blue)
             }
             .disabled(viewModel.selectedColorIDs.isEmpty)
 
