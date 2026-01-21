@@ -24,6 +24,7 @@ struct PortfolioView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(QuickActionManager.self) private var quickActionManager
     @Environment(HexCopyManager.self) private var hexCopyManager
+    @Environment(ReviewRequestManager.self) private var reviewRequestManager
 
     // MARK: - ViewModel
     @State private var viewModel = ViewModel()
@@ -674,6 +675,10 @@ private extension PortfolioView {
                     _ = try colorManager.createColor(existing: newColor)
                     createContentTip.invalidate(reason: .actionPerformed)
                     OpaliteTipActions.advanceTipsAfterContentCreation()
+                    reviewRequestManager.evaluateReviewRequest(
+                        colorCount: colorManager.colors.count,
+                        paletteCount: colorManager.palettes.count
+                    )
                 } catch {
                     toastManager.show(error: .colorCreationFailed)
                 }
@@ -846,6 +851,7 @@ private extension PortfolioView {
         .environment(manager)
         .environment(ToastManager())
         .environment(SubscriptionManager())
+        .environment(ReviewRequestManager())
         .environment(QuickActionManager())
         .environment(HexCopyManager())
         .modelContainer(container)

@@ -115,7 +115,7 @@ struct ColorCodesPickerView: View {
                             applyHexInput()
                         }
                         .bold()
-
+                        .tint(.blue)
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)
@@ -179,6 +179,7 @@ struct ColorCodesPickerView: View {
                             applyRGBInput()
                         }
                         .bold()
+                        .tint(.blue)
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)
@@ -223,6 +224,7 @@ struct ColorCodesPickerView: View {
                             applyAlphaInput()
                         }
                         .bold()
+                        .tint(.blue)
                         .buttonStyle(.borderedProminent)
                         #if os(iOS) || os(visionOS)
                         .controlSize(.small)

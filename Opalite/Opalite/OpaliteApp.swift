@@ -23,6 +23,7 @@ struct OpaliteApp: App {
     let communityManager = CommunityManager()
     let toastManager = ToastManager()
     let subscriptionManager = SubscriptionManager()
+    let reviewRequestManager = ReviewRequestManager()
     let importCoordinator = ImportCoordinator()
     let quickActionManager = QuickActionManager()
     let hexCopyManager = HexCopyManager()
@@ -204,6 +205,7 @@ struct OpaliteApp: App {
         .environment(communityManager)
         .environment(toastManager)
         .environment(subscriptionManager)
+        .environment(reviewRequestManager)
         .environment(importCoordinator)
         .commands {
             // Replace the New Item command group (Cmd+N)
@@ -230,6 +232,10 @@ struct OpaliteApp: App {
                                 let newPalette = try colorManager.createPalette(name: "New Palette")
                                 prependPaletteToOrder(newPalette.id)
                                 OpaliteTipActions.advanceTipsAfterContentCreation()
+                                reviewRequestManager.evaluateReviewRequest(
+                                    colorCount: colorManager.colors.count,
+                                    paletteCount: colorManager.palettes.count
+                                )
                             } catch {
                                 toastManager.show(error: .paletteCreationFailed)
                             }

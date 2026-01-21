@@ -50,4 +50,7 @@ enum AppStorageKeys {
 
     /// The selected app icon variant (dark or light).
     static let appIcon = "appIcon"
+
+    /// The app version when a review was last requested.
+    static let lastReviewRequestVersion = "lastReviewRequestVersion"
 }

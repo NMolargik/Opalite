@@ -47,6 +47,7 @@ struct ColorImagePickerView: View {
                         Label("Choose Photo", systemImage: "photo.on.rectangle")
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.blue)
                     .controlSize(.small)
 
                     Spacer()
@@ -58,6 +59,7 @@ struct ColorImagePickerView: View {
                         Label("Capture Photo", systemImage: "camera")
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.blue)
                     .controlSize(.small)
                 }
 
@@ -132,6 +134,7 @@ struct ColorImagePickerView: View {
             )
         }
         .aspectRatio(uiImage.size, contentMode: .fit)
+        .frame(maxHeight: horizontalSizeClass == .compact ? 350 : nil)
 
         Text("Tap or drag on the image to pick a color.")
             .font(.footnote)
