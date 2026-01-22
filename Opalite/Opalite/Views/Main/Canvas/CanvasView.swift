@@ -185,7 +185,7 @@ struct CanvasView: View {
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .lineLimit(1)
-                        .frame(width: 180)
+                        .frame(maxWidth: 150)
                 }
             }
 
@@ -328,7 +328,7 @@ struct CanvasView: View {
                     } label: {
                         Label("Export as Image", systemImage: "square.and.arrow.up")
                     }
-                    .toolbarButtonTint()
+                    .tint(.blue)
                 }
             }
 

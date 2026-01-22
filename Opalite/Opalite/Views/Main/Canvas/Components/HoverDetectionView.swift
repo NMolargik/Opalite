@@ -15,12 +15,21 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
     // Baseline roll angle captured on first touch - rotation is relative to this
     private(set) var baselineRollAngle: CGFloat?
 
+    // Baseline altitude angle captured on first touch - scale is relative to this
+    private var baselineAltitudeAngle: CGFloat?
+
+    // Current pencil-based scale (from altitude/tilt)
+    private var pencilScale: CGFloat = 1.0
+
     // Track if we're in two-finger mode (pinch/rotate)
     private var isTwoFingerMode: Bool = false
 
     // Track gesture states to know when both have ended
     private var pinchGestureActive: Bool = false
     private var rotationGestureActive: Bool = false
+
+    // Prevents double-placement when touches and gestures both try to place
+    private var hasPlacedInCurrentInteraction: Bool = false
 
     // Last known location for placement after two-finger gestures
     private var lastGestureLocation: CGPoint = .zero
@@ -66,6 +75,8 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
 
     func resetBaseline() {
         baselineRollAngle = nil
+        baselineAltitudeAngle = nil
+        pencilScale = 1.0
         lastHapticThreshold = 0
         twoFingerRotation = 0
         currentScale = 1.0
@@ -74,6 +85,7 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         isTwoFingerMode = false
         pinchGestureActive = false
         rotationGestureActive = false
+        hasPlacedInCurrentInteraction = false
         initialPinchWidth = 0
         initialPinchHeight = 0
     }
@@ -249,10 +261,11 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
 
     /// Called when a two-finger gesture ends - places shape when both gestures are done
     private func checkAndPlaceAfterTwoFingerGesture() {
-        // Only place when both gestures have ended
-        if !pinchGestureActive && !rotationGestureActive && isTwoFingerMode {
+        // Only place when both gestures have ended and we haven't already placed
+        if !pinchGestureActive && !rotationGestureActive && isTwoFingerMode && !hasPlacedInCurrentInteraction {
+            hasPlacedInCurrentInteraction = true
             onTap?(lastGestureLocation)
-            isTwoFingerMode = false
+            // Don't reset isTwoFingerMode here - let touchesEnded handle final cleanup
         }
     }
 
@@ -274,6 +287,42 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         return snappedDegrees * .pi / 180
     }
 
+    /// Calculates scale factor from pencil altitude (tilt) angle.
+    /// Tilting the pencil more upright increases scale, tilting flatter decreases it.
+    /// Returns the updated scale and whether it changed significantly for haptic feedback.
+    private func updateScaleFromAltitude(_ touch: UITouch) -> (scale: CGFloat, changed: Bool) {
+        let altitude = touch.altitudeAngle  // 0 = flat, π/2 = perpendicular
+
+        // Capture baseline on first touch
+        if baselineAltitudeAngle == nil {
+            baselineAltitudeAngle = altitude
+            return (pencilScale, false)
+        }
+
+        // Calculate change from baseline
+        // Positive change (more upright) = larger scale
+        // Negative change (more tilted) = smaller scale
+        let altitudeChange = altitude - (baselineAltitudeAngle ?? altitude)
+
+        // Map altitude change to scale multiplier
+        // A change of π/8 (22.5°) corresponds to doubling or halving the scale
+        let scaleFactor = 1.0 + (altitudeChange / (CGFloat.pi / 8))
+
+        // Apply scale factor with bounds
+        let newScale = max(0.25, min(4.0, pencilScale * scaleFactor))
+
+        // Check if scale changed significantly (for haptic feedback)
+        let previousThreshold = Int(pencilScale * 10)
+        let newThreshold = Int(newScale * 10)
+        let changed = previousThreshold != newThreshold
+
+        // Update stored values
+        pencilScale = newScale
+        baselineAltitudeAngle = altitude  // Reset baseline for incremental changes
+
+        return (newScale, changed)
+    }
+
     // Check if rotation crossed a 10-degree threshold and trigger haptic
     private func checkRotationHaptic(degrees: CGFloat, at location: CGPoint) {
         let currentThreshold = Int(degrees / 10)
@@ -292,14 +341,33 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         // If two or more fingers, enter two-finger mode (gestures will handle it)
         if touchCount >= 2 {
             isTwoFingerMode = true
+            hasPlacedInCurrentInteraction = false
+            // Update lastGestureLocation with center of touches
+            if let allTouches = event?.allTouches, allTouches.count >= 2 {
+                let touchArray = Array(allTouches)
+                let loc1 = touchArray[0].location(in: self)
+                let loc2 = touchArray[1].location(in: self)
+                lastGestureLocation = CGPoint(
+                    x: (loc1.x + loc2.x) / 2,
+                    y: (loc1.y + loc2.y) / 2
+                )
+                onHoverUpdate?(lastGestureLocation, nil)
+            }
             return
         }
 
         guard let touch = touches.first else { return }
 
+        impactGenerator.prepare()
+
         let location = touch.location(in: self)
         lastGestureLocation = location
         let rollAngle = relativeRollAngle(from: touch)
+
+        // Initialize scale from altitude angle (captures baseline)
+        let (scale, _) = updateScaleFromAltitude(touch)
+        onScaleUpdate?(scale)
+
         onHoverUpdate?(location, rollAngle)
     }
 
@@ -315,6 +383,13 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         lastGestureLocation = location
         let rollAngle = relativeRollAngle(from: touch)
 
+        // Update scale from altitude angle (tilt)
+        let (scale, scaleChanged) = updateScaleFromAltitude(touch)
+        if scaleChanged {
+            impactGenerator.impactOccurred(intensity: 0.5)
+        }
+        onScaleUpdate?(scale)
+
         // Trigger haptic every 10 degrees of rotation
         let degrees = rollAngle * 180 / .pi
         checkRotationHaptic(degrees: degrees, at: location)
@@ -325,12 +400,37 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
 
-        // If in two-finger mode, let the gesture handlers deal with placement
-        if isTwoFingerMode { return }
+        // Count remaining active touches (not ended or cancelled)
+        let remainingTouches = event?.allTouches?.filter {
+            $0.phase == .began || $0.phase == .moved || $0.phase == .stationary
+        }.count ?? 0
+
+        // If in two-finger mode, handle placement when all fingers are lifted
+        if isTwoFingerMode {
+            // Only place when all fingers are up and we haven't already placed
+            if remainingTouches == 0 && !hasPlacedInCurrentInteraction {
+                hasPlacedInCurrentInteraction = true
+                onTap?(lastGestureLocation)
+            }
+
+            // Reset state when all fingers are lifted
+            if remainingTouches == 0 {
+                isTwoFingerMode = false
+                pinchGestureActive = false
+                rotationGestureActive = false
+                hasPlacedInCurrentInteraction = false
+            }
+            return
+        }
 
         // Single finger release - place the shape
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
+        lastGestureLocation = location
+
+        // Update preview position to match placement location
+        onHoverUpdate?(location, nil)
+
         onTap?(location)
     }
 
@@ -339,6 +439,7 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         isTwoFingerMode = false
         pinchGestureActive = false
         rotationGestureActive = false
+        hasPlacedInCurrentInteraction = false
     }
 }
 #elseif canImport(AppKit)

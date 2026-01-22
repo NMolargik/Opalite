@@ -49,10 +49,9 @@ struct ShapePlacementOverlay: View {
                 shapeScale: $scale,
                 aspectRatio: $aspectRatio,
                 useNonUniformScale: useNonUniformScale,
-                onTap: { _ in
-                    // Use our tracked previewLocation instead of the tap location
-                    // to ensure the shape is placed exactly where the preview was shown
-                    guard let location = previewLocation else { return }
+                onTap: { location in
+                    // Use the actual touch/gesture location for placement
+                    // This ensures accuracy even if hover events interfere
                     onPlace(location, rotation, scale, aspectRatio)
                 }
             )
