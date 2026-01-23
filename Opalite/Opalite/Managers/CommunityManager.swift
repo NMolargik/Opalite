@@ -125,6 +125,46 @@ final class CommunityManager {
         currentUserRecordID != nil
     }
 
+    /// Discovers the current user's name from iCloud user identity
+    /// Returns a formatted display name (first + last) or nil if unavailable
+    @available(iOS, deprecated: 17.0, message: "Using deprecated CloudKit user discoverability APIs")
+    func discoverCurrentUserName() async -> String? {
+        guard let userRecordID = currentUserRecordID else {
+            #if DEBUG
+            print("[CommunityManager] No user record ID available for name discovery")
+            #endif
+            return nil
+        }
+
+        do {
+            let status = try await container.requestApplicationPermission(.userDiscoverability)
+            guard status == .granted else {
+                #if DEBUG
+                print("[CommunityManager] User discoverability not granted for name discovery")
+                #endif
+                return nil
+            }
+
+            let identity = try await container.userIdentity(forUserRecordID: userRecordID)
+
+            if let nameComponents = identity?.nameComponents {
+                let formatter = PersonNameComponentsFormatter()
+                formatter.style = .default
+                let formattedName = formatter.string(from: nameComponents)
+                if !formattedName.isEmpty {
+                    return formattedName
+                }
+            }
+
+            return nil
+        } catch {
+            #if DEBUG
+            print("[CommunityManager] Failed to discover user name: \(error)")
+            #endif
+            return nil
+        }
+    }
+
     // MARK: - Publishing Colors
 
     /// Publishes a color to the public Community database
@@ -385,7 +425,6 @@ final class CommunityManager {
 
         isLoading = true
         error = nil
-        defer { isLoading = false }
 
         let predicate = NSPredicate(format: "isHidden == %d", Int64(0))
         let sortDescriptor = NSSortDescriptor(key: sortBy.sortDescriptorKey, ascending: sortBy.ascending)
@@ -395,13 +434,11 @@ final class CommunityManager {
         do {
             let (results, cursor) = try await publicDatabase.records(matching: query, resultsLimit: resultsPerPage)
 
+            // First pass: create palettes without colors (shows immediately with placeholders)
             var newPalettes: [CommunityPalette] = []
             for result in results {
                 if case .success(let record) = result.1 {
-                    if var palette = try? CommunityPalette(record: record) {
-                        // Load colors for this palette
-                        let colors = try? await fetchPaletteColors(paletteRecordID: palette.id)
-                        palette.colors = colors ?? []
+                    if let palette = try? CommunityPalette(record: record) {
                         newPalettes.append(palette)
                     }
                 }
@@ -413,9 +450,44 @@ final class CommunityManager {
             palettes.append(contentsOf: uniqueNewPalettes)
             paletteCursor = cursor
             hasMorePalettes = cursor != nil
+
+            // Stop showing loading indicator - palettes are visible with placeholders
+            isLoading = false
+
+            // Second pass: load colors concurrently in background
+            await loadColorsForPalettes(uniqueNewPalettes)
         } catch {
+            isLoading = false
             self.error = .communityFetchFailed(reason: error.localizedDescription)
             throw OpaliteError.communityFetchFailed(reason: error.localizedDescription)
+        }
+    }
+
+    /// Loads colors for multiple palettes concurrently
+    private func loadColorsForPalettes(_ palettesToLoad: [CommunityPalette]) async {
+        // Collect all results first
+        var colorResults: [(CKRecord.ID, [CommunityColor])] = []
+
+        await withTaskGroup(of: (CKRecord.ID, [CommunityColor]).self) { group in
+            for palette in palettesToLoad {
+                group.addTask {
+                    let colors = (try? await self.fetchPaletteColors(paletteRecordID: palette.id)) ?? []
+                    return (palette.id, colors)
+                }
+            }
+
+            for await result in group {
+                colorResults.append(result)
+            }
+        }
+
+        // Update palettes by replacing structs to ensure SwiftUI observes the change
+        for (paletteID, colors) in colorResults {
+            if let index = palettes.firstIndex(where: { $0.id == paletteID }) {
+                var updatedPalette = palettes[index]
+                updatedPalette.colors = colors
+                palettes[index] = updatedPalette
+            }
         }
     }
 
@@ -424,18 +496,15 @@ final class CommunityManager {
         guard let cursor = paletteCursor else { return }
 
         isLoading = true
-        defer { isLoading = false }
 
         do {
             let (results, newCursor) = try await publicDatabase.records(continuingMatchFrom: cursor, resultsLimit: resultsPerPage)
 
+            // First pass: create palettes without colors
             var newPalettes: [CommunityPalette] = []
             for result in results {
                 if case .success(let record) = result.1 {
-                    if var palette = try? CommunityPalette(record: record) {
-                        // Load colors for this palette
-                        let colors = try? await fetchPaletteColors(paletteRecordID: palette.id)
-                        palette.colors = colors ?? []
+                    if let palette = try? CommunityPalette(record: record) {
                         newPalettes.append(palette)
                     }
                 }
@@ -447,7 +516,14 @@ final class CommunityManager {
             palettes.append(contentsOf: uniqueNewPalettes)
             paletteCursor = newCursor
             hasMorePalettes = newCursor != nil
+
+            // Stop loading indicator - palettes visible with placeholders
+            isLoading = false
+
+            // Load colors concurrently in background
+            await loadColorsForPalettes(uniqueNewPalettes)
         } catch {
+            isLoading = false
             self.error = .communityFetchFailed(reason: error.localizedDescription)
             throw OpaliteError.communityFetchFailed(reason: error.localizedDescription)
         }
@@ -744,7 +820,48 @@ final class CommunityManager {
 
     // MARK: - Publisher Profile
 
-    /// Fetches content published by a specific user
+    /// Fetches content metadata published by a specific user (palettes without colors for fast initial load)
+    func fetchPublisherContentMetadata(userRecordID: CKRecord.ID) async throws -> (colors: [CommunityColor], palettes: [CommunityPalette]) {
+        let userRef = CKRecord.Reference(recordID: userRecordID, action: .none)
+
+        // Fetch colors
+        let colorPredicate = NSPredicate(format: "publisherUserRecordID == %@ AND isHidden == %d", userRef, Int64(0))
+        let colorQuery = CKQuery(recordType: CommunityColor.recordType, predicate: colorPredicate)
+        colorQuery.sortDescriptors = [NSSortDescriptor(key: "publishedAt", ascending: false)]
+
+        // Fetch palettes
+        let palettePredicate = NSPredicate(format: "publisherUserRecordID == %@ AND isHidden == %d", userRef, Int64(0))
+        let paletteQuery = CKQuery(recordType: CommunityPalette.recordType, predicate: palettePredicate)
+        paletteQuery.sortDescriptors = [NSSortDescriptor(key: "publishedAt", ascending: false)]
+
+        do {
+            let (colorResults, _) = try await publicDatabase.records(matching: colorQuery, resultsLimit: 50)
+            let (paletteResults, _) = try await publicDatabase.records(matching: paletteQuery, resultsLimit: 50)
+
+            var userColors: [CommunityColor] = []
+            for result in colorResults {
+                if case .success(let record) = result.1,
+                   let color = try? CommunityColor(record: record) {
+                    userColors.append(color)
+                }
+            }
+
+            // Create palettes without loading colors (for fast display with placeholders)
+            var userPalettes: [CommunityPalette] = []
+            for result in paletteResults {
+                if case .success(let record) = result.1,
+                   let palette = try? CommunityPalette(record: record) {
+                    userPalettes.append(palette)
+                }
+            }
+
+            return (userColors, userPalettes)
+        } catch {
+            throw OpaliteError.communityFetchFailed(reason: error.localizedDescription)
+        }
+    }
+
+    /// Fetches content published by a specific user (full load with palette colors)
     func fetchPublisherContent(userRecordID: CKRecord.ID) async throws -> (colors: [CommunityColor], palettes: [CommunityPalette]) {
         let userRef = CKRecord.Reference(recordID: userRecordID, action: .none)
 
@@ -770,14 +887,28 @@ final class CommunityManager {
                 }
             }
 
+            // First pass: create palettes without colors
             var userPalettes: [CommunityPalette] = []
             for result in paletteResults {
                 if case .success(let record) = result.1,
-                   var palette = try? CommunityPalette(record: record) {
-                    // Load colors for this palette
-                    let paletteColors = try? await fetchPaletteColors(paletteRecordID: palette.id)
-                    palette.colors = paletteColors ?? []
+                   let palette = try? CommunityPalette(record: record) {
                     userPalettes.append(palette)
+                }
+            }
+
+            // Load colors concurrently for all palettes
+            await withTaskGroup(of: (CKRecord.ID, [CommunityColor]).self) { group in
+                for palette in userPalettes {
+                    group.addTask {
+                        let colors = (try? await self.fetchPaletteColors(paletteRecordID: palette.id)) ?? []
+                        return (palette.id, colors)
+                    }
+                }
+
+                for await (paletteID, colors) in group {
+                    if let index = userPalettes.firstIndex(where: { $0.id == paletteID }) {
+                        userPalettes[index].colors = colors
+                    }
                 }
             }
 

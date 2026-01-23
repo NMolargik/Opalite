@@ -18,6 +18,7 @@ struct CommunityPublisherProfileView: View {
     @State private var colors: [CommunityColor] = []
     @State private var palettes: [CommunityPalette] = []
     @State private var isLoading = true
+    @State private var isLoadingPaletteColors = false
     @State private var selectedSegment: CommunitySegment = .colors
 
     var body: some View {
@@ -147,13 +148,41 @@ struct CommunityPublisherProfileView: View {
     private func loadContent() async {
         isLoading = true
         do {
-            let content = try await communityManager.fetchPublisherContent(userRecordID: userRecordID)
+            // First phase: fetch colors and palette metadata (without palette colors)
+            let content = try await communityManager.fetchPublisherContentMetadata(userRecordID: userRecordID)
             colors = content.colors
             palettes = content.palettes
+            isLoading = false
+
+            // Second phase: load palette colors concurrently in background
+            if !palettes.isEmpty {
+                isLoadingPaletteColors = true
+                await loadPaletteColors()
+                isLoadingPaletteColors = false
+            }
         } catch {
             toastManager.show(error: .communityFetchFailed(reason: error.localizedDescription))
+            isLoading = false
         }
-        isLoading = false
+    }
+
+    private func loadPaletteColors() async {
+        await withTaskGroup(of: (CKRecord.ID, [CommunityColor]).self) { group in
+            for palette in palettes {
+                group.addTask {
+                    let colors = (try? await communityManager.fetchPaletteColors(paletteRecordID: palette.id)) ?? []
+                    return (palette.id, colors)
+                }
+            }
+
+            for await (paletteID, paletteColors) in group {
+                if let index = palettes.firstIndex(where: { $0.id == paletteID }) {
+                    var updatedPalette = palettes[index]
+                    updatedPalette.colors = paletteColors
+                    palettes[index] = updatedPalette
+                }
+            }
+        }
     }
 }
 

@@ -152,6 +152,7 @@ struct QuickAddHexSheet: View {
                         HapticsManager.shared.impact()
                         importColor()
                     }
+                    .tint(.blue)
                     .disabled(!isValidHex)
                 }
             }

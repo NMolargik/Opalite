@@ -16,6 +16,7 @@ struct PaletteImportConfirmationSheet: View {
     let onComplete: () -> Void
 
     @State private var isImporting = false
+    @State private var importSuccess = false
     @State private var errorMessage: String?
 
     private var allColors: [OpaliteColor] {
@@ -131,13 +132,21 @@ struct PaletteImportConfirmationSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Import") {
+                    Button {
                         HapticsManager.shared.impact()
                         withAnimation {
                             performImport()
                         }
+                    } label: {
+                        if importSuccess {
+                            Label("Imported", systemImage: "checkmark")
+                                .contentTransition(.symbolEffect(.replace))
+                        } else {
+                            Text("Import")
+                        }
                     }
-                    .disabled(isImporting || !canImport)
+                    .tint(importSuccess ? .green : .blue)
+                    .disabled(isImporting || !canImport || importSuccess)
                 }
             }
         }
@@ -174,8 +183,17 @@ struct PaletteImportConfirmationSheet: View {
                 _ = try colorManager.createPalette(existing: paletteToImport)
             }
 
-            onComplete()
-            dismiss()
+            // Show success state with animation
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                importSuccess = true
+            }
+            HapticsManager.shared.notification(.success)
+
+            // Brief delay to show success before dismissing
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                onComplete()
+                dismiss()
+            }
         } catch {
             errorMessage = error.localizedDescription
             isImporting = false

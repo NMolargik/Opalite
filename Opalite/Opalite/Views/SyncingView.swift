@@ -99,16 +99,7 @@ struct SyncingView: View {
 
     /// Performs the iCloud sync with timeout
     private func performSync() async {
-        // Start a timeout task
-        let timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(syncTimeout))
-            if !Task.isCancelled {
-                await MainActor.run {
-                    hasTimedOut = true
-                    completeSync()
-                }
-            }
-        }
+        let startTime = Date()
 
         // Refresh data from CloudKit
         await MainActor.run {
@@ -130,29 +121,60 @@ struct SyncingView: View {
         let hasColors = !colorManager.colors.isEmpty
         let hasPalettes = !colorManager.palettes.isEmpty
         let hasCanvases = !canvasManager.canvases.isEmpty
+        let foundData = hasColors || hasPalettes || hasCanvases
 
         await MainActor.run {
-            if hasColors || hasPalettes || hasCanvases {
+            if foundData {
                 var found: [String] = []
                 if hasColors { found.append("\(colorManager.colors.count) color\(colorManager.colors.count == 1 ? "" : "s")") }
                 if hasPalettes { found.append("\(colorManager.palettes.count) palette\(colorManager.palettes.count == 1 ? "" : "s")") }
                 if hasCanvases { found.append("\(canvasManager.canvases.count) canvas\(canvasManager.canvases.count == 1 ? "" : "es")") }
                 statusMessage = "Found " + found.joined(separator: ", ")
             } else {
-                statusMessage = "Ready to create"
+                statusMessage = "Waiting for iCloud"
             }
         }
 
-        // Brief pause to show the result
-        try? await Task.sleep(for: .seconds(1.5))
+        // If no data found, wait for the full timeout period to give CloudKit more time
+        // This is important for fresh installs where data may still be syncing
+        if !foundData {
+            let elapsed = Date().timeIntervalSince(startTime)
+            let remainingTime = syncTimeout - elapsed
+            if remainingTime > 0 {
+                try? await Task.sleep(for: .seconds(remainingTime))
+            }
 
-        // Cancel the timeout and complete
-        timeoutTask.cancel()
+            // Check one more time after waiting
+            await colorManager.refreshAll()
+            await canvasManager.refreshAll()
+
+            let hasColorsNow = !colorManager.colors.isEmpty
+            let hasPalettesNow = !colorManager.palettes.isEmpty
+            let hasCanvasesNow = !canvasManager.canvases.isEmpty
+            let foundDataNow = hasColorsNow || hasPalettesNow || hasCanvasesNow
+
+            await MainActor.run {
+                if foundDataNow {
+                    var found: [String] = []
+                    if hasColorsNow { found.append("\(colorManager.colors.count) color\(colorManager.colors.count == 1 ? "" : "s")") }
+                    if hasPalettesNow { found.append("\(colorManager.palettes.count) palette\(colorManager.palettes.count == 1 ? "" : "s")") }
+                    if hasCanvasesNow { found.append("\(canvasManager.canvases.count) canvas\(canvasManager.canvases.count == 1 ? "" : "es")") }
+                    statusMessage = "Found " + found.joined(separator: ", ")
+                } else {
+                    statusMessage = "Ready to create"
+                }
+            }
+
+            // Brief pause to show the result
+            try? await Task.sleep(for: .seconds(1.5))
+        } else {
+            // Data was found quickly, just pause briefly to show the result
+            try? await Task.sleep(for: .seconds(1.5))
+        }
 
         await MainActor.run {
-            if !hasTimedOut {
-                completeSync()
-            }
+            hasTimedOut = true
+            completeSync()
         }
     }
 

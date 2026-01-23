@@ -186,10 +186,11 @@ struct CommunityPalette: Identifiable, Hashable, Sendable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+        hasher.combine(colors.count)
     }
 
     static func == (lhs: CommunityPalette, rhs: CommunityPalette) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.colors.count == rhs.colors.count
     }
 }
 

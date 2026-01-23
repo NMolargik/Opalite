@@ -53,4 +53,10 @@ enum AppStorageKeys {
 
     /// The app version when a review was last requested.
     static let lastReviewRequestVersion = "lastReviewRequestVersion"
+
+    /// Whether we've attempted to fetch the user's display name from iCloud.
+    static let hasAttemptedUserNameFetch = "hasAttemptedUserNameFetch"
+
+    /// Whether the user has manually edited their display name.
+    static let hasUserEditedDisplayName = "hasUserEditedDisplayName"
 }

@@ -14,7 +14,7 @@ struct PalettePreviewView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    let palette: OpalitePalette
+    @Bindable var palette: OpalitePalette
     @Binding var isEditingName: Bool?
 
     @State private var editedName: String = ""
@@ -109,6 +109,12 @@ struct PalettePreviewView: View {
         .frame(height: totalHeight)
         .onAppear {
             syncCache()
+        }
+        .onChange(of: palette.colors?.count) { _, _ in
+            // Sync cache when colors are added or removed
+            withAnimation {
+                cachedColors = palette.sortedColors
+            }
         }
         .onChange(of: isEditingName) { _, newValue in
             if newValue == true {

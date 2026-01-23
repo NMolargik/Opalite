@@ -93,6 +93,7 @@ class HexCopyManager {
 
         #if os(iOS) || os(visionOS)
         UIPasteboard.general.string = hex
+        HapticsManager.shared.impact(.light)
         #elseif os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(hex, forType: .string)

@@ -83,6 +83,7 @@ class PhoneSessionManager: NSObject {
         pendingHexCopy = nil
 
         UIPasteboard.general.string = hex
+        HapticsManager.shared.impact(.light)
         #if DEBUG
         print("[PhoneSessionManager] Processed pending hex copy: \(hex)")
         #endif
@@ -335,6 +336,7 @@ extension PhoneSessionManager: WCSessionDelegate {
             let appState = UIApplication.shared.applicationState
             if appState == .active {
                 UIPasteboard.general.string = hex
+                HapticsManager.shared.impact(.light)
                 #if DEBUG
                 print("[PhoneSessionManager] Copied hex '\(hex)' for color '\(colorName)' to clipboard")
                 #endif

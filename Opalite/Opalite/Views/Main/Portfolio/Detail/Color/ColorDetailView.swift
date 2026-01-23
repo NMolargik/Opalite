@@ -207,10 +207,8 @@ struct ColorDetailView: View {
                         }
                     }
                 } label: {
-                    Label(
-                        didCopyHex ? "Copied" : "Copy Hex",
-                        systemImage: didCopyHex ? "checkmark" : "number"
-                    )
+                    Image(systemName: didCopyHex ? "checkmark" : "number")
+                        .contentTransition(.symbolEffect(.replace))
                 }
                 .tint(didCopyHex ? .green : .inverseTheme)
                 .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")

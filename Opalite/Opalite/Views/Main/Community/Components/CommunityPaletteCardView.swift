@@ -35,7 +35,7 @@ struct CommunityPaletteCardView: View {
                 }
                 .scrollClipDisabled()
             } else {
-                // Fallback: show placeholder swatches
+                // Fallback: show placeholder swatches with loading indicators
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(0..<min(5, palette.colorCount), id: \.self) { _ in
@@ -45,6 +45,10 @@ struct CommunityPaletteCardView: View {
                                     RoundedRectangle(cornerRadius: 16)
                                         .stroke(.thinMaterial, lineWidth: 5)
                                 )
+                                .overlay {
+                                    ProgressView()
+                                        .tint(.secondary)
+                                }
                                 .frame(width: swatchSize, height: swatchSize)
                         }
                     }

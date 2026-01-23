@@ -236,16 +236,18 @@ struct SwatchRowView: View {
             )
         )
         .overlay(alignment: .topTrailing) {
-            if selectedIDs.contains(color.id) {
-                Image(systemName: "checkmark.circle.fill")
+            if onTap != nil {
+                let isSelected = selectedIDs.contains(color.id)
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isSelected ? .white : .secondary)
                     .background(
                         Circle()
-                            .fill(.blue)
+                            .fill(isSelected ? .blue : .clear)
                             .padding(-2)
                     )
                     .padding(6)
+                    .contentTransition(.symbolEffect(.replace))
             }
         }
     }

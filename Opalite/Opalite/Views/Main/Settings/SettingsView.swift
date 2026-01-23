@@ -25,6 +25,8 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
+    @AppStorage(AppStorageKeys.hasAttemptedUserNameFetch) private var hasAttemptedUserNameFetch: Bool = false
+    @AppStorage(AppStorageKeys.hasUserEditedDisplayName) private var hasUserEditedDisplayName: Bool = false
 
     @State private var isShowingDeleteAllColorsAlert: Bool = false
     @State private var isShowingDeleteAllCanvasesAlert: Bool = false
@@ -36,6 +38,7 @@ struct SettingsView: View {
 
     @State private var exportPDFURL: IdentifiableURL?
     @State private var isShowingExportSelection: Bool = false
+    @State private var isSettingNameProgrammatically: Bool = false
 
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
@@ -61,6 +64,13 @@ struct SettingsView: View {
                                 .multilineTextAlignment(.trailing)
                                 .textInputAutocapitalization(.words)
                                 .disableAutocorrection(true)
+                                .onChange(of: userName) { _, _ in
+                                    // Mark that user has manually edited their display name
+                                    // Skip if we're setting the name programmatically (e.g., from iCloud)
+                                    if !isSettingNameProgrammatically && !hasUserEditedDisplayName {
+                                        hasUserEditedDisplayName = true
+                                    }
+                                }
                         }
                         Text("Your display name appears in the metadata of each color you create and on content you publish to Community.")
                             .font(.footnote)
@@ -205,6 +215,7 @@ struct SettingsView: View {
                         Label("Include # in Copied Codes", systemImage: "number")
                             .foregroundStyle(.primary)
                     }
+                    .tint(.green)
                 } header: {
                     Text("Copying")
                 } footer: {
@@ -297,6 +308,7 @@ struct SettingsView: View {
                             Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
                                 .foregroundStyle(.primary)
                         }
+                        .tint(.green)
                     } header: {
                         Text("SwatchBar")
                     } footer: {
@@ -309,6 +321,7 @@ struct SettingsView: View {
                         Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
                             .foregroundStyle(.primary)
                     }
+                    .tint(.green)
                 } header: {
                     Text("SwatchBar")
                 } footer: {
@@ -468,6 +481,21 @@ struct SettingsView: View {
         }
         .task {
             await communityManager.checkAdminStatus()
+
+            // Attempt to fetch user's name from iCloud on first Settings visit
+            // Never overwrite if user has manually edited their display name
+            if !hasAttemptedUserNameFetch && !hasUserEditedDisplayName {
+                hasAttemptedUserNameFetch = true
+
+                // Only attempt if userName is still the default
+                if userName == "User" {
+                    if let discoveredName = await communityManager.discoverCurrentUserName() {
+                        isSettingNameProgrammatically = true
+                        userName = discoveredName
+                        isSettingNameProgrammatically = false
+                    }
+                }
+            }
         }
     }
 

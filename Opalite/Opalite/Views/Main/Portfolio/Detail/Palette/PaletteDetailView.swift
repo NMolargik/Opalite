@@ -309,7 +309,7 @@ private struct PaletteGlassTileBackground: ViewModifier {
 // MARK: - Palette Info Tiles Row
 
 private struct PaletteInfoTilesRow: View {
-    let palette: OpalitePalette
+    @Bindable var palette: OpalitePalette
 
     var body: some View {
         HStack(spacing: 12) {

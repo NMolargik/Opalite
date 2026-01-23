@@ -101,6 +101,7 @@ struct PhotoColorPickerSheet: View {
             } label: {
                 Label("Choose Photo", systemImage: "photo.on.rectangle")
             }
+            .tint(.blue)
             .buttonStyle(.borderedProminent)
 
             Button {
@@ -109,6 +110,7 @@ struct PhotoColorPickerSheet: View {
             } label: {
                 Label("Capture Photo", systemImage: "camera")
             }
+            .tint(.blue)
             .buttonStyle(.borderedProminent)
         }
     }

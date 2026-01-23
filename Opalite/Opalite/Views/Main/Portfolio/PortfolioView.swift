@@ -25,6 +25,7 @@ struct PortfolioView: View {
     @Environment(QuickActionManager.self) private var quickActionManager
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(ReviewRequestManager.self) private var reviewRequestManager
+    @Environment(ImportCoordinator.self) private var importCoordinator
 
     // MARK: - ViewModel
     @State private var viewModel = ViewModel()
@@ -123,8 +124,13 @@ struct PortfolioView: View {
             allowedContentTypes: [.opaliteColor, .opalitePalette],
             allowsMultipleSelection: false
         ) { result in
-            viewModel.handleFileImport(result, colorManager: colorManager, toastManager: toastManager) { paletteID in
-                viewModel.prependPaletteToOrder(paletteID, paletteOrderData: &paletteOrderData)
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                importCoordinator.handleIncomingURL(url, colorManager: colorManager)
+            case .failure(let error):
+                viewModel.importError = error.localizedDescription
+                viewModel.isShowingImportError = true
             }
         }
         .alert("Import Error", isPresented: $viewModel.isShowingImportError) {
@@ -380,6 +386,7 @@ private extension PortfolioView {
             Button(viewModel.allColorsSelected(looseColorCount: colorManager.looseColors.count) ? "Deselect All" : "Select All") {
                 viewModel.selectAllColors(looseColors: colorManager.looseColors)
             }
+            .tint(.blue)
 
             Spacer()
 
@@ -388,8 +395,8 @@ private extension PortfolioView {
                 viewModel.isShowingBatchPaletteSelection = true
             } label: {
                 Label("Move To Palette", systemImage: "swatchpalette")
-                    .foregroundStyle(.blue)
             }
+            .tint(.blue)
             .disabled(viewModel.selectedColorIDs.isEmpty)
 
             Button(role: .destructive) {

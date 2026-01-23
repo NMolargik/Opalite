@@ -15,6 +15,7 @@ struct ColorImportConfirmationSheet: View {
     let onComplete: () -> Void
 
     @State private var isImporting = false
+    @State private var importSuccess = false
     @State private var errorMessage: String?
 
     var body: some View {
@@ -93,17 +94,25 @@ struct ColorImportConfirmationSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Import") {
+                    Button {
                         HapticsManager.shared.impact()
                         withAnimation {
                             performImport()
                         }
+                    } label: {
+                        if importSuccess {
+                            Label("Imported", systemImage: "checkmark")
+                                .contentTransition(.symbolEffect(.replace))
+                        } else {
+                            Text("Import")
+                        }
                     }
-                    .disabled(isImporting || preview.willSkip)
+                    .tint(importSuccess ? .green : .blue)
+                    .disabled(isImporting || preview.willSkip || importSuccess)
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 
@@ -113,8 +122,18 @@ struct ColorImportConfirmationSheet: View {
 
         do {
             _ = try colorManager.createColor(existing: preview.color)
-            onComplete()
-            dismiss()
+
+            // Show success state with animation
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                importSuccess = true
+            }
+            HapticsManager.shared.notification(.success)
+
+            // Brief delay to show success before dismissing
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                onComplete()
+                dismiss()
+            }
         } catch {
             errorMessage = error.localizedDescription
             isImporting = false

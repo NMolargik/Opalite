@@ -208,6 +208,7 @@ struct ColorEditorView: View {
                         }
                     } label: {
                         Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
+                            .contentTransition(.symbolEffect(.replace))
                     }
                     .toolbarButtonTint()
                 }
