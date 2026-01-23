@@ -200,7 +200,6 @@ private extension PortfolioView {
             viewModel.handleImageDrop(providers: providers)
         }
         #endif
-        #if targetEnvironment(macCatalyst)
         .background {
             Button("") {
                 viewModel.sampleFromScreen(colorManager: colorManager, toastManager: toastManager)
@@ -208,7 +207,6 @@ private extension PortfolioView {
             .keyboardShortcut("e", modifiers: [.command, .shift])
             .hidden()
         }
-        #endif
         .refreshable {
             Task { await colorManager.refreshAll() }
         }

@@ -5,7 +5,6 @@
 //  Created by Nick Molargik on 12/30/25.
 //
 
-#if targetEnvironment(macCatalyst)
 import UIKit
 import ObjectiveC
 
@@ -148,4 +147,3 @@ enum SystemColorSampler {
         return UIColor(cgColor: cgColor)
     }
 }
-#endif

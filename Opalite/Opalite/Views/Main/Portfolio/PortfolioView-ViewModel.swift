@@ -257,7 +257,6 @@ extension PortfolioView {
 
         // MARK: - Mac Catalyst Screen Sampler
 
-        #if targetEnvironment(macCatalyst)
         func sampleFromScreen(colorManager: ColorManager, toastManager: ToastManager) {
             SystemColorSampler.sample { uiColor in
                 guard let uiColor else {
@@ -291,7 +290,6 @@ extension PortfolioView {
                 }
             }
         }
-        #endif
 
         // MARK: - Actions
 
