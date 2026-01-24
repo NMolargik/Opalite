@@ -12,6 +12,7 @@ struct PalettePreviewView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
+    @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @Bindable var palette: OpalitePalette
@@ -26,87 +27,72 @@ struct PalettePreviewView: View {
     @State private var cachedColors: [OpaliteColor] = []
     @State private var cachedName: String = ""
 
-    private let totalHeight: CGFloat = 300
+    // Track which color was copied for feedback
+    @State private var copiedColorID: UUID?
+
     private let padding: CGFloat = 16
-    private let spacing: CGFloat = 8
+    private let mediumSwatchSize: CGFloat = 150
 
     /// The current background, falling back to theme-appropriate default
     private var currentBackground: PreviewBackground {
         cachedBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
     }
 
-    private let extraVerticalPadding: CGFloat = 44
+    private let verticalPadding: CGFloat = 50  // Space for badges
+    private let spacing: CGFloat = 12
+
+    // State to track measured width for column calculation
+    @State private var measuredWidth: CGFloat = 0
+
+    private var columns: Int {
+        let availableWidth = measuredWidth - (padding * 2)
+        return max(1, Int(availableWidth / (mediumSwatchSize + spacing)))
+    }
+
+    private var calculatedHeight: CGFloat {
+        let colorCount = cachedColors.count
+        guard colorCount > 0 else {
+            return 150  // Minimum height for empty state
+        }
+        let rows = Int(ceil(Double(colorCount) / Double(max(1, columns))))
+        let contentHeight = CGFloat(rows) * mediumSwatchSize + CGFloat(max(0, rows - 1)) * spacing
+        return contentHeight + verticalPadding * 2 + padding
+    }
 
     var body: some View {
-        GeometryReader { geometry in
-            let availableWidth = geometry.size.width - (padding * 2)
-            let availableHeight = totalHeight - (padding * 2) - (extraVerticalPadding * 2)
-            let colors = cachedColors
-            let layout = calculateLayout(
-                colorCount: colors.count,
-                availableWidth: availableWidth,
-                availableHeight: availableHeight
-            )
+        ZStack(alignment: .top) {
+            backgroundView
 
-            ZStack {
-                // Background
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(currentBackground.color)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(.thinMaterial, lineWidth: 3)
-                    )
-
-                // Color swatches grid
-                if colors.isEmpty {
-                    Text("This palette is empty")
-                        .foregroundStyle(currentBackground.idealTextColor.opacity(0.6))
-                        .font(.subheadline)
-                } else {
-                    VStack(spacing: layout.verticalSpacing) {
-                        ForEach(0..<layout.rows, id: \.self) { row in
-                            HStack(spacing: layout.horizontalSpacing) {
-                                ForEach(0..<layout.columns, id: \.self) { col in
-                                    let index = row * layout.columns + col
-                                    if index < colors.count {
-                                        let color = colors[index]
-                                        NavigationLink {
-                                            ColorDetailView(color: color)
-                                        } label: {
-                                            SwatchView(
-                                                color: color,
-                                                width: layout.swatchSize,
-                                                height: layout.swatchSize,
-                                                badgeText: layout.showHexBadges ? (color.name ?? color.hexString) : "",
-                                                showOverlays: layout.showHexBadges
-                                            )
-                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
-                                        }
-                                        .buttonStyle(.plain)
-                                    } else {
-                                        Color.clear
-                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if cachedColors.isEmpty {
+                emptyStateView
+            } else {
+                swatchGridView(columns: columns)
             }
         }
+        .frame(height: calculatedHeight)
+        .background(
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        measuredWidth = geometry.size.width
+                    }
+                    .onChange(of: geometry.size.width) { _, newWidth in
+                        measuredWidth = newWidth
+                    }
+            }
+        )
         .overlay(alignment: .topLeading) {
             HStack {
                 nameBadge
                     .frame(maxWidth: 350, alignment: .leading)
                     .padding(10)
-                
+
                 Spacer()
-                
+
                 backgroundPickerButton
                     .padding(10)
             }
         }
-        .frame(height: totalHeight)
         .onAppear {
             syncCache()
         }
@@ -131,6 +117,76 @@ struct PalettePreviewView: View {
         cachedBackground = palette.previewBackground
         cachedColors = palette.sortedColors
         cachedName = palette.name
+    }
+
+    // MARK: - View Components
+
+    private var backgroundView: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(currentBackground.color)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(.thinMaterial, lineWidth: 3)
+            )
+    }
+
+    private var emptyStateView: some View {
+        Text("This palette is empty")
+            .foregroundStyle(currentBackground.idealTextColor.opacity(0.6))
+            .font(.subheadline)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func swatchGridView(columns: Int) -> some View {
+        let rows = Int(ceil(Double(cachedColors.count) / Double(columns)))
+        return VStack(spacing: spacing) {
+            ForEach(0..<rows, id: \.self) { row in
+                swatchRow(row: row, columns: columns)
+            }
+        }
+        .padding(.top, verticalPadding + 10)
+        .padding(.bottom, verticalPadding - 10)
+        .padding(.horizontal, padding)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func swatchRow(row: Int, columns: Int) -> some View {
+        let startIndex = row * columns
+        let endIndex = min(startIndex + columns, cachedColors.count)
+
+        return HStack {
+            Spacer(minLength: 0)
+            HStack(spacing: spacing) {
+                ForEach(startIndex..<endIndex, id: \.self) { index in
+                    let color = cachedColors[index]
+                    NavigationLink {
+                        ColorDetailView(color: color)
+                    } label: {
+                        swatchViewFor(color: color)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func swatchViewFor(color: OpaliteColor) -> some View {
+        let isCopied = copiedColorID == color.id
+        return SwatchView(
+            color: color,
+            width: mediumSwatchSize,
+            height: mediumSwatchSize,
+            badgeText: color.name ?? color.hexString,
+            showOverlays: true,
+            menu: AnyView(swatchMenuContent(for: color)),
+            contextMenu: AnyView(swatchMenuContent(for: color)),
+            showCopiedFeedback: Binding(
+                get: { isCopied },
+                set: { if !$0 { copiedColorID = nil } }
+            )
+        )
+        .frame(width: mediumSwatchSize, height: mediumSwatchSize)
     }
 
     // MARK: - Name Badge
@@ -245,74 +301,30 @@ struct PalettePreviewView: View {
         }
     }
 
-    // MARK: - Layout Calculation
+    // MARK: - Swatch Menu Content
 
-    private struct LayoutInfo {
-        let rows: Int
-        let columns: Int
-        let swatchSize: CGFloat
-        let horizontalSpacing: CGFloat
-        let verticalSpacing: CGFloat
-        let showHexBadges: Bool
-    }
-
-    private func calculateLayout(
-        colorCount: Int,
-        availableWidth: CGFloat,
-        availableHeight: CGFloat
-    ) -> LayoutInfo {
-        guard colorCount > 0 else {
-            return LayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
+    @ViewBuilder
+    private func swatchMenuContent(for color: OpaliteColor) -> some View {
+        Button {
+            HapticsManager.shared.selection()
+            hexCopyManager.copyHex(for: color)
+            withAnimation {
+                copiedColorID = color.id
+            }
+        } label: {
+            Label("Copy Hex", systemImage: "number")
         }
 
-        let minSpacing: CGFloat = 8
-        let maxSpacing: CGFloat = 16
-
-        var bestLayout = LayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
-
-        // Try different row configurations (1, 2, or 3 rows)
-        for rows in 1...3 {
-            let columns = Int(ceil(Double(colorCount) / Double(rows)))
-
-            // Use fixed vertical spacing
-            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
-            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
-
-            // Calculate horizontal spacing
-            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
-            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
-
-            // Calculate max swatch size that fits in both dimensions
-            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
-            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
-
-            // Use the smaller to ensure perfect squares
-            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
-
-            // Calculate actual horizontal spacing to distribute swatches evenly
-            var actualHorizontalSpacing = horizontalSpacing
-            if columns > 1 {
-                let usedWidth = CGFloat(columns) * swatchSize
-                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
-                // Cap at max spacing - if more space available, swatches could be bigger but we've already optimized
-                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
+        Button(role: .destructive) {
+            HapticsManager.shared.selection()
+            withAnimation {
+                colorManager.detachColorFromPalette(color)
             }
-
-            // We want the largest possible swatch size
-            if swatchSize > bestLayout.swatchSize {
-                bestLayout = LayoutInfo(
-                    rows: rows,
-                    columns: columns,
-                    swatchSize: swatchSize,
-                    horizontalSpacing: actualHorizontalSpacing,
-                    verticalSpacing: verticalSpacing,
-                    showHexBadges: swatchSize >= 110 && horizontalSizeClass != .compact
-                )
-            }
+        } label: {
+            Label("Remove From Palette", systemImage: "minus.circle")
         }
-
-        return bestLayout
     }
+
 }
 
 #Preview("Palette Preview") {
@@ -346,4 +358,5 @@ struct PalettePreviewView: View {
     }
     .environment(manager)
     .environment(ToastManager())
+    .environment(HexCopyManager())
 }

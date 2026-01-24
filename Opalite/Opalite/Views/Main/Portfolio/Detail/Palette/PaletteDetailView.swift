@@ -47,15 +47,6 @@ struct PaletteDetailView: View {
 
                 // MARK: - Content Sections
                 VStack(spacing: 20) {
-                    // Colors section
-                    SectionCard(title: "Components", systemImage: "swatchpalette") {
-                        PaletteMembersView(palette: palette, onRemoveColor: { color in
-                            withAnimation {
-                                colorManager.detachColorFromPalette(color)
-                            }
-                        })
-                    }
-
                     // Notes section
                     NotesSectionView(
                         notes: $notesDraft,
