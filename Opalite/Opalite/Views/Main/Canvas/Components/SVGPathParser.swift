@@ -315,7 +315,6 @@ struct SVGPathParser {
     private func tokenize(_ data: String) -> [String] {
         var tokens: [String] = []
         var current = ""
-        var inNumber = false
 
         for char in data {
             if char.isLetter {
@@ -324,7 +323,6 @@ struct SVGPathParser {
                     current = ""
                 }
                 tokens.append(String(char))
-                inNumber = false
             } else if char.isNumber || char == "." || char == "-" || char == "e" || char == "E" {
                 // Handle negative numbers that immediately follow another number (e.g., "-7.87-0.021")
                 // Split the token unless it's part of scientific notation (e.g., "1e-10")
@@ -333,13 +331,11 @@ struct SVGPathParser {
                     current = ""
                 }
                 current.append(char)
-                inNumber = true
             } else if char == "," || char.isWhitespace {
                 if !current.isEmpty {
                     tokens.append(current)
                     current = ""
                 }
-                inNumber = false
             }
         }
 
@@ -688,3 +684,4 @@ enum SVGParseError: LocalizedError {
         }
     }
 }
+

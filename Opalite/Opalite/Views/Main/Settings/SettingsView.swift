@@ -25,6 +25,7 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
+    @AppStorage(AppStorageKeys.playLoadSound) private var playLoadSound: Bool = true
     @AppStorage(AppStorageKeys.hasAttemptedUserNameFetch) private var hasAttemptedUserNameFetch: Bool = false
     @AppStorage(AppStorageKeys.hasUserEditedDisplayName) private var hasUserEditedDisplayName: Bool = false
 
@@ -72,7 +73,7 @@ struct SettingsView: View {
                                     }
                                 }
                         }
-                        Text("Your display name appears in the metadata of each color you create and on content you publish to Community.")
+                        Text("Your display name appears in the metadata of each color you create and on content you publish to Community. The initial value may be pulled from your Apple Account.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -108,8 +109,48 @@ struct SettingsView: View {
                         .pickerStyle(.segmented)
                     }
                     #endif
+
+                    Toggle(isOn: $includeHexPrefix) {
+                        Label("Include # in Copied Codes", systemImage: "number")
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.green)
+
+                    Toggle(isOn: $playLoadSound) {
+                        Label("Play Load Sound", systemImage: "speaker.wave.2")
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.green)
+
+                    #if os(iOS)
+                    if UIDevice.current.userInterfaceIdiom != .phone {
+                        Toggle(isOn: $skipSwatchBarConfirmation) {
+                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                                .foregroundStyle(.primary)
+                        }
+                        .tint(.green)
+                    }
+                    #else
+                    Toggle(isOn: $skipSwatchBarConfirmation) {
+                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.green)
+                    #endif
                 }
-                
+
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    Section {
+                        Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        Text("iPad Tip")
+                    }
+                }
+                #endif
+
                 Section {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
@@ -210,18 +251,6 @@ struct SettingsView: View {
                     Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
                 }
 
-                Section {
-                    Toggle(isOn: $includeHexPrefix) {
-                        Label("Include # in Copied Codes", systemImage: "number")
-                            .foregroundStyle(.primary)
-                    }
-                    .tint(.green)
-                } header: {
-                    Text("Copying")
-                } footer: {
-                    Text("When enabled, copied hex codes will include the \"#\" prefix (e.g., #FF5733). When disabled, only the hex value is copied (e.g., FF5733).")
-                }
-
                 #if os(iOS)
                 // Apple Watch section - iPhone only
                 if UIDevice.current.userInterfaceIdiom == .phone {
@@ -301,34 +330,6 @@ struct SettingsView: View {
                 }
                 #endif
 
-                #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom != .phone {
-                    Section {
-                        Toggle(isOn: $skipSwatchBarConfirmation) {
-                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                                .foregroundStyle(.primary)
-                        }
-                        .tint(.green)
-                    } header: {
-                        Text("SwatchBar")
-                    } footer: {
-                        Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
-                    }
-                }
-                #else
-                Section {
-                    Toggle(isOn: $skipSwatchBarConfirmation) {
-                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                            .foregroundStyle(.primary)
-                    }
-                    .tint(.green)
-                } header: {
-                    Text("SwatchBar")
-                } footer: {
-                    Text("When enabled, tapping SwatchBar in the sidebar will immediately open the window without showing the info sheet first.")
-                }
-                #endif
-
                 Section {
                     Button {
                         HapticsManager.shared.selection()
@@ -377,18 +378,6 @@ struct SettingsView: View {
                 } footer: {
                     Text("These actions cannot be undone.")
                 }
-
-                #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    Section {
-                        Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    } header: {
-                        Text("iPad Tip")
-                    }
-                }
-                #endif
 
                 Section {
                     LabeledContent("Version") {

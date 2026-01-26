@@ -10,9 +10,14 @@ import SwiftData
 import CloudKit
 
 struct CommunityPaletteDetailView: View {
-    let palette: CommunityPalette
+    let initialPalette: CommunityPalette
 
     @Environment(CommunityManager.self) private var communityManager
+
+    /// Returns the current palette from the manager (with loaded colors) or falls back to initial
+    private var palette: CommunityPalette {
+        communityManager.palettes.first(where: { $0.id == initialPalette.id }) ?? initialPalette
+    }
     @Environment(ColorManager.self) private var colorManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(ToastManager.self) private var toastManager
@@ -147,17 +152,18 @@ struct CommunityPaletteDetailView: View {
                 } else {
                     VStack(spacing: layout.verticalSpacing) {
                         ForEach(0..<layout.rows, id: \.self) { row in
-                            HStack(spacing: layout.horizontalSpacing) {
-                                ForEach(0..<layout.columns, id: \.self) { col in
-                                    let index = row * layout.columns + col
-                                    if index < colors.count {
+                            let startIndex = row * layout.columns
+                            let endIndex = min(startIndex + layout.columns, colors.count)
+
+                            HStack {
+                                Spacer(minLength: 0)
+                                HStack(spacing: layout.horizontalSpacing) {
+                                    ForEach(startIndex..<endIndex, id: \.self) { index in
                                         let color = colors[index]
                                         communitySwatchCell(for: color, size: layout.swatchSize, showBadge: layout.showBadges)
-                                    } else {
-                                        Color.clear
-                                            .frame(width: layout.swatchSize, height: layout.swatchSize)
                                     }
                                 }
+                                Spacer(minLength: 0)
                             }
                         }
                     }
@@ -180,57 +186,28 @@ struct CommunityPaletteDetailView: View {
 
     @ViewBuilder
     private func communitySwatchCell(for color: CommunityColor, size: CGFloat, showBadge: Bool) -> some View {
-        let displayColor = simulateColorBlindness(for: color)
+        // Create a temporary OpaliteColor for SwatchView display
+        let opaliteColor = OpaliteColor(
+            name: color.name,
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha
+        )
 
         NavigationLink(value: CommunityNavigationNode.colorDetail(color)) {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(displayColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(.thinMaterial, lineWidth: 5)
-                )
-                .frame(width: size, height: size)
-                .overlay(alignment: .topLeading) {
-                    if showBadge {
-                        Text(color.name ?? color.hexString)
-                            .font(.caption2)
-                            .foregroundStyle(color.idealTextColor())
-                            .bold()
-                            .lineLimit(1)
-                            .padding(4)
-                            .glassIfAvailable(GlassConfiguration(style: .clear))
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            .padding(4)
-                    }
-                }
+            SwatchView(
+                color: opaliteColor,
+                width: size,
+                height: size,
+                badgeText: showBadge ? (color.name ?? color.hexString) : "",
+                showOverlays: showBadge
+            )
+            .frame(width: size, height: size)
         }
         .buttonStyle(.plain)
     }
 
-    private func simulateColorBlindness(for color: CommunityColor) -> Color {
-        color.simulatedSwiftUIColor(colorBlindnessMode)
-    }
-
-    @ViewBuilder
-    private func componentSwatchCell(for color: CommunityColor) -> some View {
-        let displayColor = simulateColorBlindness(for: color)
-
-        VStack(spacing: 4) {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(displayColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(.thinMaterial, lineWidth: 5)
-                )
-                .frame(width: 75, height: 75)
-
-            Text(color.name ?? color.hexString)
-                .font(.caption2)
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .frame(width: 75)
-        }
-    }
 
     // MARK: - Publisher Section
 
@@ -448,7 +425,7 @@ private struct CommunityPaletteGlassTileBackground: ViewModifier {
 
 #Preview {
     NavigationStack {
-        CommunityPaletteDetailView(palette: CommunityPalette.sample)
+        CommunityPaletteDetailView(initialPalette: CommunityPalette.sample)
     }
     .environment(CommunityManager())
     .environment(ColorManager(context: try! ModelContainer(for: OpaliteColor.self, OpalitePalette.self, CanvasFile.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)).mainContext))

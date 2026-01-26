@@ -94,7 +94,7 @@ struct CommunityView: View {
                 case .colorDetail(let color):
                     CommunityColorDetailView(color: color)
                 case .paletteDetail(let palette):
-                    CommunityPaletteDetailView(palette: palette)
+                    CommunityPaletteDetailView(initialPalette: palette)
                 case .publisherProfile(let userRecordID, let displayName):
                     CommunityPublisherProfileView(userRecordID: userRecordID, displayName: displayName)
                 }
