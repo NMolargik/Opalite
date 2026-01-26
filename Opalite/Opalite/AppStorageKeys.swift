@@ -59,4 +59,7 @@ enum AppStorageKeys {
 
     /// Whether the user has manually edited their display name.
     static let hasUserEditedDisplayName = "hasUserEditedDisplayName"
+
+    /// Whether to play the load sound when transitioning from syncing to main.
+    static let playLoadSound = "playLoadSound"
 }

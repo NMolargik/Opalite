@@ -18,9 +18,36 @@ struct SwatchBarView: View {
 
     @State private var copiedColorID: UUID?
     @State private var expandedPalettes: Set<UUID> = []
+    @State private var looseColorsExpanded: Bool = true
     @State private var showingSwatchBarInfo: Bool = false
 
     private let swatchHeight: CGFloat = 100
+
+    /// Returns true if all sections (palettes and loose colors) are currently expanded
+    private var allSectionsExpanded: Bool {
+        let palettesWithColors = colorManager.palettes.filter { !$0.sortedColors.isEmpty }
+        let allPalettesExpanded = palettesWithColors.isEmpty || palettesWithColors.allSatisfy { expandedPalettes.contains($0.id) }
+        let looseColorsCheck = colorManager.looseColors.isEmpty || looseColorsExpanded
+        return allPalettesExpanded && looseColorsCheck
+    }
+
+    /// Toggles all disclosure groups between expanded and collapsed
+    private func toggleAllSections() {
+        let palettesWithColors = colorManager.palettes.filter { !$0.sortedColors.isEmpty }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if allSectionsExpanded {
+                // Collapse all
+                expandedPalettes.removeAll()
+                looseColorsExpanded = false
+            } else {
+                // Expand all
+                for palette in palettesWithColors {
+                    expandedPalettes.insert(palette.id)
+                }
+                looseColorsExpanded = true
+            }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -53,10 +80,12 @@ struct SwatchBarView: View {
                             // Colors are pre-sorted by updatedAt from ColorManager
                             if !colorManager.looseColors.isEmpty {
                                 Section {
-                                    ForEach(colorManager.looseColors) { color in
-                                        swatchCell(for: color)
-                                            .padding(.horizontal)
-                                            .padding(.vertical, 4)
+                                    if looseColorsExpanded {
+                                        ForEach(colorManager.looseColors) { color in
+                                            swatchCell(for: color)
+                                                .padding(.horizontal)
+                                                .padding(.vertical, 4)
+                                        }
                                     }
                                 } header: {
                                     looseColorsHeader
@@ -68,10 +97,6 @@ struct SwatchBarView: View {
             }
             .padding(.bottom)
             .background(.ultraThinMaterial)
-            .navigationTitle("Opalite")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.automatic)
-            #endif
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -85,6 +110,19 @@ struct SwatchBarView: View {
                         Label("Opalite", systemImage: "macwindow")
                     }
                     .tint(.red)
+                }
+
+                ToolbarItem {
+                    Button {
+                        HapticsManager.shared.selection()
+                        toggleAllSections()
+                    } label: {
+                        Label(
+                            allSectionsExpanded ? "Collapse All" : "Expand All",
+                            systemImage: allSectionsExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical"
+                        )
+                    }
+                    .tint(.purple)
                 }
 
                 ToolbarItem {
@@ -178,16 +216,29 @@ struct SwatchBarView: View {
     }
 
     private var looseColorsHeader: some View {
-        HStack {
-            Label("Colors", systemImage: "paintpalette")
-                .font(.subheadline)
-                .fontWeight(.semibold)
+        Button {
+            HapticsManager.shared.selection()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                looseColorsExpanded.toggle()
+            }
+        } label: {
+            HStack {
+                Label("Colors", systemImage: "paintpalette")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
 
-            Spacer()
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .rotationEffect(looseColorsExpanded ? .degrees(90) : .zero)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 10)
+            .background(.regularMaterial)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(.regularMaterial)
+        .buttonStyle(.plain)
     }
 
     // MARK: - Info Sheet

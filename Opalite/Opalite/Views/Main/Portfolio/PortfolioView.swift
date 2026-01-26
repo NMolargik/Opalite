@@ -582,6 +582,8 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "swatchpalette.fill")
                 }
+                .tint(.orange)
+
             })
 
             Divider()
@@ -596,6 +598,7 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "eyedropper.halffull")
                 }
+                .tint(.cyan)
             })
             #endif
 
@@ -609,6 +612,7 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "macwindow.on.rectangle")
                 }
+                .tint(.white)
             })
             #endif
 
@@ -621,6 +625,7 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "number")
                 }
+                .tint(.red)
             })
 
             Divider()
@@ -644,6 +649,7 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "square.and.arrow.down")
                 }
+                .tint(.indigo)
             })
         } label: {
             Label("Create", systemImage: "plus")

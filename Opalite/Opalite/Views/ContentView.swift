@@ -24,6 +24,7 @@ struct ContentView: View {
 
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
+    @AppStorage(AppStorageKeys.playLoadSound) private var playLoadSound: Bool = true
 
     private var colorBlindnessMode: ColorBlindnessMode {
         ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
@@ -81,7 +82,9 @@ struct ContentView: View {
             case .syncing:
                 SyncingView(
                     onComplete: {
-                        audioPlayer.play("load")
+                        if playLoadSound {
+                            audioPlayer.play("load")
+                        }
                         withAnimation {
                             appStage = .main
                         }
