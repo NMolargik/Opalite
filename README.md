@@ -31,10 +31,10 @@ Opalite helps designers, artists, and developers manage colors and create digita
 - Share colors and palettes via share sheet
 - Export drawings from canvas
 
-## Requirements
+## Requirements - One Of
 
-- iOS 17.5+
-- iPadOS 17.5+
+- iOS 18.4+
+- iPadOS 18.4+
 - macOS (Catalyst)
 - visionOS
 - tvOS
