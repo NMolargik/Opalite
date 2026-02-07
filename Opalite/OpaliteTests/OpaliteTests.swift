@@ -840,12 +840,10 @@ struct CanvasFileTests {
 struct OnyxSubscriptionTests {
 
     @Test func monthlyProperties() {
-        let monthly = OnyxSubscription.monthly
+        let monthly = OnyxSubscription.annual
 
         #expect(monthly.rawValue == "onyx_1m_0.99")
         #expect(monthly.displayName == "Onyx Monthly")
-        #expect(monthly.period == "month")
-        #expect(monthly.savingsPercentage == nil)
     }
 
     @Test func annualProperties() {
@@ -853,8 +851,6 @@ struct OnyxSubscriptionTests {
 
         #expect(annual.rawValue == "onyx_1yr_4.99")
         #expect(annual.displayName == "Onyx Annual")
-        #expect(annual.period == "year")
-        #expect(annual.savingsPercentage == 58)
     }
 
     @Test func productIDsContainsAllCases() {

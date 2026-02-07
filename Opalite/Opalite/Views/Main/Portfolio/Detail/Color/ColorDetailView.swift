@@ -28,6 +28,8 @@ struct ColorDetailView: View {
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
+    @Namespace private var heroNamespace
+
     @State private var viewModel: ColorDetailView.ViewModel
 
     @State private var showDeleteConfirmation = false
@@ -38,6 +40,8 @@ struct ColorDetailView: View {
     @State private var isShowingContrastChecker: Bool = false
     @State private var isShowingExportSheet: Bool = false
     @State private var isShowingPaletteSheet: Bool = false
+    @State private var isShowingFullScreen: Bool = false
+    @State private var showFullScreenControls: Bool = false
 
     // Smart color naming
     @State private var nameSuggestionService = ColorNameSuggestionService()
@@ -50,91 +54,105 @@ struct ColorDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                // MARK: - Hero Swatch
-                SwatchView(
-                    color: color,
-                    height: 220,
-                    badgeText: viewModel.badgeText,
-                    showOverlays: true,
-                    isEditingBadge: $isEditingName,
-                    saveBadge: { newName in
-                        viewModel.rename(to: newName, using: colorManager) { error in
-                            toastManager.show(error: error)
-                        }
-                        nameSuggestionService.clearSuggestions()
-                    },
-                    allowBadgeTapToEdit: true,
-                    nameSuggestions: nameSuggestionService.suggestions,
-                    isLoadingSuggestions: nameSuggestionService.isGenerating,
-                    onSuggestionSelected: { suggestion in
-                        viewModel.rename(to: suggestion, using: colorManager) { error in
-                            toastManager.show(error: error)
-                        }
-                        nameSuggestionService.clearSuggestions()
-                        withAnimation(.easeInOut) {
-                            isEditingName = false
-                        }
-                    }
-                )
-                .padding(.horizontal)
-                .padding(.top)
-                .onChange(of: isEditingName) { _, newValue in
-                    if newValue == true && nameSuggestionService.isAvailable {
-                        Task {
-                            await nameSuggestionService.generateSuggestions(for: color)
-                        }
-                    } else if newValue == false {
-                        nameSuggestionService.clearSuggestions()
-                    }
-                }
-                .overlay(alignment: .bottom) {
-                    InfoTilesRow(color: color)
-                        .padding(.horizontal, 30)
-                        .offset(y: 45)
-                        .zIndex(1)
-                }
-                
-                Spacer(minLength: 80)
-
-                // MARK: - Content Sections
-                VStack(spacing: 20) {
-                    HarmoniesRow(
-                        baseColor: color,
-                        onCreateColor: { suggested in
-                            do {
-                                _ = try colorManager.createColor(
-                                    name: nil,
-                                    notes: suggested.notes,
-                                    device: nil,
-                                    red: suggested.red,
-                                    green: suggested.green,
-                                    blue: suggested.blue,
-                                    alpha: suggested.alpha,
-                                    palette: color.palette
-                                )
-                            } catch {
-                                toastManager.show(error: .colorCreationFailed)
-                            }
-                        }
-                    )
-
-                    NotesSectionView(
-                        notes: $viewModel.notesDraft,
-                        isSaving: $viewModel.isSavingNotes,
-                        onSave: {
-                            viewModel.saveNotes(using: colorManager) { error in
+        ZStack {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // MARK: - Hero Swatch
+                    SwatchView(
+                        color: color,
+                        height: 220,
+                        badgeText: viewModel.badgeText,
+                        showOverlays: !isShowingFullScreen,
+                        isEditingBadge: $isEditingName,
+                        saveBadge: { newName in
+                            viewModel.rename(to: newName, using: colorManager) { error in
                                 toastManager.show(error: error)
                             }
+                            nameSuggestionService.clearSuggestions()
+                        },
+                        allowBadgeTapToEdit: true,
+                        matchedNamespace: heroNamespace,
+                        matchedID: "heroSwatch",
+                        nameSuggestions: nameSuggestionService.suggestions,
+                        isLoadingSuggestions: nameSuggestionService.isGenerating,
+                        onSuggestionSelected: { suggestion in
+                            viewModel.rename(to: suggestion, using: colorManager) { error in
+                                toastManager.show(error: error)
+                            }
+                            nameSuggestionService.clearSuggestions()
+                            withAnimation(.easeInOut) {
+                                isEditingName = false
+                            }
                         }
                     )
+                    .opacity(isShowingFullScreen ? 0 : 1)
+                    .padding(.horizontal)
+                    .padding(.top)
+                    .onChange(of: isEditingName) { _, newValue in
+                        if newValue == true && nameSuggestionService.isAvailable {
+                            Task {
+                                await nameSuggestionService.generateSuggestions(for: color)
+                            }
+                        } else if newValue == false {
+                            nameSuggestionService.clearSuggestions()
+                        }
+                    }
+                    .overlay(alignment: .bottom) {
+                        InfoTilesRow(color: color)
+                            .offset(y: 45)
+                            .zIndex(1)
+                            .opacity(isShowingFullScreen ? 0 : 1)
+                    }
+
+                    Spacer(minLength: 80)
+
+                    // MARK: - Content Sections
+                    VStack(spacing: 20) {
+                        HarmoniesRow(
+                            baseColor: color,
+                            onCreateColor: { suggested in
+                                do {
+                                    _ = try colorManager.createColor(
+                                        name: nil,
+                                        notes: suggested.notes,
+                                        device: nil,
+                                        red: suggested.red,
+                                        green: suggested.green,
+                                        blue: suggested.blue,
+                                        alpha: suggested.alpha,
+                                        palette: color.palette
+                                    )
+                                } catch {
+                                    toastManager.show(error: .colorCreationFailed)
+                                }
+                            }
+                        )
+
+                        NotesSectionView(
+                            notes: $viewModel.notesDraft,
+                            isSaving: $viewModel.isSavingNotes,
+                            onSave: {
+                                viewModel.saveNotes(using: colorManager) { error in
+                                    toastManager.show(error: error)
+                                }
+                            }
+                        )
+                    }
+                    .opacity(isShowingFullScreen ? 0 : 1)
+                    .padding(.horizontal)
+                    .padding(.top, -20)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal)
-                .padding(.top, -20)
-                .padding(.bottom, 24)
+            }
+            .scrollDisabled(isShowingFullScreen)
+
+            // MARK: - Full Screen Overlay
+            if isShowingFullScreen {
+                fullScreenOverlay
             }
         }
+        .toolbar(isShowingFullScreen ? .hidden : .automatic, for: .navigationBar)
+        .statusBarHidden(isShowingFullScreen)
         .navigationBarTitleDisplayMode(.inline)
         .alert("Delete \(color.name ?? color.hexString)?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
@@ -197,22 +215,20 @@ struct ColorDetailView: View {
             ToolbarItem(placement:.topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
-                    hexCopyManager.copyHex(for: color)
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        didCopyHex = true
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.9)) {
+                        isShowingFullScreen = true
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            didCopyHex = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showFullScreenControls = true
                         }
                     }
                 } label: {
-                    Image(systemName: didCopyHex ? "checkmark" : "number")
-                        .contentTransition(.symbolEffect(.replace))
+                    Label("Full Screen", systemImage: "arrow.up.left.and.arrow.down.right")
                 }
-                .tint(didCopyHex ? .green : .inverseTheme)
-                .accessibilityLabel(didCopyHex ? "Copied to clipboard" : "Copy hex code")
-                .accessibilityValue(hexCopyManager.formattedHex(for: color))
+                .tint(.inverseTheme)
+                .accessibilityLabel("View color in full screen")
+                .accessibilityHint("Shows the color in full screen view")
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -300,12 +316,69 @@ struct ColorDetailView: View {
         }
         .onDisappear {
             colorManager.activeColor = nil
+            if isShowingFullScreen {
+                isShowingFullScreen = false
+                showFullScreenControls = false
+            }
         }
         .onChange(of: colorManager.editColorTrigger) { _, newValue in
             if newValue != nil {
                 colorManager.editColorTrigger = nil
                 isShowingColorEditor = true
             }
+        }
+    }
+
+    private var fullScreenOverlay: some View {
+        SwatchView(
+            color: color,
+            cornerRadius: 0,
+            showBorder: false,
+            badgeText: "",
+            showOverlays: false,
+            matchedNamespace: heroNamespace,
+            matchedID: "heroSwatch"
+        )
+        .onTapGesture {
+            dismissFullScreen()
+        }
+        .overlay(alignment: .bottom) {
+            HStack(spacing: 12) {
+                Text(color.name ?? color.hexString)
+                    .foregroundStyle(color.idealTextColor())
+                    .bold()
+                    .padding(12)
+                    .glassIfAvailable(
+                        GlassConfiguration(style: .clear)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                
+                Spacer()
+                
+                Button {
+                    HapticsManager.shared.selection()
+                    dismissFullScreen()
+                } label: {
+                    Image(systemName: "arrow.up.right.and.arrow.down.left")
+                        .foregroundStyle(color.idealTextColor())
+                        .bold()
+                        .font(.title2)
+                        .padding(12)
+                        .glassIfAvailable()
+                }
+            }
+            .padding()
+            .opacity(showFullScreenControls ? 1 : 0)
+        }
+        .ignoresSafeArea()
+    }
+
+    private func dismissFullScreen() {
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showFullScreenControls = false
+        }
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
+            isShowingFullScreen = false
         }
     }
 
@@ -347,7 +420,7 @@ private struct InfoTileView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .frame(maxWidth: 200, maxHeight: 85)
+        .frame(maxWidth: 220, maxHeight: 85)
         .modifier(GlassTileBackground())
     }
 }
@@ -356,7 +429,7 @@ private struct GlassTileBackground: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
             content
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .shadow(radius: 5)
 
         } else {
@@ -376,24 +449,24 @@ private struct InfoTilesRow: View {
     let color: OpaliteColor
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack {
             InfoTileView(
                 icon: "person.fill",
-                iconColor: .orange,
+                iconColor: color.idealTextColor(),
                 value: color.createdByDisplayName ?? "Unknown",
                 label: "Created By"
             )
 
             InfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
-                iconColor: .secondary,
+                iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
                 label: "Created On"
             )
 
             InfoTileView(
                 icon: "clock.fill",
-                iconColor: .indigo,
+                iconColor: color.idealTextColor(),
                 value: formattedShortDate(color.updatedAt),
                 label: "Updated On"
             )

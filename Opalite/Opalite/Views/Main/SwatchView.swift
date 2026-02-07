@@ -37,6 +37,8 @@ struct SwatchView: View {
     private var color: OpaliteColor
     private var width: CGFloat?
     private var height: CGFloat?
+    private var cornerRadius: CGFloat
+    private var showBorder: Bool
     private var badgeText: String
     private var showOverlays: Bool
     @Binding var isEditingBadge: Bool?
@@ -66,6 +68,8 @@ struct SwatchView: View {
         color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
+        cornerRadius: CGFloat = 16,
+        showBorder: Bool = true,
         badgeText: String,
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
@@ -86,6 +90,8 @@ struct SwatchView: View {
         self.color = color
         self.width = width
         self.height = height
+        self.cornerRadius = cornerRadius
+        self.showBorder = showBorder
         self.badgeText = badgeText
         self.showOverlays = showOverlays
         self._isEditingBadge = isEditingBadge
@@ -108,6 +114,8 @@ struct SwatchView: View {
         color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
+        cornerRadius: CGFloat = 16,
+        showBorder: Bool = true,
         badgeText: String,
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
@@ -128,6 +136,8 @@ struct SwatchView: View {
             color: color,
             width: width,
             height: height,
+            cornerRadius: cornerRadius,
+            showBorder: showBorder,
             badgeText: badgeText,
             showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
@@ -150,6 +160,8 @@ struct SwatchView: View {
         color: OpaliteColor,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
+        cornerRadius: CGFloat = 16,
+        showBorder: Bool = true,
         badgeText: String,
         showOverlays: Bool,
         isEditingBadge: Binding<Bool?> = .constant(nil),
@@ -170,6 +182,8 @@ struct SwatchView: View {
             color: color,
             width: width,
             height: height,
+            cornerRadius: cornerRadius,
+            showBorder: showBorder,
             badgeText: badgeText,
             showOverlays: showOverlays,
             isEditingBadge: isEditingBadge,
@@ -194,21 +208,23 @@ struct SwatchView: View {
         Group {
             if isDragging {
                 // Placeholder shown while this swatch is being dragged
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(.clear)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(.secondary, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
                     )
                     .frame(width: width)
                     .frame(minHeight: height)
             } else {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(displayColor.swiftUIColor)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(.thinMaterial, lineWidth: 5)
-                    )
+                    .overlay {
+                        if showBorder {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(.thinMaterial, lineWidth: 5)
+                        }
+                    }
                     .frame(width: width)
                     .frame(minHeight: height)
                     .overlay(alignment: .topLeading) {
@@ -219,7 +235,7 @@ struct SwatchView: View {
                         menuContent
                     }
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
                             .opacity(isDropTargeted ? 1 : 0)
                     )
@@ -236,7 +252,7 @@ struct SwatchView: View {
                             return provideDragItem()
                         } preview: {
                             // Clean preview without material overlay that doesn't render well during drag
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: cornerRadius)
                                 .fill(displayColor.swiftUIColor)
                                 .frame(width: width ?? 100, height: height ?? 100)
                         }
