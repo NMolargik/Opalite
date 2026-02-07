@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import Observation
 import TipKit
 import WidgetKit
 
@@ -15,7 +14,6 @@ struct OpaliteApp: App {
     @Environment(\.openWindow) private var openWindow
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
-    @AppStorage(AppStorageKeys.paletteOrder) private var paletteOrderData: Data = Data()
 
     let sharedModelContainer: ModelContainer
     let colorManager: ColorManager
@@ -29,7 +27,6 @@ struct OpaliteApp: App {
     let hexCopyManager = HexCopyManager()
 
     #if os(iOS)
-    /// Handles WatchConnectivity messages from Apple Watch for hex copying.
     let phoneSessionManager = PhoneSessionManager.shared
     #endif
 
@@ -59,11 +56,9 @@ struct OpaliteApp: App {
         canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
 
         #if os(iOS)
-        // Set up PhoneSessionManager with ColorManager for Watch sync
         phoneSessionManager.colorManager = colorManager
         #endif
 
-        // Configure TipKit for user onboarding tips
         try? Tips.configure([
             .displayFrequency(.immediate),
             .datastoreLocation(.applicationDefault)
@@ -75,46 +70,13 @@ struct OpaliteApp: App {
             ContentView()
                 .toastContainer()
                 .onChange(of: scenePhase) { _, newPhase in
-                    Task { @MainActor in
-                        await colorManager.refreshAll()
-                        await canvasManager.refreshAll()
-
-                        // Sync colors to widget storage for the widget extension
-                        syncColorsToWidgetStorage()
-
-                        #if os(iOS)
-                        // Sync colors and palettes to Apple Watch
-                        phoneSessionManager.syncToWatch()
-                        #endif
-                    }
-
-                    #if os(iOS)
-                    // Handle pending quick action when app becomes active
-                    if newPhase == .active {
-                        // Process any pending hex copy from Watch
-                        if let copiedHex = phoneSessionManager.processPendingHexCopy() {
-                            toastManager.showSuccess("Copied \(copiedHex) from Watch")
-                        }
-
-                        if let shortcutType = AppDelegate.pendingShortcutType {
-                            AppDelegate.pendingShortcutType = nil
-                            if shortcutType == "OpenSwatchBarAction" {
-                                AppDelegate.openSwatchBarWindow()
-                            } else if shortcutType == "CreateNewColorAction" {
-                                quickActionManager.requestCreateNewColor()
-                            }
-                        }
-                    }
-                    #endif
+                    handleScenePhaseChange(newPhase)
                 }
                 .task {
                     colorManager.author = userName
                     communityManager.publisherName = userName
-                    // Sync colors to widget on initial launch
                     syncColorsToWidgetStorage()
-
                     #if os(iOS)
-                    // Sync colors and palettes to Apple Watch on launch
                     phoneSessionManager.syncToWatch()
                     #endif
                 }
@@ -123,46 +85,7 @@ struct OpaliteApp: App {
                     communityManager.publisherName = newName
                 }
                 .onOpenURL { url in
-                    // Handle swatchBar URL scheme
-                    if url.scheme == "opalite" && url.host == "swatchBar" {
-                        #if os(iOS)
-                        // Check if SwatchBar already exists and activate it
-                        if AppDelegate.swatchBarSceneSession != nil {
-                            AppDelegate.openSwatchBarWindow()
-                        } else {
-                            // No existing SwatchBar, create a new one
-                            openWindow(id: "swatchBar")
-                        }
-                        #else
-                        openWindow(id: "swatchBar")
-                        #endif
-                        return
-                    }
-
-                    // Handle shared image from Share Extension
-                    if url.scheme == "opalite" && url.host == "sharedImage" {
-                        // The PortfolioView will automatically detect and open the shared image
-                        // when it becomes active (via scenePhase observer)
-                        return
-                    }
-
-                    // Handle color deep link from widget (opalite://color/<uuid>)
-                    if url.scheme == "opalite" && url.host == "color" {
-                        let pathComponents = url.pathComponents
-                        if pathComponents.count >= 2,
-                           let colorID = UUID(uuidString: pathComponents[1]) {
-                            IntentNavigationManager.shared.navigateToColor(id: colorID)
-                        }
-                        return
-                    }
-
-                    // Handle createColor deep link (opalite://createColor) - opens color editor
-                    if url.scheme == "opalite" && url.host == "createColor" {
-                        IntentNavigationManager.shared.showColorEditor()
-                        return
-                    }
-
-                    importCoordinator.handleIncomingURL(url, colorManager: colorManager)
+                    handleDeepLink(url)
                 }
                 .sheet(isPresented: Binding(
                     get: { importCoordinator.isShowingColorImport },
@@ -196,280 +119,29 @@ struct OpaliteApp: App {
                 } message: {
                     Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
                 }
-                .environment(quickActionManager)
-        .environment(hexCopyManager)
         }
-        .modelContainer(sharedModelContainer)
-        .environment(colorManager)
-        .environment(canvasManager)
-        .environment(communityManager)
-        .environment(toastManager)
-        .environment(subscriptionManager)
-        .environment(reviewRequestManager)
-        .environment(importCoordinator)
+        .opaliteEnvironment(
+            modelContainer: sharedModelContainer,
+            colorManager: colorManager,
+            canvasManager: canvasManager,
+            communityManager: communityManager,
+            toastManager: toastManager,
+            subscriptionManager: subscriptionManager,
+            quickActionManager: quickActionManager,
+            hexCopyManager: hexCopyManager,
+            reviewRequestManager: reviewRequestManager,
+            importCoordinator: importCoordinator
+        )
         .commands {
-            // Replace the New Item command group (Cmd+N)
-            CommandGroup(replacing: .newItem) {
-                Button {
-                    HapticsManager.shared.selection()
-                    if !colorManager.isMainWindowOpen {
-                        openWindow(id: "main")
-                    }
-                    quickActionManager.requestCreateNewColor()
-                } label: {
-                    Label("New Color", systemImage: "paintpalette.fill")
-                }
-                .keyboardShortcut("n", modifiers: .command)
-
-                Button {
-                    HapticsManager.shared.selection()
-                    if !colorManager.isMainWindowOpen {
-                        openWindow(id: "main")
-                    }
-                    if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-                        withAnimation {
-                            do {
-                                let newPalette = try colorManager.createPalette(name: "New Palette")
-                                prependPaletteToOrder(newPalette.id)
-                                OpaliteTipActions.advanceTipsAfterContentCreation()
-                                reviewRequestManager.evaluateReviewRequest(
-                                    colorCount: colorManager.colors.count,
-                                    paletteCount: colorManager.palettes.count
-                                )
-                            } catch {
-                                toastManager.show(error: .paletteCreationFailed)
-                            }
-                        }
-                    } else {
-                        quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
-                    }
-                } label: {
-                    Label("New Palette", systemImage: "swatchpalette.fill")
-                }
-                .keyboardShortcut("n", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    if !colorManager.isMainWindowOpen {
-                        openWindow(id: "main")
-                    }
-                    if subscriptionManager.hasOnyxEntitlement {
-                        do {
-                            let newCanvas = try canvasManager.createCanvas()
-                            canvasManager.pendingCanvasToOpen = newCanvas
-                        } catch {
-                            toastManager.show(error: .canvasCreationFailed)
-                        }
-                    } else {
-                        quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
-                    }
-                } label: {
-                    Label("New Canvas", systemImage: "pencil.and.outline")
-                }
-                .keyboardShortcut("n", modifiers: [.command, .option])
-
-                Divider()
-            }
-
-            // Add to the existing View menu (not creating a duplicate)
-            CommandGroup(after: .toolbar) {
-                Divider()
-
-                Button {
-                    HapticsManager.shared.selection()
-                    #if os(iOS)
-                    AppDelegate.openSwatchBarWindow()
-                    #else
-                    openWindow(id: "swatchBar")
-                    #endif
-                } label: {
-                    Label("SwatchBar", systemImage: "square.stack.fill")
-                }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
-
-                Divider()
-
-                Button {
-                    HapticsManager.shared.selection()
-                    Task {
-                        await colorManager.refreshAll()
-                        await canvasManager.refreshAll()
-                    }
-                } label: {
-                    Label("Refresh All", systemImage: "arrow.clockwise")
-                }
-                .keyboardShortcut("r", modifiers: .command)
-            }
-
-            // Portfolio Menu
-            CommandMenu("Portfolio") {
-                Section("Colors") {
-                    Button {
-                        HapticsManager.shared.selection()
-                        if !colorManager.isMainWindowOpen {
-                            openWindow(id: "main")
-                        }
-                        quickActionManager.requestCreateNewColor()
-                    } label: {
-                        Label("New Color", systemImage: "paintpalette.fill")
-                    }
-
-                    Button {
-                        Task { await colorManager.refreshAll() }
-                    } label: {
-                        Label("Refresh Colors", systemImage: "arrow.clockwise")
-                    }
-                }
-
-                Divider()
-
-                Section("Palettes") {
-                    Button {
-                        HapticsManager.shared.selection()
-                        if !colorManager.isMainWindowOpen {
-                            openWindow(id: "main")
-                        }
-                        if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-                            do {
-                                try colorManager.createPalette(name: "New Palette")
-                                OpaliteTipActions.advanceTipsAfterContentCreation()
-                            } catch {
-                                toastManager.show(error: .paletteCreationFailed)
-                            }
-                        } else {
-                            quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
-                        }
-                    } label: {
-                        Label("New Palette", systemImage: "swatchpalette.fill")
-                    }
-                }
-
-                Divider()
-
-                // Active Color Actions (only enabled when viewing a color detail)
-                Section("Active Color") {
-                    Button {
-                        HapticsManager.shared.selection()
-                        if let color = colorManager.activeColor {
-                            hexCopyManager.copyHex(for: color)
-                        }
-                    } label: {
-                        Label("Copy Hex", systemImage: "number")
-                    }
-                    .disabled(colorManager.activeColor == nil)
-                    .keyboardShortcut("c", modifiers: [.command, .shift])
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        colorManager.editColorTrigger = UUID()
-                    } label: {
-                        Label("Edit Color", systemImage: "slider.horizontal.3")
-                    }
-                    .disabled(colorManager.activeColor == nil)
-                    .keyboardShortcut("e", modifiers: .command)
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        colorManager.addToPaletteTrigger = UUID()
-                    } label: {
-                        Label("Move To Palette", systemImage: "swatchpalette")
-                    }
-                    .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette != nil)
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        colorManager.removeFromPaletteTrigger = UUID()
-                    } label: {
-                        Label("Remove from Palette", systemImage: "minus.circle")
-                    }
-                    .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette == nil)
-                }
-
-                Divider()
-
-                // Active Palette Actions (only enabled when viewing a palette detail)
-                Section("Active Palette") {
-                    Button {
-                        HapticsManager.shared.selection()
-                        colorManager.renamePaletteTrigger = UUID()
-                    } label: {
-                        Label("Rename Palette", systemImage: "character.cursor.ibeam")
-                    }
-                    .disabled(colorManager.activePalette == nil)
-                }
-            }
-
-            // Canvas Menu
-            CommandMenu("Canvas") {
-                Button {
-                    HapticsManager.shared.selection()
-                    if !colorManager.isMainWindowOpen {
-                        openWindow(id: "main")
-                    }
-                    if subscriptionManager.hasOnyxEntitlement {
-                        do {
-                            let newCanvas = try canvasManager.createCanvas()
-                            canvasManager.pendingCanvasToOpen = newCanvas
-                        } catch {
-                            toastManager.show(error: .canvasCreationFailed)
-                        }
-                    } else {
-                        quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
-                    }
-                } label: {
-                    Label("New Canvas", systemImage: "pencil.and.outline")
-                }
-
-                Button {
-                    Task { await canvasManager.refreshAll() }
-                } label: {
-                    Label("Refresh Canvases", systemImage: "arrow.clockwise")
-                }
-
-                Divider()
-
-                Section("Shapes") {
-                    Button {
-                        HapticsManager.shared.selection()
-                        canvasManager.pendingShape = .square
-                    } label: {
-                        Label("Square", systemImage: "square")
-                    }
-                    .keyboardShortcut("1", modifiers: [.command, .shift])
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        canvasManager.pendingShape = .circle
-                    } label: {
-                        Label("Circle", systemImage: "circle")
-                    }
-                    .keyboardShortcut("2", modifiers: [.command, .shift])
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        canvasManager.pendingShape = .triangle
-                    } label: {
-                        Label("Triangle", systemImage: "triangle")
-                    }
-                    .keyboardShortcut("3", modifiers: [.command, .shift])
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        canvasManager.pendingShape = .line
-                    } label: {
-                        Label("Line", systemImage: "line.diagonal")
-                    }
-                    .keyboardShortcut("4", modifiers: [.command, .shift])
-
-                    Button {
-                        HapticsManager.shared.selection()
-                        canvasManager.pendingShape = .arrow
-                    } label: {
-                        Label("Arrow", systemImage: "arrow.right")
-                    }
-                    .keyboardShortcut("5", modifiers: [.command, .shift])
-                }
-            }
+            OpaliteCommands(
+                colorManager: colorManager,
+                canvasManager: canvasManager,
+                subscriptionManager: subscriptionManager,
+                toastManager: toastManager,
+                quickActionManager: quickActionManager,
+                hexCopyManager: hexCopyManager,
+                reviewRequestManager: reviewRequestManager
+            )
         }
 
 #if os(macOS)
@@ -480,14 +152,18 @@ struct OpaliteApp: App {
                     await colorManager.refreshAll()
                 }
         }
-        .modelContainer(sharedModelContainer)
-        .environment(colorManager)
-        .environment(canvasManager)
-        .environment(communityManager)
-        .environment(toastManager)
-        .environment(subscriptionManager)
-        .environment(quickActionManager)
-        .environment(hexCopyManager)
+        .opaliteEnvironment(
+            modelContainer: sharedModelContainer,
+            colorManager: colorManager,
+            canvasManager: canvasManager,
+            communityManager: communityManager,
+            toastManager: toastManager,
+            subscriptionManager: subscriptionManager,
+            quickActionManager: quickActionManager,
+            hexCopyManager: hexCopyManager,
+            reviewRequestManager: reviewRequestManager,
+            importCoordinator: importCoordinator
+        )
         .windowResizability(.contentSize)
         .defaultSize(width: 250, height: 1000)
 #elseif os(iOS)
@@ -507,39 +183,93 @@ struct OpaliteApp: App {
                 }
         }
         .handlesExternalEvents(matching: Set(arrayLiteral: "swatchBar"))
-        .modelContainer(sharedModelContainer)
-        .environment(colorManager)
-        .environment(canvasManager)
-        .environment(communityManager)
-        .environment(toastManager)
-        .environment(subscriptionManager)
-        .environment(quickActionManager)
-        .environment(hexCopyManager)
+        .opaliteEnvironment(
+            modelContainer: sharedModelContainer,
+            colorManager: colorManager,
+            canvasManager: canvasManager,
+            communityManager: communityManager,
+            toastManager: toastManager,
+            subscriptionManager: subscriptionManager,
+            quickActionManager: quickActionManager,
+            hexCopyManager: hexCopyManager,
+            reviewRequestManager: reviewRequestManager,
+            importCoordinator: importCoordinator
+        )
         .windowResizability(.contentSize)
         .defaultSize(width: 250, height: 1000)
 #endif
     }
 
-    private func prependPaletteToOrder(_ paletteID: UUID) {
-        var currentOrder: [UUID] = []
-        if !paletteOrderData.isEmpty,
-           let decoded = try? JSONDecoder().decode([UUID].self, from: paletteOrderData) {
-            currentOrder = decoded
+    // MARK: - Scene Phase
+
+    private func handleScenePhaseChange(_ newPhase: ScenePhase) {
+        Task { @MainActor in
+            await colorManager.refreshAll()
+            await canvasManager.refreshAll()
+            syncColorsToWidgetStorage()
+
+            #if os(iOS)
+            phoneSessionManager.syncToWatch()
+            #endif
         }
 
-        // Remove if already exists (shouldn't happen for new palettes, but safe)
-        currentOrder.removeAll { $0 == paletteID }
+        #if os(iOS)
+        if newPhase == .active {
+            if let copiedHex = phoneSessionManager.processPendingHexCopy() {
+                toastManager.showSuccess("Copied \(copiedHex) from Watch")
+            }
 
-        // Prepend to front
-        currentOrder.insert(paletteID, at: 0)
-
-        // Save
-        if let encoded = try? JSONEncoder().encode(currentOrder) {
-            paletteOrderData = encoded
+            if let shortcutType = AppDelegate.pendingShortcutType {
+                AppDelegate.pendingShortcutType = nil
+                if shortcutType == "OpenSwatchBarAction" {
+                    AppDelegate.openSwatchBarWindow()
+                } else if shortcutType == "CreateNewColorAction" {
+                    quickActionManager.requestCreateNewColor()
+                }
+            }
         }
+        #endif
     }
 
-    /// Syncs colors to the shared App Group storage for the widget extension
+    // MARK: - Deep Linking
+
+    private func handleDeepLink(_ url: URL) {
+        if url.scheme == "opalite" && url.host == "swatchBar" {
+            #if os(iOS)
+            if AppDelegate.swatchBarSceneSession != nil {
+                AppDelegate.openSwatchBarWindow()
+            } else {
+                openWindow(id: "swatchBar")
+            }
+            #else
+            openWindow(id: "swatchBar")
+            #endif
+            return
+        }
+
+        if url.scheme == "opalite" && url.host == "sharedImage" {
+            return
+        }
+
+        if url.scheme == "opalite" && url.host == "color" {
+            let pathComponents = url.pathComponents
+            if pathComponents.count >= 2,
+               let colorID = UUID(uuidString: pathComponents[1]) {
+                IntentNavigationManager.shared.navigateToColor(id: colorID)
+            }
+            return
+        }
+
+        if url.scheme == "opalite" && url.host == "createColor" {
+            IntentNavigationManager.shared.showColorEditor()
+            return
+        }
+
+        importCoordinator.handleIncomingURL(url, colorManager: colorManager)
+    }
+
+    // MARK: - Widget Sync
+
     private func syncColorsToWidgetStorage() {
         let widgetColors = colorManager.colors.map { color in
             WidgetColor(
@@ -551,16 +281,7 @@ struct OpaliteApp: App {
                 alpha: color.alpha
             )
         }
-
-        guard let defaults = UserDefaults(suiteName: "group.com.molargiksoftware.Opalite"),
-              let data = try? JSONEncoder().encode(widgetColors) else {
-            return
-        }
-        defaults.set(data, forKey: "widgetColors")
-
-        // Tell WidgetKit to reload the widget timeline
-        #if canImport(WidgetKit)
+        WidgetColorStorage.saveColors(widgetColors)
         WidgetCenter.shared.reloadAllTimelines()
-        #endif
     }
 }
