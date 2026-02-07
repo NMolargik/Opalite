@@ -8,6 +8,7 @@
 import Foundation
 import WatchConnectivity
 import WatchKit
+import WidgetKit
 
 @MainActor
 @Observable
@@ -91,6 +92,10 @@ class WatchSessionManager: NSObject {
 
         // Save to local storage
         saveToLocalStorage(colors: colors, palettes: palettes)
+
+        // Save to widget shared storage and refresh widget timelines
+        WatchWidgetStorage.saveColors(colors)
+        WidgetCenter.shared.reloadAllTimelines()
 
         // Notify listeners
         onDataReceived?(colors, palettes)

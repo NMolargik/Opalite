@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB1A15492F37955200A8B6EF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */; };
+		EB1A154A2F37955200A8B6EF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */; };
+		EB1A15552F37955300A8B6EF /* OpaliteWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = EB224D022EF38D9B00F350D4 /* DeviceKit */; };
 		EB3BCAD62EF8B58F0059764A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAD52EF8B58F0059764A /* QuickLook.framework */; };
 		EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -42,6 +45,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = EB17A9F02F02F88700D00D03;
 			remoteInfo = "OpaliteWatch Watch App";
+		};
+		EB1A15532F37955300A8B6EF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBD4AD142EE48DF300012D16 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EB1A15472F37955200A8B6EF;
+			remoteInfo = OpaliteWatchWidgetsExtension;
 		};
 		EB3BCAE02EF8B58F0059764A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -106,6 +116,17 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB1A155A2F37955300A8B6EF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				EB1A15552F37955300A8B6EF /* OpaliteWatchWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB3BCAE72EF8B58F0059764A /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -129,6 +150,8 @@
 		EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpaliteWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB17A9FD2F02F88800D00D03 /* OpaliteWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OpaliteWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB17AA072F02F88800D00D03 /* OpaliteWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OpaliteWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB1A155F2F3795AD00A8B6EF /* OpaliteWatchWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpaliteWatchWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB3BCAD52EF8B58F0059764A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpaliteThumbnail.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -152,6 +175,27 @@
 				Extensions/GlassIfAvailable.swift,
 				Models/OpaliteColor.swift,
 				Models/OpalitePalette.swift,
+			);
+			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
+		};
+		EB1A15592F37955300A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
+		};
+		EB1A15612F37966100A8B6EF /* Exceptions for "OpaliteWatch Watch App" folder in "OpaliteWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WatchModels.swift,
+			);
+			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
+		};
+		EB1A15632F37967800A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				RecentColorsWidget.swift,
 			);
 			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
 		};
@@ -246,6 +290,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EB17A9F22F02F88700D00D03 /* OpaliteWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB1A15612F37966100A8B6EF /* Exceptions for "OpaliteWatch Watch App" folder in "OpaliteWatchWidgetsExtension" target */,
+			);
 			path = "OpaliteWatch Watch App";
 			sourceTree = "<group>";
 		};
@@ -257,6 +304,15 @@
 		EB17AA0A2F02F88800D00D03 /* OpaliteWatch Watch AppUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "OpaliteWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+		EB1A154B2F37955200A8B6EF /* OpaliteWatchWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB1A15632F37967800A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatch Watch App" target */,
+				EB1A15592F37955300A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatchWidgetsExtension" target */,
+			);
+			path = OpaliteWatchWidgets;
 			sourceTree = "<group>";
 		};
 		EB3BCAD72EF8B58F0059764A /* OpaliteQuickLook */ = {
@@ -353,6 +409,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB1A15452F37955200A8B6EF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB1A154A2F37955200A8B6EF /* SwiftUI.framework in Frameworks */,
+				EB1A15492F37955200A8B6EF /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB3BCAD12EF8B58F0059764A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -441,6 +506,7 @@
 		EBD4AD132EE48DF300012D16 = {
 			isa = PBXGroup;
 			children = (
+				EB1A155F2F3795AD00A8B6EF /* OpaliteWatchWidgetsExtension.entitlements */,
 				EB92BFB02F1D56DC00305170 /* OpaliteWidgetsExtension.entitlements */,
 				EBD4AD1E2EE48DF300012D16 /* Opalite */,
 				EBD4AD302EE48DF400012D16 /* OpaliteTests */,
@@ -454,6 +520,7 @@
 				EB92BF302F1D1F1C00305170 /* OpaliteTV */,
 				EB92BFA12F1D565200305170 /* OpaliteWidgets */,
 				EB92BFC62F1D5CEF00305170 /* OpaliteMessages */,
+				EB1A154B2F37955200A8B6EF /* OpaliteWatchWidgets */,
 				EB224D012EF38D9B00F350D4 /* Frameworks */,
 				EBD4AD1D2EE48DF300012D16 /* Products */,
 			);
@@ -474,6 +541,7 @@
 				EB92BF2F2F1D1F1C00305170 /* OpaliteTV.app */,
 				EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */,
 				EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */,
+				EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -488,10 +556,12 @@
 				EB17A9ED2F02F88700D00D03 /* Sources */,
 				EB17A9EE2F02F88700D00D03 /* Frameworks */,
 				EB17A9EF2F02F88700D00D03 /* Resources */,
+				EB1A155A2F37955300A8B6EF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EB1A15542F37955300A8B6EF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				EB17A9F22F02F88700D00D03 /* OpaliteWatch Watch App */,
@@ -548,6 +618,28 @@
 			productName = "OpaliteWatch Watch AppUITests";
 			productReference = EB17AA072F02F88800D00D03 /* OpaliteWatch Watch AppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB1A15562F37955300A8B6EF /* Build configuration list for PBXNativeTarget "OpaliteWatchWidgetsExtension" */;
+			buildPhases = (
+				EB1A15442F37955200A8B6EF /* Sources */,
+				EB1A15452F37955200A8B6EF /* Frameworks */,
+				EB1A15462F37955200A8B6EF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EB1A154B2F37955200A8B6EF /* OpaliteWatchWidgets */,
+			);
+			name = OpaliteWatchWidgetsExtension;
+			packageProductDependencies = (
+			);
+			productName = OpaliteWatchWidgetsExtension;
+			productReference = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */ = {
 			isa = PBXNativeTarget;
@@ -765,8 +857,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2620;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					EB17A9F02F02F88700D00D03 = {
 						CreatedOnToolsVersion = 26.2;
@@ -778,6 +870,9 @@
 					EB17AA062F02F88800D00D03 = {
 						CreatedOnToolsVersion = 26.2;
 						TestTargetID = EB17A9F02F02F88700D00D03;
+					};
+					EB1A15472F37955200A8B6EF = {
+						CreatedOnToolsVersion = 26.3;
 					};
 					EB3BCAD32EF8B58F0059764A = {
 						CreatedOnToolsVersion = 26.2;
@@ -836,6 +931,7 @@
 				EBD4AD362EE48DF400012D16 /* OpaliteUITests */,
 				EB17AA062F02F88800D00D03 /* OpaliteWatch Watch AppUITests */,
 				EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */,
+				EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */,
 				EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */,
 				EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */,
 				EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */,
@@ -860,6 +956,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		EB17AA052F02F88800D00D03 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB1A15462F37955200A8B6EF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -953,6 +1056,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB1A15442F37955200A8B6EF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB3BCAD02EF8B58F0059764A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1034,6 +1144,11 @@
 			platformFilter = ios;
 			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
 			targetProxy = EB17AA0F2F02F88800D00D03 /* PBXContainerItemProxy */;
+		};
+		EB1A15542F37955300A8B6EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
+			targetProxy = EB1A15532F37955300A8B6EF /* PBXContainerItemProxy */;
 		};
 		EB3BCAE12EF8B58F0059764A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1231,6 +1346,75 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_TARGET_NAME = "OpaliteWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		EB1A15572F37955300A8B6EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = OpaliteWatchWidgetsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp.OpaliteWatchWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		EB1A15582F37955300A8B6EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = OpaliteWatchWidgetsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R8Q8DM58C6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpaliteWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpaliteWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp.OpaliteWatchWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -1450,6 +1634,7 @@
 				CODE_SIGN_ENTITLEMENTS = OpaliteWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1496,6 +1681,7 @@
 				CODE_SIGN_ENTITLEMENTS = OpaliteWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1677,6 +1863,7 @@
 				CODE_SIGN_ENTITLEMENTS = Opalite/Opalite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1737,6 +1924,7 @@
 				CODE_SIGN_ENTITLEMENTS = Opalite/Opalite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1822,6 +2010,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1845,6 +2034,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -1884,6 +2074,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1900,6 +2091,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -1910,6 +2102,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -1936,6 +2129,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -1961,6 +2155,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -1986,6 +2181,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = R8Q8DM58C6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
@@ -2032,6 +2228,15 @@
 			buildConfigurations = (
 				EB17AA172F02F88800D00D03 /* Debug */,
 				EB17AA182F02F88800D00D03 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB1A15562F37955300A8B6EF /* Build configuration list for PBXNativeTarget "OpaliteWatchWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB1A15572F37955300A8B6EF /* Debug */,
+				EB1A15582F37955300A8B6EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

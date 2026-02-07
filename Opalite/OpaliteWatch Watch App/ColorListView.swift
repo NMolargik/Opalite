@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ColorListView: View {
+    @Environment(WatchColorManager.self) private var colorManager
+
     let title: String
     let colors: [WatchColor]
 
@@ -17,7 +19,7 @@ struct ColorListView: View {
                 ContentUnavailableView(
                     "No Colors",
                     systemImage: "paintpalette",
-                    description: Text("Colors will appear here once synced from your iPhone.")
+                    description: Text("Add colors to this palette in Opalite on your iPhone, iPad, or Mac and they'll appear here.")
                 )
             } else {
                 ScrollView {
@@ -31,6 +33,12 @@ struct ColorListView: View {
             }
         }
         .navigationTitle(title)
+        .refreshable {
+            await colorManager.refreshAll()
+        }
+        .onAppear {
+            colorManager.playNavigationHaptic()
+        }
     }
 }
 

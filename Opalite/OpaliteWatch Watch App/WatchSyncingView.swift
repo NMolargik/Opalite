@@ -23,7 +23,32 @@ struct WatchSyncingView: View {
         VStack(spacing: 16) {
             Spacer()
 
-            // iPhone icon with pulse animation
+            if colorManager.isPhoneReachable {
+                reachableContent
+            } else {
+                unreachableContent
+            }
+
+            Spacer()
+
+            ProgressView()
+                .tint(colorManager.isPhoneReachable ? .blue : .orange)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+        .onAppear {
+            pulseScale = 1.1
+            startDotAnimation()
+        }
+        .task {
+            await colorManager.performInitialSync()
+        }
+    }
+
+    // MARK: - Reachable State
+
+    private var reachableContent: some View {
+        Group {
             Image(systemName: "iphone.and.arrow.forward")
                 .font(.system(size: 44))
                 .foregroundStyle(.blue)
@@ -43,21 +68,34 @@ struct WatchSyncingView: View {
                     .foregroundStyle(.secondary)
                     .frame(height: 16)
             }
-
-            Spacer()
-
-            // Progress indicator
-            ProgressView()
-                .tint(.blue)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .onAppear {
-            pulseScale = 1.1
-            startDotAnimation()
-        }
-        .task {
-            await colorManager.performInitialSync()
+    }
+
+    // MARK: - Unreachable State
+
+    private var unreachableContent: some View {
+        Group {
+            Image(systemName: "iphone.slash")
+                .font(.system(size: 44))
+                .foregroundStyle(.orange)
+
+            VStack(spacing: 6) {
+                Text("iPhone Not Connected")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+
+                if colorManager.hasCachedData {
+                    Text("Loading cached colors" + animatedDots)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(height: 16)
+                } else {
+                    Text("Open Opalite on your iPhone to sync your colors.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
         }
     }
 

@@ -6,20 +6,22 @@
 //
 
 import SwiftUI
-import WatchKit
 
 struct WatchSwatchView: View {
     let color: WatchColor
     let badgeText: String
 
     @Environment(WatchColorManager.self) private var colorManager
-    @State private var showCopiedFeedback: Bool = false
+    @Environment(\.colorSchemeContrast) private var systemContrast
 
-    private let sessionManager = WatchSessionManager.shared
+    @ScaledMetric(relativeTo: .body) private var swatchHeight: CGFloat = 60
+
+    private var isHighContrast: Bool {
+        systemContrast == .increased || colorManager.highContrastEnabled
+    }
 
     init(color: WatchColor) {
         self.color = color
-        // Show name if available, otherwise hex
         if let name = color.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
             self.badgeText = name
         } else {
@@ -28,61 +30,46 @@ struct WatchSwatchView: View {
     }
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(color.swiftUIColor)
-            .frame(height: 60)
-            .overlay(alignment: .topLeading) {
-                Text(badgeText)
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .padding(6)
-            }
-            .overlay {
-                // Hex copy feedback overlay
-                if showCopiedFeedback {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial)
-                        .overlay {
-                            Image(systemName: "number")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundStyle(color.idealTextColor())
+        NavigationLink {
+            WatchColorDetailView(color: color)
+        } label: {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(color.swiftUIColor)
+                .frame(height: swatchHeight)
+                .overlay(alignment: .topLeading) {
+                    Text(badgeText)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background {
+                            if isHighContrast {
+                                Capsule().fill(Color.black.opacity(0.85))
+                            } else {
+                                Capsule().fill(.ultraThinMaterial)
+                            }
                         }
-                        .transition(.opacity)
+                        .padding(6)
                 }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                copyHex()
-            }
-    }
-
-    private func copyHex() {
-        // Show immediate feedback
-        WKInterfaceDevice.current().play(.click)
-
-        withAnimation(.easeIn(duration: 0.1)) {
-            showCopiedFeedback = true
+                .overlay {
+                    if isHighContrast {
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(.white.opacity(0.4), lineWidth: 1)
+                    }
+                }
         }
-
-        // Send hex to iPhone clipboard via WatchConnectivity
-        let hex = colorManager.formattedHex(for: color)
-        sessionManager.copyHexToiPhone(hex, colorName: color.name)
-
-        // Hide feedback after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            withAnimation(.easeOut(duration: 0.2)) {
-                showCopiedFeedback = false
-            }
-        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(color.voiceOverDescription)
+        .accessibilityHint("Opens color details")
     }
 }
 
 #Preview {
-    WatchSwatchView(color: WatchColor.sample)
-        .environment(WatchColorManager())
+    NavigationStack {
+        WatchSwatchView(color: WatchColor.sample)
+            .environment(WatchColorManager())
+    }
 }

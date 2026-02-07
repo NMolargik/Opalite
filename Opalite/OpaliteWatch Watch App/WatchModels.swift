@@ -32,6 +32,46 @@ struct WatchColor: Codable, Identifiable, Hashable {
         return String(format: "#%02X%02X%02X", r, g, b)
     }
 
+    // MARK: - Color Space Conversions
+
+    var hsl: (hue: Double, saturation: Double, lightness: Double) {
+        let maxVal = max(red, max(green, blue))
+        let minVal = min(red, min(green, blue))
+        let delta = maxVal - minVal
+        let lightness = (maxVal + minVal) / 2.0
+
+        guard delta != 0 else {
+            return (0, 0, lightness)
+        }
+
+        let saturation = lightness > 0.5
+            ? delta / (2.0 - maxVal - minVal)
+            : delta / (maxVal + minVal)
+
+        var hue: Double
+        if maxVal == red {
+            hue = (green - blue) / delta + (green < blue ? 6 : 0)
+        } else if maxVal == green {
+            hue = (blue - red) / delta + 2
+        } else {
+            hue = (red - green) / delta + 4
+        }
+        hue *= 60
+
+        return (hue, saturation, lightness)
+    }
+
+    var cmyk: (cyan: Double, magenta: Double, yellow: Double, key: Double) {
+        let k = 1.0 - max(red, max(green, blue))
+        guard k < 1.0 else {
+            return (0, 0, 0, 1)
+        }
+        let c = (1.0 - red - k) / (1.0 - k)
+        let m = (1.0 - green - k) / (1.0 - k)
+        let y = (1.0 - blue - k) / (1.0 - k)
+        return (c, m, y, k)
+    }
+
     /// WCAG relative luminance
     var relativeLuminance: Double {
         func channel(_ c: Double) -> Double {
@@ -43,6 +83,16 @@ struct WatchColor: Codable, Identifiable, Hashable {
     /// Returns black or white depending on which has better contrast
     func idealTextColor() -> Color {
         relativeLuminance > 0.179 ? .black : .white
+    }
+
+    // MARK: - Accessibility
+
+    /// A spoken description for VoiceOver combining name and hex
+    var voiceOverDescription: String {
+        if let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
+            return "\(name), \(hexString)"
+        }
+        return hexString
     }
 
     // MARK: - Init from Dictionary
