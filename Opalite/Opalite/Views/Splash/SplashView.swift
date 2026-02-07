@@ -46,28 +46,21 @@ struct SplashView: View {
                 // Background
                 Color.black.ignoresSafeArea()
 
-                // Scrolling swatch rows - delayed start for performance
-                VStack(spacing: 12) {
-                    ForEach(Array(Self.rowConfigs.enumerated()), id: \.offset) { _, config in
-                        InfiniteSwatchRow(
-                            colors: config.colors,
-                            scrollsRight: config.scrollsRight,
-                            speed: config.speed,
-                            swatchHeight: config.swatchHeight,
-                            isAnimating: startAnimations
-                        )
-                        .frame(height: config.swatchHeight)
-                    }
-                }
+                // Scrolling swatch rows - single Canvas for all rows
+                SwatchRowsCanvas(
+                    configs: Self.rowConfigs,
+                    isAnimating: startAnimations
+                )
                 .blur(radius: 2)
                 .opacity(hasAppeared ? 1 : 0)
+                .ignoresSafeArea()
                 .accessibilityHidden(true)
 
                 // Material overlay
                 Rectangle()
                     .fill(.ultraThickMaterial)
                     .ignoresSafeArea()
-                    .opacity(showContent ? 0.85 : 0)
+                    .opacity(showContent ? 0.2 : 0)
                     .accessibilityHidden(true)
 
                 // Content
@@ -106,7 +99,7 @@ struct SplashView: View {
                             .foregroundStyle(.white)
                             .accessibilityAddTraits(.isHeader)
 
-                        Text("Color management for all")
+                        Text("The Ultimate Color Manager")
                             .font(.title3)
                             .foregroundStyle(.secondary)
                     }
@@ -315,78 +308,75 @@ private struct SwatchRowConfig {
     let swatchHeight: CGFloat
 }
 
-// MARK: - Infinite Swatch Row
+// MARK: - Swatch Rows Canvas
 
-private struct InfiniteSwatchRow: View {
-    let colors: [OpaliteColor]
-    let scrollsRight: Bool
-    let speed: Double // pixels per second
-    let swatchHeight: CGFloat
+/// Draws all scrolling swatch rows in a single Canvas — one GPU draw call per frame
+/// instead of hundreds of individual SwiftUI views with expensive material effects.
+private struct SwatchRowsCanvas: View {
+    let configs: [SwatchRowConfig]
     let isAnimating: Bool
 
-    // Calculate dimensions
-    private var swatchWidth: CGFloat { swatchHeight }
-    private var spacing: CGFloat { 12 }
-    private var setWidth: CGFloat {
-        CGFloat(colors.count) * (swatchWidth + spacing)
-    }
+    private let rowSpacing: CGFloat = 12
+    private let swatchSpacing: CGFloat = 12
+    private let cornerRadius: CGFloat = 16
+    private let borderWidth: CGFloat = 5
 
     var body: some View {
-        GeometryReader { geometry in
-            let screenWidth = geometry.size.width
-
-            // We need enough sets to cover screen + buffer on both sides
-            let setsNeeded = Int(ceil(screenWidth / setWidth)) + 3
-
-            if isAnimating {
-                // Animated version with TimelineView
-                TimelineView(.animation) { context in
-                    let elapsed = context.date.timeIntervalSinceReferenceDate
-                    let pixelsPerSecond = setWidth / speed
-                    let totalOffset = elapsed * pixelsPerSecond
-
-                    let normalizedOffset = totalOffset.truncatingRemainder(dividingBy: Double(setWidth))
-                    let offset: CGFloat = scrollsRight
-                        ? CGFloat(normalizedOffset) - setWidth
-                        : -CGFloat(normalizedOffset)
-
-                    rowContent(setsNeeded: setsNeeded)
-                        .offset(x: offset)
+        if isAnimating {
+            TimelineView(.animation) { context in
+                Canvas { ctx, size in
+                    draw(in: ctx, size: size, date: context.date)
                 }
-            } else {
-                // Static version for initial render - no expensive TimelineView
-                rowContent(setsNeeded: setsNeeded)
             }
-        }
-        // Use contentShape to define hit area without clipping visuals
-        .contentShape(Rectangle())
-    }
-
-    @ViewBuilder
-    private func rowContent(setsNeeded: Int) -> some View {
-        // Use LazyHStack for better performance with many swatches
-        LazyHStack(spacing: spacing) {
-            ForEach(0..<setsNeeded, id: \.self) { setIndex in
-                ForEach(Array(colors.enumerated()), id: \.offset) { colorIndex, color in
-                    SimpleSwatch(color: color, size: swatchHeight)
-                        .id("\(setIndex)-\(colorIndex)")
-                }
+        } else {
+            Canvas { ctx, size in
+                draw(in: ctx, size: size, date: .now)
             }
         }
     }
-}
 
-// MARK: - Simple Swatch (Lightweight for Splash)
+    private func draw(in ctx: GraphicsContext, size: CGSize, date: Date) {
+        let elapsed = date.timeIntervalSinceReferenceDate
+        var y: CGFloat = 0
+        var rowIndex = 0
 
-/// Lightweight swatch for splash screen - avoids full SwatchView overhead
-private struct SimpleSwatch: View {
-    let color: OpaliteColor
-    let size: CGFloat
+        // Cycle through configs repeatedly until the full height is filled
+        while y < size.height {
+            let config = configs[rowIndex % configs.count]
+            let swatchSize = config.swatchHeight
+            let setWidth = CGFloat(config.colors.count) * (swatchSize + swatchSpacing)
+            let pixelsPerSecond = setWidth / config.speed
 
-    var body: some View {
-        RoundedRectangle(cornerRadius: size * 0.2, style: .continuous)
-            .fill(Color(red: color.red, green: color.green, blue: color.blue))
-            .frame(width: size, height: size)
+            let totalOffset = elapsed * pixelsPerSecond
+            let normalizedOffset = CGFloat(totalOffset.truncatingRemainder(dividingBy: Double(setWidth)))
+            let baseOffset = config.scrollsRight
+                ? normalizedOffset - setWidth
+                : -normalizedOffset
+
+            // Draw enough sets to cover the width
+            let setsNeeded = Int(ceil(size.width / setWidth)) + 3
+            for setIndex in 0..<setsNeeded {
+                let setOffset = CGFloat(setIndex) * setWidth
+                for (colorIndex, color) in config.colors.enumerated() {
+                    let x = baseOffset + setOffset + CGFloat(colorIndex) * (swatchSize + swatchSpacing)
+
+                    // Skip swatches entirely off-screen
+                    if x + swatchSize < 0 || x > size.width { continue }
+
+                    let rect = CGRect(x: x, y: y, width: swatchSize, height: swatchSize)
+                    let path = Path(roundedRect: rect, cornerRadius: cornerRadius)
+
+                    // Fill
+                    ctx.fill(path, with: .color(Color(red: color.red, green: color.green, blue: color.blue)))
+
+                    // Border
+                    ctx.stroke(path, with: .color(.white.opacity(0.15)), lineWidth: borderWidth)
+                }
+            }
+
+            y += swatchSize + rowSpacing
+            rowIndex += 1
+        }
     }
 }
 

@@ -398,6 +398,23 @@ struct SettingsView: View {
                 } footer: {
                    Text("Thank you to all of our amazing TestFlight testers!")
                }
+
+                #if DEBUG
+                Section {
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        UserDefaults.standard.set(false, forKey: AppStorageKeys.isOnboardingComplete)
+                        exit(0)
+                    } label: {
+                        Label("Reset Onboarding & Restart", systemImage: "arrow.counterclockwise")
+                            .foregroundStyle(.red)
+                    }
+                } header: {
+                    Text("Debug")
+                } footer: {
+                    Text("Resets the onboarding flag and terminates the app. Relaunch to see the splash screen.")
+                }
+                #endif
             }
             .navigationTitle("Settings")
         }
