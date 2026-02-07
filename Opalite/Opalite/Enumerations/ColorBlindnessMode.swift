@@ -41,7 +41,7 @@ enum ColorBlindnessMode: String, CaseIterable, Identifiable {
         }
     }
 
-    var description: String {
+    var modeDescription: String {
         switch self {
         case .off:
             return "No simulation active"

@@ -7,24 +7,25 @@
 
 import SwiftUI
 
-enum Tabs: Equatable, Hashable, Identifiable {
+enum Tabs: Hashable, Identifiable {
     case portfolio
     case community
     case canvas
     case settings
     case search
     case swatchBar
-    case canvasBody(CanvasFile?)
+    case canvasBody(CanvasFile)
 
+    /// Stable identifiers used for tab persistence and state restoration.
     var id: Int {
         switch self {
         case .portfolio: 2001
-        case .community: 2007
         case .canvas: 2002
         case .settings: 2003
         case .search: 2004
         case .swatchBar: 2005
         case .canvasBody: 2006
+        case .community: 2007
         }
     }
 
@@ -52,22 +53,14 @@ enum Tabs: Equatable, Hashable, Identifiable {
         }
     }
 
-    func symbolColor() -> Color {
+    var symbolColor: Color {
         switch self {
-        case .portfolio:
-            return .blue
-        case .community:
-            return .teal
-        case .canvas:
-            return .red
-        case .settings:
-            return .orange
-        case .search:
-            return .green
-        case .swatchBar:
-            return .purple
-        case .canvasBody:
-            return .red
+        case .portfolio: .blue
+        case .community: .teal
+        case .canvas, .canvasBody: .red
+        case .settings: .orange
+        case .search: .green
+        case .swatchBar: .purple
         }
     }
 

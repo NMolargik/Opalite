@@ -565,35 +565,42 @@ struct ColorBlindnessSimulationTests {
 struct ColorBlindnessModeTests {
 
     @Test func allCasesExist() {
-        #expect(ColorBlindnessMode.allCases.count == 4)
+        #expect(ColorBlindnessMode.allCases.count == 5)
     }
 
     @Test func offModeProperties() {
         let mode = ColorBlindnessMode.off
         #expect(mode.title == "Off")
         #expect(mode.shortTitle == "Normal Vision")
-        #expect(mode.description == "No simulation active")
+        #expect(mode.modeDescription == "No simulation active")
     }
 
     @Test func protanopiaProperties() {
         let mode = ColorBlindnessMode.protanopia
         #expect(mode.title == "Protanopia (Red-blind)")
         #expect(mode.shortTitle == "Protanopia")
-        #expect(mode.description.contains("red"))
+        #expect(mode.modeDescription.contains("red"))
     }
 
     @Test func deuteranopiaProperties() {
         let mode = ColorBlindnessMode.deuteranopia
         #expect(mode.title == "Deuteranopia (Green-blind)")
         #expect(mode.shortTitle == "Deuteranopia")
-        #expect(mode.description.contains("green"))
+        #expect(mode.modeDescription.contains("green"))
     }
 
     @Test func tritanopiaProperties() {
         let mode = ColorBlindnessMode.tritanopia
         #expect(mode.title == "Tritanopia (Blue-blind)")
         #expect(mode.shortTitle == "Tritanopia")
-        #expect(mode.description.contains("blue"))
+        #expect(mode.modeDescription.contains("blue"))
+    }
+
+    @Test func achromatopsiaProperties() {
+        let mode = ColorBlindnessMode.achromatopsia
+        #expect(mode.title == "Achromatopsia (No Color)")
+        #expect(mode.shortTitle == "Achromatopsia")
+        #expect(mode.modeDescription.contains("grayscale"))
     }
 
     @Test func identifiableConformance() {
@@ -839,26 +846,31 @@ struct CanvasFileTests {
 
 struct OnyxSubscriptionTests {
 
-    @Test func monthlyProperties() {
-        let monthly = OnyxSubscription.annual
-
-        #expect(monthly.rawValue == "onyx_1m_0.99")
-        #expect(monthly.displayName == "Onyx Monthly")
-    }
-
     @Test func annualProperties() {
         let annual = OnyxSubscription.annual
 
         #expect(annual.rawValue == "onyx_1yr_4.99")
         #expect(annual.displayName == "Onyx Annual")
+        #expect(annual.priceDescription == "per year")
+        #expect(annual.isSubscription == true)
+    }
+
+    @Test func lifetimeProperties() {
+        let lifetime = OnyxSubscription.lifetime
+
+        #expect(lifetime.rawValue == "onyx_lifetime_20")
+        #expect(lifetime.displayName == "Onyx Lifetime")
+        #expect(lifetime.priceDescription == "one-time purchase")
+        #expect(lifetime.isSubscription == false)
     }
 
     @Test func productIDsContainsAllCases() {
         let productIDs = OnyxSubscription.productIDs
 
-        #expect(productIDs.count == 2)
-        #expect(productIDs.contains("onyx_1m_0.99"))
-        #expect(productIDs.contains("onyx_1yr_4.99"))
+        #expect(productIDs.count == OnyxSubscription.allCases.count)
+        for subscription in OnyxSubscription.allCases {
+            #expect(productIDs.contains(subscription.rawValue))
+        }
     }
 
     @Test func identifiableConformance() {
@@ -1145,5 +1157,327 @@ struct ColorUtilityTests {
 
         #expect(almostWhite.hexString == "#FFFFFF")
         #expect(almostBlack.hexString == "#000000")
+    }
+}
+
+// MARK: - AppIconOption Tests
+
+struct AppIconOptionTests {
+
+    @Test func allCasesExist() {
+        #expect(AppIconOption.allCases.count == 2)
+    }
+
+    @Test func darkIconProperties() {
+        let dark = AppIconOption.dark
+        #expect(dark.title == "Dark")
+        #expect(dark.iconName == nil)
+        #expect(dark.id == "dark")
+    }
+
+    @Test func lightIconProperties() {
+        let light = AppIconOption.light
+        #expect(light.title == "Light")
+        #expect(light.iconName == "AppIcon-Light")
+        #expect(light.id == "light")
+    }
+}
+
+// MARK: - AppStage Tests
+
+struct AppStageTests {
+
+    @Test func rawValues() {
+        #expect(AppStage.splash.rawValue == "splash")
+        #expect(AppStage.onboarding.rawValue == "onboarding")
+        #expect(AppStage.syncing.rawValue == "syncing")
+        #expect(AppStage.main.rawValue == "main")
+    }
+
+    @Test func identifiableConformance() {
+        let stages: [AppStage] = [.splash, .onboarding, .syncing, .main]
+        let ids = Set(stages.map(\.id))
+        #expect(ids.count == 4)
+    }
+}
+
+// MARK: - AppThemeOption Tests
+
+struct AppThemeOptionTests {
+
+    @Test func allCasesExist() {
+        #expect(AppThemeOption.allCases.count == 3)
+    }
+
+    @Test func titles() {
+        #expect(AppThemeOption.system.title == "System")
+        #expect(AppThemeOption.light.title == "Light")
+        #expect(AppThemeOption.dark.title == "Dark")
+    }
+
+    @Test func identifiableConformance() {
+        for option in AppThemeOption.allCases {
+            #expect(option.id == option.rawValue)
+        }
+    }
+}
+
+// MARK: - CanvasShape Tests
+
+struct CanvasShapeTests {
+
+    @Test func allCasesExist() {
+        #expect(CanvasShape.allCases.count == 7)
+    }
+
+    @Test func displayNames() {
+        #expect(CanvasShape.square.displayName == "Square")
+        #expect(CanvasShape.circle.displayName == "Circle")
+        #expect(CanvasShape.triangle.displayName == "Triangle")
+        #expect(CanvasShape.line.displayName == "Line")
+        #expect(CanvasShape.arrow.displayName == "Arrow")
+        #expect(CanvasShape.shirt.displayName == "Shirt")
+        #expect(CanvasShape.rectangle.displayName == "Rectangle")
+    }
+
+    @Test func systemImages() {
+        for shape in CanvasShape.allCases {
+            #expect(!shape.systemImage.isEmpty)
+        }
+    }
+
+    @Test func onlyRectangleSupportsNonUniformScale() {
+        for shape in CanvasShape.allCases {
+            if shape == .rectangle {
+                #expect(shape.supportsNonUniformScale == true)
+            } else {
+                #expect(shape.supportsNonUniformScale == false)
+            }
+        }
+    }
+}
+
+// MARK: - ColorPickerTab Tests
+
+struct ColorPickerTabTests {
+
+    @Test func allCasesExist() {
+        #expect(ColorPickerTab.allCases.count == 6)
+    }
+
+    @Test func rawValuesAreDisplayNames() {
+        #expect(ColorPickerTab.spectrum.rawValue == "Spectrum")
+        #expect(ColorPickerTab.grid.rawValue == "Grid")
+        #expect(ColorPickerTab.shuffle.rawValue == "Shuffle")
+        #expect(ColorPickerTab.sliders.rawValue == "Channels")
+        #expect(ColorPickerTab.codes.rawValue == "Codes")
+        #expect(ColorPickerTab.image.rawValue == "Image")
+    }
+
+    @Test func keyboardShortcuts() {
+        #expect(ColorPickerTab.spectrum.keyboardShortcutKey == "1")
+        #expect(ColorPickerTab.grid.keyboardShortcutKey == "2")
+        #expect(ColorPickerTab.shuffle.keyboardShortcutKey == "3")
+        #expect(ColorPickerTab.sliders.keyboardShortcutKey == "4")
+        #expect(ColorPickerTab.codes.keyboardShortcutKey == "5")
+        #expect(ColorPickerTab.image.keyboardShortcutKey == "6")
+    }
+
+    @Test func fromKeyRoundTrip() {
+        for tab in ColorPickerTab.allCases {
+            let key = tab.keyboardShortcutKey
+            let recovered = ColorPickerTab(fromKey: key)
+            #expect(recovered == tab)
+        }
+    }
+
+    @Test func fromKeyInvalidReturnsNil() {
+        #expect(ColorPickerTab(fromKey: "0") == nil)
+        #expect(ColorPickerTab(fromKey: "7") == nil)
+        #expect(ColorPickerTab(fromKey: "a") == nil)
+    }
+
+    @Test func accessibilityLabels() {
+        for tab in ColorPickerTab.allCases {
+            #expect(!tab.accessibilityLabel.isEmpty)
+        }
+    }
+}
+
+// MARK: - CommunitySegment Tests
+
+struct CommunitySegmentTests {
+
+    @Test func allCasesExist() {
+        #expect(CommunitySegment.allCases.count == 2)
+    }
+
+    @Test func properties() {
+        #expect(CommunitySegment.colors.rawValue == "Colors")
+        #expect(CommunitySegment.colors.icon == "paintpalette")
+
+        #expect(CommunitySegment.palettes.rawValue == "Palettes")
+        #expect(CommunitySegment.palettes.icon == "swatchpalette")
+    }
+
+    @Test func identifiableConformance() {
+        for segment in CommunitySegment.allCases {
+            #expect(segment.id == segment.rawValue)
+        }
+    }
+}
+
+// MARK: - DeviceKind Tests
+
+struct DeviceKindTests {
+
+    @Test func fromKnownDeviceNames() {
+        #expect(DeviceKind.from("Apple Watch Series 9") == .appleWatch)
+        #expect(DeviceKind.from("Apple Vision Pro") == .visionPro)
+        #expect(DeviceKind.from("iPhone 16 Pro") == .iPhone)
+        #expect(DeviceKind.from("iPad Pro 13-inch") == .iPad)
+        #expect(DeviceKind.from("iMac 24-inch") == .iMac)
+        #expect(DeviceKind.from("Mac Studio") == .macStudio)
+        #expect(DeviceKind.from("Mac mini") == .macMini)
+        #expect(DeviceKind.from("Mac Pro") == .macPro)
+        #expect(DeviceKind.from("MacBook Pro 16-inch") == .macBook)
+    }
+
+    @Test func fromNilReturnsUnknown() {
+        #expect(DeviceKind.from(nil) == .unknown)
+    }
+
+    @Test func fromEmptyStringReturnsUnknown() {
+        #expect(DeviceKind.from("") == .unknown)
+        #expect(DeviceKind.from("   ") == .unknown)
+    }
+
+    @Test func fromUnrecognizedReturnsUnknown() {
+        #expect(DeviceKind.from("Toaster") == .unknown)
+    }
+
+    @Test func caseInsensitiveMatching() {
+        #expect(DeviceKind.from("IPHONE") == .iPhone)
+        #expect(DeviceKind.from("macbook") == .macBook)
+    }
+
+    @Test func symbolNames() {
+        #expect(DeviceKind.iPhone.symbolName == "iphone")
+        #expect(DeviceKind.iPad.symbolName == "ipad")
+        #expect(DeviceKind.macBook.symbolName == "macbook")
+        #expect(DeviceKind.unknown.symbolName == "ipad.and.iphone")
+    }
+}
+
+// MARK: - PreviewBackground Tests
+
+struct PreviewBackgroundTests {
+
+    @Test func allCasesExist() {
+        #expect(PreviewBackground.allCases.count == 8)
+    }
+
+    @Test func defaultForColorScheme() {
+        #expect(PreviewBackground.defaultFor(colorScheme: .dark) == .black)
+        #expect(PreviewBackground.defaultFor(colorScheme: .light) == .white)
+    }
+
+    @Test func displayNames() {
+        for bg in PreviewBackground.allCases {
+            #expect(!bg.displayName.isEmpty)
+        }
+    }
+
+    @Test func iconNames() {
+        for bg in PreviewBackground.allCases {
+            #expect(!bg.iconName.isEmpty)
+        }
+    }
+
+    @Test func idealTextColorContrast() {
+        // Light backgrounds should have black text
+        #expect(PreviewBackground.white.idealTextColor == .black)
+        #expect(PreviewBackground.cream.idealTextColor == .black)
+
+        // Dark backgrounds should have white text
+        #expect(PreviewBackground.black.idealTextColor == .white)
+        #expect(PreviewBackground.navy.idealTextColor == .white)
+    }
+}
+
+// MARK: - SwatchSize Tests
+
+struct SwatchSizeTests {
+
+    @Test func allCasesExist() {
+        #expect(SwatchSize.allCases.count == 3)
+    }
+
+    @Test func sizeValues() {
+        #expect(SwatchSize.small.size == 75)
+        #expect(SwatchSize.medium.size == 150)
+        #expect(SwatchSize.large.size == 250)
+    }
+
+    @Test func showOverlays() {
+        #expect(SwatchSize.small.showOverlays == false)
+        #expect(SwatchSize.medium.showOverlays == true)
+        #expect(SwatchSize.large.showOverlays == true)
+    }
+
+    @Test func nextCyclesThroughAll() {
+        #expect(SwatchSize.small.next == .medium)
+        #expect(SwatchSize.medium.next == .large)
+        #expect(SwatchSize.large.next == .small)
+    }
+
+    @Test func nextCompactCyclesBetweenSmallAndMedium() {
+        #expect(SwatchSize.small.nextCompact == .medium)
+        #expect(SwatchSize.medium.nextCompact == .small)
+        #expect(SwatchSize.large.nextCompact == .small)
+    }
+
+    @Test func accessibilityNames() {
+        #expect(SwatchSize.small.accessibilityName == "Small")
+        #expect(SwatchSize.medium.accessibilityName == "Medium")
+        #expect(SwatchSize.large.accessibilityName == "Large")
+    }
+}
+
+// MARK: - Tabs Tests
+
+struct TabsTests {
+
+    @Test func uniqueIDs() {
+        let tabs: [Tabs] = [.portfolio, .community, .canvas, .settings, .search, .swatchBar]
+        let ids = Set(tabs.map(\.id))
+        #expect(ids.count == tabs.count)
+    }
+
+    @Test func names() {
+        #expect(Tabs.portfolio.name == "Portfolio")
+        #expect(Tabs.community.name == "Community")
+        #expect(Tabs.canvas.name == "Canvas")
+        #expect(Tabs.settings.name == "Settings")
+        #expect(Tabs.search.name == "Search")
+        #expect(Tabs.swatchBar.name == "SwatchBar")
+    }
+
+    @Test func symbols() {
+        #expect(Tabs.portfolio.symbol == "paintpalette.fill")
+        #expect(Tabs.community.symbol == "person.2")
+        #expect(Tabs.canvas.symbol == "pencil.and.scribble")
+        #expect(Tabs.settings.symbol == "gear")
+        #expect(Tabs.search.symbol == "magnifyingglass")
+        #expect(Tabs.swatchBar.symbol == "square.stack")
+    }
+
+    @Test func isSecondary() {
+        #expect(Tabs.portfolio.isSecondary == false)
+        #expect(Tabs.community.isSecondary == false)
+        #expect(Tabs.canvas.isSecondary == false)
+        #expect(Tabs.settings.isSecondary == false)
+        #expect(Tabs.search.isSecondary == false)
+        #expect(Tabs.swatchBar.isSecondary == false)
     }
 }

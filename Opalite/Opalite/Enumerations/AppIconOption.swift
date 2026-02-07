@@ -9,8 +9,8 @@ import Foundation
 
 /// Options for the app icon appearance.
 enum AppIconOption: String, CaseIterable, Identifiable {
-    case dark = "dark"
-    case light = "light"
+    case dark
+    case light
 
     var id: String { rawValue }
 

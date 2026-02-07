@@ -64,16 +64,11 @@ enum ColorPickerTab: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Initialize from a keyboard character (1-6)
+    /// Initialize from a keyboard character (1-6), derived from `keyboardShortcutKey`.
     init?(fromKey key: Character) {
-        switch key {
-        case "1": self = .spectrum
-        case "2": self = .grid
-        case "3": self = .shuffle
-        case "4": self = .sliders
-        case "5": self = .codes
-        case "6": self = .image
-        default: return nil
+        guard let match = Self.allCases.first(where: { $0.keyboardShortcutKey == key }) else {
+            return nil
         }
+        self = match
     }
 }

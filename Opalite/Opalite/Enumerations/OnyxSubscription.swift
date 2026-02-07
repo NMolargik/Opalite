@@ -5,7 +5,7 @@
 //  Created by Nick Molargik on 12/22/25.
 //
 
-import StoreKit
+import Foundation
 
 /// Defines the Onyx products available for purchase.
 enum OnyxSubscription: String, CaseIterable, Identifiable {

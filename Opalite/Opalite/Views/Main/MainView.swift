@@ -163,7 +163,7 @@ struct MainView: View {
             .hidden(horizontalSizeClass == .compact)
         }
         .tabViewStyle(.sidebarAdaptable)
-        .tint(selectedTab.symbolColor())
+        .tint(selectedTab.symbolColor)
         .alert("Rename Canvas", isPresented: Binding(
             get: { canvasToRename != nil },
             set: { if !$0 { canvasToRename = nil } }
@@ -261,7 +261,7 @@ struct MainView: View {
 
     /// Handles canvas list changes - switches to portfolio if the current canvas was deleted
     private func handleCanvasListChange(_ canvases: [CanvasFile]) {
-        if case .canvasBody(let optionalCanvas) = selectedTab, let canvas = optionalCanvas {
+        if case .canvasBody(let canvas) = selectedTab {
             let canvasID = canvas.id
             let canvasStillExists = canvases.contains { (file: CanvasFile) in file.id == canvasID }
             if !canvasStillExists {

@@ -9,9 +9,6 @@
 import UIKit
 
 enum PortfolioPDFExporter {
-    enum ExportError: Error {
-        case couldNotWrite
-    }
 
     // MARK: - Layout Constants
     private static let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792) // US Letter @ 72dpi

@@ -5,9 +5,9 @@
 //  Created by Nick Molargik on 12/19/25.
 //
 
-import SwiftUI
+import Foundation
 
-enum PortfolioNavigationNode: Equatable, Hashable, Identifiable {
+enum PortfolioNavigationNode: Hashable, Identifiable {
     case palette(OpalitePalette)
     case color(OpaliteColor)
 

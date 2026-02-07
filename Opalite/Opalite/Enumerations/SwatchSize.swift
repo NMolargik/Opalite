@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum SwatchSize: String, CaseIterable, Equatable {
+enum SwatchSize: String, CaseIterable {
     case small
     case medium
     case large
@@ -21,11 +21,7 @@ enum SwatchSize: String, CaseIterable, Equatable {
     }
 
     var showOverlays: Bool {
-        switch self {
-            case .small: return false
-            case .medium: return true
-            case .large: return true
-        }
+        self != .small
     }
 
     var next: SwatchSize {
