@@ -137,36 +137,10 @@ extension OpaliteColor {
 
     /// HSL representation
     var hslString: String {
-        let r = red
-        let g = green
-        let b = blue
-
-        let maxVal = max(r, max(g, b))
-        let minVal = min(r, min(g, b))
-        let delta = maxVal - minVal
-
-        var h: Double = 0
-        var s: Double = 0
-        let l: Double = (maxVal + minVal) / 2
-
-        if delta != 0 {
-            s = l > 0.5 ? delta / (2 - maxVal - minVal) : delta / (maxVal + minVal)
-
-            if maxVal == r {
-                h = (g - b) / delta + (g < b ? 6 : 0)
-            } else if maxVal == g {
-                h = (b - r) / delta + 2
-            } else {
-                h = (r - g) / delta + 4
-            }
-
-            h /= 6
-        }
-
+        let (h, s, l) = Self.rgbToHSL(r: red, g: green, b: blue)
         let hDeg = Int(round(h * 360))
         let sPerc = Int(round(s * 100))
         let lPerc = Int(round(l * 100))
-
         return "hsl(\(hDeg), \(sPerc)%, \(lPerc)%)"
     }
 

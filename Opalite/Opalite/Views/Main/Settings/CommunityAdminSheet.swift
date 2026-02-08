@@ -16,7 +16,11 @@ struct CommunityAdminSheet: View {
     @State private var reportedColors: [CommunityColor] = []
     @State private var reportedPalettes: [CommunityPalette] = []
     @State private var isLoading = true
-    @State private var selectedTab = 0
+    @State private var selectedTab = AdminTab.colors
+
+    private enum AdminTab {
+        case colors, palettes
+    }
 
     var body: some View {
         NavigationStack {
@@ -33,20 +37,57 @@ struct CommunityAdminSheet: View {
                     )
                 } else {
                     Picker("Type", selection: $selectedTab) {
-                        Text("Colors (\(reportedColors.count))").tag(0)
-                        Text("Palettes (\(reportedPalettes.count))").tag(1)
+                        Text("Colors (\(reportedColors.count))").tag(AdminTab.colors)
+                        Text("Palettes (\(reportedPalettes.count))").tag(AdminTab.palettes)
                     }
                     .pickerStyle(.segmented)
                     .padding()
 
                     List {
-                        if selectedTab == 0 {
+                        if selectedTab == .colors {
                             ForEach(reportedColors) { color in
-                                ReportedColorRow(color: color, onClear: clearReports, onDelete: deleteEntity)
+                                ReportedItemRow(
+                                    name: color.name ?? color.hexString,
+                                    publisherName: color.publisherName,
+                                    reportCount: Int(color.reportCount),
+                                    itemLabel: "Color",
+                                    deleteMessage: "This will permanently delete \"\(color.name ?? color.hexString)\" from Community.",
+                                    onClear: { clearReports(recordID: color.id) },
+                                    onDelete: { deleteEntity(recordID: color.id, type: .color) }
+                                ) {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(color.swiftUIColor)
+                                        .frame(width: 50, height: 50)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .strokeBorder(.primary.opacity(0.2), lineWidth: 1)
+                                        )
+                                }
                             }
                         } else {
                             ForEach(reportedPalettes) { palette in
-                                ReportedPaletteRow(palette: palette, onClear: clearReports, onDelete: deleteEntity)
+                                ReportedItemRow(
+                                    name: palette.name,
+                                    publisherName: palette.publisherName,
+                                    reportCount: Int(palette.reportCount),
+                                    itemLabel: "Palette",
+                                    deleteMessage: "This will permanently delete \"\(palette.name)\" and its colors from Community.",
+                                    onClear: { clearReports(recordID: palette.id) },
+                                    onDelete: { deleteEntity(recordID: palette.id, type: .palette) }
+                                ) {
+                                    HStack(spacing: 2) {
+                                        ForEach(palette.colors.prefix(4)) { color in
+                                            Rectangle()
+                                                .fill(color.swiftUIColor)
+                                        }
+                                    }
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .strokeBorder(.primary.opacity(0.2), lineWidth: 1)
+                                    )
+                                }
                             }
                         }
                     }
@@ -109,32 +150,31 @@ struct CommunityAdminSheet: View {
     }
 }
 
-// MARK: - Row Views
+// MARK: - Row View
 
-private struct ReportedColorRow: View {
-    let color: CommunityColor
-    let onClear: (CKRecord.ID) -> Void
-    let onDelete: (CKRecord.ID, CommunityItemType) -> Void
+private struct ReportedItemRow<Thumbnail: View>: View {
+    let name: String
+    let publisherName: String
+    let reportCount: Int
+    let itemLabel: String
+    let deleteMessage: String
+    let onClear: () -> Void
+    let onDelete: () -> Void
+    @ViewBuilder let thumbnail: Thumbnail
 
     @State private var showingDeleteAlert = false
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(color.swiftUIColor)
-                .frame(width: 50, height: 50)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(.primary.opacity(0.2), lineWidth: 1)
-                )
+            thumbnail
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(color.name ?? color.hexString)
+                Text(name)
                     .font(.headline)
-                Text("By \(color.publisherName)")
+                Text("By \(publisherName)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Label("\(color.reportCount) reports", systemImage: "exclamationmark.triangle.fill")
+                Label("\(reportCount) reports", systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
@@ -143,7 +183,7 @@ private struct ReportedColorRow: View {
 
             Menu {
                 Button {
-                    onClear(color.id)
+                    onClear()
                 } label: {
                     Label("Clear Reports", systemImage: "checkmark.shield")
                 }
@@ -151,7 +191,7 @@ private struct ReportedColorRow: View {
                 Button(role: .destructive) {
                     showingDeleteAlert = true
                 } label: {
-                    Label("Delete Color", systemImage: "trash")
+                    Label("Delete \(itemLabel)", systemImage: "trash")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
@@ -159,78 +199,13 @@ private struct ReportedColorRow: View {
             }
         }
         .padding(.vertical, 4)
-        .alert("Delete Color?", isPresented: $showingDeleteAlert) {
+        .alert("Delete \(itemLabel)?", isPresented: $showingDeleteAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
-                onDelete(color.id, .color)
+                onDelete()
             }
         } message: {
-            Text("This will permanently delete \"\(color.name ?? color.hexString)\" from Community.")
-        }
-    }
-}
-
-private struct ReportedPaletteRow: View {
-    let palette: CommunityPalette
-    let onClear: (CKRecord.ID) -> Void
-    let onDelete: (CKRecord.ID, CommunityItemType) -> Void
-
-    @State private var showingDeleteAlert = false
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Palette preview
-            HStack(spacing: 2) {
-                ForEach(palette.colors.prefix(4)) { color in
-                    Rectangle()
-                        .fill(color.swiftUIColor)
-                }
-            }
-            .frame(width: 50, height: 50)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(.primary.opacity(0.2), lineWidth: 1)
-            )
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(palette.name)
-                    .font(.headline)
-                Text("By \(palette.publisherName)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Label("\(palette.reportCount) reports", systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
-
-            Spacer()
-
-            Menu {
-                Button {
-                    onClear(palette.id)
-                } label: {
-                    Label("Clear Reports", systemImage: "checkmark.shield")
-                }
-
-                Button(role: .destructive) {
-                    showingDeleteAlert = true
-                } label: {
-                    Label("Delete Palette", systemImage: "trash")
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.title2)
-            }
-        }
-        .padding(.vertical, 4)
-        .alert("Delete Palette?", isPresented: $showingDeleteAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
-                onDelete(palette.id, .palette)
-            }
-        } message: {
-            Text("This will permanently delete \"\(palette.name)\" and its colors from Community.")
+            Text(deleteMessage)
         }
     }
 }

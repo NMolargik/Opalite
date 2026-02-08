@@ -52,46 +52,16 @@ struct CommunityColor: Identifiable, Hashable, Sendable {
 
     /// RGB string representation (e.g., "rgb(255, 128, 0)")
     var rgbString: String {
-        let r = Int(red * 255)
-        let g = Int(green * 255)
-        let b = Int(blue * 255)
+        let r = Int(round(red * 255))
+        let g = Int(round(green * 255))
+        let b = Int(round(blue * 255))
         return "rgb(\(r), \(g), \(b))"
     }
 
     /// HSL string representation (e.g., "hsl(30, 100%, 50%)")
     var hslString: String {
-        let maxVal = max(red, green, blue)
-        let minVal = min(red, green, blue)
-        let delta = maxVal - minVal
-
-        // Lightness
-        let l = (maxVal + minVal) / 2
-
-        // Saturation
-        let s: Double
-        if delta == 0 {
-            s = 0
-        } else {
-            s = delta / (1 - abs(2 * l - 1))
-        }
-
-        // Hue
-        var h: Double = 0
-        if delta != 0 {
-            switch maxVal {
-            case red:
-                h = 60 * (((green - blue) / delta).truncatingRemainder(dividingBy: 6))
-            case green:
-                h = 60 * (((blue - red) / delta) + 2)
-            case blue:
-                h = 60 * (((red - green) / delta) + 4)
-            default:
-                break
-            }
-        }
-        if h < 0 { h += 360 }
-
-        return "hsl(\(Int(h)), \(Int(s * 100))%, \(Int(l * 100))%)"
+        let (h, s, l) = hslComponents
+        return "hsl(\(Int(round(h))), \(Int(round(s * 100)))%, \(Int(round(l * 100)))%)"
     }
 
     // MARK: - CloudKit Mapping

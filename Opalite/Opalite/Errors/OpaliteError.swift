@@ -130,14 +130,14 @@ enum OpaliteError: LocalizedError, Equatable {
             return "Purchase verification failed"
 
         // Community
-        case .communityFetchFailed:
-            return "Couldn't load content"
-        case .communityPublishFailed:
-            return "Publish failed"
-        case .communityDeleteFailed:
-            return "Delete failed"
-        case .communityReportFailed:
-            return "Report failed"
+        case .communityFetchFailed(let reason):
+            return "Couldn't load content: \(reason)"
+        case .communityPublishFailed(let reason):
+            return "Publish failed: \(reason)"
+        case .communityDeleteFailed(let reason):
+            return "Delete failed: \(reason)"
+        case .communityReportFailed(let reason):
+            return "Report failed: \(reason)"
         case .communityRateLimited:
             return "Slow down, try again soon"
         case .communityRequiresOnyx:
@@ -198,7 +198,4 @@ enum OpaliteError: LocalizedError, Equatable {
         }
     }
 
-    static func == (lhs: OpaliteError, rhs: OpaliteError) -> Bool {
-        lhs.errorDescription == rhs.errorDescription
-    }
 }

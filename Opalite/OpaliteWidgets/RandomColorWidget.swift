@@ -2,7 +2,7 @@
 //  RandomColorWidget.swift
 //  OpaliteWidgets
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 //  NOTE: Add WidgetColorStorage.swift (from Opalite/Utilities/) to the
 //  OpaliteWidgets target in Xcode for shared color data access.

@@ -553,7 +553,7 @@ private extension PortfolioView {
                 viewModel.isShowingColorEditor.toggle()
             }, label: {
                 Label {
-                    Text("New Color")
+                    Text("Create Color")
                 } icon: {
                     Image(systemName: "paintpalette.fill")
                         .symbolRenderingMode(.monochrome)
@@ -573,7 +573,7 @@ private extension PortfolioView {
             }, label: {
                 Label {
                     HStack {
-                        Text("New Palette")
+                        Text("Create Palette")
                         if !subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
                             Image(systemName: "lock.fill")
                                 .font(.footnote)

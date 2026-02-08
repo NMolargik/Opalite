@@ -199,6 +199,20 @@
 			);
 			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
 		};
+		EB1A156F2F37B93D00A8B6EF /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Errors/FileHandlerError.swift,
+			);
+			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
+		};
+		EB1A15712F37B9C700A8B6EF /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Errors/FileHandlerError.swift,
+			);
+			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
+		};
 		EB3BCAE62EF8B58F0059764A /* Exceptions for "OpaliteQuickLook" folder in "OpaliteQuickLook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -270,20 +284,6 @@
 				Info.plist,
 			);
 			target = EBD4AD1B2EE48DF300012D16 /* Opalite */;
-		};
-		EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Errors/ThumbnailError.swift,
-			);
-			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
-		};
-		EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Errors/PreviewError.swift,
-			);
-			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -369,8 +369,8 @@
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
 				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
 				EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */,
-				EBD670D72EF9F653003312F6 /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
-				EBD670D52EF9F647003312F6 /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
+				EB1A15712F37B9C700A8B6EF /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
+				EB1A156F2F37B93D00A8B6EF /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";

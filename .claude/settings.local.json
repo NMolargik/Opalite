@@ -17,7 +17,9 @@
       "WebFetch(domain:github.com)",
       "Bash(xcrun devicectl device install app:*)",
       "Bash(xcrun devicectl device process launch:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(echo:*)",
+      "Bash(wc:*)"
     ]
   }
 }

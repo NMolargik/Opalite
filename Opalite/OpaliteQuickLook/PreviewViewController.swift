@@ -20,7 +20,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
         do {
             let data = try Data(contentsOf: url)
             guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                handler(PreviewError.invalidFormat)
+                handler(FileHandlerError.invalidFormat)
                 return
             }
 
@@ -29,7 +29,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
             if pathExtension == "opalitecolor" {
                 // Single color preview
                 guard let color = decodeColor(from: json) else {
-                    handler(PreviewError.decodingFailed)
+                    handler(FileHandlerError.decodingFailed)
                     return
                 }
                 setupColorPreview(color: color, name: json["name"] as? String)
@@ -38,7 +38,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
                 // Palette preview
                 guard let name = json["name"] as? String,
                       let colorDicts = json["colors"] as? [[String: Any]] else {
-                    handler(PreviewError.decodingFailed)
+                    handler(FileHandlerError.decodingFailed)
                     return
                 }
 

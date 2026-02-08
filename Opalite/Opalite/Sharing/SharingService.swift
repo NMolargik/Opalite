@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
-import Compression
 
 // MARK: - Color Export Formats
 
@@ -167,6 +166,66 @@ struct PaletteImportPreview {
     let newColors: [OpaliteColor]
     let existingColors: [OpaliteColor]
     var willUpdate: Bool { existingPalette != nil }
+}
+
+// MARK: - Palette Preview Layout
+
+/// Shared layout calculation for palette preview grids, used by both PaletteExportSheet and PaletteImportConfirmationSheet.
+struct PalettePreviewLayoutInfo {
+    let rows: Int
+    let columns: Int
+    let swatchSize: CGFloat
+    let horizontalSpacing: CGFloat
+    let verticalSpacing: CGFloat
+
+    static func calculate(
+        colorCount: Int,
+        availableWidth: CGFloat,
+        availableHeight: CGFloat,
+        minSpacing: CGFloat = 6,
+        maxSpacing: CGFloat = 12,
+        maxRows: Int = 2
+    ) -> PalettePreviewLayoutInfo {
+        guard colorCount > 0 else {
+            return PalettePreviewLayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+        }
+
+        var bestLayout = PalettePreviewLayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+
+        for rows in 1...maxRows {
+            let columns = Int(ceil(Double(colorCount) / Double(rows)))
+
+            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
+            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
+
+            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
+            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
+
+            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
+            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
+
+            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
+
+            var actualHorizontalSpacing = horizontalSpacing
+            if columns > 1 {
+                let usedWidth = CGFloat(columns) * swatchSize
+                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
+                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
+            }
+
+            if swatchSize > bestLayout.swatchSize {
+                bestLayout = PalettePreviewLayoutInfo(
+                    rows: rows,
+                    columns: columns,
+                    swatchSize: swatchSize,
+                    horizontalSpacing: actualHorizontalSpacing,
+                    verticalSpacing: verticalSpacing
+                )
+            }
+        }
+
+        return bestLayout
+    }
 }
 
 // MARK: - Sharing Errors
@@ -431,7 +490,7 @@ enum SharingService {
 
     // MARK: - Color Space Helpers
 
-    private static func rgbToHSV(r: Double, g: Double, b: Double) -> (h: Double, s: Double, v: Double) {
+    static func rgbToHSV(r: Double, g: Double, b: Double) -> (h: Double, s: Double, v: Double) {
         let maxVal = max(r, max(g, b))
         let minVal = min(r, min(g, b))
         let delta = maxVal - minVal
@@ -521,7 +580,7 @@ enum SharingService {
         return zip
     }
 
-    private static func crc32(_ data: Data) -> UInt32 {
+    static func crc32(_ data: Data) -> UInt32 {
         var crc: UInt32 = 0xFFFFFFFF
         let polynomial: UInt32 = 0xEDB88320
 
@@ -539,7 +598,7 @@ enum SharingService {
         return ~crc
     }
 
-    private static func dosDateTime() -> (date: UInt16, time: UInt16) {
+    static func dosDateTime() -> (date: UInt16, time: UInt16) {
         let calendar = Calendar.current
         let now = Date()
         let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: now)
@@ -1006,7 +1065,7 @@ enum SharingService {
 
     // MARK: - Helpers
 
-    private static func sanitizeFilename(_ name: String) -> String {
+    static func sanitizeFilename(_ name: String) -> String {
         // Capitalize first letter of each word and remove whitespace
         let words = name
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1029,7 +1088,7 @@ enum SharingService {
     }
 
     /// Creates a clean filename from a hex code (e.g., "#FF5733" -> "FF5733")
-    private static func filenameFromHex(_ hex: String) -> String {
+    static func filenameFromHex(_ hex: String) -> String {
         hex.replacingOccurrences(of: "#", with: "")
     }
 }

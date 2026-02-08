@@ -103,10 +103,7 @@ enum ColorImageRenderer {
     // MARK: - Platform-Specific Rendering
 
     #if canImport(UIKit)
-    /// Renders a SwiftUI view as a UIImage using the best available method.
-    ///
-    /// On iOS 16+, uses `ImageRenderer` for optimal performance.
-    /// Falls back to `UIHostingController` + `drawHierarchy` on older versions.
+    /// Renders a SwiftUI view as a UIImage using `ImageRenderer`.
     ///
     /// - Parameters:
     ///   - content: The SwiftUI view to render
@@ -114,49 +111,16 @@ enum ColorImageRenderer {
     ///   - opaque: Whether the image should be opaque
     /// - Returns: A UIImage of the rendered view, or nil if rendering fails
     private static func renderViewAsUIImage<Content: View>(_ content: Content, size: CGSize, opaque: Bool) -> UIImage? {
-        // Use ImageRenderer on iOS 16+ for best results
-        if #available(iOS 16.0, *) {
-            let renderer = ImageRenderer(content: content.frame(width: size.width, height: size.height))
-            renderer.proposedSize = ProposedViewSize(size)
-            renderer.isOpaque = opaque
+        let renderer = ImageRenderer(content: content.frame(width: size.width, height: size.height))
+        renderer.proposedSize = ProposedViewSize(size)
+        renderer.isOpaque = opaque
 
-            // Get display scale from trait collection (avoids deprecated UIScreen.main)
-            let hostingController = UIHostingController(rootView: content)
-            hostingController.view.frame = CGRect(origin: .zero, size: size)
-            renderer.scale = hostingController.traitCollection.displayScale
+        // Get display scale from trait collection (avoids deprecated UIScreen.main)
+        let hostingController = UIHostingController(rootView: content)
+        hostingController.view.frame = CGRect(origin: .zero, size: size)
+        renderer.scale = hostingController.traitCollection.displayScale
 
-            return renderer.uiImage
-        }
-
-        // Fallback for iOS 15 and earlier
-        return renderViewWithHostingController(content, size: size, opaque: opaque)
-    }
-
-    /// Fallback rendering method using UIHostingController for iOS 15 and earlier.
-    ///
-    /// - Parameters:
-    ///   - content: The SwiftUI view to render
-    ///   - size: The size of the output image
-    ///   - opaque: Whether the image should be opaque
-    /// - Returns: A UIImage of the rendered view, or nil if rendering fails
-    private static func renderViewWithHostingController<Content: View>(_ content: Content, size: CGSize, opaque: Bool) -> UIImage? {
-        let controller = UIHostingController(rootView: content.frame(width: size.width, height: size.height))
-        controller.view.frame = CGRect(origin: .zero, size: size)
-        controller.view.bounds = CGRect(origin: .zero, size: size)
-        controller.view.backgroundColor = opaque ? .white : .clear
-        controller.view.isOpaque = opaque
-
-        controller.view.setNeedsLayout()
-        controller.view.layoutIfNeeded()
-
-        let format = UIGraphicsImageRendererFormat.default()
-        format.scale = controller.traitCollection.displayScale
-        format.opaque = opaque
-
-        let renderer = UIGraphicsImageRenderer(size: size, format: format)
-        return renderer.image { _ in
-            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
-        }
+        return renderer.uiImage
     }
     #endif
 

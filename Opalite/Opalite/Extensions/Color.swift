@@ -1,5 +1,5 @@
 //
-//  Color-rgbaComponents.swift
+//  Color.swift
 //  Opalite
 //
 //  Created by Nick Molargik on 12/7/25.

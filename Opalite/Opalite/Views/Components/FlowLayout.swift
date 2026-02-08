@@ -15,12 +15,14 @@ struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = layout(subviews: subviews, proposal: proposal)
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        let result = Self.calculateLayout(itemSizes: sizes, maxWidth: proposal.width ?? .infinity, spacing: spacing)
         return result.size
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = layout(subviews: subviews, proposal: proposal)
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        let result = Self.calculateLayout(itemSizes: sizes, maxWidth: proposal.width ?? .infinity, spacing: spacing)
 
         for (index, subview) in subviews.enumerated() {
             let point = CGPoint(
@@ -31,8 +33,13 @@ struct FlowLayout: Layout {
         }
     }
 
-    private func layout(subviews: Subviews, proposal: ProposedViewSize) -> (size: CGSize, positions: [CGPoint]) {
-        let maxWidth = proposal.width ?? .infinity
+    /// Pure layout calculation for an array of item sizes.
+    /// Arranges items horizontally, wrapping to the next line when exceeding maxWidth.
+    static func calculateLayout(
+        itemSizes: [CGSize],
+        maxWidth: CGFloat,
+        spacing: CGFloat
+    ) -> (size: CGSize, positions: [CGPoint]) {
         var positions: [CGPoint] = []
         var currentX: CGFloat = 0
         var currentY: CGFloat = 0
@@ -40,9 +47,7 @@ struct FlowLayout: Layout {
         var totalHeight: CGFloat = 0
         var totalWidth: CGFloat = 0
 
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
+        for size in itemSizes {
             // Check if we need to wrap to the next line
             if currentX + size.width > maxWidth && currentX > 0 {
                 currentX = 0

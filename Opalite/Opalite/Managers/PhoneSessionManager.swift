@@ -104,6 +104,50 @@ class PhoneSessionManager: NSObject {
         #endif
     }
 
+    // MARK: - Serialization Helpers
+
+    /// Serializes colors for WatchConnectivity transfer.
+    /// WatchConnectivity doesn't support NSNull, so nil values use empty strings.
+    private func serializeColors() -> [[String: Any]] {
+        guard let colorManager = colorManager else { return [] }
+        return colorManager.colors.map { color in
+            [
+                "id": color.id.uuidString,
+                "name": color.name ?? "",
+                "red": color.red,
+                "green": color.green,
+                "blue": color.blue,
+                "alpha": color.alpha,
+                "paletteId": color.palette?.id.uuidString ?? "",
+                "createdAt": color.createdAt.timeIntervalSince1970,
+                "updatedAt": color.updatedAt.timeIntervalSince1970
+            ]
+        }
+    }
+
+    /// Serializes palettes for WatchConnectivity transfer.
+    private func serializePalettes() -> [[String: Any]] {
+        guard let colorManager = colorManager else { return [] }
+        return colorManager.palettes.map { palette in
+            [
+                "id": palette.id.uuidString,
+                "name": palette.name,
+                "createdAt": palette.createdAt.timeIntervalSince1970,
+                "updatedAt": palette.updatedAt.timeIntervalSince1970
+            ]
+        }
+    }
+
+    /// Tracks a successful sync and logs in debug mode.
+    private func trackSync(colorCount: Int, paletteCount: Int) {
+        lastSyncToWatch = Date()
+        lastSyncColorCount = colorCount
+        lastSyncPaletteCount = paletteCount
+        #if DEBUG
+        print("[PhoneSessionManager] Synced \(colorCount) colors and \(paletteCount) palettes to Watch")
+        #endif
+    }
+
     // MARK: - Sync to Watch
 
     /// Sends all colors and palettes to the Watch via application context.
@@ -117,38 +161,15 @@ class PhoneSessionManager: NSObject {
             return
         }
 
-        guard let colorManager = colorManager else {
+        guard colorManager != nil else {
             #if DEBUG
             print("[PhoneSessionManager] Cannot sync: colorManager not set")
             #endif
             return
         }
 
-        // Serialize colors (only essential data for Watch)
-        // Note: WatchConnectivity doesn't support NSNull, so we use empty string for nil values
-        let colorsData: [[String: Any]] = colorManager.colors.map { color in
-            [
-                "id": color.id.uuidString,
-                "name": color.name ?? "",
-                "red": color.red,
-                "green": color.green,
-                "blue": color.blue,
-                "alpha": color.alpha,
-                "paletteId": color.palette?.id.uuidString ?? "",
-                "createdAt": color.createdAt.timeIntervalSince1970,
-                "updatedAt": color.updatedAt.timeIntervalSince1970
-            ]
-        }
-
-        // Serialize palettes
-        let palettesData: [[String: Any]] = colorManager.palettes.map { palette in
-            [
-                "id": palette.id.uuidString,
-                "name": palette.name,
-                "createdAt": palette.createdAt.timeIntervalSince1970,
-                "updatedAt": palette.updatedAt.timeIntervalSince1970
-            ]
-        }
+        let colorsData = serializeColors()
+        let palettesData = serializePalettes()
 
         let context: [String: Any] = [
             "colors": colorsData,
@@ -158,13 +179,7 @@ class PhoneSessionManager: NSObject {
 
         do {
             try session.updateApplicationContext(context)
-            // Track the sync
-            lastSyncToWatch = Date()
-            lastSyncColorCount = colorsData.count
-            lastSyncPaletteCount = palettesData.count
-            #if DEBUG
-            print("[PhoneSessionManager] Synced \(colorsData.count) colors and \(palettesData.count) palettes to Watch")
-            #endif
+            trackSync(colorCount: colorsData.count, paletteCount: palettesData.count)
         } catch {
             #if DEBUG
             print("[PhoneSessionManager] Failed to update application context: \(error)")
@@ -177,35 +192,14 @@ class PhoneSessionManager: NSObject {
     func sendImmediateUpdate() {
         #if os(iOS)
         guard let session = session, session.isReachable else {
-            // Fall back to application context for background delivery
             syncToWatch()
             return
         }
 
-        guard let colorManager = colorManager else { return }
+        guard colorManager != nil else { return }
 
-        let colorsData: [[String: Any]] = colorManager.colors.map { color in
-            [
-                "id": color.id.uuidString,
-                "name": color.name ?? "",
-                "red": color.red,
-                "green": color.green,
-                "blue": color.blue,
-                "alpha": color.alpha,
-                "paletteId": color.palette?.id.uuidString ?? "",
-                "createdAt": color.createdAt.timeIntervalSince1970,
-                "updatedAt": color.updatedAt.timeIntervalSince1970
-            ]
-        }
-
-        let palettesData: [[String: Any]] = colorManager.palettes.map { palette in
-            [
-                "id": palette.id.uuidString,
-                "name": palette.name,
-                "createdAt": palette.createdAt.timeIntervalSince1970,
-                "updatedAt": palette.updatedAt.timeIntervalSince1970
-            ]
-        }
+        let colorsData = serializeColors()
+        let palettesData = serializePalettes()
 
         let message: [String: Any] = [
             "action": "syncData",
@@ -218,7 +212,6 @@ class PhoneSessionManager: NSObject {
             #if DEBUG
             print("[PhoneSessionManager] Failed to send immediate update: \(error)")
             #endif
-            // Fall back to application context
             Task { @MainActor in
                 self.syncToWatch()
             }
@@ -277,33 +270,13 @@ extension PhoneSessionManager: WCSessionDelegate {
 
     private nonisolated func handleRequestSync(replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
-            guard let colorManager = self.colorManager else {
+            guard self.colorManager != nil else {
                 replyHandler(["success": false, "error": "ColorManager not available"])
                 return
             }
 
-            let colorsData: [[String: Any]] = colorManager.colors.map { color in
-                [
-                    "id": color.id.uuidString,
-                    "name": color.name ?? "",
-                    "red": color.red,
-                    "green": color.green,
-                    "blue": color.blue,
-                    "alpha": color.alpha,
-                    "paletteId": color.palette?.id.uuidString ?? "",
-                    "createdAt": color.createdAt.timeIntervalSince1970,
-                    "updatedAt": color.updatedAt.timeIntervalSince1970
-                ]
-            }
-
-            let palettesData: [[String: Any]] = colorManager.palettes.map { palette in
-                [
-                    "id": palette.id.uuidString,
-                    "name": palette.name,
-                    "createdAt": palette.createdAt.timeIntervalSince1970,
-                    "updatedAt": palette.updatedAt.timeIntervalSince1970
-                ]
-            }
+            let colorsData = self.serializeColors()
+            let palettesData = self.serializePalettes()
 
             replyHandler([
                 "success": true,
@@ -312,14 +285,7 @@ extension PhoneSessionManager: WCSessionDelegate {
                 "syncTimestamp": Date().timeIntervalSince1970
             ])
 
-            // Track the sync
-            self.lastSyncToWatch = Date()
-            self.lastSyncColorCount = colorsData.count
-            self.lastSyncPaletteCount = palettesData.count
-
-            #if DEBUG
-            print("[PhoneSessionManager] Sent \(colorsData.count) colors and \(palettesData.count) palettes in response to sync request")
-            #endif
+            self.trackSync(colorCount: colorsData.count, paletteCount: palettesData.count)
         }
     }
 

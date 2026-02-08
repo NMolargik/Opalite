@@ -258,21 +258,21 @@ private struct CommunityColorInfoTilesRow: View {
         HStack(spacing: 12) {
             CommunityInfoTileView(
                 icon: "person.fill",
-                iconColor: .orange,
+                iconColor: color.idealTextColor(),
                 value: color.publisherName,
                 label: "Publisher"
             )
 
             CommunityInfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
-                iconColor: .secondary,
+                iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
                 label: "Created On"
             )
 
             CommunityInfoTileView(
                 icon: "person.2",
-                iconColor: .blue,
+                iconColor: color.idealTextColor(),
                 value: formattedShortDate(color.publishedAt),
                 label: "Published"
             )

@@ -2,7 +2,7 @@
 //  OpaliteColorQuery.swift
 //  Opalite
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 
 import AppIntents

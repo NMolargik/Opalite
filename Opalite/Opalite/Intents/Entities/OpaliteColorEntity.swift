@@ -2,11 +2,10 @@
 //  OpaliteColorEntity.swift
 //  Opalite
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 
 import AppIntents
-import SwiftData
 
 /// AppEntity wrapper for OpaliteColor that Siri can understand and display.
 struct OpaliteColorEntity: AppEntity {

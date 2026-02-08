@@ -2,11 +2,10 @@
 //  ShowPaletteIntent.swift
 //  Opalite
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 
 import AppIntents
-import SwiftData
 
 /// App Intent that opens a specific palette in Opalite.
 /// Triggered by Siri phrases like "Show me my [palette name] in Opalite"

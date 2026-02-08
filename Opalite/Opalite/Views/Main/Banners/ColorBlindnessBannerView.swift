@@ -2,7 +2,7 @@
 //  ColorBlindnessBannerView.swift
 //  Opalite
 //
-//  Created by Claude on 12/26/25.
+//  Created by Nick Molargik on 12/26/25.
 //
 
 import SwiftUI

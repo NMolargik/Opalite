@@ -71,7 +71,17 @@ struct SwatchBarView: View {
                                             }
                                         }
                                     } header: {
-                                        sectionHeader(for: palette)
+                                        collapsibleHeader(
+                                            title: palette.name,
+                                            icon: "swatchpalette",
+                                            isExpanded: expandedPalettes.contains(palette.id)
+                                        ) {
+                                            if expandedPalettes.contains(palette.id) {
+                                                expandedPalettes.remove(palette.id)
+                                            } else {
+                                                expandedPalettes.insert(palette.id)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -88,7 +98,13 @@ struct SwatchBarView: View {
                                         }
                                     }
                                 } header: {
-                                    looseColorsHeader
+                                    collapsibleHeader(
+                                        title: "Colors",
+                                        icon: "paintpalette",
+                                        isExpanded: looseColorsExpanded
+                                    ) {
+                                        looseColorsExpanded.toggle()
+                                    }
                                 }
                             }
                         }
@@ -184,20 +200,15 @@ struct SwatchBarView: View {
     }
     #endif
 
-    @ViewBuilder
-    private func sectionHeader(for palette: OpalitePalette) -> some View {
+    private func collapsibleHeader(title: String, icon: String, isExpanded: Bool, toggle: @escaping () -> Void) -> some View {
         Button {
             HapticsManager.shared.selection()
             withAnimation(.easeInOut(duration: 0.2)) {
-                if expandedPalettes.contains(palette.id) {
-                    expandedPalettes.remove(palette.id)
-                } else {
-                    expandedPalettes.insert(palette.id)
-                }
+                toggle()
             }
         } label: {
             HStack {
-                Label(palette.name, systemImage: "swatchpalette")
+                Label(title, systemImage: icon)
                     .font(.subheadline)
                     .fontWeight(.semibold)
 
@@ -206,33 +217,7 @@ struct SwatchBarView: View {
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .rotationEffect(expandedPalettes.contains(palette.id) ? .degrees(90) : .zero)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
-            .background(.regularMaterial)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var looseColorsHeader: some View {
-        Button {
-            HapticsManager.shared.selection()
-            withAnimation(.easeInOut(duration: 0.2)) {
-                looseColorsExpanded.toggle()
-            }
-        } label: {
-            HStack {
-                Label("Colors", systemImage: "paintpalette")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .rotationEffect(looseColorsExpanded ? .degrees(90) : .zero)
+                    .rotationEffect(isExpanded ? .degrees(90) : .zero)
             }
             .padding(.horizontal)
             .padding(.vertical, 10)
@@ -352,7 +337,7 @@ struct SwatchBarView: View {
             let availableWidth = proxy.size.width
 
             let labelText: String = {
-                let hex = "\(color.hexString)"
+                let hex = color.hexString
                 if let name = color.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
                     return "\(name) - \(hex)"
                 } else {

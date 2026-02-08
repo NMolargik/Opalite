@@ -128,7 +128,7 @@ struct OnboardingView: View {
                         } label: {
                             Text("Skip")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.inverseTheme)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
                                 .background(.ultraThinMaterial, in: Capsule())

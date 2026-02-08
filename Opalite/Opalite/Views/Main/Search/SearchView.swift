@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct SearchView: View {
-    @Environment(ColorManager.self) private var colorManager: ColorManager
-    @Environment(CanvasManager.self) private var canvasManager: CanvasManager
+    @Environment(ColorManager.self) private var colorManager
+    @Environment(CanvasManager.self) private var canvasManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -75,6 +75,69 @@ struct SearchView: View {
         }
     }
 
+    // MARK: - Row Helpers
+
+    private func paletteRow(for palette: OpalitePalette) -> some View {
+        NavigationLink {
+            PaletteDetailView(palette: palette)
+                .tint(.none)
+        } label: {
+            HStack(spacing: 12) {
+                HStack(spacing: 0) {
+                    ForEach(Array(palette.sortedColors.prefix(4)), id: \.id) { color in
+                        Rectangle()
+                            .fill(color.swiftUIColor)
+                    }
+                }
+                .frame(width: 32, height: 32)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(.secondary.opacity(0.3), lineWidth: 1)
+                )
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(palette.name)
+                        .font(.body)
+                    Text("\(palette.colors?.count ?? 0) colors")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private func canvasRow(for canvas: CanvasFile) -> some View {
+        Button {
+            HapticsManager.shared.selection()
+            openCanvas(canvas)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "scribble.variable")
+                    .font(.title2)
+                    .foregroundStyle(.red)
+                    .frame(width: 32, height: 32)
+
+                Text(canvas.title)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+
+                Spacer()
+
+                if !subscriptionManager.hasOnyxEntitlement {
+                    Image(systemName: "lock.fill")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -129,34 +192,7 @@ struct SearchView: View {
                     if !colorManager.palettes.isEmpty {
                         Section {
                             ForEach(colorManager.palettes.prefix(3)) { palette in
-                                NavigationLink {
-                                    PaletteDetailView(palette: palette)
-                                        .tint(.none)
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        // Mini palette preview
-                                        HStack(spacing: 0) {
-                                            ForEach(Array(palette.sortedColors.prefix(4)), id: \.id) { color in
-                                                Rectangle()
-                                                    .fill(color.swiftUIColor)
-                                            }
-                                        }
-                                        .frame(width: 32, height: 32)
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .stroke(.secondary.opacity(0.3), lineWidth: 1)
-                                        )
-
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(palette.name)
-                                                .font(.body)
-                                            Text("\(palette.colors?.count ?? 0) colors")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                    }
-                                }
+                                paletteRow(for: palette)
                             }
                         } header: {
                             Label("Palettes", systemImage: "swatchpalette.fill")
@@ -168,34 +204,7 @@ struct SearchView: View {
                     if !canvasManager.canvases.isEmpty {
                         Section {
                             ForEach(canvasManager.canvases.prefix(3)) { canvas in
-                                Button {
-                                    HapticsManager.shared.selection()
-                                    openCanvas(canvas)
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "scribble.variable")
-                                            .font(.title2)
-                                            .foregroundStyle(.red)
-                                            .frame(width: 32, height: 32)
-
-                                        Text(canvas.title)
-                                            .font(.body)
-                                            .foregroundStyle(.primary)
-
-                                        Spacer()
-
-                                        if !subscriptionManager.hasOnyxEntitlement {
-                                            Image(systemName: "lock.fill")
-                                                .font(.caption)
-                                                .foregroundStyle(.red)
-                                        }
-
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundStyle(.red)
-                                    }
-                                }
-                                .buttonStyle(.plain)
+                                canvasRow(for: canvas)
                             }
                         } header: {
                             Label("Canvases", systemImage: "pencil.and.scribble")
@@ -217,12 +226,7 @@ struct SearchView: View {
                                 } label: {
                                     HStack(spacing: 12) {
                                         RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color(
-                                                red: color.red,
-                                                green: color.green,
-                                                blue: color.blue,
-                                                opacity: color.alpha
-                                            ))
+                                            .fill(color.swiftUIColor)
                                             .frame(width: 32, height: 32)
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 6)
@@ -251,39 +255,7 @@ struct SearchView: View {
                     if !filteredPalettes.isEmpty {
                         Section {
                             ForEach(filteredPalettes) { palette in
-                                NavigationLink {
-                                    PaletteDetailView(palette: palette)
-                                        .tint(.none)
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        // Mini palette preview
-                                        HStack(spacing: 0) {
-                                            ForEach(Array(palette.sortedColors.prefix(4)), id: \.id) { color in
-                                                Rectangle()
-                                                    .fill(Color(
-                                                        red: color.red,
-                                                        green: color.green,
-                                                        blue: color.blue,
-                                                        opacity: color.alpha
-                                                    ))
-                                            }
-                                        }
-                                        .frame(width: 32, height: 32)
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .stroke(.secondary.opacity(0.3), lineWidth: 1)
-                                        )
-
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(palette.name)
-                                                .font(.body)
-                                            Text("\(palette.colors?.count ?? 0) colors")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                    }
-                                }
+                                paletteRow(for: palette)
                             }
                         } header: {
                             Label("Palettes", systemImage: "swatchpalette.fill")
@@ -296,34 +268,7 @@ struct SearchView: View {
                     if !filteredCanvases.isEmpty {
                         Section {
                             ForEach(filteredCanvases) { canvas in
-                                Button {
-                                    HapticsManager.shared.selection()
-                                    openCanvas(canvas)
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "scribble.variable")
-                                            .font(.title2)
-                                            .foregroundStyle(.red)
-                                            .frame(width: 32, height: 32)
-
-                                        Text(canvas.title)
-                                            .font(.body)
-                                            .foregroundStyle(.primary)
-
-                                        Spacer()
-
-                                        if !subscriptionManager.hasOnyxEntitlement {
-                                            Image(systemName: "lock.fill")
-                                                .font(.caption)
-                                                .foregroundStyle(.red)
-                                        }
-
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundStyle(.red)
-                                    }
-                                }
-                                .buttonStyle(.plain)
+                                canvasRow(for: canvas)
                             }
                         } header: {
                             Label("Canvases", systemImage: "pencil.and.scribble")

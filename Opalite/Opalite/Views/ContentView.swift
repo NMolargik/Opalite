@@ -159,6 +159,11 @@ struct ContentView: View {
     }
 
     private func prepareApp() async {
+        // Allow UI tests to force the full onboarding flow
+        if CommandLine.arguments.contains("--reset-onboarding") {
+            isOnboardingComplete = false
+        }
+
         // For returning users, go to syncing view to check for iCloud data
         // For new users, go to splash/onboarding first
         appStage = isOnboardingComplete ? .syncing : .splash

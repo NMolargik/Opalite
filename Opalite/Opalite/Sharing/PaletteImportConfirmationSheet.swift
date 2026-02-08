@@ -211,7 +211,7 @@ struct PaletteImportConfirmationSheet: View {
             let availableWidth = geometry.size.width - (previewPadding * 2)
             let availableHeight = previewHeight - (previewPadding * 2) - 44 // Account for name badge
             let colors = preview.palette.sortedColors
-            let layout = calculatePreviewLayout(
+            let layout = PalettePreviewLayoutInfo.calculate(
                 colorCount: colors.count,
                 availableWidth: availableWidth,
                 availableHeight: availableHeight
@@ -268,61 +268,4 @@ struct PaletteImportConfirmationSheet: View {
         .frame(height: previewHeight)
     }
 
-    private struct PreviewLayoutInfo {
-        let rows: Int
-        let columns: Int
-        let swatchSize: CGFloat
-        let horizontalSpacing: CGFloat
-        let verticalSpacing: CGFloat
-    }
-
-    private func calculatePreviewLayout(
-        colorCount: Int,
-        availableWidth: CGFloat,
-        availableHeight: CGFloat
-    ) -> PreviewLayoutInfo {
-        guard colorCount > 0 else {
-            return PreviewLayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
-        }
-
-        let minSpacing: CGFloat = 6
-        let maxSpacing: CGFloat = 12
-
-        var bestLayout = PreviewLayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
-
-        // Try different row configurations (1 or 2 rows for the compact preview)
-        for rows in 1...2 {
-            let columns = Int(ceil(Double(colorCount) / Double(rows)))
-
-            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
-            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
-
-            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
-            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
-
-            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
-            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
-
-            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
-
-            var actualHorizontalSpacing = horizontalSpacing
-            if columns > 1 {
-                let usedWidth = CGFloat(columns) * swatchSize
-                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
-                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
-            }
-
-            if swatchSize > bestLayout.swatchSize {
-                bestLayout = PreviewLayoutInfo(
-                    rows: rows,
-                    columns: columns,
-                    swatchSize: swatchSize,
-                    horizontalSpacing: actualHorizontalSpacing,
-                    verticalSpacing: verticalSpacing
-                )
-            }
-        }
-
-        return bestLayout
-    }
 }

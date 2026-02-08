@@ -99,6 +99,7 @@ struct ColorDetailView: View {
                     }
                     .overlay(alignment: .bottom) {
                         InfoTilesRow(color: color)
+                            .padding(.horizontal, 30)
                             .offset(y: 45)
                             .zIndex(1)
                             .opacity(isShowingFullScreen ? 0 : 1)
@@ -342,7 +343,7 @@ struct ColorDetailView: View {
         .onTapGesture {
             dismissFullScreen()
         }
-        .overlay(alignment: .bottom) {
+        .overlay(alignment: .top) {
             HStack(spacing: 12) {
                 Text(color.name ?? color.hexString)
                     .foregroundStyle(color.idealTextColor())
@@ -394,81 +395,38 @@ struct ColorDetailView: View {
     }
 }
 
-// MARK: - Info Tile View
-
-private struct InfoTileView: View {
-    let icon: String
-    let iconColor: Color
-    let value: String
-    let label: String
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(iconColor)
-                .frame(height: 30)
-
-            Text(value)
-                .font(.subheadline.bold())
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(12)
-        .frame(maxWidth: 220, maxHeight: 85)
-        .modifier(GlassTileBackground())
-    }
-}
-
-private struct GlassTileBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-            content
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(radius: 5)
-
-        } else {
-            content
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.white)
-                        .shadow(radius: 5)
-                )
-        }
-    }
-}
-
 // MARK: - Info Tiles Row
 
 private struct InfoTilesRow: View {
     let color: OpaliteColor
 
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             InfoTileView(
                 icon: "person.fill",
                 iconColor: color.idealTextColor(),
                 value: color.createdByDisplayName ?? "Unknown",
-                label: "Created By"
+                label: "Created By",
+                glassStyle: .regular
+
             )
 
             InfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
                 iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
-                label: "Created On"
+                label: "Created On",
+                glassStyle: .regular
+
             )
 
             InfoTileView(
                 icon: "clock.fill",
                 iconColor: color.idealTextColor(),
                 value: formattedShortDate(color.updatedAt),
-                label: "Updated On"
+                label: "Updated On",
+                glassStyle: .regular
+
             )
         }
     }

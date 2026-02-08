@@ -2,7 +2,7 @@
 //  MacCatalystToolPicker.swift
 //  Opalite
 //
-//  Created by Claude on 1/1/26.
+//  Created by Nick Molargik on 1/1/26.
 //
 
 import SwiftUI

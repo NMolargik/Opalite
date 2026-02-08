@@ -17,7 +17,7 @@ class ThumbnailProvider: QLThumbnailProvider {
         do {
             let data = try Data(contentsOf: request.fileURL)
             guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                handler(nil, ThumbnailError.invalidFormat)
+                handler(nil, FileHandlerError.invalidFormat)
                 return
             }
 
@@ -26,7 +26,7 @@ class ThumbnailProvider: QLThumbnailProvider {
             if pathExtension == "opalitecolor" {
                 // Single color thumbnail
                 guard let color = decodeColor(from: json) else {
-                    handler(nil, ThumbnailError.decodingFailed)
+                    handler(nil, FileHandlerError.decodingFailed)
                     return
                 }
 
@@ -39,7 +39,7 @@ class ThumbnailProvider: QLThumbnailProvider {
             } else if pathExtension == "opalitepalette" {
                 // Palette thumbnail
                 guard let colorDicts = json["colors"] as? [[String: Any]] else {
-                    handler(nil, ThumbnailError.decodingFailed)
+                    handler(nil, FileHandlerError.decodingFailed)
                     return
                 }
 
@@ -51,7 +51,7 @@ class ThumbnailProvider: QLThumbnailProvider {
                 })
                 handler(reply, nil)
             } else {
-                handler(nil, ThumbnailError.invalidFormat)
+                handler(nil, FileHandlerError.invalidFormat)
             }
 
         } catch {

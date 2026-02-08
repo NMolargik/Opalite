@@ -124,18 +124,10 @@ struct SettingsView: View {
 
                     #if os(iOS)
                     if UIDevice.current.userInterfaceIdiom != .phone {
-                        Toggle(isOn: $skipSwatchBarConfirmation) {
-                            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                                .foregroundStyle(.primary)
-                        }
-                        .tint(.green)
+                        swatchBarConfirmationToggle
                     }
                     #else
-                    Toggle(isOn: $skipSwatchBarConfirmation) {
-                        Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
-                            .foregroundStyle(.primary)
-                    }
-                    .tint(.green)
+                    swatchBarConfirmationToggle
                     #endif
                 }
 
@@ -505,6 +497,16 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Helpers
+
+    private var swatchBarConfirmationToggle: some View {
+        Toggle(isOn: $skipSwatchBarConfirmation) {
+            Label("Skip SwatchBar Confirmation", systemImage: "square.stack")
+                .foregroundStyle(.primary)
+        }
+        .tint(.green)
+    }
+
     // MARK: - Actions
 
     #if canImport(UIKit) && !os(visionOS)
@@ -549,8 +551,8 @@ struct SettingsView: View {
         }
     }
 
+    #if canImport(UIKit)
     private func exportColorsToPDF(palettes: [OpalitePalette], looseColors: [OpaliteColor]) {
-        #if canImport(UIKit)
         do {
             let url = try PortfolioPDFExporter.export(
                 palettes: palettes,
@@ -561,10 +563,8 @@ struct SettingsView: View {
         } catch {
             print("Failed to export PDF: \(error)")
         }
-        #else
-        // PDF export requires UIKit.
-        #endif
     }
+    #endif
 }
 
 private struct IdentifiableURL: Identifiable {

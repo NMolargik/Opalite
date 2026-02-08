@@ -92,21 +92,6 @@ struct PaletteRowHeaderView: View {
                     .contentShape(Circle())
                     .hoverEffect(.lift)
             }
-            //
-            //                Button {
-            //                    HapticsManager.shared.selection()
-            //                    isShowingColorEditor = true
-            //                } label: {
-            //                    Image(systemName: "plus")
-            //                        .imageScale(.large)
-            //                        .bold()
-            //                        .foregroundStyle(.white)
-            //                        .frame(width: 36, height: 36)
-            //                        .background(Circle().fill(.blue))
-            //                        .glassIfAvailable(GlassConfiguration(style: .regular))
-            //                        .contentShape(Circle())
-            //                        .hoverEffect(.lift)
-            //                }
 
             NavigationLink {
                 PaletteDetailView(palette: palette)

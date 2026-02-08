@@ -84,9 +84,9 @@ final class ColorNameSuggestionService {
     #endif
 
     private func buildPrompt(for color: OpaliteColor, count: Int) -> String {
-        let r = Int(color.red * 255)
-        let g = Int(color.green * 255)
-        let b = Int(color.blue * 255)
+        let r = Int(round(color.red * 255))
+        let g = Int(round(color.green * 255))
+        let b = Int(round(color.blue * 255))
 
         // Calculate HSL for better color description
         let (h, s, l) = OpaliteColor.rgbToHSL(r: color.red, g: color.green, b: color.blue)
@@ -113,7 +113,7 @@ final class ColorNameSuggestionService {
         """
     }
 
-    private func describeColorFamily(hue: Int, saturation: Int, lightness: Int) -> String {
+    func describeColorFamily(hue: Int, saturation: Int, lightness: Int) -> String {
         // Handle achromatic colors
         if saturation < 10 {
             if lightness < 20 { return "black/very dark gray" }
@@ -147,7 +147,7 @@ final class ColorNameSuggestionService {
         return "\(modifiers.joined(separator: " ")) \(hueFamily)"
     }
 
-    private func parseNames(from response: String, count: Int) -> [String] {
+    func parseNames(from response: String, count: Int) -> [String] {
         // Split by comma and clean up
         let rawNames = response
             .replacingOccurrences(of: "\n", with: ",")

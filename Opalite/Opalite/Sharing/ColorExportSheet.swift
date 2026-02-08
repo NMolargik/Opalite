@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-#if canImport(UIKit)
-import UIKit
-private typealias PlatformImage = UIImage
-#elseif canImport(AppKit)
-import AppKit
-private typealias PlatformImage = NSImage
-#endif
-
 struct ColorExportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SubscriptionManager.self) private var subscriptionManager

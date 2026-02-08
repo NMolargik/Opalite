@@ -2,11 +2,10 @@
 //  OpalitePaletteEntity.swift
 //  Opalite
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 
 import AppIntents
-import SwiftData
 
 /// AppEntity wrapper for OpalitePalette that Siri can understand and display.
 struct OpalitePaletteEntity: AppEntity {
@@ -18,7 +17,7 @@ struct OpalitePaletteEntity: AppEntity {
     var colorCount: Int
 
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: "\(name)", subtitle: "\(colorCount) colors")
+        DisplayRepresentation(title: "\(name)", subtitle: "\(colorCount) \(colorCount == 1 ? "color" : "colors")")
     }
 
     init(id: UUID, name: String, colorCount: Int) {

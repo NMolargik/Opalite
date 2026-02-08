@@ -2,7 +2,7 @@
 //  WidgetColorStorage.swift
 //  Opalite
 //
-//  Created by Claude on 1/18/26.
+//  Created by Nick Molargik on 1/18/26.
 //
 //  Shared between the main app and widget extension.
 //  Add this file to both targets in Xcode.

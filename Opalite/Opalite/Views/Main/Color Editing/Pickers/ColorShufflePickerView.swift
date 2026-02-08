@@ -2,7 +2,7 @@
 //  ColorShufflePickerView.swift
 //  Opalite
 //
-//  Created by Claude on 1/21/26.
+//  Created by Nick Molargik on 1/21/26.
 //
 
 import SwiftUI
