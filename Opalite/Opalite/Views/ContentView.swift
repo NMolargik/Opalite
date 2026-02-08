@@ -20,11 +20,8 @@ struct ContentView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
     @State private var isColorBlindnessBannerVisible: Bool = true
-    @State private var audioPlayer = AudioPlayer()
-
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
-    @AppStorage(AppStorageKeys.playLoadSound) private var playLoadSound: Bool = true
 
     private var colorBlindnessMode: ColorBlindnessMode {
         ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
@@ -82,9 +79,6 @@ struct ContentView: View {
             case .syncing:
                 SyncingView(
                     onComplete: {
-                        if playLoadSound {
-                            audioPlayer.play("load")
-                        }
                         withAnimation {
                             appStage = .main
                         }

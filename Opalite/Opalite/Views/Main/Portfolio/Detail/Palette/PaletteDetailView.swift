@@ -258,7 +258,6 @@ private struct PaletteInfoTilesRow: View {
         HStack(spacing: 12) {
             InfoTileView(
                 icon: "swatchpalette.fill",
-                iconColor: .purple,
                 value: "\(palette.sortedColors.count)",
                 label: "Colors",
                 maxWidth: 200,
@@ -267,17 +266,14 @@ private struct PaletteInfoTilesRow: View {
 
             InfoTileView(
                 icon: "person.fill",
-                iconColor: .orange,
                 value: palette.createdByDisplayName ?? "Unknown",
                 label: "Created By",
                 maxWidth: 200,
-                glassStyle: .regular,
-                marquee: true
+                glassStyle: .regular
             )
 
             InfoTileView(
                 icon: "clock.fill",
-                iconColor: .indigo,
                 value: formattedShortDate(palette.updatedAt),
                 label: "Updated On",
                 maxWidth: 200,

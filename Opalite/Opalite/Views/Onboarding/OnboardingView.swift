@@ -67,9 +67,9 @@ struct OnboardingView: View {
             title: "Draw & Design",
             subtitle: "Bring your colors to life on a creative canvas",
             features: [
-                OnboardingFeature(icon: "pencil.tip", iconColor: .blue, text: "Sketch with your colors", requiresOnyx: true),
-                OnboardingFeature(icon: "square.on.square.dashed", iconColor: .purple, text: "Draw shapes and outlines", requiresOnyx: true),
-                OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Draw precisely with Apple Pencil", requiresOnyx: true),
+                OnboardingFeature(icon: "pencil.tip", iconColor: .blue, text: "Sketch with your colors"),
+                OnboardingFeature(icon: "square.on.square.dashed", iconColor: .purple, text: "Draw shapes and outlines"),
+                OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Draw precisely with Apple Pencil"),
                 OnboardingFeature(icon: "doc.fill.badge.plus", iconColor: .green, text: "Create multiple canvases", requiresOnyx: true)
             ]
         ),

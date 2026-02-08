@@ -346,7 +346,6 @@ private struct CommunityPaletteInfoTilesRow: View {
         HStack(spacing: 12) {
             InfoTileView(
                 icon: "swatchpalette.fill",
-                iconColor: .purple,
                 value: "\(palette.colorCount)",
                 label: "Colors",
                 maxWidth: 200,
@@ -357,17 +356,14 @@ private struct CommunityPaletteInfoTilesRow: View {
 
             InfoTileView(
                 icon: "person.fill",
-                iconColor: .orange,
                 value: palette.publisherName,
                 label: "Publisher",
                 maxWidth: 200,
-                glassStyle: .regular,
-                marquee: true
+                glassStyle: .regular
             )
 
             InfoTileView(
                 icon: "person.2",
-                iconColor: .blue,
                 value: palette.publishedAt.formattedShortDate,
                 label: "Published",
                 maxWidth: 200,

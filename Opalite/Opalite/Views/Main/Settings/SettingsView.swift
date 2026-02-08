@@ -25,7 +25,6 @@ struct SettingsView: View {
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
-    @AppStorage(AppStorageKeys.playLoadSound) private var playLoadSound: Bool = true
     @AppStorage(AppStorageKeys.hasAttemptedUserNameFetch) private var hasAttemptedUserNameFetch: Bool = false
     @AppStorage(AppStorageKeys.hasUserEditedDisplayName) private var hasUserEditedDisplayName: Bool = false
 
@@ -112,12 +111,6 @@ struct SettingsView: View {
 
                     Toggle(isOn: $includeHexPrefix) {
                         Label("Include # in Copied Codes", systemImage: "number")
-                            .foregroundStyle(.primary)
-                    }
-                    .tint(.green)
-
-                    Toggle(isOn: $playLoadSound) {
-                        Label("Play Load Sound", systemImage: "speaker.wave.2")
                             .foregroundStyle(.primary)
                     }
                     .tint(.green)

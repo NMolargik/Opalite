@@ -257,7 +257,7 @@ struct OpaliteCommands: Commands {
         if !colorManager.isMainWindowOpen {
             openWindow(id: "main")
         }
-        if subscriptionManager.hasOnyxEntitlement {
+        if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
             do {
                 let newCanvas = try canvasManager.createCanvas()
                 canvasManager.pendingCanvasToOpen = newCanvas
@@ -265,7 +265,7 @@ struct OpaliteCommands: Commands {
                 toastManager.show(error: .canvasCreationFailed)
             }
         } else {
-            quickActionManager.requestPaywall(context: "Canvas access requires Onyx")
+            quickActionManager.requestPaywall(context: "Unlimited canvases require Onyx")
         }
     }
 

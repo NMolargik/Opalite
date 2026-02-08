@@ -83,9 +83,6 @@ struct CommunityView: View {
                     await refreshContentForCurrentSegment()
                 }
             }
-            .refreshable {
-                await forceRefreshContent()
-            }
             .task {
                 await initialLoad()
             }
@@ -187,6 +184,9 @@ struct CommunityView: View {
                 .padding(.top, 8)
             }
         }
+        .refreshable {
+            await forceRefreshContent()
+        }
         .overlay {
             if communityManager.isLoading && communityManager.colors.isEmpty {
                 ProgressView("Gathering Colors...")
@@ -232,6 +232,9 @@ struct CommunityView: View {
                 .padding()
                 .padding(.top, 8)
             }
+        }
+        .refreshable {
+            await forceRefreshContent()
         }
         .overlay {
             if communityManager.isLoading && communityManager.palettes.isEmpty {

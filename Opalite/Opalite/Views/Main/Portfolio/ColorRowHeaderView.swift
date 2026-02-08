@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 /// Header for the loose colors section with title, edit mode toggle, and create button.
 struct ColorRowHeaderView: View {
@@ -40,9 +41,9 @@ struct ColorRowHeaderView: View {
                     }
                 } label: {
                     Image(systemName: isEditingColors ? "checkmark" : "pencil")
-                        .imageScale(.large)
+                        .imageScale(.medium)
                         .foregroundStyle(isEditingColors ? .green : .inverseTheme)
-                        .frame(height: 20)
+                        .frame(width: 15, height: 15)
                         .padding(8)
                         .background(
                             Circle().fill(.clear)
@@ -79,4 +80,24 @@ struct ColorRowHeaderView: View {
             )
         }
     }
+}
+
+#Preview("Color Row Header") {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: OpalitePalette.self,
+        OpaliteColor.self,
+        CanvasFile.self,
+        configurations: config
+    )
+    let manager = ColorManager(context: container.mainContext)
+    try? manager.loadSamples()
+
+    return ColorRowHeaderView(
+        isEditingColors: .constant(false),
+        selectedColorIDs: .constant([])
+    )
+    .modelContainer(container)
+    .environment(manager)
+    .environment(ToastManager())
 }

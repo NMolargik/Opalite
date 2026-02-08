@@ -258,17 +258,14 @@ private struct CommunityColorInfoTilesRow: View {
         HStack(spacing: 12) {
             InfoTileView(
                 icon: "person.fill",
-                iconColor: color.idealTextColor(),
                 value: color.publisherName,
                 label: "Publisher",
                 maxWidth: 200,
-                glassStyle: .regular,
-                marquee: true
+                glassStyle: .regular
             )
 
             InfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
-                iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
                 label: "Created On",
                 maxWidth: 200,
@@ -279,7 +276,6 @@ private struct CommunityColorInfoTilesRow: View {
 
             InfoTileView(
                 icon: "person.2",
-                iconColor: color.idealTextColor(),
                 value: color.publishedAt.formattedShortDate,
                 label: "Published",
                 maxWidth: 200,

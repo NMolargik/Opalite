@@ -127,6 +127,18 @@ final class SubscriptionManager {
         hasOnyxEntitlement || currentCount < 5
     }
 
+    /// Checks if the user can create a new canvas based on their subscription status.
+    /// Free users are limited to 1 canvas.
+    func canCreateCanvas(currentCount: Int) -> Bool {
+        hasOnyxEntitlement || currentCount < 1
+    }
+
+    /// Checks if a free user can access a specific canvas.
+    /// Free users may only access the oldest canvas (by creation date).
+    func canAccessCanvas(_ canvas: CanvasFile, oldestCanvasID: UUID?) -> Bool {
+        hasOnyxEntitlement || canvas.id == oldestCanvasID
+    }
+
     /// Updates the set of purchased product IDs by checking current entitlements.
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []

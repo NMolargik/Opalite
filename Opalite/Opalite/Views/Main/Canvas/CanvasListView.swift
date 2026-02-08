@@ -37,7 +37,7 @@ struct CanvasListView: View {
                 ForEach(filteredCanvases) { canvasFile in
                     Button {
                         HapticsManager.shared.impact()
-                        if subscriptionManager.hasOnyxEntitlement {
+                        if subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) {
                             selectedCanvasFile = canvasFile
                         } else {
                             isShowingPaywall = true
@@ -51,7 +51,7 @@ struct CanvasListView: View {
                                     .foregroundStyle(.red)
                             }
                             Spacer()
-                            if !subscriptionManager.hasOnyxEntitlement {
+                            if !subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) {
                                 Image(systemName: "lock.fill")
                                     .font(.footnote)
                                     .foregroundStyle(.secondary)
@@ -118,7 +118,7 @@ struct CanvasListView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
                         HapticsManager.shared.impact()
-                        if subscriptionManager.hasOnyxEntitlement {
+                        if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
                             do {
                                 let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
                                 selectedCanvasFile = newCanvasFile
@@ -135,7 +135,7 @@ struct CanvasListView: View {
                 }
             }
             .sheet(isPresented: $isShowingPaywall) {
-                PaywallView(featureContext: "Canvas access requires Onyx")
+                PaywallView(featureContext: "Unlimited canvases require Onyx")
             }
             .alert("Rename Canvas", isPresented: Binding(
                 get: { canvasToRename != nil },

@@ -72,6 +72,11 @@ final class CanvasManager {
     /// The UI layer should observe this and clear it after handling.
     var pendingCanvasToOpen: CanvasFile?
 
+    /// The oldest canvas by creation date. Free users get access to this one canvas.
+    var oldestCanvas: CanvasFile? {
+        canvases.min(by: { $0.createdAt < $1.createdAt })
+    }
+
     #if canImport(PencilKit)
     /// Shape waiting to be placed on the active canvas.
     ///

@@ -404,16 +404,13 @@ private struct InfoTilesRow: View {
         HStack(spacing: 12) {
             InfoTileView(
                 icon: "person.fill",
-                iconColor: color.idealTextColor(),
                 value: color.createdByDisplayName ?? "Unknown",
                 label: "Created By",
-                glassStyle: .regular,
-                marquee: true
+                glassStyle: .regular
             )
 
             InfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
-                iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
                 label: "Created On",
                 glassStyle: .regular
@@ -422,7 +419,6 @@ private struct InfoTilesRow: View {
 
             InfoTileView(
                 icon: "clock.fill",
-                iconColor: color.idealTextColor(),
                 value: formattedShortDate(color.updatedAt),
                 label: "Updated On",
                 glassStyle: .regular

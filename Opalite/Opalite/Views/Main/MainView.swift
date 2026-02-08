@@ -138,7 +138,7 @@ struct MainView: View {
             .sectionActions {
                 Button {
                     HapticsManager.shared.selection()
-                    if subscriptionManager.hasOnyxEntitlement {
+                    if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
                         do {
                             let newCanvas = try canvasManager.createCanvas()
                             // Defer tab selection to allow view hierarchy to update first
@@ -157,7 +157,7 @@ struct MainView: View {
                     Label("New Canvas", systemImage: "plus")
                 }
                 .accessibilityLabel("New Canvas")
-                .accessibilityHint(subscriptionManager.hasOnyxEntitlement ? "Creates a new drawing canvas" : "Opens Onyx subscription options")
+                .accessibilityHint(subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) ? "Creates a new drawing canvas" : "Opens Onyx subscription options")
             }
             .defaultVisibility(.hidden, for: .tabBar)
             .hidden(horizontalSizeClass == .compact)
@@ -193,9 +193,9 @@ struct MainView: View {
             }
         }
         .onChange(of: selectedTab) { oldTab, newTab in
-            // Check if user is trying to open a canvas without entitlement
-            if case .canvasBody = newTab {
-                if !subscriptionManager.hasOnyxEntitlement {
+            // Check if user is trying to open a locked canvas
+            if case .canvasBody(let canvas) = newTab {
+                if !subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
                     // Block access and show paywall
                     HapticsManager.shared.selection()
                     selectedTab = oldTab
@@ -224,8 +224,8 @@ struct MainView: View {
         .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
             if let canvas = newCanvas {
                 canvasManager.pendingCanvasToOpen = nil
-                // Check entitlement before switching to canvas tab
-                if subscriptionManager.hasOnyxEntitlement {
+                // Check if this canvas is accessible
+                if subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
                     DispatchQueue.main.async {
                         selectedTab = .canvasBody(canvas)
                     }
@@ -250,7 +250,7 @@ struct MainView: View {
             }
         }
         .sheet(isPresented: $isShowingPaywall) {
-            PaywallView(featureContext: "Canvas access requires Onyx")
+            PaywallView(featureContext: "Unlimited canvases require Onyx")
         }
         .sheet(isPresented: $isShowingSwatchBarInfo) {
             SwatchBarInfoSheet()

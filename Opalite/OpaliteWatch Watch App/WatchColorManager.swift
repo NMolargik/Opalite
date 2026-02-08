@@ -77,7 +77,6 @@ class WatchColorManager {
             self?.hasCompletedInitialSync = true
             self?.isSyncing = false
             self?.lastSyncReceivedData = true
-            self?.playSuccessHaptic()
         }
 
         // Load any cached data from local storage

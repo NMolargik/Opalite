@@ -60,7 +60,7 @@ struct SearchView: View {
     // MARK: - Navigation
 
     private func openCanvas(_ canvas: CanvasFile) {
-        guard subscriptionManager.hasOnyxEntitlement else {
+        guard subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) else {
             isShowingPaywall = true
             return
         }
@@ -124,7 +124,7 @@ struct SearchView: View {
 
                 Spacer()
 
-                if !subscriptionManager.hasOnyxEntitlement {
+                if !subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
                     Image(systemName: "lock.fill")
                         .font(.caption)
                         .foregroundStyle(.red)
@@ -299,7 +299,7 @@ struct SearchView: View {
                 #endif
             }
             .sheet(isPresented: $isShowingPaywall) {
-                PaywallView(featureContext: "Canvas access requires Onyx")
+                PaywallView(featureContext: "Unlimited canvases require Onyx")
             }
             #if targetEnvironment(macCatalyst)
             .focusEffectDisabled()
