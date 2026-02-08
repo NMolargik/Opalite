@@ -271,7 +271,8 @@ private struct PaletteInfoTilesRow: View {
                 value: palette.createdByDisplayName ?? "Unknown",
                 label: "Created By",
                 maxWidth: 200,
-                glassStyle: .regular
+                glassStyle: .regular,
+                marquee: true
             )
 
             InfoTileView(

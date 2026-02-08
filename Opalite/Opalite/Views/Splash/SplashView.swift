@@ -84,7 +84,7 @@ struct SplashView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 200, height: 200)
-                            .accessibilityLabel("Opalite gemstone sqyares")
+                            .accessibilityLabel("Opalite gemstone sqyaress")
                             .scaleEffect(pulse ? 1.06 : 0.94)
                             .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: pulse)
 

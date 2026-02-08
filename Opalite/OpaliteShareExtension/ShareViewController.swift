@@ -47,7 +47,9 @@ class ShareViewController: UIViewController {
             guard let self = self else { return }
 
             if let error = error {
+                #if DEBUG
                 print("[ShareExtension] Error loading image: \(error)")
+                #endif
                 self.completeRequest(success: false)
                 return
             }
@@ -92,7 +94,9 @@ class ShareViewController: UIViewController {
         do {
             try pngData.write(to: fileURL, options: .atomic)
         } catch {
+            #if DEBUG
             print("[ShareExtension] Failed to save image: \(error)")
+            #endif
             completeRequest(success: false)
             return
         }

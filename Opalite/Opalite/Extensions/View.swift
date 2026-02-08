@@ -38,3 +38,13 @@ private struct TransitionSourceModifier: ViewModifier {
             #endif
     }
 }
+
+// MARK: - Date Formatting
+
+extension Date {
+    var formattedShortDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: self)
+    }
+}

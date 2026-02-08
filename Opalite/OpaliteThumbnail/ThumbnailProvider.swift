@@ -25,7 +25,7 @@ class ThumbnailProvider: QLThumbnailProvider {
 
             if pathExtension == "opalitecolor" {
                 // Single color thumbnail
-                guard let color = decodeColor(from: json) else {
+                guard let color = OpaliteFileDecoder.decodeColor(from: json) else {
                     handler(nil, FileHandlerError.decodingFailed)
                     return
                 }
@@ -43,7 +43,7 @@ class ThumbnailProvider: QLThumbnailProvider {
                     return
                 }
 
-                let colors = colorDicts.compactMap { decodeColor(from: $0) }
+                let colors = colorDicts.compactMap { OpaliteFileDecoder.decodeColor(from: $0) }
 
                 let reply = QLThumbnailReply(contextSize: maximumSize, currentContextDrawing: { () -> Bool in
                     self.drawPaletteThumbnail(colors: colors, size: maximumSize)
@@ -57,18 +57,6 @@ class ThumbnailProvider: QLThumbnailProvider {
         } catch {
             handler(nil, error)
         }
-    }
-
-    // MARK: - Color Decoding
-
-    private func decodeColor(from json: [String: Any]) -> UIColor? {
-        guard let red = json["red"] as? Double,
-              let green = json["green"] as? Double,
-              let blue = json["blue"] as? Double else {
-            return nil
-        }
-        let alpha = json["alpha"] as? Double ?? 1.0
-        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
 
     // MARK: - Drawing

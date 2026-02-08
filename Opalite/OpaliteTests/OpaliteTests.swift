@@ -3626,3 +3626,153 @@ struct PortfolioViewModelTests {
         #expect(vm.selectedColorIDs.isEmpty)
     }
 }
+
+// MARK: - PalettePreviewLayoutInfo Tests
+
+struct PalettePreviewLayoutInfoTests {
+
+    @Test func emptyColorCount() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 0,
+            availableWidth: 300,
+            availableHeight: 200
+        )
+        #expect(layout.rows == 0)
+        #expect(layout.columns == 0)
+        #expect(layout.swatchSize == 0)
+        #expect(layout.showHexBadges == false)
+    }
+
+    @Test func singleColor() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 1,
+            availableWidth: 300,
+            availableHeight: 200
+        )
+        #expect(layout.rows == 1)
+        #expect(layout.columns == 1)
+        #expect(layout.swatchSize > 0)
+        #expect(layout.showHexBadges == false)
+    }
+
+    @Test func multipleColorsDefaultPreviewParams() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 6,
+            availableWidth: 300,
+            availableHeight: 200
+        )
+        #expect(layout.rows >= 1)
+        #expect(layout.rows <= 2)
+        #expect(layout.columns >= 1)
+        #expect(layout.swatchSize > 0)
+        #expect(layout.showHexBadges == false)
+    }
+
+    @Test func exportParamsThreeRows() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 9,
+            availableWidth: 800,
+            availableHeight: 600,
+            minSpacing: 16,
+            maxSpacing: 32,
+            maxRows: 3,
+            hexBadgeMinSize: 110
+        )
+        #expect(layout.rows >= 1)
+        #expect(layout.rows <= 3)
+        #expect(layout.columns >= 1)
+        #expect(layout.swatchSize > 0)
+    }
+
+    @Test func hexBadgesShownWhenLargeEnough() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 2,
+            availableWidth: 800,
+            availableHeight: 400,
+            minSpacing: 16,
+            maxSpacing: 32,
+            maxRows: 3,
+            hexBadgeMinSize: 110
+        )
+        #expect(layout.swatchSize >= 110)
+        #expect(layout.showHexBadges == true)
+    }
+
+    @Test func hexBadgesHiddenWhenSmall() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 20,
+            availableWidth: 300,
+            availableHeight: 200,
+            minSpacing: 16,
+            maxSpacing: 32,
+            maxRows: 3,
+            hexBadgeMinSize: 110
+        )
+        #expect(layout.showHexBadges == false)
+    }
+
+    @Test func noHexBadgesWithoutMinSize() {
+        let layout = PalettePreviewLayoutInfo.calculate(
+            colorCount: 2,
+            availableWidth: 800,
+            availableHeight: 400
+        )
+        #expect(layout.showHexBadges == false)
+    }
+}
+
+// MARK: - ExportFormat Protocol Tests
+
+struct ExportFormatTests {
+
+    @Test func colorExportFormatConformance() {
+        for format in ColorExportFormat.allCases {
+            #expect(!format.displayName.isEmpty)
+            #expect(!format.description.isEmpty)
+            #expect(!format.icon.isEmpty)
+        }
+    }
+
+    @Test func paletteExportFormatConformance() {
+        for format in PaletteExportFormat.allCases {
+            #expect(!format.displayName.isEmpty)
+            #expect(!format.description.isEmpty)
+            #expect(!format.icon.isEmpty)
+        }
+    }
+
+    @Test func colorFreeFormats() {
+        #expect(ColorExportFormat.opalite.isFreeFormat == true)
+        #expect(ColorExportFormat.image.isFreeFormat == true)
+        #expect(ColorExportFormat.ase.isFreeFormat == false)
+        #expect(ColorExportFormat.procreate.isFreeFormat == false)
+        #expect(ColorExportFormat.gpl.isFreeFormat == false)
+        #expect(ColorExportFormat.css.isFreeFormat == false)
+        #expect(ColorExportFormat.swiftui.isFreeFormat == false)
+    }
+
+    @Test func paletteFreeFormats() {
+        #expect(PaletteExportFormat.opalite.isFreeFormat == true)
+        #expect(PaletteExportFormat.image.isFreeFormat == true)
+        #expect(PaletteExportFormat.pdf.isFreeFormat == true)
+        #expect(PaletteExportFormat.ase.isFreeFormat == false)
+        #expect(PaletteExportFormat.procreate.isFreeFormat == false)
+        #expect(PaletteExportFormat.gpl.isFreeFormat == false)
+        #expect(PaletteExportFormat.css.isFreeFormat == false)
+        #expect(PaletteExportFormat.swiftui.isFreeFormat == false)
+    }
+}
+
+// MARK: - Date Formatting Tests
+
+struct DateFormattingTests {
+
+    @Test func formattedShortDate() {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 2
+        components.day = 8
+        let date = Calendar.current.date(from: components)!
+        #expect(date.formattedShortDate == "Feb 8")
+    }
+}

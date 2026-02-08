@@ -394,38 +394,8 @@ extension CommunityPublisher {
 extension CommunityColor {
     /// HSL components (hue: 0-360, saturation: 0-1, lightness: 0-1)
     var hslComponents: (hue: Double, saturation: Double, lightness: Double) {
-        let maxVal = max(red, green, blue)
-        let minVal = min(red, green, blue)
-        let delta = maxVal - minVal
-
-        // Lightness
-        let l = (maxVal + minVal) / 2
-
-        // Saturation
-        let s: Double
-        if delta == 0 {
-            s = 0
-        } else {
-            s = delta / (1 - abs(2 * l - 1))
-        }
-
-        // Hue
-        var h: Double = 0
-        if delta != 0 {
-            switch maxVal {
-            case red:
-                h = 60 * (((green - blue) / delta).truncatingRemainder(dividingBy: 6))
-            case green:
-                h = 60 * (((blue - red) / delta) + 2)
-            case blue:
-                h = 60 * (((red - green) / delta) + 4)
-            default:
-                break
-            }
-        }
-        if h < 0 { h += 360 }
-
-        return (h, s, l)
+        let (h, s, l) = OpaliteColor.rgbToHSL(r: red, g: green, b: blue)
+        return (h * 360, s, l)
     }
 
     /// Primary color family (red, orange, yellow, green, cyan, blue, purple, pink, gray, black, white, brown)

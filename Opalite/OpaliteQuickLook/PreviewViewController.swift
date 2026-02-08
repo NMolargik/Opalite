@@ -28,7 +28,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
 
             if pathExtension == "opalitecolor" {
                 // Single color preview
-                guard let color = decodeColor(from: json) else {
+                guard let color = OpaliteFileDecoder.decodeColor(from: json) else {
                     handler(FileHandlerError.decodingFailed)
                     return
                 }
@@ -42,7 +42,7 @@ class PreviewViewController: UIViewController, QLPreviewingController {
                     return
                 }
 
-                let colors = colorDicts.compactMap { decodeColor(from: $0) }
+                let colors = colorDicts.compactMap { OpaliteFileDecoder.decodeColor(from: $0) }
                 setupPalettePreview(colors: colors, name: name)
             }
 
@@ -50,18 +50,6 @@ class PreviewViewController: UIViewController, QLPreviewingController {
         } catch {
             handler(error)
         }
-    }
-
-    // MARK: - Color Decoding
-
-    private func decodeColor(from json: [String: Any]) -> UIColor? {
-        guard let red = json["red"] as? Double,
-              let green = json["green"] as? Double,
-              let blue = json["blue"] as? Double else {
-            return nil
-        }
-        let alpha = json["alpha"] as? Double ?? 1.0
-        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
 
     // MARK: - Single Color Preview

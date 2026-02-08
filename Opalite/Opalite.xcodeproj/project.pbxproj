@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB1A15492F37955200A8B6EF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */; };
 		EB1A154A2F37955200A8B6EF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */; };
 		EB1A15552F37955300A8B6EF /* OpaliteWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -20,7 +20,7 @@
 		EB92BFA02F1D565200305170 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */; };
 		EB92BFAB2F1D565300305170 /* OpaliteWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB92BFC52F1D5CEF00305170 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB92BFC42F1D5CEF00305170 /* Messages.framework */; };
-		EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EBAD2C2A2F06D37800EB94EB /* OpaliteShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -203,6 +203,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Errors/FileHandlerError.swift,
+				Utilities/OpaliteFileDecoder.swift,
 			);
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
 		};
@@ -210,6 +211,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Errors/FileHandlerError.swift,
+				Utilities/OpaliteFileDecoder.swift,
 			);
 			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
 		};
@@ -226,6 +228,20 @@
 				Info.plist,
 			);
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
+		};
+		EB5ECA162F38B62900A2916E /* Exceptions for "Opalite" folder in "OpaliteWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Utilities/WidgetColorStorage.swift,
+			);
+			target = EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */;
+		};
+		EB5ECA182F38B64300A2916E /* Exceptions for "Opalite" folder in "OpaliteMessages" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Utilities/WidgetColorStorage.swift,
+			);
+			target = EB92BFC22F1D5CEF00305170 /* OpaliteMessages */;
 		};
 		EB92BF3B2F1D1F1D00305170 /* Exceptions for "OpaliteTV" folder in "OpaliteTV" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -369,8 +385,10 @@
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
 				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
 				EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */,
+				EB5ECA162F38B62900A2916E /* Exceptions for "Opalite" folder in "OpaliteWidgetsExtension" target */,
 				EB1A15712F37B9C700A8B6EF /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
 				EB1A156F2F37B93D00A8B6EF /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
+				EB5ECA182F38B64300A2916E /* Exceptions for "Opalite" folder in "OpaliteMessages" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";
@@ -1167,6 +1185,7 @@
 		};
 		EB92BFD02F1D5CF000305170 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = EB92BFC22F1D5CEF00305170 /* OpaliteMessages */;
 			targetProxy = EB92BFCF2F1D5CF000305170 /* PBXContainerItemProxy */;
 		};

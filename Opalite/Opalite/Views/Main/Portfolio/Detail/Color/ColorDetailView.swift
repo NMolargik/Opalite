@@ -345,6 +345,8 @@ struct ColorDetailView: View {
         }
         .overlay(alignment: .top) {
             HStack(spacing: 12) {
+                Spacer()
+                
                 Text(color.name ?? color.hexString)
                     .foregroundStyle(color.idealTextColor())
                     .bold()
@@ -353,8 +355,6 @@ struct ColorDetailView: View {
                         GlassConfiguration(style: .clear)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                
-                Spacer()
                 
                 Button {
                     HapticsManager.shared.selection()
@@ -407,8 +407,8 @@ private struct InfoTilesRow: View {
                 iconColor: color.idealTextColor(),
                 value: color.createdByDisplayName ?? "Unknown",
                 label: "Created By",
-                glassStyle: .regular
-
+                glassStyle: .regular,
+                marquee: true
             )
 
             InfoTileView(

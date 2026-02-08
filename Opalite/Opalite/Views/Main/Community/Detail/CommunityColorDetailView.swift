@@ -256,25 +256,36 @@ private struct CommunityColorInfoTilesRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            CommunityInfoTileView(
+            InfoTileView(
                 icon: "person.fill",
                 iconColor: color.idealTextColor(),
                 value: color.publisherName,
-                label: "Publisher"
+                label: "Publisher",
+                maxWidth: 200,
+                glassStyle: .regular,
+                marquee: true
             )
 
-            CommunityInfoTileView(
+            InfoTileView(
                 icon: DeviceKind.from(color.createdOnDeviceName).symbolName,
                 iconColor: color.idealTextColor(),
                 value: shortDeviceName(color.createdOnDeviceName),
-                label: "Created On"
+                label: "Created On",
+                maxWidth: 200,
+                glassStyle: .regular,
+                lineLimit: 2,
+                minimumScaleFactor: 0.7
             )
 
-            CommunityInfoTileView(
+            InfoTileView(
                 icon: "person.2",
                 iconColor: color.idealTextColor(),
-                value: formattedShortDate(color.publishedAt),
-                label: "Published"
+                value: color.publishedAt.formattedShortDate,
+                label: "Published",
+                maxWidth: 200,
+                glassStyle: .regular,
+                lineLimit: 2,
+                minimumScaleFactor: 0.7
             )
         }
     }
@@ -289,61 +300,6 @@ private struct CommunityColorInfoTilesRow: View {
             return "Mac"
         }
         return name
-    }
-
-    private func formattedShortDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: date)
-    }
-}
-
-// MARK: - Info Tile View
-
-private struct CommunityInfoTileView: View {
-    let icon: String
-    let iconColor: Color
-    let value: String
-    let label: String
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(iconColor)
-                .frame(height: 30)
-
-            Text(value)
-                .font(.subheadline.bold())
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-                .multilineTextAlignment(.center)
-
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(12)
-        .frame(maxWidth: 200, maxHeight: 85)
-        .modifier(CommunityGlassTileBackground())
-    }
-}
-
-private struct CommunityGlassTileBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-            content
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(radius: 5)
-        } else {
-            content
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.white)
-                        .shadow(radius: 5)
-                )
-        }
     }
 }
 

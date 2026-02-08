@@ -344,81 +344,37 @@ private struct CommunityPaletteInfoTilesRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            CommunityPaletteInfoTileView(
+            InfoTileView(
                 icon: "swatchpalette.fill",
                 iconColor: .purple,
                 value: "\(palette.colorCount)",
-                label: "Colors"
+                label: "Colors",
+                maxWidth: 200,
+                glassStyle: .regular,
+                lineLimit: 2,
+                minimumScaleFactor: 0.7
             )
 
-            CommunityPaletteInfoTileView(
+            InfoTileView(
                 icon: "person.fill",
                 iconColor: .orange,
                 value: palette.publisherName,
-                label: "Publisher"
+                label: "Publisher",
+                maxWidth: 200,
+                glassStyle: .regular,
+                marquee: true
             )
 
-            CommunityPaletteInfoTileView(
+            InfoTileView(
                 icon: "person.2",
                 iconColor: .blue,
-                value: formattedShortDate(palette.publishedAt),
-                label: "Published"
+                value: palette.publishedAt.formattedShortDate,
+                label: "Published",
+                maxWidth: 200,
+                glassStyle: .regular,
+                lineLimit: 2,
+                minimumScaleFactor: 0.7
             )
-        }
-    }
-
-    private func formattedShortDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: date)
-    }
-}
-
-// MARK: - Palette Info Tile View
-
-private struct CommunityPaletteInfoTileView: View {
-    let icon: String
-    let iconColor: Color
-    let value: String
-    let label: String
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(iconColor)
-                .frame(height: 30)
-
-            Text(value)
-                .font(.subheadline.bold())
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-                .multilineTextAlignment(.center)
-
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(12)
-        .frame(maxWidth: 200, maxHeight: 85)
-        .modifier(CommunityPaletteGlassTileBackground())
-    }
-}
-
-private struct CommunityPaletteGlassTileBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-            content
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(radius: 5)
-        } else {
-            content
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.white)
-                        .shadow(radius: 5)
-                )
         }
     }
 }

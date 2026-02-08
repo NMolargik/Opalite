@@ -45,13 +45,26 @@ struct PaletteExportSheet: View {
 
                     VStack(spacing: 12) {
                         // Publish to Community option
-                        publishToCommunityButton
+                        PublishToCommunityButton(isOffline: !communityManager.isConnectedToNetwork) {
+                            isShowingPublishSheet = true
+                        }
 
                         Divider()
                             .padding(.vertical, 4)
 
                         ForEach(PaletteExportFormat.allCases) { format in
-                            formatButton(for: format)
+                            ExportFormatButton(
+                                format: format,
+                                hasOnyx: subscriptionManager.hasOnyxEntitlement,
+                                isExporting: isExporting,
+                                selectedFormat: selectedFormat
+                            ) {
+                                if !format.isFreeFormat && !subscriptionManager.hasOnyxEntitlement {
+                                    isShowingPaywall = true
+                                } else {
+                                    exportPalette(in: format)
+                                }
+                            }
                         }
                     }
 
@@ -89,116 +102,6 @@ struct PaletteExportSheet: View {
         }
         .sheet(isPresented: $isShowingPublishSheet) {
             PublishPaletteSheet(palette: palette)
-        }
-    }
-
-    // MARK: - Publish to Community Button
-
-    @ViewBuilder
-    private var publishToCommunityButton: some View {
-        let isOffline = !communityManager.isConnectedToNetwork
-
-        Button {
-            HapticsManager.shared.selection()
-            isShowingPublishSheet = true
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: isOffline ? "wifi.slash" : "person.2")
-                    .font(.title2)
-                    .frame(width: 32)
-                    .foregroundStyle(isOffline ? Color.secondary : Color.teal)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Publish to Community")
-                        .font(.headline)
-                        .foregroundStyle(isOffline ? Color.secondary : Color.primary)
-
-                    Text(isOffline ? "Requires internet connection" : "Share with the Opalite community")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
-            .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-        .disabled(isOffline)
-    }
-
-    @ViewBuilder
-    private func formatButton(for format: PaletteExportFormat) -> some View {
-        let isFreeFormat = format == .opalite || format == .image || format == .pdf
-        let requiresOnyx = !isFreeFormat && !subscriptionManager.hasOnyxEntitlement
-
-        Button {
-            HapticsManager.shared.selection()
-            if requiresOnyx {
-                isShowingPaywall = true
-            } else {
-                exportPalette(in: format)
-            }
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: format.icon)
-                    .font(.title2)
-                    .frame(width: 32)
-                    .foregroundStyle(iconColor(for: format))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack {
-                        Text(format.displayName)
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-
-                        if requiresOnyx {
-                            Image(systemName: "lock.fill")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Text(format.description)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                }
-
-                Spacer()
-
-                if isExporting && selectedFormat == format {
-                    ProgressView()
-                        .controlSize(.small)
-                } else {
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-            .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-        .disabled(isExporting)
-        .accessibilityLabel(format.displayName)
-        .accessibilityHint(requiresOnyx ? "Requires Onyx subscription" : format.description)
-    }
-
-    private func iconColor(for format: PaletteExportFormat) -> Color {
-        switch format {
-        case .image: return .cyan
-        case .pdf: return .red
-        case .opalite: return .purple
-        case .ase: return .red
-        case .procreate: return .orange
-        case .gpl: return .green
-        case .css: return .blue
-        case .swiftui: return .orange
         }
     }
 

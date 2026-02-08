@@ -9,9 +9,19 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
+// MARK: - Export Format Protocol
+
+protocol ExportFormat: CaseIterable, Identifiable {
+    var displayName: String { get }
+    var description: String { get }
+    var icon: String { get }
+    var iconColor: Color { get }
+    var isFreeFormat: Bool { get }
+}
+
 // MARK: - Color Export Formats
 
-enum ColorExportFormat: String, CaseIterable, Identifiable {
+enum ColorExportFormat: String, CaseIterable, Identifiable, ExportFormat {
     case image = "image"
     case opalite = "opalite"
     case ase = "ase"
@@ -76,11 +86,27 @@ enum ColorExportFormat: String, CaseIterable, Identifiable {
             return "SwiftUI Color extension ready for your Xcode project."
         }
     }
+
+    var iconColor: Color {
+        switch self {
+        case .image: return .cyan
+        case .opalite: return .purple
+        case .ase: return .red
+        case .procreate: return .orange
+        case .gpl: return .green
+        case .css: return .blue
+        case .swiftui: return .orange
+        }
+    }
+
+    var isFreeFormat: Bool {
+        self == .opalite || self == .image
+    }
 }
 
 // MARK: - Palette Export Formats
 
-enum PaletteExportFormat: String, CaseIterable, Identifiable {
+enum PaletteExportFormat: String, CaseIterable, Identifiable, ExportFormat {
     case image = "image"
     case pdf = "pdf"
     case opalite = "opalite"
@@ -151,6 +177,23 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable {
             return "SwiftUI Color extension ready for your Xcode project."
         }
     }
+
+    var iconColor: Color {
+        switch self {
+        case .image: return .cyan
+        case .pdf: return .red
+        case .opalite: return .purple
+        case .ase: return .red
+        case .procreate: return .orange
+        case .gpl: return .green
+        case .css: return .blue
+        case .swiftui: return .orange
+        }
+    }
+
+    var isFreeFormat: Bool {
+        self == .opalite || self == .image || self == .pdf
+    }
 }
 
 // MARK: - Import Preview Types
@@ -170,13 +213,14 @@ struct PaletteImportPreview {
 
 // MARK: - Palette Preview Layout
 
-/// Shared layout calculation for palette preview grids, used by both PaletteExportSheet and PaletteImportConfirmationSheet.
+/// Shared layout calculation for palette preview grids, used by preview sheets, export sheets, and export image rendering.
 struct PalettePreviewLayoutInfo {
     let rows: Int
     let columns: Int
     let swatchSize: CGFloat
     let horizontalSpacing: CGFloat
     let verticalSpacing: CGFloat
+    let showHexBadges: Bool
 
     static func calculate(
         colorCount: Int,
@@ -184,13 +228,14 @@ struct PalettePreviewLayoutInfo {
         availableHeight: CGFloat,
         minSpacing: CGFloat = 6,
         maxSpacing: CGFloat = 12,
-        maxRows: Int = 2
+        maxRows: Int = 2,
+        hexBadgeMinSize: CGFloat? = nil
     ) -> PalettePreviewLayoutInfo {
         guard colorCount > 0 else {
-            return PalettePreviewLayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+            return PalettePreviewLayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
         }
 
-        var bestLayout = PalettePreviewLayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0)
+        var bestLayout = PalettePreviewLayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
 
         for rows in 1...maxRows {
             let columns = Int(ceil(Double(colorCount) / Double(rows)))
@@ -214,12 +259,14 @@ struct PalettePreviewLayoutInfo {
             }
 
             if swatchSize > bestLayout.swatchSize {
+                let showBadges = hexBadgeMinSize.map { swatchSize >= $0 } ?? false
                 bestLayout = PalettePreviewLayoutInfo(
                     rows: rows,
                     columns: columns,
                     swatchSize: swatchSize,
                     horizontalSpacing: actualHorizontalSpacing,
-                    verticalSpacing: verticalSpacing
+                    verticalSpacing: verticalSpacing,
+                    showHexBadges: showBadges
                 )
             }
         }
@@ -1114,10 +1161,14 @@ private struct PaletteExportImageView: View {
         let availableWidth = size.width - (padding * 2)
         let availableHeight = size.height - (padding * 2) - (extraVerticalPadding * 2)
         let colors = palette.sortedColors
-        let layout = calculateLayout(
+        let layout = PalettePreviewLayoutInfo.calculate(
             colorCount: colors.count,
             availableWidth: availableWidth,
-            availableHeight: availableHeight
+            availableHeight: availableHeight,
+            minSpacing: 16,
+            maxSpacing: 32,
+            maxRows: 3,
+            hexBadgeMinSize: 110
         )
 
         ZStack {
@@ -1195,67 +1246,6 @@ private struct PaletteExportImageView: View {
             .background(Color.black.opacity(0.15), in: RoundedRectangle(cornerRadius: 12))
     }
 
-    // MARK: - Layout Calculation
-
-    private struct LayoutInfo {
-        let rows: Int
-        let columns: Int
-        let swatchSize: CGFloat
-        let horizontalSpacing: CGFloat
-        let verticalSpacing: CGFloat
-        let showHexBadges: Bool
-    }
-
-    private func calculateLayout(
-        colorCount: Int,
-        availableWidth: CGFloat,
-        availableHeight: CGFloat
-    ) -> LayoutInfo {
-        guard colorCount > 0 else {
-            return LayoutInfo(rows: 0, columns: 0, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
-        }
-
-        let minSpacing: CGFloat = 16
-        let maxSpacing: CGFloat = 32
-
-        var bestLayout = LayoutInfo(rows: 1, columns: 1, swatchSize: 0, horizontalSpacing: 0, verticalSpacing: 0, showHexBadges: false)
-
-        // Try different row configurations (1, 2, or 3 rows)
-        for rows in 1...3 {
-            let columns = Int(ceil(Double(colorCount) / Double(rows)))
-
-            let verticalSpacing: CGFloat = rows > 1 ? minSpacing : 0
-            let totalVerticalSpacing = CGFloat(rows - 1) * verticalSpacing
-
-            let horizontalSpacing: CGFloat = columns > 1 ? minSpacing : 0
-            let totalHorizontalSpacing = CGFloat(columns - 1) * maxSpacing
-
-            let maxHeightPerSwatch = (availableHeight - totalVerticalSpacing) / CGFloat(rows)
-            let maxWidthPerSwatch = (availableWidth - totalHorizontalSpacing) / CGFloat(columns)
-
-            let swatchSize = min(maxWidthPerSwatch, maxHeightPerSwatch)
-
-            var actualHorizontalSpacing = horizontalSpacing
-            if columns > 1 {
-                let usedWidth = CGFloat(columns) * swatchSize
-                actualHorizontalSpacing = (availableWidth - usedWidth) / CGFloat(columns - 1)
-                actualHorizontalSpacing = min(actualHorizontalSpacing, maxSpacing)
-            }
-
-            if swatchSize > bestLayout.swatchSize {
-                bestLayout = LayoutInfo(
-                    rows: rows,
-                    columns: columns,
-                    swatchSize: swatchSize,
-                    horizontalSpacing: actualHorizontalSpacing,
-                    verticalSpacing: verticalSpacing,
-                    showHexBadges: swatchSize >= 110
-                )
-            }
-        }
-
-        return bestLayout
-    }
 }
 
 // MARK: - Color Export Image View
