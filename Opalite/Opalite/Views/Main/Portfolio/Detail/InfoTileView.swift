@@ -65,3 +65,11 @@ struct GlassTileBackground: ViewModifier {
         }
     }
 }
+
+#Preview("Info Tiles") {
+    HStack {
+        InfoTileView(icon: "paintpalette", value: "12", label: "Colors")
+        InfoTileView(icon: "calendar", value: "Feb 8", label: "Created", glassStyle: .regular)
+    }
+    .padding()
+}

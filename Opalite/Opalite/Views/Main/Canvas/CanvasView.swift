@@ -72,12 +72,12 @@ struct CanvasView: View {
                 externalTool: $externalTool
             )
 
-            // Shape placement overlay - isolated to prevent parent re-renders
+            // Shape placement overlay — drag-to-define with 3-phase state machine
             if let shape = pendingShape {
                 ShapePlacementOverlay(
                     shape: shape,
-                    onPlace: { location, rotation, scale, aspectRatio in
-                        placeShape(shape, at: location, rotation: rotation, scale: scale, aspectRatio: aspectRatio)
+                    onPlace: { rect, rotation in
+                        placeShape(shape, in: rect, rotation: rotation)
                         pendingShape = nil
                     },
                     onCancel: {
@@ -86,13 +86,13 @@ struct CanvasView: View {
                 )
             }
 
-            // SVG placement overlay
+            // SVG placement overlay — drag-to-define with 3-phase state machine
             if let paths = pendingSVGPaths, let bounds = pendingSVGBounds {
                 SVGPlacementOverlay(
                     paths: paths,
                     svgBounds: bounds,
-                    onPlace: { location, rotation, scale in
-                        placeSVG(paths: paths, bounds: bounds, at: location, rotation: rotation, scale: scale)
+                    onPlace: { rect, rotation in
+                        placeSVG(paths: paths, bounds: bounds, in: rect, rotation: rotation)
                         pendingSVGPaths = nil
                         pendingSVGBounds = nil
                     },
@@ -449,38 +449,34 @@ struct CanvasView: View {
 
     // MARK: - Shape Placement
 
-    /// Places a geometric shape on the canvas at the specified location.
+    /// Places a geometric shape on the canvas using the drag-to-define bounding rect.
     ///
-    /// Transforms view coordinates to canvas content coordinates accounting for
+    /// Transforms the view-coordinate rect to canvas content coordinates accounting for
     /// scroll offset and zoom scale, then generates PencilKit strokes for the shape.
     ///
     /// - Parameters:
     ///   - shape: The type of shape to place
-    ///   - center: The tap location in view coordinates
-    ///   - rotation: Optional rotation angle from Apple Pencil roll or two-finger gesture
-    ///   - scale: Optional scale factor from pinch gesture (1.0 = 100pt base size)
-    ///   - aspectRatio: Optional aspect ratio (width/height) for shapes that support non-uniform scaling
-    private func placeShape(_ shape: CanvasShape, at center: CGPoint, rotation: Angle = .zero, scale: CGFloat = 1.0, aspectRatio: CGFloat = 1.0) {
-        // Transform from view coordinates to canvas content coordinates:
-        // contentOffset is where the visible area starts in content space
-        // center / zoomScale converts screen distance to content distance
+    ///   - rect: The bounding rect in view coordinates (from ShapePlacementOverlay)
+    ///   - rotation: The rotation angle from two-finger gesture
+    private func placeShape(_ shape: CanvasShape, in rect: CGRect, rotation: Angle) {
+        // Transform rect from view coordinates to canvas content coordinates
         let canvasCenter = CGPoint(
-            x: canvasContentOffset.x + (center.x / canvasZoomScale),
-            y: canvasContentOffset.y + (center.y / canvasZoomScale)
+            x: canvasContentOffset.x + (rect.midX / canvasZoomScale),
+            y: canvasContentOffset.y + (rect.midY / canvasZoomScale)
         )
+        let canvasWidth = rect.width / canvasZoomScale
+        let canvasHeight = rect.height / canvasZoomScale
 
-        // Base size is 100pt, scale factor adjusts this
-        let shapeSize: CGFloat = 100 * scale
         let ink = PKInk(.pen, color: .black)
         let shapeGenerator = CanvasShapeGenerator()
 
         let newStrokes = shapeGenerator.generateStrokes(
             for: shape,
             center: canvasCenter,
-            size: shapeSize,
+            width: canvasWidth,
+            height: canvasHeight,
             ink: ink,
-            rotation: rotation,
-            aspectRatio: aspectRatio
+            rotation: rotation
         )
 
         guard !newStrokes.isEmpty else { return }
@@ -529,23 +525,22 @@ struct CanvasView: View {
         }
     }
 
-    /// Places an SVG shape on the canvas at the specified location.
+    /// Places an SVG shape on the canvas using the drag-to-define bounding rect.
     ///
     /// - Parameters:
     ///   - paths: The CGPath objects from the parsed SVG
     ///   - bounds: The bounds of the original SVG
-    ///   - center: The placement location in view coordinates
-    ///   - rotation: The rotation angle
-    ///   - scale: The scale factor
-    private func placeSVG(paths: [CGPath], bounds: CGRect, at center: CGPoint, rotation: Angle, scale: CGFloat) {
-        // Transform from view coordinates to canvas content coordinates
+    ///   - rect: The bounding rect in view coordinates (from SVGPlacementOverlay)
+    ///   - rotation: The rotation angle from two-finger or pencil gesture
+    private func placeSVG(paths: [CGPath], bounds: CGRect, in rect: CGRect, rotation: Angle) {
+        // Transform rect from view coordinates to canvas content coordinates
         let canvasCenter = CGPoint(
-            x: canvasContentOffset.x + (center.x / canvasZoomScale),
-            y: canvasContentOffset.y + (center.y / canvasZoomScale)
+            x: canvasContentOffset.x + (rect.midX / canvasZoomScale),
+            y: canvasContentOffset.y + (rect.midY / canvasZoomScale)
         )
+        // Use height as the SVG size (generateSVGStrokes scales by height)
+        let canvasHeight = rect.height / canvasZoomScale
 
-        // Base size is 100pt, scale factor adjusts this
-        let shapeSize: CGFloat = 100 * scale
         let ink = PKInk(.pen, color: .black)
         let shapeGenerator = CanvasShapeGenerator()
 
@@ -553,7 +548,7 @@ struct CanvasView: View {
             from: paths,
             svgBounds: bounds,
             center: canvasCenter,
-            size: shapeSize,
+            size: canvasHeight,
             ink: ink,
             rotation: rotation
         )

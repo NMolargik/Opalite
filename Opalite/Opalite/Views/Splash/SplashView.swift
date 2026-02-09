@@ -134,27 +134,18 @@ struct SplashView: View {
                         onContinue()
                     } label: {
                         HStack(spacing: 8) {
-                            Text("Continue")
-                                .font(.headline)
+                            Text("Get Started")
 
                             Image(systemName: "arrow.right")
-                                .font(.headline)
                         }
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 40)
-                        .padding(.vertical, 16)
-                        .background(
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [.white, .white.opacity(0.9)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                        )
-                        .shadow(color: .white.opacity(0.3), radius: 20, y: 5)
+                        .font(.title2)
+                        .bold()
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 14)
+                        .background(.blue, in: RoundedRectangle(cornerRadius: 16))
                     }
+                    .shadow(color: .white.opacity(0.3), radius: 20, y: 5)
                     .accessibilityLabel("Continue")
                     .accessibilityHint("Proceeds to app introduction")
                     .scaleEffect(showButton ? 1 : 0.8)

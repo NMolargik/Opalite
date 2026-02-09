@@ -262,6 +262,7 @@ struct ColorContrastCheckerView: View {
                     } label: {
                         Text("Apply")
                     }
+                    .tint(.blue)
                     .buttonStyle(.borderedProminent)
                     .disabled(hexInput.isEmpty)
                 }

@@ -315,7 +315,7 @@ private extension PortfolioView {
                     Image(systemName: "swatchpalette")
                         .font(.title2)
 
-                    Text("Create A New Palette")
+                    Text("Create A Palette")
                 }
                 .bold()
                 .foregroundStyle(.white)
@@ -327,7 +327,7 @@ private extension PortfolioView {
                 .contentShape(RoundedRectangle(cornerRadius: 16))
                 .hoverEffect(.lift)
             }
-            .accessibilityLabel("Create A New Palette")
+            .accessibilityLabel("Create A Palette")
             .accessibilityHint("Creates a new empty palette to organize your colors")
 
             Spacer()
@@ -462,8 +462,9 @@ private extension PortfolioView {
                     HapticsManager.shared.selection()
                     viewModel.colorToExport = color
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Share Color", systemImage: "square.and.arrow.up")
                 }
+                .tint(.blue)
 
                 Divider()
 
@@ -528,7 +529,9 @@ private extension PortfolioView {
                         viewModel.swatchSize = isCompact ? viewModel.swatchSize.nextCompact : viewModel.swatchSize.next
                     }
                 }) {
-                    Image(systemName: "square.arrowtriangle.4.outward")
+                    Image(systemName: viewModel.nextSwatchSizeWillIncrease(isCompact: isCompact)
+                          ? "arrow.down.left.and.arrow.up.right.square"
+                          : "arrow.up.right.and.arrow.down.left.square")
                 }
                 .toolbarButtonTint()
                 .accessibilityLabel("Change swatch size")
@@ -594,7 +597,7 @@ private extension PortfolioView {
                 viewModel.isShowingPhotoColorPicker = true
             }, label: {
                 Label {
-                    Text("Sample from Photo")
+                    Text("Sample Photo")
                 } icon: {
                     Image(systemName: "eyedropper.halffull")
                 }
@@ -621,7 +624,7 @@ private extension PortfolioView {
                 viewModel.isShowingQuickAddHex = true
             }, label: {
                 Label {
-                    Text("Quick Add Hex")
+                    Text("Add By Hex")
                 } icon: {
                     Image(systemName: "number")
                 }
@@ -640,7 +643,7 @@ private extension PortfolioView {
             }, label: {
                 Label {
                     HStack {
-                        Text("Import From File")
+                        Text("Import")
                         if !subscriptionManager.hasOnyxEntitlement {
                             Image(systemName: "lock.fill")
                                 .font(.footnote)
@@ -866,5 +869,6 @@ private extension PortfolioView {
         .environment(ReviewRequestManager())
         .environment(QuickActionManager())
         .environment(HexCopyManager())
+        .environment(ImportCoordinator())
         .modelContainer(container)
 }

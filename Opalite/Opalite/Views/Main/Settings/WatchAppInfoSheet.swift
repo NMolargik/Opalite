@@ -15,53 +15,39 @@ struct WatchAppInfoSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Header with gradient background
-                ZStack {
-                    LinearGradient(
-                        colors: [
-                            .blue.opacity(0.8),
-                            .blue.opacity(0.4),
-                            .clear
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 200)
-                    .ignoresSafeArea(edges: .top)
+                VStack(spacing: 16) {
+                    Spacer(minLength: 60)
+                    
+                    ZStack {
+                        Image(systemName: "applewatch")
+                            .font(.system(size: 70))
+                            .foregroundStyle(.blue)
+                            .blur(radius: 20)
+                            .opacity(0.6)
 
-                    VStack(spacing: 16) {
-                        // Icon with glow
-                        ZStack {
-                            Image(systemName: "applewatch")
-                                .font(.system(size: 70))
-                                .foregroundStyle(.blue)
-                                .blur(radius: 20)
-                                .opacity(0.6)
-
-                            Image(systemName: "applewatch")
-                                .font(.system(size: 70))
-                                .foregroundStyle(.white)
-                                .shadow(color: .blue.opacity(0.5), radius: 10)
-                        }
-                        .scaleEffect(appearAnimation ? 1 : 0.5)
-                        .opacity(appearAnimation ? 1 : 0)
-                        .accessibilityHidden(true)
-
-                        Text("Opalite for Apple Watch")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.inverseTheme)
-                            .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
-                            .opacity(appearAnimation ? 1 : 0)
-                            .offset(y: appearAnimation ? 0 : 10)
-
-                        Text("Your colors, on your wrist")
-                            .font(.subheadline)
-                            .foregroundStyle(.inverseTheme)
-                            .opacity(appearAnimation ? 1 : 0)
-                            .offset(y: appearAnimation ? 0 : 10)
+                        Image(systemName: "applewatch")
+                            .font(.system(size: 70))
+                            .foregroundStyle(.white)
+                            .shadow(color: .blue.opacity(0.5), radius: 10)
                     }
-                    .padding(.top, 20)
+                    .scaleEffect(appearAnimation ? 1 : 0.5)
+                    .opacity(appearAnimation ? 1 : 0)
+                    .accessibilityHidden(true)
+
+                    Text("Opalite for Apple Watch")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(.inverseTheme)
+                        .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
+                        .opacity(appearAnimation ? 1 : 0)
+                        .offset(y: appearAnimation ? 0 : 10)
+
+                    Text("Your colors, on your wrist")
+                        .font(.subheadline)
+                        .foregroundStyle(.inverseTheme)
+                        .opacity(appearAnimation ? 1 : 0)
+                        .offset(y: appearAnimation ? 0 : 10)
                 }
+                .padding(.top, 20)
 
                 // Features section
                 VStack(spacing: 12) {
@@ -103,6 +89,7 @@ struct WatchAppInfoSheet: View {
                             text: "Pull to refresh on the Watch to manually sync anytime"
                         )
                     }
+                    .foregroundStyle(.black)
                     .padding(.horizontal, 20)
                 }
                 .padding(.top, 24)
@@ -129,7 +116,17 @@ struct WatchAppInfoSheet: View {
                 .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.6), value: appearAnimation)
             }
         }
-        .background(colorScheme == .dark ? Color.black : Color(.systemGroupedBackground))
+        .background {
+            LinearGradient(
+                colors: [
+                    .blue.opacity(0.8),
+                    .blue.opacity(0.4),
+                    .clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
         .ignoresSafeArea(edges: .top)
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {

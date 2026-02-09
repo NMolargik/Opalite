@@ -39,4 +39,19 @@ enum CanvasShape: String, CaseIterable {
         default: return false
         }
     }
+
+    /// Aspect ratio (width/height) to enforce during drag-to-define.
+    /// Returns `nil` for shapes that allow free-form sizing.
+    var constrainedAspectRatio: CGFloat? {
+        switch self {
+        case .square, .circle:
+            return 1.0
+        case .triangle:
+            return 1.0 / 0.866
+        case .shirt:
+            return 1260.0 / 1000.0
+        case .rectangle, .line, .arrow:
+            return nil
+        }
+    }
 }

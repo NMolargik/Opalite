@@ -15,54 +15,39 @@ struct SwatchBarInfoSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Header with gradient background
-                ZStack {
-                    // Gradient background
-                    LinearGradient(
-                        colors: [
-                            .purple.opacity(0.8),
-                            .purple.opacity(0.4),
-                            .clear
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 200)
-                    .ignoresSafeArea(edges: .top)
+                VStack(spacing: 16) {
+                    // Icon with glow
+                    Spacer(minLength: 60)
+                    
+                    ZStack {
+                        // Glow effect
+                        Image(systemName: "square.stack.fill")
+                            .font(.system(size: 70))
+                            .foregroundStyle(.purple)
+                            .blur(radius: 20)
+                            .opacity(0.6)
 
-                    VStack(spacing: 16) {
-                        // Icon with glow
-                        ZStack {
-                            // Glow effect
-                            Image(systemName: "square.stack.fill")
-                                .font(.system(size: 70))
-                                .foregroundStyle(.purple)
-                                .blur(radius: 20)
-                                .opacity(0.6)
-
-                            Image(systemName: "square.stack.fill")
-                                .font(.system(size: 70))
-                                .foregroundStyle(.white)
-                                .shadow(color: .purple.opacity(0.5), radius: 10)
-                        }
-                        .scaleEffect(appearAnimation ? 1 : 0.5)
-                        .opacity(appearAnimation ? 1 : 0)
-                        .accessibilityHidden(true)
-
-                        Text("SwatchBar")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
-                            .foregroundStyle(.inverseTheme)
-                            .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
-                            .opacity(appearAnimation ? 1 : 0)
-                            .offset(y: appearAnimation ? 0 : 10)
-
-                        Text("Your colors, always within reach")
-                            .font(.subheadline)
-                            .foregroundStyle(.inverseTheme)
-                            .opacity(appearAnimation ? 1 : 0)
-                            .offset(y: appearAnimation ? 0 : 10)
+                        Image(systemName: "square.stack.fill")
+                            .font(.system(size: 70))
+                            .foregroundStyle(.white)
+                            .shadow(color: .purple.opacity(0.5), radius: 10)
                     }
-                    .padding(.top, 20)
+                    .scaleEffect(appearAnimation ? 1 : 0.5)
+                    .opacity(appearAnimation ? 1 : 0)
+                    .accessibilityHidden(true)
+
+                    Text("SwatchBar")
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(.inverseTheme)
+                        .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
+                        .opacity(appearAnimation ? 1 : 0)
+                        .offset(y: appearAnimation ? 0 : 10)
+
+                    Text("Your colors, always within reach")
+                        .font(.subheadline)
+                        .foregroundStyle(.inverseTheme)
+                        .opacity(appearAnimation ? 1 : 0)
+                        .offset(y: appearAnimation ? 0 : 10)
                 }
 
                 // Features section
@@ -131,7 +116,17 @@ struct SwatchBarInfoSheet: View {
                 .animation(.easeOut.delay(0.6), value: appearAnimation)
             }
         }
-        .background(colorScheme == .dark ? Color.black : Color(.systemGroupedBackground))
+        .background {
+            LinearGradient(
+                colors: [
+                    .purple.opacity(0.8),
+                    .purple.opacity(0.4),
+                    .clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
         .ignoresSafeArea(edges: .top)
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {

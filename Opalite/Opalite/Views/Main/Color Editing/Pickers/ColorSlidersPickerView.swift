@@ -69,7 +69,7 @@ struct ColorChannelsPickerView: View {
                 channelSlider(
                     label: "Alpha",
                     value: $color.alpha,
-                    tint: .blue.opacity(0.7)
+                    tint: .black.opacity(0.7)
                 )
             }
             .padding(12)

@@ -136,7 +136,7 @@ struct QuickAddHexSheet: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Quick Add Hex")
+            .navigationTitle("Add By Hex")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

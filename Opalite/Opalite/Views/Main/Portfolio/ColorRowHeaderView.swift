@@ -30,31 +30,33 @@ struct ColorRowHeaderView: View {
                     .font(.title)
                     .padding(.trailing)
 
-                Button {
-                    HapticsManager.shared.selection()
-                    withAnimation {
-                        isEditingColors.toggle()
-                        // Clear selections when exiting edit mode
-                        if !isEditingColors {
-                            selectedColorIDs.removeAll()
+                if !colorManager.looseColors.isEmpty {
+                    Button {
+                        HapticsManager.shared.selection()
+                        withAnimation {
+                            isEditingColors.toggle()
+                            // Clear selections when exiting edit mode
+                            if !isEditingColors {
+                                selectedColorIDs.removeAll()
+                            }
                         }
+                    } label: {
+                        Image(systemName: isEditingColors ? "checkmark" : "pencil")
+                            .imageScale(.medium)
+                            .foregroundStyle(isEditingColors ? .green : .inverseTheme)
+                            .frame(width: 15, height: 15)
+                            .padding(8)
+                            .background(
+                                Circle().fill(.clear)
+                            )
+                            .glassIfAvailable(
+                                GlassConfiguration(style: .regular)
+                            )
+                            .contentShape(Circle())
+                            .hoverEffect(.lift)
                     }
-                } label: {
-                    Image(systemName: isEditingColors ? "checkmark" : "pencil")
-                        .imageScale(.medium)
-                        .foregroundStyle(isEditingColors ? .green : .inverseTheme)
-                        .frame(width: 15, height: 15)
-                        .padding(8)
-                        .background(
-                            Circle().fill(.clear)
-                        )
-                        .glassIfAvailable(
-                            GlassConfiguration(style: .regular)
-                        )
-                        .contentShape(Circle())
-                        .hoverEffect(.lift)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .bold()
             .accessibilityAddTraits(.isHeader)

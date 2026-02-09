@@ -3776,3 +3776,99 @@ struct DateFormattingTests {
         #expect(date.formattedShortDate == "Feb 8")
     }
 }
+
+// MARK: - CanvasShape Tests
+
+struct CanvasShapeTests {
+
+    @Test func constrainedAspectRatioSquare() {
+        #expect(CanvasShape.square.constrainedAspectRatio == 1.0)
+    }
+
+    @Test func constrainedAspectRatioCircle() {
+        #expect(CanvasShape.circle.constrainedAspectRatio == 1.0)
+    }
+
+    @Test func constrainedAspectRatioTriangle() {
+        let ratio = CanvasShape.triangle.constrainedAspectRatio
+        #expect(ratio != nil)
+        // 1.0 / 0.866 ≈ 1.1547
+        #expect(abs(ratio! - (1.0 / 0.866)) < 0.001)
+    }
+
+    @Test func constrainedAspectRatioShirt() {
+        let ratio = CanvasShape.shirt.constrainedAspectRatio
+        #expect(ratio != nil)
+        #expect(abs(ratio! - (1260.0 / 1000.0)) < 0.001)
+    }
+
+    @Test func constrainedAspectRatioRectangleIsFreeForm() {
+        #expect(CanvasShape.rectangle.constrainedAspectRatio == nil)
+    }
+
+    @Test func constrainedAspectRatioLineIsFreeForm() {
+        #expect(CanvasShape.line.constrainedAspectRatio == nil)
+    }
+
+    @Test func constrainedAspectRatioArrowIsFreeForm() {
+        #expect(CanvasShape.arrow.constrainedAspectRatio == nil)
+    }
+}
+
+// MARK: - CanvasShapeGenerator Width/Height Overload Tests
+
+struct CanvasShapeGeneratorTests {
+
+    @Test func widthHeightOverloadProducesStrokes() {
+        let generator = CanvasShapeGenerator()
+        let ink = PKInk(.pen, color: .black)
+
+        for shape in CanvasShape.allCases {
+            let strokes = generator.generateStrokes(
+                for: shape,
+                center: CGPoint(x: 200, y: 200),
+                width: 150,
+                height: 100,
+                ink: ink
+            )
+            #expect(!strokes.isEmpty, "Expected strokes for \(shape.displayName)")
+        }
+    }
+
+    @Test func widthHeightOverloadWithRotation() {
+        let generator = CanvasShapeGenerator()
+        let ink = PKInk(.pen, color: .black)
+        let strokes = generator.generateStrokes(
+            for: .rectangle,
+            center: CGPoint(x: 300, y: 300),
+            width: 200,
+            height: 100,
+            ink: ink,
+            rotation: .degrees(45)
+        )
+        #expect(!strokes.isEmpty)
+    }
+
+    @Test func widthHeightOverloadMatchesSizeOverloadForSquare() {
+        let generator = CanvasShapeGenerator()
+        let ink = PKInk(.pen, color: .black)
+        let center = CGPoint(x: 100, y: 100)
+
+        // width=100, height=100 should produce same result as size=100 for a square
+        let fromWidthHeight = generator.generateStrokes(
+            for: .square,
+            center: center,
+            width: 100,
+            height: 100,
+            ink: ink
+        )
+        let fromSize = generator.generateStrokes(
+            for: .square,
+            center: center,
+            size: 100,
+            ink: ink
+        )
+
+        #expect(fromWidthHeight.count == fromSize.count)
+    }
+}

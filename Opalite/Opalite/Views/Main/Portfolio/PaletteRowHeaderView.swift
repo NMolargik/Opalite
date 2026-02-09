@@ -65,7 +65,9 @@ struct PaletteRowHeaderView: View {
                     HapticsManager.shared.selection()
                     isShowingExportSheet = true
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Share Palette", systemImage: "square.and.arrow.up")
+                        .tint(.blue)
+
                 }
                 .disabled(palette.sortedColors.isEmpty)
                 

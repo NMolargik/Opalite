@@ -81,7 +81,7 @@ struct SwatchRowView: View {
                             Image(systemName: "questionmark.square.dashed")
                                 .font(.title2)
 
-                            Text("Create A New Color")
+                            Text("Create A Color")
                         }
                         .bold()
                         .foregroundStyle(.white)
@@ -93,7 +93,7 @@ struct SwatchRowView: View {
                         .contentShape(RoundedRectangle(cornerRadius: 16))
                         .hoverEffect(.lift)
                     }
-                    .accessibilityLabel("Create A New Color")
+                    .accessibilityLabel("Create A Color")
                     .accessibilityHint("Opens the color editor to create a new color")
 
                     Spacer()
@@ -424,4 +424,5 @@ struct SwatchRowView: View {
         )
     }
     .environment(manager)
+    .environment(ToastManager())
 }

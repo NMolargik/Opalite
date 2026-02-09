@@ -428,5 +428,6 @@ struct ColorEditorView: View {
             color: OpaliteColor.sample2,
             onApprove: { _ in }
         )
+        .environment(HexCopyManager())
     }
 }

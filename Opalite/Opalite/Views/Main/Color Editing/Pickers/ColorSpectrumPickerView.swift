@@ -90,6 +90,7 @@ struct ColorSpectrumPickerView: View {
 
                     HStack {
                         Slider(value: $color.alpha, in: 0...1)
+                            .tint(.blue)
                             .accessibilityLabel("Opacity")
                             .accessibilityValue("\(Int(color.alpha * 100)) percent")
 
@@ -126,7 +127,7 @@ struct ColorSpectrumPickerView: View {
     }
 
     private var currentColorDescription: String {
-        let hueNames = ["Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Magenta", "Pink", "Red"]
+        let hueNames: [String] = ["Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Magenta", "Pink", "Red"]
         let hueIndex = Int(dragLocation.x * 9)
         let hueName = hueNames[min(hueIndex, hueNames.count - 1)]
         let brightness = Int((1.0 - dragLocation.y) * 100)

@@ -68,6 +68,49 @@ struct CanvasShapeGenerator {
         }
     }
 
+    /// Generates PencilKit strokes for a shape defined by explicit width and height.
+    ///
+    /// Converts to the existing `size` + `aspectRatio` API internally:
+    /// `size = height`, `aspectRatio = width / height`.
+    ///
+    /// - Parameters:
+    ///   - shape: The type of shape to generate
+    ///   - center: The center point of the shape on the canvas
+    ///   - width: The explicit width of the bounding box
+    ///   - height: The explicit height of the bounding box
+    ///   - ink: The PencilKit ink to use for the strokes
+    ///   - rotation: Optional rotation angle for the shape
+    /// - Returns: An array of PKStroke objects representing the shape
+    func generateStrokes(
+        for shape: CanvasShape,
+        center: CGPoint,
+        width: CGFloat,
+        height: CGFloat,
+        ink: PKInk,
+        rotation: Angle = .zero
+    ) -> [PKStroke] {
+        // Line and arrow use `size` as their length (width), not height.
+        // All other shapes use `size` as height with aspectRatio = width/height.
+        let size: CGFloat
+        let aspectRatio: CGFloat
+        switch shape {
+        case .line, .arrow:
+            size = width
+            aspectRatio = 1.0
+        default:
+            size = height
+            aspectRatio = height > 0 ? width / height : 1.0
+        }
+        return generateStrokes(
+            for: shape,
+            center: center,
+            size: size,
+            ink: ink,
+            rotation: rotation,
+            aspectRatio: aspectRatio
+        )
+    }
+
     // MARK: - Point Generation
 
     /// Generates the corner/edge points for a given shape.
@@ -479,42 +522,48 @@ struct CanvasShapeGenerator {
         )
 
         for cgPath in paths {
-            let points = samplePointsFromPath(cgPath, samplingDistance: 2.0)
+            // Split each CGPath into separate subpaths so distinct closed shapes
+            // within the same <path> element become independent strokes.
+            let subpaths = sampleSubpathsFromPath(cgPath, samplingDistance: 2.0)
 
-            guard !points.isEmpty else { continue }
+            for points in subpaths {
+                guard !points.isEmpty else { continue }
 
-            // Transform points: scale, center, and rotate
-            let transformedPoints = points.map { point -> CGPoint in
-                // Scale relative to SVG center
-                var scaled = CGPoint(
-                    x: (point.x - svgCenter.x) * scaleFactor + center.x,
-                    y: (point.y - svgCenter.y) * scaleFactor + center.y
-                )
+                // Transform points: scale, center, and rotate
+                let transformedPoints = points.map { point -> CGPoint in
+                    // Scale relative to SVG center
+                    var scaled = CGPoint(
+                        x: (point.x - svgCenter.x) * scaleFactor + center.x,
+                        y: (point.y - svgCenter.y) * scaleFactor + center.y
+                    )
 
-                // Apply rotation if needed
-                if rotation != .zero {
-                    scaled = rotatePoint(scaled, around: center, by: rotation)
+                    // Apply rotation if needed
+                    if rotation != .zero {
+                        scaled = rotatePoint(scaled, around: center, by: rotation)
+                    }
+
+                    return scaled
                 }
 
-                return scaled
-            }
-
-            if let stroke = createStroke(from: transformedPoints, ink: ink) {
-                strokes.append(stroke)
+                if let stroke = createStroke(from: transformedPoints, ink: ink) {
+                    strokes.append(stroke)
+                }
             }
         }
 
         return strokes
     }
 
-    /// Samples points along a CGPath at regular intervals.
+    /// Samples points along a CGPath at regular intervals, splitting on each subpath
+    /// so that distinct closed shapes within the same CGPath are returned separately.
     ///
     /// - Parameters:
     ///   - path: The CGPath to sample
     ///   - samplingDistance: The distance between sampled points
-    /// - Returns: An array of CGPoints along the path
-    private func samplePointsFromPath(_ path: CGPath, samplingDistance: CGFloat) -> [CGPoint] {
-        var points: [CGPoint] = []
+    /// - Returns: An array of point arrays — one per subpath
+    private func sampleSubpathsFromPath(_ path: CGPath, samplingDistance: CGFloat) -> [[CGPoint]] {
+        var subpaths: [[CGPoint]] = []
+        var currentSubpath: [CGPoint] = []
         var currentPoint = CGPoint.zero
         var subpathStart = CGPoint.zero
 
@@ -522,14 +571,18 @@ struct CanvasShapeGenerator {
             let element = elementPointer.pointee
             switch element.type {
             case .moveToPoint:
+                // Flush the previous subpath if it has content
+                if currentSubpath.count >= 2 {
+                    subpaths.append(currentSubpath)
+                }
                 currentPoint = element.points[0]
                 subpathStart = currentPoint
-                points.append(currentPoint)
+                currentSubpath = [currentPoint]
 
             case .addLineToPoint:
                 let endPoint = element.points[0]
                 let linePoints = sampleLine(from: currentPoint, to: endPoint, distance: samplingDistance)
-                points.append(contentsOf: linePoints)
+                currentSubpath.append(contentsOf: linePoints)
                 currentPoint = endPoint
 
             case .addQuadCurveToPoint:
@@ -541,7 +594,7 @@ struct CanvasShapeGenerator {
                     to: endPoint,
                     distance: samplingDistance
                 )
-                points.append(contentsOf: curvePoints)
+                currentSubpath.append(contentsOf: curvePoints)
                 currentPoint = endPoint
 
             case .addCurveToPoint:
@@ -555,13 +608,13 @@ struct CanvasShapeGenerator {
                     to: endPoint,
                     distance: samplingDistance
                 )
-                points.append(contentsOf: curvePoints)
+                currentSubpath.append(contentsOf: curvePoints)
                 currentPoint = endPoint
 
             case .closeSubpath:
                 if currentPoint != subpathStart {
                     let linePoints = sampleLine(from: currentPoint, to: subpathStart, distance: samplingDistance)
-                    points.append(contentsOf: linePoints)
+                    currentSubpath.append(contentsOf: linePoints)
                 }
                 currentPoint = subpathStart
 
@@ -570,7 +623,12 @@ struct CanvasShapeGenerator {
             }
         }
 
-        return points
+        // Flush final subpath
+        if currentSubpath.count >= 2 {
+            subpaths.append(currentSubpath)
+        }
+
+        return subpaths
     }
 
     /// Samples points along a straight line.

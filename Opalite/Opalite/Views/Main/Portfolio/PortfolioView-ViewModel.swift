@@ -106,6 +106,12 @@ extension PortfolioView {
             return result
         }
 
+        /// Whether the next swatch size change will increase the size
+        func nextSwatchSizeWillIncrease(isCompact: Bool) -> Bool {
+            let next = isCompact ? swatchSize.nextCompact : swatchSize.next
+            return next.size > swatchSize.size
+        }
+
         /// Whether all loose colors are selected
         func allColorsSelected(looseColorCount: Int) -> Bool {
             selectedColorIDs.count == looseColorCount

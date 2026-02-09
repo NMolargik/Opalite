@@ -292,6 +292,10 @@ struct MainView: View {
         .environment(colorManager)
         .environment(canvasManager)
         .environment(CommunityManager())
+        .environment(QuickActionManager())
+        .environment(HexCopyManager())
         .environment(SubscriptionManager())
+        .environment(ReviewRequestManager())
+        .environment(ImportCoordinator())
         .environment(ToastManager())
 }

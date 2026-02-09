@@ -141,6 +141,7 @@ struct CommunityView: View {
             } label: {
                 Label("Retry", systemImage: "arrow.clockwise")
             }
+            .tint(.blue)
             .buttonStyle(.borderedProminent)
         }
     }

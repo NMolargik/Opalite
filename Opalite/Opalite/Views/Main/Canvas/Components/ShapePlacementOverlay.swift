@@ -7,108 +7,143 @@
 
 import SwiftUI
 
-/// Overlay view for shape placement that manages its own gesture state
-/// to avoid causing parent view re-renders during drag/pinch/rotate gestures.
+/// Overlay view for drag-to-define shape placement.
+///
+/// Three phases:
+/// 1. **Idle** — dimmed overlay, instructions, waiting for first touch.
+/// 2. **Drawing** — drag from A to B to define bounding box; shape preview stretches in real-time.
+/// 3. **Adjusting** — shape at final size; one-finger drag repositions, two-finger rotates.
+///    Place/Cancel buttons visible.
 struct ShapePlacementOverlay: View {
     let shape: CanvasShape
-    /// Callback when shape is placed: (location, rotation, scale, aspectRatio)
-    let onPlace: (CGPoint, Angle, CGFloat, CGFloat) -> Void
+    /// Called when the user commits the shape: (bounding rect in view coords, rotation angle).
+    let onPlace: (CGRect, Angle) -> Void
     let onCancel: () -> Void
 
-    // Local state - changes don't propagate to parent
-    @State private var previewLocation: CGPoint?
-    @State private var rotation: Angle = .zero
-    @State private var scale: CGFloat = 1.0
-    @State private var aspectRatio: CGFloat = 1.0
-
-    /// Whether this shape supports non-uniform (independent width/height) scaling
-    private var useNonUniformScale: Bool {
-        shape.supportsNonUniformScale
-    }
+    // Local state — isolated from parent to prevent re-renders
+    @State private var phase: ShapePlacementPhase = .idle
+    @State private var shapeRect: CGRect = .zero
+    @State private var rotation: CGFloat = 0
 
     var body: some View {
         ZStack {
+            // Dimmed background
             Color.black.opacity(0.1)
                 .ignoresSafeArea()
 
-            // Shape preview at current location
-            if let location = previewLocation {
-                ShapePreviewView(shape: shape, scale: scale, aspectRatio: aspectRatio)
-                    .rotationEffect(rotation)
-                    .position(location)
-                    .allowsHitTesting(false)
+            // Shape preview — visible during drawing and adjusting phases
+            if phase == .drawing || phase == .adjusting {
+                shapePreview
             }
         }
         .overlay(alignment: .top) {
             instructionsView
         }
         .overlay {
-            PencilHoverView(
-                hoverLocation: $previewLocation,
-                rollAngle: $rotation,
-                shapeScale: $scale,
-                aspectRatio: $aspectRatio,
-                useNonUniformScale: useNonUniformScale,
-                onTap: { location in
-                    // Use the actual touch/gesture location for placement
-                    // This ensures accuracy even if hover events interfere
-                    onPlace(location, rotation, scale, aspectRatio)
-                }
+            // Gesture layer
+            ShapeDrawingRepresentable(
+                shapeRect: $shapeRect,
+                rotation: $rotation,
+                phase: $phase,
+                constrainedAspectRatio: shape.constrainedAspectRatio
             )
         }
         .overlay(alignment: .bottom) {
-            cancelButton
+            buttonsView
         }
     }
 
+    // MARK: - Shape Preview
+
+    private var shapePreview: some View {
+        ShapePreviewView(
+            shape: shape,
+            explicitWidth: max(shapeRect.width, 1),
+            explicitHeight: max(shapeRect.height, 1)
+        )
+        .rotationEffect(Angle(radians: Double(rotation)))
+        .position(
+            x: shapeRect.midX,
+            y: shapeRect.midY
+        )
+        .allowsHitTesting(false)
+    }
+
+    // MARK: - Instructions
+
     private var instructionsView: some View {
         VStack(spacing: 8) {
-            Text("Drag to position, release to place")
-                .font(.headline)
-            if useNonUniformScale {
-                Text("Use two fingers to resize and rotate")
+            switch phase {
+            case .idle:
+                Text("Drag to draw \(shape.displayName.lowercased())")
+                    .font(.headline)
+                Text("Draw from corner to corner to define size")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-            } else {
-                Text("Use two fingers to pinch and rotate")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            HStack(spacing: 16) {
-                if rotation != .zero {
-                    Text("Rotation: \(Int(rotation.degrees))°")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                if scale != 1.0 {
-                    Text("Scale: \(String(format: "%.1fx", scale))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                if useNonUniformScale && aspectRatio != 1.0 {
-                    Text("Aspect: \(String(format: "%.2f", aspectRatio))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+
+            case .drawing:
+                Text("Release to finalize size")
+                    .font(.headline)
+                dimensionLabel
+
+            case .adjusting:
+                Text("Drag to reposition, rotate with two fingers or Apple Pencil Pro")
+                    .font(.headline)
+                HStack(spacing: 16) {
+                    dimensionLabel
+                    if rotation != 0 {
+                        let degrees = rotation * 180 / .pi
+                        let snapped = (degrees / 5).rounded() * 5
+                        Text("\(Int(snapped))°")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .padding(.top, 80)
+        .animation(.easeInOut(duration: 0.2), value: phase == .idle)
     }
 
-    private var cancelButton: some View {
-        Button {
-            HapticsManager.shared.impact()
-            onCancel()
-        } label: {
-            Text("Cancel")
-                .font(.headline)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+    private var dimensionLabel: some View {
+        Text("\(Int(shapeRect.width)) × \(Int(shapeRect.height))")
+            .font(.caption.monospaced())
+            .foregroundStyle(.secondary)
+    }
+
+    // MARK: - Buttons
+
+    private var buttonsView: some View {
+        HStack(spacing: 16) {
+            Button {
+                HapticsManager.shared.impact()
+                onCancel()
+            } label: {
+                Text("Cancel")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            if phase == .adjusting {
+                Button {
+                    HapticsManager.shared.impact()
+                    onPlace(shapeRect, Angle(radians: Double(rotation)))
+                } label: {
+                    Text("Place")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(.blue, in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
         }
         .padding(.bottom, 100)
+        .animation(.easeInOut(duration: 0.2), value: phase == .adjusting)
     }
 }

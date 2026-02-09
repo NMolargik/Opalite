@@ -15,97 +15,114 @@ struct ColorGridPickerView: View {
     private let columns: Int = 10   // more columns for a smoother hue sweep
 
     var body: some View {
-        let gridItems: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 4), count: columns)
-
-        return VStack(alignment: .leading, spacing: 12) {
-            // Header
-            HStack(spacing: 8) {
-                Image(systemName: "square.grid.2x2")
-                    .imageScale(.medium)
-                    .foregroundStyle(.secondary)
-
-                Text("Grid")
-                    .font(.headline)
-
-                Spacer()
-            }
-
-            // Card container
-            VStack(alignment: .leading, spacing: 12) {
-                GeometryReader { geometry in
-                    let availableHeight = geometry.size.height
-                    let totalSpacing = CGFloat(rows - 1) * 4
-                    let itemHeight = max(28, (availableHeight - totalSpacing) / CGFloat(rows))
-
-                    LazyVGrid(columns: gridItems, spacing: 4) {
-                        ForEach(0..<(rows * columns), id: \.self) { index in
-                            let row = index / columns
-                            let column = index % columns
-
-                            let swatchColor: Color = colorFor(row: row, column: column, rows: rows, columns: columns)
-                            let selected: Bool = isColorSelected(swatchColor)
-
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(swatchColor)
-                                .frame(height: itemHeight)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .strokeBorder(
-                                            selected ? Color.white : Color.black.opacity(0.15),
-                                            lineWidth: selected ? 2 : 1
-                                        )
-                                )
-                                .shadow(color: selected ? Color.black.opacity(0.25) : .clear,
-                                        radius: selected ? 2 : 0,
-                                        x: 0, y: 0)
-                                .onTapGesture {
-                                    if let rgba = swatchColor.rgbaComponents {
-                                        color.red = rgba.red
-                                        color.green = rgba.green
-                                        color.blue = rgba.blue
-                                        color.alpha = rgba.alpha
-                                    }
-                                }
-                                .accessibilityLabel(accessibilityLabelFor(row: row, column: column, rows: rows, columns: columns))
-                                .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-                                .accessibilityHint("Double tap to select this color")
-                        }
-                    }
-                }
-                .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
-                .frame(minHeight: horizontalSizeClass == .compact ? CGFloat(rows) * 28 + CGFloat(rows - 1) * 4 : nil)
-
-                // Opacity control, similar to system Grid picker
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Opacity")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    HStack {
-                        Slider(value: $color.alpha, in: 0...1)
-                            .accessibilityLabel("Opacity")
-                            .accessibilityValue("\(Int(color.alpha * 100)) percent")
-
-                        Text("\(Int(color.alpha * 100))%")
-                            .monospacedDigit()
-                            .frame(width: 48, alignment: .trailing)
-                            .foregroundStyle(.secondary)
-                            .accessibilityHidden(true)
-                    }
-                }
-            }
-            .padding(12)
-            .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.ultraThinMaterial)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(.white.opacity(0.12), lineWidth: 1)
-            )
+        VStack(alignment: .leading, spacing: 12) {
+            headerRow
+            cardContainer
         }
         .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
+    }
+
+    // MARK: - Subviews
+
+    private var headerRow: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "square.grid.2x2")
+                .imageScale(.medium)
+                .foregroundStyle(.secondary)
+
+            Text("Grid")
+                .font(.headline)
+
+            Spacer()
+        }
+    }
+
+    private var cardContainer: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            colorGrid
+            opacityControl
+        }
+        .padding(12)
+        .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.white.opacity(0.12), lineWidth: 1)
+        )
+    }
+
+    private var colorGrid: some View {
+        let gridItems: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 4), count: columns)
+
+        return GeometryReader { geometry in
+            let availableHeight = geometry.size.height
+            let totalSpacing = CGFloat(rows - 1) * 4
+            let itemHeight = max(28, (availableHeight - totalSpacing) / CGFloat(rows))
+
+            LazyVGrid(columns: gridItems, spacing: 4) {
+                ForEach(0..<(rows * columns), id: \.self) { index in
+                    gridCell(index: index, itemHeight: itemHeight)
+                }
+            }
+        }
+        .frame(maxHeight: horizontalSizeClass == .regular ? .infinity : nil)
+        .frame(minHeight: horizontalSizeClass == .compact ? CGFloat(rows) * 28 + CGFloat(rows - 1) * 4 : nil)
+    }
+
+    private func gridCell(index: Int, itemHeight: CGFloat) -> some View {
+        let row = index / columns
+        let column = index % columns
+        let swatchColor: Color = colorFor(row: row, column: column, rows: rows, columns: columns)
+        let selected: Bool = isColorSelected(swatchColor)
+
+        return RoundedRectangle(cornerRadius: 4)
+            .fill(swatchColor)
+            .frame(height: itemHeight)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .strokeBorder(
+                        selected ? Color.white : Color.black.opacity(0.15),
+                        lineWidth: selected ? 2 : 1
+                    )
+            )
+            .shadow(color: selected ? Color.black.opacity(0.25) : .clear,
+                    radius: selected ? 2 : 0,
+                    x: 0, y: 0)
+            .onTapGesture {
+                if let rgba = swatchColor.rgbaComponents {
+                    color.red = rgba.red
+                    color.green = rgba.green
+                    color.blue = rgba.blue
+                    color.alpha = rgba.alpha
+                }
+            }
+            .accessibilityLabel(accessibilityLabelFor(row: row, column: column, rows: rows, columns: columns))
+            .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+            .accessibilityHint("Double tap to select this color")
+    }
+
+    private var opacityControl: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Opacity")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            HStack {
+                Slider(value: $color.alpha, in: 0...1)
+                    .tint(.blue)
+                    .accessibilityLabel("Opacity")
+                    .accessibilityValue("\(Int(color.alpha * 100)) percent")
+
+                Text("\(Int(color.alpha * 100))%")
+                    .monospacedDigit()
+                    .frame(width: 48, alignment: .trailing)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+            }
+        }
     }
 
     private func colorFor(row: Int, column: Int, rows: Int, columns: Int) -> Color {
@@ -153,7 +170,7 @@ struct ColorGridPickerView: View {
             return "Gray, \(brightness)% brightness"
         }
 
-        let hueNames = ["Red", "Orange", "Yellow", "Yellow-Green", "Green", "Cyan", "Light Blue", "Blue", "Purple", "Magenta"]
+        let hueNames: [String] = ["Red", "Orange", "Yellow", "Yellow-Green", "Green", "Cyan", "Light Blue", "Blue", "Purple", "Magenta"]
         let hueIndex = column % hueNames.count
         let hueName = hueNames[hueIndex]
 
@@ -168,14 +185,13 @@ struct ColorGridPickerView: View {
     }
 }
 
-private struct ColorGridPickerPreviewContainer: View {
-    @State var color: OpaliteColor = .sample
-    var body: some View {
-        ColorGridPickerView(color: $color)
-            .padding()
+#Preview("Color Grid Picker") {
+    struct PreviewContainer: View {
+        @State var color = OpaliteColor.sample
+        var body: some View {
+            ColorGridPickerView(color: $color)
+                .padding()
+        }
     }
-}
-
-#Preview {
-    ColorGridPickerPreviewContainer()
+    return PreviewContainer()
 }

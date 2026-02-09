@@ -12,6 +12,11 @@ struct ShapePreviewView: View {
     var scale: CGFloat = 1.0
     /// Aspect ratio (width/height) for shapes that support non-uniform scaling
     var aspectRatio: CGFloat = 1.0
+    /// Explicit width override (used by drag-to-define). When set, `scale` is ignored.
+    var explicitWidth: CGFloat?
+    /// Explicit height override (used by drag-to-define). When set, `scale` is ignored.
+    var explicitHeight: CGFloat?
+
     private let baseSize: CGFloat = 100
 
     private var size: CGFloat {
@@ -25,44 +30,95 @@ struct ShapePreviewView: View {
 
     var body: some View {
         Group {
-            switch shape {
-            case .square:
-                Rectangle()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size, height: size)
-
-            case .rectangle:
-                Rectangle()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: rectWidth, height: size)
-
-            case .circle:
-                Circle()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size, height: size)
-
-            case .triangle:
-                TriangleShape()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size, height: size * 0.866)
-
-            case .line:
-                Rectangle()
-                    .fill(.black)
-                    .frame(width: size, height: 2)
-
-            case .arrow:
-                ArrowShape()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size, height: size * 0.5)
-
-            case .shirt:
-                ShirtShape()
-                    .stroke(.black, lineWidth: 2)
-                    .frame(width: size * 1.26, height: size)
+            if let w = explicitWidth, let h = explicitHeight {
+                explicitSizeBody(width: w, height: h)
+            } else {
+                scaledBody
             }
         }
         .opacity(0.6)
+    }
+
+    /// Body using explicit width/height (drag-to-define mode)
+    @ViewBuilder
+    private func explicitSizeBody(width w: CGFloat, height h: CGFloat) -> some View {
+        switch shape {
+        case .square:
+            Rectangle()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+
+        case .rectangle:
+            Rectangle()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+
+        case .circle:
+            Ellipse()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+
+        case .triangle:
+            TriangleShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+
+        case .line:
+            Rectangle()
+                .fill(.black)
+                .frame(width: w, height: 2)
+
+        case .arrow:
+            ArrowShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+
+        case .shirt:
+            ShirtShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: w, height: h)
+        }
+    }
+
+    /// Body using scale-based sizing (legacy/SVG mode)
+    @ViewBuilder
+    private var scaledBody: some View {
+        switch shape {
+        case .square:
+            Rectangle()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: size, height: size)
+
+        case .rectangle:
+            Rectangle()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: rectWidth, height: size)
+
+        case .circle:
+            Circle()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: size, height: size)
+
+        case .triangle:
+            TriangleShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: size, height: size * 0.866)
+
+        case .line:
+            Rectangle()
+                .fill(.black)
+                .frame(width: size, height: 2)
+
+        case .arrow:
+            ArrowShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: size, height: size * 0.5)
+
+        case .shirt:
+            ShirtShape()
+                .stroke(.black, lineWidth: 2)
+                .frame(width: size * 1.26, height: size)
+        }
     }
 }
 

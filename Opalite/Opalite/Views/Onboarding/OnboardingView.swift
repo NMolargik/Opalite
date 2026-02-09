@@ -70,6 +70,7 @@ struct OnboardingView: View {
                 OnboardingFeature(icon: "pencil.tip", iconColor: .blue, text: "Sketch with your colors"),
                 OnboardingFeature(icon: "square.on.square.dashed", iconColor: .purple, text: "Draw shapes and outlines"),
                 OnboardingFeature(icon: "pencil.and.scribble", iconColor: .pink, text: "Draw precisely with Apple Pencil"),
+                OnboardingFeature(icon: "drop.halffull", iconColor: .cyan, text: "Mix and sample new colors"),
                 OnboardingFeature(icon: "doc.fill.badge.plus", iconColor: .green, text: "Create multiple canvases", requiresOnyx: true)
             ]
         ),

@@ -52,7 +52,7 @@ struct PhotoColorPickerSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Sample from Photo")
+            .navigationTitle("Sample Photo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
