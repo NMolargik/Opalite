@@ -22,7 +22,7 @@ struct CommunityInfoSheet: View {
 
                     // Title and description
                     VStack(spacing: 12) {
-                        Text("Welcome to Community")
+                        Text("Welcome to the Community")
                             .font(.title.bold())
 
                         Text("A community-driven space to discover and share colors and palettes with creators around the world.")
@@ -75,6 +75,7 @@ struct CommunityInfoSheet: View {
                     }
                 }
             }
+            
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.hidden)

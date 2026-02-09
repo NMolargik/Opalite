@@ -564,9 +564,9 @@ final class OpalitePortfolioWorkflowTests: XCTestCase {
         createMenu.tap()
 
         // Tap "Create Color" from the menu
-        let newColorButton = app.buttons["Create Color"]
+        let newColorButton = app.buttons["Create A Color"]
         XCTAssertTrue(newColorButton.waitForExistence(timeout: 3),
-                       "Create Color option should appear in Create menu")
+                       "Create A Color option should appear in Create menu")
         newColorButton.tap()
 
         // ColorEditorView should appear (fullScreenCover)
@@ -619,9 +619,9 @@ final class OpalitePortfolioWorkflowTests: XCTestCase {
         XCTAssertTrue(createMenu2.waitForExistence(timeout: 5))
         createMenu2.tap()
 
-        let newPaletteButton = app.buttons["Create Palette"]
+        let newPaletteButton = app.buttons["Create A Palette"]
         XCTAssertTrue(newPaletteButton.waitForExistence(timeout: 3),
-                       "Create Palette option should appear in Create menu")
+                       "Create A Palette option should appear in Create menu")
         newPaletteButton.tap()
 
         sleep(2)

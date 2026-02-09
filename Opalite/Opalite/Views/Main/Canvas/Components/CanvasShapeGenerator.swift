@@ -97,6 +97,11 @@ struct CanvasShapeGenerator {
         case .line, .arrow:
             size = width
             aspectRatio = 1.0
+        case .triangle:
+            // generateTrianglePoints interprets size as the base width,
+            // then derives height as size * 0.866
+            size = width
+            aspectRatio = 1.0
         default:
             size = height
             aspectRatio = height > 0 ? width / height : 1.0

@@ -17,7 +17,7 @@ struct NotesSectionView: View {
     @State private var lastSavedAt: Date?
 
     var body: some View {
-        SectionCard(title: "Notes", systemImage: "note.text") {
+        SectionCard(title: "Notes", systemImage: "note.text", isCollapsible: true) {
             VStack(alignment: .leading, spacing: 10) {
 
                 ZStack(alignment: .topLeading) {

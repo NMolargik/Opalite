@@ -138,7 +138,7 @@ struct SwatchBarInfoSheet: View {
     // MARK: - Feature Data
 
     private var features: [(icon: String, title: String, description: String)] {
-        [
+        var items: [(icon: String, title: String, description: String)] = [
             (
                 icon: "rectangle.on.rectangle",
                 title: "Minimal Footprint",
@@ -149,17 +149,23 @@ struct SwatchBarInfoSheet: View {
                 title: "Quick Copy",
                 description: "Tap any swatch to instantly copy its hex value to your clipboard."
             ),
-            (
-                icon: "eyedropper.halffull",
-                title: "Color Sampling",
-                description: "Use any app's color picker to sample directly from SwatchBar."
-            ),
-            (
-                icon: "macwindow.on.rectangle",
-                title: "Always Accessible",
-                description: "Position it anywhere on screen while you work in other apps."
-            )
         ]
+
+        #if targetEnvironment(macCatalyst)
+        items.append((
+            icon: "eyedropper.halffull",
+            title: "Color Sampling",
+            description: "Use any app's color picker to sample directly from SwatchBar."
+        ))
+        #endif
+
+        items.append((
+            icon: "macwindow.on.rectangle",
+            title: "Always Accessible",
+            description: "Position it anywhere on screen while you work in other apps."
+        ))
+
+        return items
     }
 
     // MARK: - Feature Row

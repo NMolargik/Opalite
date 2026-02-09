@@ -463,11 +463,8 @@ final class CommunityManager {
         }
     }
 
-    /// Loads colors for multiple palettes concurrently
+    /// Loads colors for multiple palettes concurrently, updating each palette as its colors arrive
     private func loadColorsForPalettes(_ palettesToLoad: [CommunityPalette]) async {
-        // Collect all results first
-        var colorResults: [(CKRecord.ID, [CommunityColor])] = []
-
         await withTaskGroup(of: (CKRecord.ID, [CommunityColor]).self) { group in
             for palette in palettesToLoad {
                 group.addTask {
@@ -476,17 +473,12 @@ final class CommunityManager {
                 }
             }
 
-            for await result in group {
-                colorResults.append(result)
-            }
-        }
-
-        // Update palettes by replacing structs to ensure SwiftUI observes the change
-        for (paletteID, colors) in colorResults {
-            if let index = palettes.firstIndex(where: { $0.id == paletteID }) {
-                var updatedPalette = palettes[index]
-                updatedPalette.colors = colors
-                palettes[index] = updatedPalette
+            for await (paletteID, colors) in group {
+                if let index = palettes.firstIndex(where: { $0.id == paletteID }) {
+                    var updatedPalette = palettes[index]
+                    updatedPalette.colors = colors
+                    palettes[index] = updatedPalette
+                }
             }
         }
     }
@@ -548,16 +540,28 @@ final class CommunityManager {
                 }
             }
 
-            // Fetch the actual color records
-            var colors: [CommunityColor] = []
-            for recordID in colorRecordIDs {
-                if let record = try? await publicDatabase.record(for: recordID),
-                   let color = try? CommunityColor(record: record) {
-                    colors.append(color)
+            // Fetch color records concurrently, preserving sort order
+            let indexedColors = await withTaskGroup(of: (Int, CommunityColor?).self) { group in
+                for (index, recordID) in colorRecordIDs.enumerated() {
+                    group.addTask {
+                        guard let record = try? await self.publicDatabase.record(for: recordID),
+                              let color = try? CommunityColor(record: record) else {
+                            return (index, nil)
+                        }
+                        return (index, color)
+                    }
                 }
+
+                var results: [(Int, CommunityColor?)] = []
+                for await result in group {
+                    results.append(result)
+                }
+                return results
             }
 
-            return colors
+            return indexedColors
+                .sorted { $0.0 < $1.0 }
+                .compactMap(\.1)
         } catch {
             throw OpaliteError.communityFetchFailed(reason: error.localizedDescription)
         }

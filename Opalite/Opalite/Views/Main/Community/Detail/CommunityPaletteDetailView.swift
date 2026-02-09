@@ -23,8 +23,16 @@ struct CommunityPaletteDetailView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var isShowingPaywall = false
     @State private var isShowingReportSheet = false
+    @State private var isShowingRemoveConfirmation = false
+
+    private var isOwnContent: Bool {
+        communityManager.currentUserRecordID != nil &&
+        palette.publisherUserRecordID == communityManager.currentUserRecordID
+    }
 
     // Color blindness simulation
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
@@ -99,12 +107,23 @@ struct CommunityPaletteDetailView: View {
                         }
                     }
 
-                    Section {
-                        Button(role: .destructive) {
-                            HapticsManager.shared.selection()
-                            isShowingReportSheet = true
-                        } label: {
-                            Label("Report", systemImage: "flag")
+                    if isOwnContent {
+                        Section {
+                            Button(role: .destructive) {
+                                HapticsManager.shared.selection()
+                                isShowingRemoveConfirmation = true
+                            } label: {
+                                Label("Remove From Community", systemImage: "trash")
+                            }
+                        }
+                    } else {
+                        Section {
+                            Button(role: .destructive) {
+                                HapticsManager.shared.selection()
+                                isShowingReportSheet = true
+                            } label: {
+                                Label("Report", systemImage: "flag")
+                            }
                         }
                     }
                 } label: {
@@ -119,6 +138,14 @@ struct CommunityPaletteDetailView: View {
         }
         .sheet(isPresented: $isShowingReportSheet) {
             ReportItemSheet(recordID: palette.id, itemType: .palette)
+        }
+        .alert("Remove From Community", isPresented: $isShowingRemoveConfirmation) {
+            Button("Remove", role: .destructive) {
+                removeFromCommunity()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This palette will be permanently removed from the Community. This action cannot be undone.")
         }
     }
 
@@ -252,6 +279,26 @@ struct CommunityPaletteDetailView: View {
                 try await communityManager.savePaletteToPortfolio(palette, colorManager: colorManager, subscriptionManager: subscriptionManager)
                 await MainActor.run {
                     toastManager.showSuccess("Saved to Portfolio")
+                }
+            } catch let error as OpaliteError {
+                await MainActor.run {
+                    toastManager.show(error: error)
+                }
+            } catch {
+                await MainActor.run {
+                    toastManager.show(error: .unknownError(error.localizedDescription))
+                }
+            }
+        }
+    }
+
+    private func removeFromCommunity() {
+        Task {
+            do {
+                try await communityManager.unpublishPalette(recordID: palette.id)
+                await MainActor.run {
+                    toastManager.showSuccess("Removed from Community")
+                    dismiss()
                 }
             } catch let error as OpaliteError {
                 await MainActor.run {

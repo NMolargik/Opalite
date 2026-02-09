@@ -19,7 +19,8 @@
       "Bash(xcrun devicectl device process launch:*)",
       "Bash(git mv:*)",
       "Bash(echo:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(xargs dirname:*)"
     ]
   }
 }

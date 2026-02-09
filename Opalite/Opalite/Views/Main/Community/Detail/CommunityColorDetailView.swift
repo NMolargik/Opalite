@@ -26,9 +26,17 @@ struct CommunityColorDetailView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var isShowingPaywall = false
     @State private var isShowingReportSheet = false
+    @State private var isShowingRemoveConfirmation = false
     @State private var didCopyHex = false
+
+    private var isOwnContent: Bool {
+        communityManager.currentUserRecordID != nil &&
+        color.publisherUserRecordID == communityManager.currentUserRecordID
+    }
 
     // Color blindness simulation
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
@@ -82,9 +90,13 @@ struct CommunityColorDetailView: View {
                 saveToPortfolioButton
             }
 
-            // Report button
+            // Report / Remove button
             ToolbarItem(placement: .topBarTrailing) {
-                reportButton
+                if isOwnContent {
+                    removeFromCommunityButton
+                } else {
+                    reportButton
+                }
             }
         }
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
@@ -93,6 +105,14 @@ struct CommunityColorDetailView: View {
         }
         .sheet(isPresented: $isShowingReportSheet) {
             ReportItemSheet(recordID: color.id, itemType: .color)
+        }
+        .alert("Remove From Community", isPresented: $isShowingRemoveConfirmation) {
+            Button("Remove", role: .destructive) {
+                removeFromCommunity()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This color will be permanently removed from the Community. This action cannot be undone.")
         }
     }
 
@@ -114,6 +134,16 @@ struct CommunityColorDetailView: View {
             isShowingReportSheet = true
         } label: {
             Label("Report", systemImage: "flag")
+        }
+        .tint(.red)
+    }
+
+    private var removeFromCommunityButton: some View {
+        Button(role: .destructive) {
+            HapticsManager.shared.selection()
+            isShowingRemoveConfirmation = true
+        } label: {
+            Label("Remove From Community", systemImage: "trash")
         }
         .tint(.red)
     }
@@ -223,6 +253,26 @@ struct CommunityColorDetailView: View {
             toastManager.show(error: error)
         } catch {
             toastManager.show(error: .unknownError(error.localizedDescription))
+        }
+    }
+
+    private func removeFromCommunity() {
+        Task {
+            do {
+                try await communityManager.unpublishColor(recordID: color.id)
+                await MainActor.run {
+                    toastManager.showSuccess("Removed from Community")
+                    dismiss()
+                }
+            } catch let error as OpaliteError {
+                await MainActor.run {
+                    toastManager.show(error: error)
+                }
+            } catch {
+                await MainActor.run {
+                    toastManager.show(error: .unknownError(error.localizedDescription))
+                }
+            }
         }
     }
 

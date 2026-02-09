@@ -109,7 +109,7 @@ struct ColorDetailView: View {
 
                     // MARK: - Content Sections
                     VStack(spacing: 20) {
-                        HarmoniesRow(
+                        ColorHarmonyWheelView(
                             baseColor: color,
                             onCreateColor: { suggested in
                                 do {
@@ -520,7 +520,7 @@ private struct HarmoniesRow: View {
                     }
                 } label: {
                     Label(
-                        baseColor.palette != nil ? "Add To Palette" : "Save to Colors",
+                        baseColor.palette != nil ? "Add To Palette" : "Save To Colors",
                         systemImage: "plus"
                     )
                 }
@@ -552,7 +552,7 @@ private struct HarmoniesRow: View {
 
 // MARK: - Color Harmonies Info Sheet
 
-private struct ColorHarmoniesInfoSheet: View {
+struct ColorHarmoniesInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
