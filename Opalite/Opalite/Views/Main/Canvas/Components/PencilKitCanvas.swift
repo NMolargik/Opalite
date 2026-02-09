@@ -36,6 +36,25 @@ struct PencilKitCanvas: View {
 }
 
 #if os(iOS)
+
+/// PKCanvasView subclass that hooks into the view hierarchy lifecycle.
+/// On Mac Catalyst, `becomeFirstResponder()` only works once the view
+/// is in a window, so we use `didMoveToWindow()` to trigger tool picker
+/// attachment at exactly the right moment.
+private class OpaliteCanvasView: PKCanvasView {
+    /// Called by the coordinator to set itself up once the view has a window.
+    var onMovedToWindow: (() -> Void)?
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window != nil {
+            onMovedToWindow?()
+        }
+    }
+
+    override var canBecomeFirstResponder: Bool { true }
+}
+
 private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     @Binding var drawing: PKDrawing
     @Binding var inkColor: UIColor
@@ -47,14 +66,13 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     var showToolPickerTrigger: UUID
     @Binding var externalTool: PKTool?
 
-    func makeUIView(context: Context) -> PKCanvasView {
-        let view = PKCanvasView()
+    func makeUIView(context: Context) -> OpaliteCanvasView {
+        let view = OpaliteCanvasView()
         view.overrideUserInterfaceStyle = .light
         view.drawing = drawing
         view.backgroundColor = .clear
         view.isOpaque = false
         #if targetEnvironment(macCatalyst)
-        // On Mac Catalyst, allow drawing with mouse/trackpad
         view.drawingPolicy = .anyInput
         #else
         view.drawingPolicy = .default
@@ -78,7 +96,14 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             context.coordinator.viewSize = view.bounds.size
         }
 
-        // Attach tool picker
+        // Hook into didMoveToWindow so the tool picker attaches when the view
+        // is actually in the window hierarchy (critical for Mac Catalyst).
+        view.onMovedToWindow = { [weak view, weak coordinator = context.coordinator] in
+            guard let view, let coordinator else { return }
+            coordinator.attachToolPicker(to: view)
+        }
+
+        // Try attaching now (will defer if no window yet)
         context.coordinator.attachToolPicker(to: view)
 
         // Initialize tool only if we haven't seen a user change yet
@@ -94,7 +119,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: PKCanvasView, context: Context) {
+    func updateUIView(_ uiView: OpaliteCanvasView, context: Context) {
         if uiView.drawing != drawing {
             uiView.drawing = drawing
         }
@@ -180,7 +205,26 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             _drawing = drawing
             _contentOffset = contentOffset
             _zoomScale = zoomScale
+            super.init()
+
+            #if targetEnvironment(macCatalyst)
+            // On Mac Catalyst, the tool picker only shows when the window is key.
+            // Re-assert visibility whenever the window becomes key.
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(windowDidBecomeKey),
+                name: UIWindow.didBecomeKeyNotification,
+                object: nil
+            )
+            #endif
         }
+
+        #if targetEnvironment(macCatalyst)
+        @objc private func windowDidBecomeKey(_ notification: Notification) {
+            guard let canvasView, canvasView.window != nil else { return }
+            forceToolPickerVisible()
+        }
+        #endif
 
         // MARK: - UIScrollViewDelegate
 
@@ -252,23 +296,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             _ = canvasView.becomeFirstResponder()
 
             #if targetEnvironment(macCatalyst)
-            // On Mac Catalyst, aggressively ensure tool picker visibility
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak canvasView, weak toolPicker] in
-                guard let canvasView, let toolPicker else { return }
-                // Force the canvas to be first responder and show picker
-                if !canvasView.isFirstResponder {
-                    _ = canvasView.becomeFirstResponder()
-                }
-                toolPicker.setVisible(true, forFirstResponder: canvasView)
-
-                // Also try showing via the window
-                if let window = canvasView.window {
-                    toolPicker.setVisible(true, forFirstResponder: canvasView)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        _ = canvasView.becomeFirstResponder()
-                    }
-                }
-            }
+            forceToolPickerVisible()
             #endif
         }
 
@@ -291,14 +319,27 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             _ = canvasView.becomeFirstResponder()
 
             #if targetEnvironment(macCatalyst)
-            // On Mac Catalyst, the tool picker needs additional prompting to appear
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak canvasView, weak toolPicker] in
-                guard let canvasView, let toolPicker else { return }
-                toolPicker.setVisible(true, forFirstResponder: canvasView)
-                _ = canvasView.becomeFirstResponder()
-            }
+            forceToolPickerVisible()
             #endif
         }
+
+        #if targetEnvironment(macCatalyst)
+        /// On Mac Catalyst, PKToolPicker requires repeated nudges to stay visible.
+        /// This retries at increasing intervals until the picker is confirmed visible.
+        private func forceToolPickerVisible() {
+            let delays: [Double] = [0.1, 0.3, 0.6, 1.0]
+            for delay in delays {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                    guard let self, let canvasView = self.canvasView, let toolPicker = self.toolPicker else { return }
+                    guard canvasView.window != nil else { return }
+                    if !toolPicker.isVisible || !canvasView.isFirstResponder {
+                        toolPicker.setVisible(true, forFirstResponder: canvasView)
+                        _ = canvasView.becomeFirstResponder()
+                    }
+                }
+            }
+        }
+        #endif
 
         func toolPickerSelectedToolDidChange(_ toolPicker: PKToolPicker) {
             if !isProgrammaticToolChange {
@@ -310,16 +351,18 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             // If the tool picker became hidden unexpectedly, try to re-show it
             guard let canvasView = canvasView else { return }
 
-            if !toolPicker.isVisible {
-                // Delay slightly to avoid interfering with intentional dismissals
+            if !toolPicker.isVisible && canvasView.window != nil {
+                #if targetEnvironment(macCatalyst)
+                forceToolPickerVisible()
+                #else
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak canvasView, weak toolPicker] in
                     guard let canvasView, let toolPicker else { return }
-                    // Only re-show if the canvas is still in the window hierarchy
                     if canvasView.window != nil {
                         toolPicker.setVisible(true, forFirstResponder: canvasView)
                         _ = canvasView.becomeFirstResponder()
                     }
                 }
+                #endif
             }
         }
 
@@ -328,6 +371,9 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         }
 
         deinit {
+            #if targetEnvironment(macCatalyst)
+            NotificationCenter.default.removeObserver(self)
+            #endif
             if let toolPicker {
                 toolPicker.removeObserver(self)
                 if let canvasView {

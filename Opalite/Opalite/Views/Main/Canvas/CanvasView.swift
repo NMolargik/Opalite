@@ -29,6 +29,10 @@ struct CanvasView: View {
     @State private var showDeleteConfirmation: Bool = false
     @State private var showToolPickerTrigger: UUID = UUID()
     @State private var externalTool: PKTool?
+    #if targetEnvironment(macCatalyst)
+    @State private var catalystStrokeWidth: CGFloat = 4
+    @State private var catalystInkType: PKInkingTool.InkType = .pen
+    #endif
 
     // Color sampling state
     @State private var isColorSamplingMode: Bool = false
@@ -41,12 +45,6 @@ struct CanvasView: View {
     // Export state
     @State private var exportedImage: UIImage?
     @State private var showShareSheet: Bool = false
-
-    // Mac Catalyst custom tool picker state
-    #if targetEnvironment(macCatalyst)
-    @State private var selectedTool: PKTool = PKInkingTool(.pen, color: .label, width: 4)
-    @State private var strokeWidth: CGFloat = 4
-    #endif
 
     // MARK: - Canvas Size & Scroll State
     @State private var effectiveCanvasSize: CGSize?
@@ -146,34 +144,8 @@ struct CanvasView: View {
                 forceColorUpdate = UUID()
                 // Force tool picker to reappear after selecting a swatch
                 showToolPickerTrigger = UUID()
-                #if targetEnvironment(macCatalyst)
-                // Update the selected tool color, switching from eraser to pen if needed
-                if let inkTool = selectedTool as? PKInkingTool {
-                    selectedTool = PKInkingTool(inkTool.inkType, color: color.uiColor, width: inkTool.width)
-                } else {
-                    // Currently on eraser or other non-inking tool, switch to pen
-                    selectedTool = PKInkingTool(.pen, color: color.uiColor, width: strokeWidth)
-                    externalTool = selectedTool
-                }
-                #endif
             }
         }
-        #if targetEnvironment(macCatalyst)
-        .overlay(alignment: .bottom) {
-            MacCatalystToolPicker(
-                selectedTool: Binding(
-                    get: { selectedTool },
-                    set: { newTool in
-                        selectedTool = newTool
-                        externalTool = newTool
-                    }
-                ),
-                selectedColor: $selectedInkColor,
-                strokeWidth: $strokeWidth
-            )
-            .padding(.bottom, 20)
-        }
-        #endif
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -235,6 +207,12 @@ struct CanvasView: View {
                             }
                         }
 
+                        #if targetEnvironment(macCatalyst)
+                        Section("Drawing Tools") {
+                            drawingToolMenuItems
+                        }
+                        #endif
+
                         Section {
                             Button(role: .destructive) {
                                 HapticsManager.shared.impact()
@@ -267,6 +245,17 @@ struct CanvasView: View {
                     }
                     .toolbarButtonTint()
                 }
+
+                #if targetEnvironment(macCatalyst)
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        drawingToolMenuItems
+                    } label: {
+                        Label("Drawing Tools", systemImage: "pencil.and.ruler")
+                    }
+                    .toolbarButtonTint()
+                }
+                #endif
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -576,6 +565,89 @@ struct CanvasView: View {
 
         isColorSamplingMode = false
     }
+
+    // MARK: - Mac Catalyst Drawing Tools
+
+    #if targetEnvironment(macCatalyst)
+    @ViewBuilder
+    private var drawingToolMenuItems: some View {
+        Section("Ink Type") {
+            Button {
+                catalystInkType = .pen
+                externalTool = PKInkingTool(.pen, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Pen", systemImage: catalystInkType == .pen ? "checkmark" : "pencil")
+            }
+
+            Button {
+                catalystInkType = .pencil
+                externalTool = PKInkingTool(.pencil, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Pencil", systemImage: catalystInkType == .pencil ? "checkmark" : "pencil.line")
+            }
+
+            Button {
+                catalystInkType = .marker
+                externalTool = PKInkingTool(.marker, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Marker", systemImage: catalystInkType == .marker ? "checkmark" : "highlighter")
+            }
+
+            Button {
+                catalystInkType = .monoline
+                externalTool = PKInkingTool(.monoline, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Monoline", systemImage: catalystInkType == .monoline ? "checkmark" : "line.diagonal")
+            }
+
+            Button {
+                catalystInkType = .fountainPen
+                externalTool = PKInkingTool(.fountainPen, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Fountain Pen", systemImage: catalystInkType == .fountainPen ? "checkmark" : "paintbrush.pointed")
+            }
+
+            Button {
+                catalystInkType = .watercolor
+                externalTool = PKInkingTool(.watercolor, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Watercolor", systemImage: catalystInkType == .watercolor ? "checkmark" : "drop")
+            }
+
+            Button {
+                catalystInkType = .crayon
+                externalTool = PKInkingTool(.crayon, color: selectedInkColor, width: catalystStrokeWidth)
+            } label: {
+                Label("Crayon", systemImage: catalystInkType == .crayon ? "checkmark" : "pencil.tip")
+            }
+        }
+
+        Section("Eraser") {
+            Button {
+                externalTool = PKEraserTool(.bitmap)
+            } label: {
+                Label("Pixel Eraser", systemImage: "eraser")
+            }
+
+            Button {
+                externalTool = PKEraserTool(.vector)
+            } label: {
+                Label("Object Eraser", systemImage: "eraser.line.dashed")
+            }
+        }
+
+        Section("Stroke Width") {
+            ForEach([2, 4, 8, 12, 20], id: \.self) { (width: Int) in
+                Button {
+                    catalystStrokeWidth = CGFloat(width)
+                    externalTool = PKInkingTool(catalystInkType, color: selectedInkColor, width: CGFloat(width))
+                } label: {
+                    Label("\(width)pt", systemImage: catalystStrokeWidth == CGFloat(width) ? "checkmark" : "circle")
+                }
+            }
+        }
+    }
+    #endif
 
     // MARK: - Export
 
