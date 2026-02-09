@@ -255,6 +255,7 @@ private extension PortfolioView {
             palette: viewModel.pendingPaletteToAddTo,
             swatchWidth: viewModel.swatchSize.size,
             swatchHeight: viewModel.swatchSize.size,
+            swatchCornerRadius: viewModel.swatchSize.cornerRadius,
             showOverlays: viewModel.looseColorShowOverlays(swatchShowsOverlays: viewModel.swatchSize.showOverlays),
             showsNavigation: viewModel.looseColorShowsNavigation,
             onTap: viewModel.isEditingColors ? { color in viewModel.handleColorTap(color) } : nil,
@@ -357,6 +358,7 @@ private extension PortfolioView {
                 palette: palette,
                 swatchWidth: viewModel.swatchSize.size,
                 swatchHeight: viewModel.swatchSize.size,
+                swatchCornerRadius: viewModel.swatchSize.cornerRadius,
                 showOverlays: viewModel.swatchSize.showOverlays,
                 menuContent: { color in
                     if viewModel.swatchSize.showOverlays {

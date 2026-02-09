@@ -1354,6 +1354,39 @@ struct CanvasShapeTests {
             }
         }
     }
+
+    @Test func constrainedAspectRatioSquare() {
+        #expect(CanvasShape.square.constrainedAspectRatio == 1.0)
+    }
+
+    @Test func constrainedAspectRatioCircle() {
+        #expect(CanvasShape.circle.constrainedAspectRatio == 1.0)
+    }
+
+    @Test func constrainedAspectRatioTriangle() {
+        let ratio = CanvasShape.triangle.constrainedAspectRatio
+        #expect(ratio != nil)
+        // 1.0 / 0.866 ≈ 1.1547
+        #expect(abs(ratio! - (1.0 / 0.866)) < 0.001)
+    }
+
+    @Test func constrainedAspectRatioShirt() {
+        let ratio = CanvasShape.shirt.constrainedAspectRatio
+        #expect(ratio != nil)
+        #expect(abs(ratio! - (1260.0 / 1000.0)) < 0.001)
+    }
+
+    @Test func constrainedAspectRatioRectangleIsFreeForm() {
+        #expect(CanvasShape.rectangle.constrainedAspectRatio == nil)
+    }
+
+    @Test func constrainedAspectRatioLineIsFreeForm() {
+        #expect(CanvasShape.line.constrainedAspectRatio == nil)
+    }
+
+    @Test func constrainedAspectRatioArrowIsFreeForm() {
+        #expect(CanvasShape.arrow.constrainedAspectRatio == nil)
+    }
 }
 
 // MARK: - ColorPickerTab Tests
@@ -1509,34 +1542,39 @@ struct PreviewBackgroundTests {
 struct SwatchSizeTests {
 
     @Test func allCasesExist() {
-        #expect(SwatchSize.allCases.count == 3)
+        #expect(SwatchSize.allCases.count == 4)
     }
 
     @Test func sizeValues() {
+        #expect(SwatchSize.extraSmall.size == 40)
         #expect(SwatchSize.small.size == 75)
         #expect(SwatchSize.medium.size == 150)
         #expect(SwatchSize.large.size == 250)
     }
 
     @Test func showOverlays() {
+        #expect(SwatchSize.extraSmall.showOverlays == false)
         #expect(SwatchSize.small.showOverlays == false)
         #expect(SwatchSize.medium.showOverlays == true)
         #expect(SwatchSize.large.showOverlays == true)
     }
 
     @Test func nextCyclesThroughAll() {
+        #expect(SwatchSize.extraSmall.next == .small)
         #expect(SwatchSize.small.next == .medium)
         #expect(SwatchSize.medium.next == .large)
-        #expect(SwatchSize.large.next == .small)
+        #expect(SwatchSize.large.next == .extraSmall)
     }
 
-    @Test func nextCompactCyclesBetweenSmallAndMedium() {
+    @Test func nextCompactCyclesBetweenExtraSmallSmallAndMedium() {
+        #expect(SwatchSize.extraSmall.nextCompact == .small)
         #expect(SwatchSize.small.nextCompact == .medium)
-        #expect(SwatchSize.medium.nextCompact == .small)
-        #expect(SwatchSize.large.nextCompact == .small)
+        #expect(SwatchSize.medium.nextCompact == .extraSmall)
+        #expect(SwatchSize.large.nextCompact == .extraSmall)
     }
 
     @Test func accessibilityNames() {
+        #expect(SwatchSize.extraSmall.accessibilityName == "Extra Small")
         #expect(SwatchSize.small.accessibilityName == "Small")
         #expect(SwatchSize.medium.accessibilityName == "Medium")
         #expect(SwatchSize.large.accessibilityName == "Large")
@@ -2884,71 +2922,6 @@ struct SharingServiceUtilityTests {
     }
 }
 
-// MARK: - PalettePreviewLayoutInfo Tests
-
-struct PalettePreviewLayoutInfoTests {
-
-    @Test func zeroColorsReturnsEmpty() {
-        let layout = PalettePreviewLayoutInfo.calculate(colorCount: 0, availableWidth: 300, availableHeight: 200)
-        #expect(layout.rows == 0)
-        #expect(layout.columns == 0)
-        #expect(layout.swatchSize == 0)
-    }
-
-    @Test func singleColor() {
-        let layout = PalettePreviewLayoutInfo.calculate(colorCount: 1, availableWidth: 300, availableHeight: 200)
-        #expect(layout.rows == 1)
-        #expect(layout.columns == 1)
-        #expect(layout.swatchSize > 0)
-    }
-
-    @Test func twoColors() {
-        let layout = PalettePreviewLayoutInfo.calculate(colorCount: 2, availableWidth: 300, availableHeight: 100)
-        #expect(layout.columns >= 1)
-        #expect(layout.rows >= 1)
-        #expect(layout.swatchSize > 0)
-    }
-
-    @Test func manyColorsUsesTwoRows() {
-        let layout = PalettePreviewLayoutInfo.calculate(colorCount: 10, availableWidth: 300, availableHeight: 200)
-        // With many colors, should use 2 rows for larger swatches
-        #expect(layout.rows >= 1)
-        #expect(layout.rows <= 2)
-        #expect(layout.swatchSize > 0)
-    }
-
-    @Test func customMaxRows() {
-        let layout = PalettePreviewLayoutInfo.calculate(
-            colorCount: 20,
-            availableWidth: 600,
-            availableHeight: 400,
-            maxRows: 3
-        )
-        #expect(layout.rows >= 1)
-        #expect(layout.rows <= 3)
-    }
-
-    @Test func layoutMaximizesSwatchSize() {
-        // For 4 colors in a wide container, 1 row should give bigger swatches
-        let layout1Row = PalettePreviewLayoutInfo.calculate(
-            colorCount: 4,
-            availableWidth: 800,
-            availableHeight: 100,
-            maxRows: 1
-        )
-        // The layout should fit within available space
-        let totalWidth = CGFloat(layout1Row.columns) * layout1Row.swatchSize
-        #expect(totalWidth <= 800 + 1) // +1 for floating point tolerance
-    }
-
-    @Test func spacingValues() {
-        let layout = PalettePreviewLayoutInfo.calculate(colorCount: 6, availableWidth: 400, availableHeight: 200)
-        // Spacing should be non-negative
-        #expect(layout.horizontalSpacing >= 0)
-        #expect(layout.verticalSpacing >= 0)
-    }
-}
-
 // MARK: - ImportCoordinator Tests
 
 struct ImportCoordinatorTests {
@@ -3650,7 +3623,7 @@ struct PalettePreviewLayoutInfoTests {
             availableHeight: 200
         )
         #expect(layout.rows == 1)
-        #expect(layout.columns == 1)
+        #expect(layout.columns == 1) 
         #expect(layout.swatchSize > 0)
         #expect(layout.showHexBadges == false)
     }
@@ -3774,44 +3747,6 @@ struct DateFormattingTests {
         components.day = 8
         let date = Calendar.current.date(from: components)!
         #expect(date.formattedShortDate == "Feb 8")
-    }
-}
-
-// MARK: - CanvasShape Tests
-
-struct CanvasShapeTests {
-
-    @Test func constrainedAspectRatioSquare() {
-        #expect(CanvasShape.square.constrainedAspectRatio == 1.0)
-    }
-
-    @Test func constrainedAspectRatioCircle() {
-        #expect(CanvasShape.circle.constrainedAspectRatio == 1.0)
-    }
-
-    @Test func constrainedAspectRatioTriangle() {
-        let ratio = CanvasShape.triangle.constrainedAspectRatio
-        #expect(ratio != nil)
-        // 1.0 / 0.866 ≈ 1.1547
-        #expect(abs(ratio! - (1.0 / 0.866)) < 0.001)
-    }
-
-    @Test func constrainedAspectRatioShirt() {
-        let ratio = CanvasShape.shirt.constrainedAspectRatio
-        #expect(ratio != nil)
-        #expect(abs(ratio! - (1260.0 / 1000.0)) < 0.001)
-    }
-
-    @Test func constrainedAspectRatioRectangleIsFreeForm() {
-        #expect(CanvasShape.rectangle.constrainedAspectRatio == nil)
-    }
-
-    @Test func constrainedAspectRatioLineIsFreeForm() {
-        #expect(CanvasShape.line.constrainedAspectRatio == nil)
-    }
-
-    @Test func constrainedAspectRatioArrowIsFreeForm() {
-        #expect(CanvasShape.arrow.constrainedAspectRatio == nil)
     }
 }
 

@@ -18,6 +18,7 @@ struct SwatchRowView: View {
     let palette: OpalitePalette?
     let swatchWidth: CGFloat
     let swatchHeight: CGFloat
+    var swatchCornerRadius: CGFloat = 16
     var showOverlays: Bool = false
     var showsNavigation: Bool = true
     var acceptsDrops: Bool = true
@@ -40,6 +41,7 @@ struct SwatchRowView: View {
         palette: OpalitePalette?,
         swatchWidth: CGFloat,
         swatchHeight: CGFloat,
+        swatchCornerRadius: CGFloat = 16,
         showOverlays: Bool = false,
         showsNavigation: Bool = true,
         acceptsDrops: Bool = true,
@@ -54,6 +56,7 @@ struct SwatchRowView: View {
         self.palette = palette
         self.swatchWidth = swatchWidth
         self.swatchHeight = swatchHeight
+        self.swatchCornerRadius = swatchCornerRadius
         self.showOverlays = showOverlays
         self.showsNavigation = showsNavigation
         self.acceptsDrops = acceptsDrops
@@ -204,6 +207,7 @@ struct SwatchRowView: View {
             color: color,
             width: swatchWidth,
             height: swatchHeight,
+            cornerRadius: swatchCornerRadius,
             badgeText: color.name ?? color.hexString,
             showOverlays: showOverlays,
             isEditingBadge: .constant(nil),

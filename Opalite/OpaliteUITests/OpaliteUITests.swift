@@ -540,12 +540,14 @@ final class OpalitePortfolioWorkflowTests: XCTestCase {
     }
 
     /// Ensures the swatch size is set to medium so that overlay menus (ellipsis) are visible.
-    /// On compact displays, taps the "Change swatch size" toolbar button if currently "Small".
+    /// On compact displays, taps the "Change swatch size" toolbar button until it reaches "Medium".
     @MainActor
     private func ensureMediumSwatchSize() {
         let changeSizeButton = app.buttons["Change swatch size"]
         guard changeSizeButton.waitForExistence(timeout: 5) else { return }
-        if changeSizeButton.value as? String == "Small" {
+        // Cycle past Extra Small and Small until we reach Medium
+        while let value = changeSizeButton.value as? String,
+              value == "Extra Small" || value == "Small" {
             changeSizeButton.tap()
             sleep(1)
         }
@@ -603,7 +605,7 @@ final class OpalitePortfolioWorkflowTests: XCTestCase {
         XCTAssertTrue(createMenu.waitForExistence(timeout: 5))
         createMenu.tap()
 
-        let newColorButton = app.buttons["Create Color"]
+        let newColorButton = app.buttons["Create A Color"]
         XCTAssertTrue(newColorButton.waitForExistence(timeout: 3))
         newColorButton.tap()
 
