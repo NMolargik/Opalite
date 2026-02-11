@@ -23,60 +23,84 @@ struct PaletteDetailView: View {
     @State private var isSavingNotes: Bool = false
     @State private var isShowingExportSheet: Bool = false
     @State private var isShowingColorEditor: Bool = false
+    @State private var isShowingFullScreen: Bool = false
+    @State private var showFullScreenControls: Bool = false
+    @State private var currentColorIndex: Int = 0
+
+    @Namespace private var heroNamespace
 
     let palette: OpalitePalette
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                // MARK: - Hero Preview
-                PalettePreviewView(
-                    palette: palette,
-                    isEditingName: $isEditingName
-                )
-                .padding(.horizontal)
-                .padding(.top)
-                .overlay(alignment: .bottom) {
-                    PaletteInfoTilesRow(palette: palette)
-                        .padding(.horizontal, 30)
-                        .offset(y: 45)
-                        .zIndex(1)
-                }
-
-                Spacer(minLength: 80)
-
-                // MARK: - Content Sections
-                VStack(spacing: 20) {
-                    // Notes section
-                    NotesSectionView(
-                        notes: $notesDraft,
-                        isSaving: $isSavingNotes,
-                        onSave: {
-                            isSavingNotes = true
-                            defer { isSavingNotes = false }
-
-                            do {
-                                try colorManager.updatePalette(palette) { pal in
-                                    let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                                    pal.notes = trimmed.isEmpty ? nil : trimmed
-                                }
-                            } catch {
-                                toastManager.show(error: .paletteUpdateFailed)
-                            }
-                        }
+        ZStack {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // MARK: - Hero Preview
+                    PalettePreviewView(
+                        palette: palette,
+                        isEditingName: $isEditingName
                     )
+                    .opacity(isShowingFullScreen ? 0 : 1)
+                    .padding(.horizontal)
+                    .padding(.top)
+                    .overlay(alignment: .bottom) {
+                        PaletteInfoTilesRow(palette: palette)
+                            .padding(.horizontal, 30)
+                            .offset(y: 45)
+                            .zIndex(1)
+                            .opacity(isShowingFullScreen ? 0 : 1)
+                    }
+
+                    Spacer(minLength: 80)
+
+                    // MARK: - Content Sections
+                    VStack(spacing: 20) {
+                        // Notes section
+                        NotesSectionView(
+                            notes: $notesDraft,
+                            isSaving: $isSavingNotes,
+                            onSave: {
+                                isSavingNotes = true
+                                defer { isSavingNotes = false }
+
+                                do {
+                                    try colorManager.updatePalette(palette) { pal in
+                                        let trimmed = notesDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        pal.notes = trimmed.isEmpty ? nil : trimmed
+                                    }
+                                } catch {
+                                    toastManager.show(error: .paletteUpdateFailed)
+                                }
+                            }
+                        )
+                    }
+                    .opacity(isShowingFullScreen ? 0 : 1)
+                    .padding(.horizontal)
+                    .padding(.top, -20)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal)
-                .padding(.top, -20)
-                .padding(.bottom, 24)
+            }
+            .scrollDisabled(isShowingFullScreen)
+
+            // MARK: - Full Screen Overlay
+            if isShowingFullScreen {
+                fullScreenOverlay
+                    .ignoresSafeArea()
+
             }
         }
+        .toolbar(isShowingFullScreen ? .hidden : .automatic, for: .navigationBar)
+        .statusBarHidden(isShowingFullScreen)
         .onAppear {
             notesDraft = palette.notes ?? ""
             colorManager.activePalette = palette
         }
         .onDisappear {
             colorManager.activePalette = nil
+            if isShowingFullScreen {
+                isShowingFullScreen = false
+                showFullScreenControls = false
+            }
         }
         .onChange(of: colorManager.renamePaletteTrigger) { _, newValue in
             if newValue != nil {
@@ -123,6 +147,27 @@ struct PaletteDetailView: View {
             Text("This action cannot be undone.")
         }
         .toolbar {
+            // Full screen button
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticsManager.shared.selection()
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.9)) {
+                        isShowingFullScreen = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showFullScreenControls = true
+                        }
+                    }
+                } label: {
+                    Label("Full Screen", systemImage: "arrow.up.left.and.arrow.down.right")
+                }
+                .tint(.inverseTheme)
+                .disabled(palette.sortedColors.isEmpty)
+                .accessibilityLabel("View palette in full screen")
+                .accessibilityHint("Shows the palette colors in full screen view")
+            }
+
             // Export button first for priority
             ToolbarItem(placement: .confirmationAction) {
                 Button {
@@ -214,6 +259,86 @@ struct PaletteDetailView: View {
                     isShowingColorEditor = false
                 }
             )
+        }
+    }
+
+    // MARK: - Full Screen Overlay
+
+    private var fullScreenOverlay: some View {
+        TabView(selection: $currentColorIndex) {
+            ForEach(Array(palette.sortedColors.enumerated()), id: \.element.id) { index, color in
+                SwatchView(
+                    color: color,
+                    cornerRadius: 0,
+                    showBorder: false,
+                    badgeText: "",
+                    showOverlays: false
+                )
+                .ignoresSafeArea()
+                .onTapGesture {
+                    dismissFullScreen()
+                }
+                .overlay(alignment: .top) {
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Spacer()
+                            
+                            Text(color.name ?? color.hexString)
+                                .foregroundStyle(color.idealTextColor())
+                                .bold()
+                                .padding(12)
+                                .glassIfAvailable(
+                                    GlassConfiguration(style: .clear)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            
+                            Button {
+                                HapticsManager.shared.selection()
+                                dismissFullScreen()
+                            } label: {
+                                Image(systemName: "arrow.up.right.and.arrow.down.left")
+                                    .foregroundStyle(color.idealTextColor())
+                                    .bold()
+                                    .font(.title2)
+                                    .padding(12)
+                                    .glassIfAvailable()
+                            }
+                        }
+                        
+                        HStack {
+                            Spacer()
+                            customPageIndicator(for: color)
+                                .padding(.top, 8)
+                        }
+                    }
+                    .padding()
+                    .opacity(showFullScreenControls ? 1 : 0)
+                }
+                .tag(index)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+    }
+    
+    private func customPageIndicator(for color: OpaliteColor) -> some View {
+        Text("\(currentColorIndex + 1) of \(palette.sortedColors.count)")
+            .foregroundStyle(color.idealTextColor())
+            .font(.subheadline)
+            .bold()
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .glassIfAvailable(
+                GlassConfiguration(style: .clear)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func dismissFullScreen() {
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showFullScreenControls = false
+        }
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
+            isShowingFullScreen = false
         }
     }
 
