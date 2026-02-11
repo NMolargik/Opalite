@@ -26,6 +26,8 @@ struct PaletteDetailView: View {
     @State private var isShowingFullScreen: Bool = false
     @State private var showFullScreenControls: Bool = false
     @State private var currentColorIndex: Int = 0
+    @State private var lastSqueezeTime: Date = .distantPast
+    @State private var lastDoubleTapTime: Date = .distantPast
 
     @Namespace private var heroNamespace
 
@@ -275,8 +277,37 @@ struct PaletteDetailView: View {
                     showOverlays: false
                 )
                 .ignoresSafeArea()
-                .onTapGesture {
-                    dismissFullScreen()
+                .onPencilDoubleTap { _ in
+                    handlePencilDoubleTap()
+                }
+                .onPencilSqueeze { phase in
+                    switch phase {
+                    case .active:
+                        handlePencilSqueeze()
+                    case .ended:
+                        break
+                    case .failed:
+                        break
+                    }
+                }
+                .overlay {
+                    GeometryReader { geometry in
+                        HStack(spacing: 0) {
+                            // Left half - go to previous
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    goToPreviousColor()
+                                }
+                            
+                            // Right half - go to next
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    goToNextColor()
+                                }
+                        }
+                    }
                 }
                 .overlay(alignment: .top) {
                     VStack(spacing: 0) {
@@ -313,11 +344,52 @@ struct PaletteDetailView: View {
                     }
                     .padding()
                     .opacity(showFullScreenControls ? 1 : 0)
+                    .allowsHitTesting(true)
                 }
                 .tag(index)
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
+    }
+    
+    private func goToPreviousColor() {
+        HapticsManager.shared.selection()
+        withAnimation {
+            if currentColorIndex > 0 {
+                currentColorIndex -= 1
+            }
+        }
+    }
+    
+    private func goToNextColor() {
+        HapticsManager.shared.selection()
+        withAnimation {
+            if currentColorIndex < palette.sortedColors.count - 1 {
+                currentColorIndex += 1
+            }
+        }
+    }
+    
+    private func handlePencilSqueeze() {
+        let now = Date()
+        let timeSinceLastSqueeze = now.timeIntervalSince(lastSqueezeTime)
+        
+        // Debounce: only allow one squeeze action per 0.5 seconds
+        guard timeSinceLastSqueeze > 0.5 else { return }
+        
+        lastSqueezeTime = now
+        goToNextColor()
+    }
+    
+    private func handlePencilDoubleTap() {
+        let now = Date()
+        let timeSinceLastDoubleTap = now.timeIntervalSince(lastDoubleTapTime)
+        
+        // Debounce: only allow one double-tap action per 0.3 seconds
+        guard timeSinceLastDoubleTap > 0.3 else { return }
+        
+        lastDoubleTapTime = now
+        goToPreviousColor()
     }
     
     private func customPageIndicator(for color: OpaliteColor) -> some View {

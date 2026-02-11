@@ -267,6 +267,7 @@ struct ColorDetailView: View {
                         Button {
                             HapticsManager.shared.selection()
                             hexCopyManager.copyHex(for: color)
+                            toastManager.show(message: "Code Copied", style: .success)
                         } label: {
                             Label(color.hexString, systemImage: "number")
                         }
@@ -274,6 +275,7 @@ struct ColorDetailView: View {
                         Button {
                             HapticsManager.shared.selection()
                             copyToClipboard(color.rgbString)
+                            toastManager.show(message: "Code Copied", style: .success)
                         } label: {
                             Label(color.rgbString, systemImage: "slider.horizontal.3")
                         }
@@ -281,6 +283,7 @@ struct ColorDetailView: View {
                         Button {
                             HapticsManager.shared.selection()
                             copyToClipboard(color.hslString)
+                            toastManager.show(message: "Code Copied", style: .success)
                         } label: {
                             Label(color.hslString, systemImage: "circle.lefthalf.filled")
                         }
