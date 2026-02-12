@@ -91,9 +91,12 @@ class HexCopyManager {
     private func performCopy(for color: OpaliteColor) {
         let hex = formattedHex(for: color)
 
-        #if os(iOS) || os(visionOS)
+        #if os(iOS)
         UIPasteboard.general.string = hex
         HapticsManager.shared.impact(.light)
+        #elseif os(visionOS)
+        UIPasteboard.general.string = hex
+        HapticsManager.shared.impact()
         #elseif os(macOS)
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(hex, forType: .string)

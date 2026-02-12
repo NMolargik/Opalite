@@ -238,64 +238,74 @@ struct ColorHarmonyWheelView: View {
             let markerRadius = size / 2 - ringWidth / 2
 
             ZStack {
-                // Hue ring
-                Circle()
-                    .stroke(
-                        AngularGradient(
-                            colors: [.red, .yellow, .green, .cyan, .blue, .purple, .red],
-                            center: .center,
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(270)
-                        ),
-                        lineWidth: ringWidth
-                    )
-                    .padding(ringWidth / 2)
-
-                // Overlay shape connecting points
-                HarmonyOverlayShape(
-                    angle0: paddedAngles[0],
-                    angle1: paddedAngles[1],
-                    angle2: paddedAngles[2],
-                    angle3: paddedAngles[3],
-                    pointCount: totalPoints
-                )
-                .stroke(
-                    Color.primary.opacity(0.4),
-                    style: StrokeStyle(lineWidth: 2, dash: [6, 4])
-                )
-                .padding(ringWidth / 2)
-
-                // Harmony markers (drawn first so base sits on top)
-                ForEach(Array(selectedHarmony.hueOffsets.enumerated()), id: \.offset) { index, hueOffset in
-                    let angle = (baseHue + hueOffset - 90) * .pi / 180
-                    let color = harmonyColors[index]
-                    Circle()
-                        .fill(color.swiftUIColor)
-                        .frame(width: 16, height: 16)
-                        .overlay(
-                            Circle().stroke(.white, lineWidth: 2)
-                        )
-                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                        .position(
-                            x: centerX + markerRadius * cos(angle),
-                            y: centerY + markerRadius * sin(angle)
-                        )
-                }
-
-                // Base color marker (on top)
-                Circle()
-                    .fill(baseColor.swiftUIColor)
-                    .frame(width: 22, height: 22)
-                    .overlay(
-                        Circle().stroke(.white, lineWidth: 3)
-                    )
-                    .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
-                    .position(
-                        x: centerX + markerRadius * cos((baseHue - 90) * .pi / 180),
-                        y: centerY + markerRadius * sin((baseHue - 90) * .pi / 180)
-                    )
+                hueRing(ringWidth: ringWidth)
+                harmonyOverlay(ringWidth: ringWidth)
+                harmonyMarkers(centerX: centerX, centerY: centerY, markerRadius: markerRadius)
+                baseMarker(centerX: centerX, centerY: centerY, markerRadius: markerRadius)
             }
         }
+    }
+
+    private func hueRing(ringWidth: CGFloat) -> some View {
+        Circle()
+            .stroke(
+                AngularGradient(
+                    colors: [.red, .yellow, .green, .cyan, .blue, .purple, .red],
+                    center: .center,
+                    startAngle: .degrees(-90),
+                    endAngle: .degrees(270)
+                ),
+                lineWidth: ringWidth
+            )
+            .padding(ringWidth / 2)
+    }
+
+    private func harmonyOverlay(ringWidth: CGFloat) -> some View {
+        HarmonyOverlayShape(
+            angle0: paddedAngles[0],
+            angle1: paddedAngles[1],
+            angle2: paddedAngles[2],
+            angle3: paddedAngles[3],
+            pointCount: totalPoints
+        )
+        .stroke(
+            Color.primary.opacity(0.4),
+            style: StrokeStyle(lineWidth: 2, dash: [6, 4])
+        )
+        .padding(ringWidth / 2)
+    }
+
+    private func harmonyMarkers(centerX: CGFloat, centerY: CGFloat, markerRadius: CGFloat) -> some View {
+        let offsets = selectedHarmony.hueOffsets
+        let colors = harmonyColors
+        return ForEach(0..<offsets.count, id: \.self) { index in
+            let angle: CGFloat = (baseHue + offsets[index] - 90) * .pi / 180
+            Circle()
+                .fill(colors[index].swiftUIColor)
+                .frame(width: 16, height: 16)
+                .overlay(
+                    Circle().stroke(Color.white, lineWidth: 2)
+                )
+                .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+                .position(
+                    x: centerX + markerRadius * cos(angle),
+                    y: centerY + markerRadius * sin(angle)
+                )
+        }
+    }
+
+    private func baseMarker(centerX: CGFloat, centerY: CGFloat, markerRadius: CGFloat) -> some View {
+        Circle()
+            .fill(baseColor.swiftUIColor)
+            .frame(width: 22, height: 22)
+            .overlay(
+                Circle().stroke(.white, lineWidth: 3)
+            )
+            .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
+            .position(
+                x: centerX + markerRadius * cos((baseHue - 90) * .pi / 180),
+                y: centerY + markerRadius * sin((baseHue - 90) * .pi / 180)
+            )
     }
 
     // MARK: - Swatch Row
@@ -367,7 +377,12 @@ private struct HarmonyChipBackground: ViewModifier {
             if isSelected {
                 content.background(tintColor.opacity(0.25), in: Capsule())
             } else {
+                #if os(visionOS)
+                // glassEffect is unavailable on visionOS, use material instead
+                content.background(.ultraThinMaterial, in: Capsule())
+                #else
                 content.glassEffect(.regular, in: Capsule())
+                #endif
             }
         } else {
             if isSelected {

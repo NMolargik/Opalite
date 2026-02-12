@@ -319,7 +319,9 @@ extension PortfolioView {
         }
 
         func confirmBatchDelete(looseColors: [OpaliteColor]) {
+            #if os(iOS)
             HapticsManager.shared.notification(.warning)
+            #endif
             colorsToDelete = looseColors.filter { selectedColorIDs.contains($0.id) }
         }
 

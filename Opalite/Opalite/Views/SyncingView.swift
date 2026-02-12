@@ -179,7 +179,9 @@ struct SyncingView: View {
     }
 
     private func completeSync() {
+        #if !os(visionOS)
         HapticsManager.shared.impact(.light)
+        #endif
         onComplete()
     }
 }

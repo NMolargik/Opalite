@@ -144,51 +144,53 @@ struct PhotoColorPickerSheet: View {
 
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
-        VStack(spacing: 8) {
-            GeometryReader { geometry in
-                let viewSize = geometry.size
-                // Calculate where the image actually appears within the view when using scaledToFit
-                let imageRect = calculateImageRect(for: uiImage, in: viewSize)
+        GeometryReader { outerGeometry in
+            VStack(spacing: 8) {
+                GeometryReader { geometry in
+                    let viewSize = geometry.size
+                    // Calculate where the image actually appears within the view when using scaledToFit
+                    let imageRect = calculateImageRect(for: uiImage, in: viewSize)
 
-                ZStack {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: viewSize.width, height: viewSize.height)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(.secondary.opacity(0.3))
-                        )
-
-                    if let point = sampledPoint {
-                        Circle()
-                            .fill(currentColor?.swiftUIColor ?? .clear)
-                            .frame(width: 32, height: 32)
+                    ZStack {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: viewSize.width, height: viewSize.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
-                                Circle()
-                                    .strokeBorder(.white, lineWidth: 3)
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(.secondary.opacity(0.3))
                             )
-                            .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
-                            .position(point)
-                    }
-                }
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            handleSample(at: value.location, imageRect: imageRect, image: uiImage)
-                        }
-                        .onEnded { value in
-                            handleSample(at: value.location, imageRect: imageRect, image: uiImage)
-                        }
-                )
-            }
-            .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: UIScreen.main.bounds.width - 32))
 
-            Text("Tap or drag on the image to pick a color")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                        if let point = sampledPoint {
+                            Circle()
+                                .fill(currentColor?.swiftUIColor ?? .clear)
+                                .frame(width: 32, height: 32)
+                                .overlay(
+                                    Circle()
+                                        .strokeBorder(.white, lineWidth: 3)
+                                )
+                                .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
+                                .position(point)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                handleSample(at: value.location, imageRect: imageRect, image: uiImage)
+                            }
+                            .onEnded { value in
+                                handleSample(at: value.location, imageRect: imageRect, image: uiImage)
+                            }
+                    )
+                }
+                .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: outerGeometry.size.width))
+
+                Text("Tap or drag on the image to pick a color")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 /// Handles quick actions when app is already running
 class SceneDelegate: NSObject, UIWindowSceneDelegate {
     func windowScene(

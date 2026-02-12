@@ -413,6 +413,7 @@ struct SwatchView: View {
                         .hoverEffect(.lift)
                         .contentTransition(.symbolEffect(.replace))
                 }
+                .buttonStyle(.plain)
                 .menuStyle(.automatic)
                 .padding(8)
                 .onChange(of: showCopiedFeedback) { _, newValue in

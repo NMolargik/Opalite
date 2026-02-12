@@ -7,7 +7,7 @@
 
 import Foundation
 
-#if canImport(UIKit) && !os(tvOS)
+#if canImport(UIKit) && !os(tvOS) && !os(visionOS)
 import UIKit
 
 final class HapticsManager {
@@ -42,9 +42,9 @@ final class HapticsManager {
 
 #else
 
-// MARK: - tvOS / Fallback (No-Op)
+// MARK: - tvOS / visionOS / Fallback (No-Op)
 
-/// No-op HapticsManager for platforms without haptic feedback (tvOS, etc.)
+/// No-op HapticsManager for platforms without haptic feedback (tvOS, visionOS, etc.)
 final class HapticsManager {
 
     static let shared = HapticsManager()

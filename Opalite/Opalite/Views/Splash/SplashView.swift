@@ -130,7 +130,9 @@ struct SplashView: View {
 
                     // Continue button
                     Button {
+                        #if os(iOS)
                         HapticsManager.shared.impact(.medium)
+                        #endif
                         onContinue()
                     } label: {
                         HStack(spacing: 8) {
@@ -145,6 +147,7 @@ struct SplashView: View {
                         .padding(.vertical, 14)
                         .background(.blue, in: RoundedRectangle(cornerRadius: 16))
                     }
+                    .buttonStyle(.plain)
                     .shadow(color: .white.opacity(0.3), radius: 20, y: 5)
                     .accessibilityLabel("Continue")
                     .accessibilityHint("Proceeds to app introduction")

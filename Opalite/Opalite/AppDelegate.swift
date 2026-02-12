@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 /// Handles home screen quick actions
 class AppDelegate: NSObject, UIApplicationDelegate {
     /// Pending quick action type to handle after launch

@@ -75,7 +75,12 @@ private struct SectionCardBackground: ViewModifier {
     private let shape = RoundedRectangle(cornerRadius: 18, style: .continuous)
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+        #if os(visionOS)
+        content
+            .background(shape.fill(.ultraThinMaterial))
+            .overlay(shape.stroke(.white.opacity(0.08), lineWidth: 1))
+        #else
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             content
                 .glassEffect(.regular, in: shape)
         } else {
@@ -83,6 +88,7 @@ private struct SectionCardBackground: ViewModifier {
                 .background(shape.fill(.ultraThinMaterial))
                 .overlay(shape.stroke(.white.opacity(0.08), lineWidth: 1))
         }
+        #endif
     }
 }
 

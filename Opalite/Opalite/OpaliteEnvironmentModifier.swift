@@ -20,6 +20,7 @@ struct OpaliteEnvironmentModifier: ViewModifier {
     let hexCopyManager: HexCopyManager
     let reviewRequestManager: ReviewRequestManager
     let importCoordinator: ImportCoordinator
+    let immersiveColorManager: ImmersiveColorManager
 
     func body(content: Content) -> some View {
         content
@@ -33,6 +34,7 @@ struct OpaliteEnvironmentModifier: ViewModifier {
             .environment(hexCopyManager)
             .environment(reviewRequestManager)
             .environment(importCoordinator)
+            .environment(immersiveColorManager)
     }
 }
 
@@ -47,7 +49,8 @@ extension Scene {
         quickActionManager: QuickActionManager,
         hexCopyManager: HexCopyManager,
         reviewRequestManager: ReviewRequestManager,
-        importCoordinator: ImportCoordinator
+        importCoordinator: ImportCoordinator,
+        immersiveColorManager: ImmersiveColorManager
     ) -> some Scene {
         self
             .modelContainer(modelContainer)
@@ -60,5 +63,6 @@ extension Scene {
             .environment(hexCopyManager)
             .environment(reviewRequestManager)
             .environment(importCoordinator)
+            .environment(immersiveColorManager)
     }
 }

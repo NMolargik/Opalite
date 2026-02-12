@@ -164,7 +164,14 @@ struct ColorShufflePickerView: View {
 
     @ViewBuilder
     private var shuffleButtonBackground: some View {
-        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+        #if os(visionOS)
+        // glassEffect is unavailable on visionOS
+        Circle()
+            .fill(Color(red: color.red, green: color.green, blue: color.blue, opacity: color.alpha))
+            .frame(width: 160, height: 160)
+            .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
+        #else
+        if #available(iOS 26.0, macOS 26.0, *) {
             Circle()
                 .fill(Color(red: color.red, green: color.green, blue: color.blue, opacity: color.alpha))
                 .frame(width: 160, height: 160)
@@ -175,10 +182,13 @@ struct ColorShufflePickerView: View {
                 .frame(width: 160, height: 160)
                 .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
         }
+        #endif
     }
 
     private func performShuffle() {
+        #if os(iOS)
         HapticsManager.shared.impact(.medium)
+        #endif
 
         // Save current color to history before shuffling
         saveToRecent()

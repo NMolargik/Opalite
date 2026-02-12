@@ -86,7 +86,15 @@ final class SubscriptionManager {
         isLoading = true
         defer { isLoading = false }
 
+        #if os(visionOS)
+        // visionOS requires using purchase(confirmIn:options:) with a UIWindowScene
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            throw OpaliteError.subscriptionPurchaseFailed
+        }
+        let result = try await product.purchase(confirmIn: scene, options: [])
+        #else
         let result = try await product.purchase()
+        #endif
 
         switch result {
         case .success(let verification):

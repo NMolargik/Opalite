@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(visionOS)
 import UIKit
 
 struct CameraCaptureView: UIViewControllerRepresentable {
@@ -44,6 +44,25 @@ struct CameraCaptureView: UIViewControllerRepresentable {
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             picker.dismiss(animated: true)
         }
+    }
+}
+#elseif os(visionOS)
+import SwiftUI
+
+/// Placeholder for visionOS where camera capture is unavailable.
+struct CameraCaptureView: View {
+    @Binding var selectedImage: UIImage?
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "camera.slash")
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+            Text("Camera capture is not available on visionOS.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 #elseif canImport(AppKit)

@@ -74,6 +74,7 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
 
     // MARK: - Haptic Generators
 
+    #if !os(visionOS)
     private lazy var impactGenerator: UIImpactFeedbackGenerator = {
         UIImpactFeedbackGenerator(style: .light)
     }()
@@ -82,6 +83,7 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
     private lazy var canvasFeedbackGenerator: UICanvasFeedbackGenerator = {
         UICanvasFeedbackGenerator(view: self)
     }()
+    #endif
 
     /// Last 10-degree threshold crossed for rotation haptics.
     private var lastRotationHapticThreshold: Int = 0
@@ -136,7 +138,9 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
             drawOrigin = location
             shapeRect = CGRect(origin: location, size: .zero)
             setPhase(.drawing)
+            #if !os(visionOS)
             impactGenerator.prepare()
+            #endif
 
         case .adjusting:
             // Begin reposition drag
@@ -297,7 +301,9 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
         cumulativeRotation = 0
         lastRotationHapticThreshold = 0
         setPhase(.adjusting)
+        #if !os(visionOS)
         impactGenerator.impactOccurred(intensity: 0.6)
+        #endif
     }
 
     // MARK: - Rotation (Two-Finger Gesture + Apple Pencil Pro Roll)
@@ -329,8 +335,10 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
         let currentThreshold = Int(snappedDegrees / 10)
         if currentThreshold != lastRotationHapticThreshold {
             lastRotationHapticThreshold = currentThreshold
+            #if !os(visionOS)
             impactGenerator.impactOccurred(intensity: 0.6)
             canvasFeedbackGenerator.alignmentOccurred(at: location)
+            #endif
         }
 
         onRotationUpdate?(snappedRadians)

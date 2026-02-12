@@ -28,6 +28,12 @@ struct ColorDetailView: View {
     @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
+    #if os(visionOS)
+    @Environment(ImmersiveColorManager.self) private var immersiveColorManager
+    @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    #endif
+
     @Namespace private var heroNamespace
 
     @State private var viewModel: ColorDetailView.ViewModel
@@ -356,7 +362,28 @@ struct ColorDetailView: View {
                         GlassConfiguration(style: .clear)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                
+
+                #if os(visionOS)
+                Button {
+                    Task {
+                        if immersiveColorManager.isImmersed {
+                            await dismissImmersiveSpace()
+                        } else {
+                            immersiveColorManager.prepareForSingleColor(color)
+                            await openImmersiveSpace(id: "colorConstellation")
+                        }
+                    }
+                } label: {
+                    Image(systemName: immersiveColorManager.isImmersed ? "visionpro.slash" : "visionpro")
+                        .foregroundStyle(color.idealTextColor())
+                        .bold()
+                        .font(.title2)
+                        .padding(12)
+                        .glassIfAvailable()
+                }
+                .buttonStyle(.plain)
+                #endif
+
                 Button {
                     HapticsManager.shared.selection()
                     dismissFullScreen()
@@ -368,6 +395,7 @@ struct ColorDetailView: View {
                         .padding(12)
                         .glassIfAvailable()
                 }
+                .buttonStyle(.plain)
             }
             .padding()
             .opacity(showFullScreenControls ? 1 : 0)
@@ -376,6 +404,12 @@ struct ColorDetailView: View {
     }
 
     private func dismissFullScreen() {
+        #if os(visionOS)
+        if immersiveColorManager.isImmersed {
+            Task { await dismissImmersiveSpace() }
+        }
+        #endif
+
         withAnimation(.easeInOut(duration: 0.15)) {
             showFullScreenControls = false
         }

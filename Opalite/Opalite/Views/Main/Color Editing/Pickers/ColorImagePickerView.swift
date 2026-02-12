@@ -52,6 +52,7 @@ struct ColorImagePickerView: View {
 
                     Spacer()
 
+                    #if !os(visionOS)
                     Button {
                         HapticsManager.shared.impact()
                         isShowingCamera = true
@@ -61,6 +62,7 @@ struct ColorImagePickerView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)
                     .controlSize(.small)
+                    #endif
                 }
 
                 if let uiImage = selectedImage {

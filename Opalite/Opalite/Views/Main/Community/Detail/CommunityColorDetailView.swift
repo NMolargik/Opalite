@@ -278,7 +278,9 @@ struct CommunityColorDetailView: View {
 
     private func copyHex() {
         copyToClipboard(color.hexString)
+        #if os(iOS)
         HapticsManager.shared.impact(.light)
+        #endif
         withAnimation(.easeIn(duration: 0.15)) {
             didCopyHex = true
         }

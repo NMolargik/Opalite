@@ -94,6 +94,7 @@ struct PaletteRowHeaderView: View {
                     .contentShape(Circle())
                     .hoverEffect(.lift)
             }
+            .buttonStyle(.plain)
 
             NavigationLink {
                 PaletteDetailView(palette: palette)

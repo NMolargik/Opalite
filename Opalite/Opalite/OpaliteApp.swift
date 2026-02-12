@@ -25,6 +25,7 @@ struct OpaliteApp: App {
     let importCoordinator = ImportCoordinator()
     let quickActionManager = QuickActionManager()
     let hexCopyManager = HexCopyManager()
+    let immersiveColorManager = ImmersiveColorManager()
 
     #if os(iOS)
     let phoneSessionManager = PhoneSessionManager.shared
@@ -130,7 +131,8 @@ struct OpaliteApp: App {
             quickActionManager: quickActionManager,
             hexCopyManager: hexCopyManager,
             reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator
+            importCoordinator: importCoordinator,
+            immersiveColorManager: immersiveColorManager
         )
         .commands {
             OpaliteCommands(
@@ -162,17 +164,19 @@ struct OpaliteApp: App {
             quickActionManager: quickActionManager,
             hexCopyManager: hexCopyManager,
             reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator
+            importCoordinator: importCoordinator,
+            immersiveColorManager: immersiveColorManager
         )
         .windowResizability(.contentSize)
         .defaultSize(width: 250, height: 1000)
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
         WindowGroup(id: "swatchBar") {
             SwatchBarView()
                 .toastContainer()
                 .task {
                     await colorManager.refreshAll()
                 }
+                #if os(iOS)
                 .onAppear {
                     colorManager.isSwatchBarOpen = true
                     AppDelegate.registerSwatchBarSceneSession()
@@ -181,6 +185,7 @@ struct OpaliteApp: App {
                     colorManager.isSwatchBarOpen = false
                     AppDelegate.swatchBarSceneSession = nil
                 }
+                #endif
         }
         .handlesExternalEvents(matching: Set(arrayLiteral: "swatchBar"))
         .opaliteEnvironment(
@@ -193,10 +198,31 @@ struct OpaliteApp: App {
             quickActionManager: quickActionManager,
             hexCopyManager: hexCopyManager,
             reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator
+            importCoordinator: importCoordinator,
+            immersiveColorManager: immersiveColorManager
         )
         .windowResizability(.contentSize)
         .defaultSize(width: 250, height: 1000)
+#endif
+
+#if os(visionOS)
+        ImmersiveSpace(id: "colorConstellation") {
+            ColorConstellationView()
+        }
+        .immersionStyle(selection: .constant(.full), in: .full)
+        .opaliteEnvironment(
+            modelContainer: sharedModelContainer,
+            colorManager: colorManager,
+            canvasManager: canvasManager,
+            communityManager: communityManager,
+            toastManager: toastManager,
+            subscriptionManager: subscriptionManager,
+            quickActionManager: quickActionManager,
+            hexCopyManager: hexCopyManager,
+            reviewRequestManager: reviewRequestManager,
+            importCoordinator: importCoordinator,
+            immersiveColorManager: immersiveColorManager
+        )
 #endif
     }
 

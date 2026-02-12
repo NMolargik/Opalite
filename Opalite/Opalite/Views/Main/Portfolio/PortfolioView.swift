@@ -328,6 +328,7 @@ private extension PortfolioView {
                 .contentShape(RoundedRectangle(cornerRadius: 16))
                 .hoverEffect(.lift)
             }
+            .buttonStyle(.plain)
             .accessibilityLabel("Create A Palette")
             .accessibilityHint("Creates a new empty palette to organize your colors")
 
@@ -508,9 +509,11 @@ private extension PortfolioView {
                 .toolbarButtonTint()
             }
             
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+            #if !os(visionOS)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
+            #endif
         }
 
         if !colorManager.colors.isEmpty {

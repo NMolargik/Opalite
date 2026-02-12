@@ -108,15 +108,19 @@ struct HapticSwatchScrollView: UIViewRepresentable {
         weak var contentView: UIView?
 
         private var lastFocusedIndex: Int = -1
+        #if !os(visionOS)
         private var selectionFeedback: UISelectionFeedbackGenerator?
         private var canvasFeedback: UICanvasFeedbackGenerator?
+        #endif
         private var swatchViews: [PencilHapticSwatchView] = []
 
         init(parent: HapticSwatchScrollView) {
             self.parent = parent
             super.init()
+            #if !os(visionOS)
             selectionFeedback = UISelectionFeedbackGenerator()
             selectionFeedback?.prepare()
+            #endif
         }
 
         func rebuildContent() {
@@ -160,9 +164,11 @@ struct HapticSwatchScrollView: UIViewRepresentable {
             scrollView.contentSize = CGSize(width: contentWidth, height: contentHeight)
 
             // Initialize canvas feedback generator if not already done
+            #if !os(visionOS)
             if canvasFeedback == nil {
                 canvasFeedback = UICanvasFeedbackGenerator(view: scrollView)
             }
+            #endif
         }
 
         // MARK: - UIScrollViewDelegate
@@ -175,12 +181,16 @@ struct HapticSwatchScrollView: UIViewRepresentable {
                 lastFocusedIndex = focusedIndex
 
                 // Trigger iPhone haptic
+                #if !os(visionOS)
                 selectionFeedback?.selectionChanged()
                 selectionFeedback?.prepare()
+                #endif
 
                 // Trigger Apple Pencil Pro haptic
+                #if !os(visionOS)
                 let hapticLocation = CGPoint(x: scrollView.bounds.width / 2, y: scrollView.bounds.height / 2)
                 canvasFeedback?.alignmentOccurred(at: hapticLocation)
+                #endif
             }
         }
 
@@ -253,7 +263,9 @@ class PencilHapticSwatchView: UIView, UIPointerInteractionDelegate {
     private let borderLayer = CALayer()
     private let checkmarkImageView = UIImageView()
 
+    #if !os(visionOS)
     private var canvasFeedbackGenerator: UICanvasFeedbackGenerator?
+    #endif
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -292,9 +304,11 @@ class PencilHapticSwatchView: UIView, UIPointerInteractionDelegate {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         // Initialize the feedback generator once the view is in the window hierarchy
+        #if !os(visionOS)
         if window != nil && canvasFeedbackGenerator == nil {
             canvasFeedbackGenerator = UICanvasFeedbackGenerator(view: self)
         }
+        #endif
     }
 
     override func layoutSubviews() {
@@ -352,7 +366,9 @@ class PencilHapticSwatchView: UIView, UIPointerInteractionDelegate {
         // Check if touch ended inside the view
         if bounds.contains(location) {
             // Trigger Apple Pencil Pro haptic feedback
+            #if !os(visionOS)
             canvasFeedbackGenerator?.alignmentOccurred(at: location)
+            #endif
 
             // Call the tap handler directly - we're already on main thread
             onTap?()

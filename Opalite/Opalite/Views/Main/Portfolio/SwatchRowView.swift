@@ -96,6 +96,7 @@ struct SwatchRowView: View {
                         .contentShape(RoundedRectangle(cornerRadius: 16))
                         .hoverEffect(.lift)
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel("Create A Color")
                     .accessibilityHint("Opens the color editor to create a new color")
 

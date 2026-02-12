@@ -187,7 +187,9 @@ struct PaletteImportConfirmationSheet: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 importSuccess = true
             }
+            #if os(iOS)
             HapticsManager.shared.notification(.success)
+            #endif
 
             // Brief delay to show success before dismissing
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {

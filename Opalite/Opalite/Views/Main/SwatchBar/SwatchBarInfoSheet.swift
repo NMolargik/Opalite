@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SwatchBarInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.colorScheme) private var colorScheme
     @State private var appearAnimation = false
 
@@ -72,8 +73,12 @@ struct SwatchBarInfoSheet: View {
 
                 // Launch button
                 Button {
+                    #if os(iOS)
                     HapticsManager.shared.impact(.medium)
                     AppDelegate.openSwatchBarWindow()
+                    #else
+                    openWindow(id: "swatchBar")
+                    #endif
                     dismiss()
                 } label: {
                     HStack(spacing: 10) {
@@ -95,6 +100,7 @@ struct SwatchBarInfoSheet: View {
                     )
                     .shadow(color: .purple.opacity(0.4), radius: 8, y: 4)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 20)
                 .padding(.top, 28)
                 .opacity(appearAnimation ? 1 : 0)

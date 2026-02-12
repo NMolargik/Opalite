@@ -304,7 +304,7 @@ struct PaletteDetailView: View {
                                     GlassConfiguration(style: .clear)
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            
+
                             Button {
                                 HapticsManager.shared.selection()
                                 dismissFullScreen()
@@ -316,8 +316,9 @@ struct PaletteDetailView: View {
                                     .padding(12)
                                     .glassIfAvailable()
                             }
+                            .buttonStyle(.plain)
                         }
-                        
+
                         HStack {
                             Spacer()
                             customPageIndicator(for: color)
@@ -333,7 +334,7 @@ struct PaletteDetailView: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
     }
-    
+
     private func goToPreviousColor() {
         HapticsManager.shared.selection()
         withAnimation {

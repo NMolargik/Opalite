@@ -8,6 +8,7 @@
 import SwiftUI
 import PencilKit
 
+#if os(iOS) || os(macOS) || os(visionOS)
 struct PencilKitCanvas: View {
     @Binding var drawing: PKDrawing
     @Binding var inkColor: UIColor
@@ -34,8 +35,9 @@ struct PencilKitCanvas: View {
         .ignoresSafeArea(edges: .bottom)
     }
 }
+#endif
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 /// PKCanvasView subclass that hooks into the view hierarchy lifecycle.
 /// On Mac Catalyst, `becomeFirstResponder()` only works once the view

@@ -108,6 +108,7 @@ struct WatchAppInfoSheet: View {
                         .padding(.vertical, 16)
                         .background(.blue, in: RoundedRectangle(cornerRadius: 14))
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 20)
                 .padding(.top, 28)
                 .padding(.bottom, 30)

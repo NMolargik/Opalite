@@ -307,9 +307,11 @@ struct CanvasView: View {
                 }
             }
 
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+            #if !os(visionOS)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
+            #endif
         }
         .alert("Clear Canvas?", isPresented: $showClearConfirmation) {
             Button("Cancel", role: .cancel) {
@@ -654,7 +656,11 @@ struct CanvasView: View {
         let exportBounds = contentBounds.insetBy(dx: -padding, dy: -padding)
 
         // Render the drawing
+        #if os(visionOS)
+        let scale: CGFloat = 2.0
+        #else
         let scale = UIScreen.main.scale
+        #endif
         let drawingImage = drawing.image(from: exportBounds, scale: scale)
 
         // Create a new image with white background

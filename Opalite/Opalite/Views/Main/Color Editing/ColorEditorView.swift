@@ -132,9 +132,11 @@ struct ColorEditorView: View {
                         .accessibilityLabel(viewModel.isShowingPaletteStrip ? "Hide palette colors" : "Show palette colors")
                     }
                     
-                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                    #if !os(visionOS)
+                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                         ToolbarSpacer(.fixed, placement: .topBarTrailing)
                     }
+                    #endif
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {

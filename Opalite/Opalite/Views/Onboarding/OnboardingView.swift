@@ -134,6 +134,7 @@ struct OnboardingView: View {
                                 .padding(.vertical, 8)
                                 .background(.ultraThinMaterial, in: Capsule())
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Skip introduction")
                         .accessibilityHint("Skips remaining pages and enters the app")
                         .opacity(currentPage < pages.count - 1 ? 1 : 0)
@@ -178,6 +179,7 @@ struct OnboardingView: View {
                                     .padding(.vertical, 14)
                                     .background(.red, in: RoundedRectangle(cornerRadius: 16))
                                 }
+                                .buttonStyle(.plain)
                                 .accessibilityLabel("Back")
                                 .accessibilityHint("Goes to the previous page")
                                 .transition(.move(edge: .leading).combined(with: .opacity))
@@ -222,6 +224,7 @@ struct OnboardingView: View {
                                 .padding(.vertical, 14)
                                 .background(.blue, in: RoundedRectangle(cornerRadius: 16))
                             }
+                            .buttonStyle(.plain)
                             .accessibilityLabel(currentPage < pages.count - 1 ? "Next" : "Get Started")
                             .accessibilityHint(currentPage < pages.count - 1 ? "Goes to the next page" : "Completes introduction and enters the app")
                             .animation(.spring(response: 0.35, dampingFraction: 0.85), value: currentPage)
@@ -240,7 +243,9 @@ struct OnboardingView: View {
     }
 
     private func completeOnboarding() {
+        #if os(iOS)
         HapticsManager.shared.impact(.medium)
+        #endif
         isOnboardingComplete = true
         onContinue()
     }

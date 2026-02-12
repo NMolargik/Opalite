@@ -65,6 +65,10 @@ struct GlassIfAvailable: ViewModifier {
         if let tint = configuration.tint {
             content.background(tint.opacity(0.3), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         } else {
+            #if os(visionOS)
+            // glassEffect is unavailable on visionOS, use material instead
+            content.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            #else
             switch configuration.style {
             case .clear:
                 if configuration.isInteractive {
@@ -80,6 +84,7 @@ struct GlassIfAvailable: ViewModifier {
                     content.glassEffect(.regular)
                 }
             }
+            #endif
         }
     }
 }

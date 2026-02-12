@@ -45,6 +45,15 @@ struct GlassTileBackground: ViewModifier {
 
     func body(content: Content) -> some View {
         if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+            #if os(visionOS)
+            // glassEffect is unavailable on visionOS, use material instead
+            content
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(radius: 5)
+                )
+            #else
             switch style {
             case .clear:
                 content
@@ -55,6 +64,7 @@ struct GlassTileBackground: ViewModifier {
                     .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .shadow(radius: 5)
             }
+            #endif
         } else {
             content
                 .background(

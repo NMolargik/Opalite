@@ -77,6 +77,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
 
+                    #if !os(visionOS)
                     Picker(selection: Binding<AppThemeOption>(
                         get: { AppThemeOption(rawValue: appThemeRaw) ?? .system },
                         set: { appThemeRaw = $0.rawValue }
@@ -88,6 +89,7 @@ struct SettingsView: View {
                         Label("App Theme", systemImage: "circle.lefthalf.filled")
                             .foregroundStyle(.primary)
                     }
+                    #endif
 
                     #if canImport(UIKit) && !os(visionOS)
                     VStack(alignment: .leading, spacing: 8) {

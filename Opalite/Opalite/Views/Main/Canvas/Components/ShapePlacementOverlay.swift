@@ -128,6 +128,7 @@ struct ShapePlacementOverlay: View {
                     .padding(.vertical, 12)
                     .background(.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
             }
+            .buttonStyle(.plain)
 
             if phase == .adjusting {
                 Button {
@@ -141,6 +142,7 @@ struct ShapePlacementOverlay: View {
                         .padding(.vertical, 12)
                         .background(.blue, in: RoundedRectangle(cornerRadius: 12))
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(.bottom, 100)

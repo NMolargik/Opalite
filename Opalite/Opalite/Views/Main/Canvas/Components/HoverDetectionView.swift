@@ -48,14 +48,18 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
     private var initialPinchHeight: CGFloat = 0
 
     // Haptic feedback for Apple Pencil Pro rotation (iOS only)
+    #if os(iOS) && !os(visionOS)
     private lazy var canvasFeedbackGenerator: UICanvasFeedbackGenerator = {
         UICanvasFeedbackGenerator(view: self)
     }()
+    #endif
 
     // Standard haptic for scale/rotate feedback
+    #if os(iOS) && !os(visionOS)
     private lazy var impactGenerator: UIImpactFeedbackGenerator = {
         UIImpactFeedbackGenerator(style: .light)
     }()
+    #endif
 
     // Track the last 10-degree threshold crossed for haptic feedback
     private var lastHapticThreshold: Int = 0
@@ -136,7 +140,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         case .began:
             isTwoFingerMode = true
             pinchGestureActive = true
+            #if os(iOS) && !os(visionOS)
             impactGenerator.prepare()
+            #endif
 
             // Capture initial touch positions for aspect ratio calculation
             if useNonUniformScale && gesture.numberOfTouches >= 2 {
@@ -171,7 +177,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
                 let currentThreshold = Int(newScale * 10)
                 if currentThreshold != lastScaleHapticThreshold {
                     lastScaleHapticThreshold = currentThreshold
+                    #if os(iOS) && !os(visionOS)
                     impactGenerator.impactOccurred(intensity: 0.5)
+                    #endif
                 }
 
                 onScaleUpdate?(newScale)
@@ -192,7 +200,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
                 let currentThreshold = Int(newScale * 10)
                 if currentThreshold != lastScaleHapticThreshold {
                     lastScaleHapticThreshold = currentThreshold
+                    #if os(iOS) && !os(visionOS)
                     impactGenerator.impactOccurred(intensity: 0.5)
+                    #endif
                 }
 
                 onScaleUpdate?(newScale)
@@ -237,7 +247,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
             let currentThreshold = Int(snappedDegrees / 10)
             if currentThreshold != lastHapticThreshold {
                 lastHapticThreshold = currentThreshold
+                #if os(iOS) && !os(visionOS)
                 impactGenerator.impactOccurred(intensity: 0.6)
+                #endif
             }
 
             onRotationUpdate?(snappedRadians)
@@ -329,7 +341,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         if currentThreshold != lastHapticThreshold {
             lastHapticThreshold = currentThreshold
             // Trigger Apple Pencil Pro haptic feedback for alignment/snap
+            #if os(iOS) && !os(visionOS)
             canvasFeedbackGenerator.alignmentOccurred(at: location)
+            #endif
         }
     }
 
@@ -358,7 +372,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
 
         guard let touch = touches.first else { return }
 
+        #if os(iOS) && !os(visionOS)
         impactGenerator.prepare()
+        #endif
 
         let location = touch.location(in: self)
         lastGestureLocation = location
@@ -386,7 +402,9 @@ class HoverDetectionView: UIView, UIGestureRecognizerDelegate {
         // Update scale from altitude angle (tilt)
         let (scale, scaleChanged) = updateScaleFromAltitude(touch)
         if scaleChanged {
+            #if os(iOS) && !os(visionOS)
             impactGenerator.impactOccurred(intensity: 0.5)
+            #endif
         }
         onScaleUpdate?(scale)
 
