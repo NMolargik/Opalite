@@ -239,6 +239,7 @@ struct SwatchRowView: View {
                 set: { if !$0 { draggingColorID = nil } }
             )
         )
+        .hoverEffect(.lift)
         .overlay(alignment: .topTrailing) {
             if onTap != nil {
                 let isSelected = selectedIDs.contains(color.id)

@@ -205,63 +205,49 @@ struct SwatchView: View {
 
     // MARK: - The View
     var body: some View {
-        Group {
-            if isDragging {
-                // Placeholder shown while this swatch is being dragged
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(.clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(.secondary, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
-                    )
-                    .frame(width: width)
-                    .frame(minHeight: height)
-            } else {
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(displayColor.swiftUIColor)
-                    .overlay {
-                        if showBorder {
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(.thinMaterial, lineWidth: 5)
-                        }
-                    }
-                    .frame(width: width)
-                    .frame(minHeight: height)
-                    .overlay(alignment: .topLeading) {
-                        badgeContent
-                            .frame(maxWidth: 500, alignment: .leading)
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        menuContent
-                    }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
-                            .opacity(isDropTargeted ? 1 : 0)
-                    )
-                    .contextMenu {
-                        contextMenuContent
-                    }
-                    .if(matchedNamespace != nil && matchedID != nil) { view in
-                        view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
-                    }
-                    .zIndex(2)
-                    .if(isEditingBadge != true) { view in
-                        view.onDrag {
-                            onDragStarted?()
-                            return provideDragItem()
-                        } preview: {
-                            // Clean preview without material overlay that doesn't render well during drag
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(displayColor.swiftUIColor)
-                                .frame(width: width ?? 100, height: height ?? 100)
-                        }
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel(accessibilityDescription)
-                    .accessibilityAddTraits(.isButton)
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(displayColor.swiftUIColor)
+            .overlay {
+                if showBorder {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(.thinMaterial, lineWidth: 5)
+                }
             }
-        }
+            .frame(width: width)
+            .frame(minHeight: height)
+            .overlay(alignment: .topLeading) {
+                badgeContent
+                    .frame(maxWidth: 500, alignment: .leading)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                menuContent
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(.blue, style: StrokeStyle(lineWidth: 3, dash: [8, 6]))
+                    .opacity(isDropTargeted ? 1 : 0)
+            )
+            .contextMenu {
+                contextMenuContent
+            }
+            .if(matchedNamespace != nil && matchedID != nil) { view in
+                view.matchedGeometryEffect(id: matchedID!, in: matchedNamespace!)
+            }
+            .zIndex(2)
+            .if(isEditingBadge != true) { view in
+                view.onDrag {
+                    onDragStarted?()
+                    return provideDragItem()
+                } preview: {
+                    // Clean preview without material overlay that doesn't render well during drag
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(displayColor.swiftUIColor)
+                        .frame(width: width ?? 100, height: height ?? 100)
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityDescription)
+            .accessibilityAddTraits(.isButton)
     }
 
     private var accessibilityDescription: String {

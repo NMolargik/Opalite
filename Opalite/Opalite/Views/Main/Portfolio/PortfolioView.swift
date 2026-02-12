@@ -75,7 +75,7 @@ struct PortfolioView: View {
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
             mainScrollContent
-                .navigationTitle(isCompact ? "Opalite" : "")
+                .navigationTitle("Opalite")
                 .toolbarBackground(.hidden)
                 .toolbar { toolbarContent }
                 .toolbarRole(isCompact ? .automatic : .editor)
@@ -507,19 +507,9 @@ private extension PortfolioView {
                 }
                 .toolbarButtonTint()
             }
-        }
-
-        if colorManager.palettes.count >= 3 {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    HapticsManager.shared.selection()
-                    viewModel.isShowingPaletteOrder = true
-                } label: {
-                    Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
-                }
-                .toolbarButtonTint()
-                .accessibilityLabel("Reorder palettes")
-                .accessibilityHint("Opens a sheet to reorder your palettes")
+            
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
         }
 
@@ -541,9 +531,19 @@ private extension PortfolioView {
                 .accessibilityValue(viewModel.swatchSize.accessibilityName)
             }
         }
-
-        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+        
+        if colorManager.palettes.count >= 3 {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticsManager.shared.selection()
+                    viewModel.isShowingPaletteOrder = true
+                } label: {
+                    Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
+                }
+                .toolbarButtonTint()
+                .accessibilityLabel("Reorder palettes")
+                .accessibilityHint("Opens a sheet to reorder your palettes")
+            }
         }
 
         ToolbarItem(placement: .confirmationAction) {

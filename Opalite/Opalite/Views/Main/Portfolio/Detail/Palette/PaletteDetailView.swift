@@ -192,49 +192,31 @@ struct PaletteDetailView: View {
                     Label("Add Color", systemImage: "plus.square.dashed")
                 }
             }
-
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
-
+            
             // Ellipsis menu with palette info and actions
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    // Palette info section
-                    Section("Palette Info") {
-                        Label("\(palette.sortedColors.count) colors", systemImage: "swatchpalette")
-                        Label("Created \(formattedDate(palette.createdAt))", systemImage: "calendar")
-                        Label("Updated \(formattedDate(palette.updatedAt))", systemImage: "clock.arrow.circlepath")
-                        if let creator = palette.createdByDisplayName {
-                            Label("By \(creator)", systemImage: "person")
-                        }
+                    Button {
+                        HapticsManager.shared.selection()
+                        duplicatePalette()
+                    } label: {
+                        Label("Duplicate Palette", systemImage: "plus.square.on.square")
                     }
-
-                    Section {
-                        Button {
-                            HapticsManager.shared.selection()
-                            withAnimation {
-                                isEditingName = true
-                            }
-                        } label: {
-                            Label("Rename", systemImage: "character.cursor.ibeam")
+                    
+                    Button {
+                        HapticsManager.shared.selection()
+                        withAnimation {
+                            isEditingName = true
                         }
-
-                        Button {
-                            HapticsManager.shared.selection()
-                            duplicatePalette()
-                        } label: {
-                            Label("Duplicate Palette", systemImage: "plus.square.on.square")
-                        }
+                    } label: {
+                        Label("Rename", systemImage: "character.cursor.ibeam")
                     }
-
-                    Section {
-                        Button(role: .destructive) {
-                            HapticsManager.shared.selection()
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete", systemImage: "trash.fill")
-                        }
+                    
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash.fill")
                     }
                 } label: {
                     Label("More", systemImage: "ellipsis")

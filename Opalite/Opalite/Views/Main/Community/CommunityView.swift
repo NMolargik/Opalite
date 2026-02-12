@@ -47,17 +47,21 @@ struct CommunityView: View {
             }
             .navigationTitle("Community")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    sortMenu
+                }
+                
+                if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         HapticsManager.shared.selection()
                         viewModel.isShowingCommunityInfo = true
                     } label: {
-                        Label("About Community", systemImage: "info.circle")
+                        Label("About Community", systemImage: "questionmark")
                     }
-                }
-
-                ToolbarItem(placement: .primaryAction) {
-                    sortMenu
                 }
             }
             .sheet(isPresented: $viewModel.isShowingCommunityInfo) {

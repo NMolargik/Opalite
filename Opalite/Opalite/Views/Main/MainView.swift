@@ -99,7 +99,7 @@ struct MainView: View {
                     .disabled(true)
                 } else {
                     ForEach(canvasManager.canvases) { canvasFile in
-                        Tab(canvasFile.title, systemImage: "scribble", value: Tabs.canvasBody(canvasFile)) {
+                        Tab(canvasFile.title, systemImage: subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) ? "scribble" : "lock.fill", value: Tabs.canvasBody(canvasFile)) {
                             NavigationStack {
                                 CanvasView(canvasFile: canvasFile)
                                     .tint(.none)

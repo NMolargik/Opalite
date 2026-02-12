@@ -165,14 +165,6 @@ struct CanvasView: View {
                 // Compact: Single "Tools" menu containing everything
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button {
-                            HapticsManager.shared.impact()
-                            editedTitle = canvasFile.title
-                            showRenameTitleAlert = true
-                        } label: {
-                            Label("Rename", systemImage: "character.cursor.ibeam")
-                        }
-
                         Section("Shapes") {
                             ForEach(CanvasShape.allCases, id: \.self) { shape in
                                 Button {
@@ -234,18 +226,6 @@ struct CanvasView: View {
                     .toolbarButtonTint()
                 }
             } else {
-                // Regular: Separate buttons with Export as Image in confirmationAction
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        HapticsManager.shared.impact()
-                        editedTitle = canvasFile.title
-                        showRenameTitleAlert = true
-                    } label: {
-                        Label("Rename", systemImage: "character.cursor.ibeam")
-                    }
-                    .toolbarButtonTint()
-                }
-
                 #if targetEnvironment(macCatalyst)
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -266,7 +246,7 @@ struct CanvasView: View {
                     }
                     .toolbarButtonTint()
                 }
-
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Section("Shapes") {
@@ -279,8 +259,8 @@ struct CanvasView: View {
                                 }
                             }
                         }
-
-                        Section("Tools") {
+                        
+                        Section {
                             Button {
                                 HapticsManager.shared.impact()
                                 isShowingSVGImporter = true
@@ -288,7 +268,13 @@ struct CanvasView: View {
                                 Label("Place SVG Shape", systemImage: "square.on.circle")
                             }
                         }
+                    } label: {
+                        Label("Shapes", systemImage: "xmark.triangle.circle.square.fill")
+                    }
+                }
 
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
                         Section {
                             Button(role: .destructive) {
                                 HapticsManager.shared.impact()

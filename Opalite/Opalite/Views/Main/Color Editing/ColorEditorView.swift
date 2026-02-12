@@ -131,6 +131,23 @@ struct ColorEditorView: View {
                         }
                         .accessibilityLabel(viewModel.isShowingPaletteStrip ? "Hide palette colors" : "Show palette colors")
                     }
+                    
+                    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        HapticsManager.shared.impact()
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                            viewModel.isColorExpanded.toggle()
+                        }
+                    } label: {
+                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
+                    }
+                    .toolbarButtonTint()
+                    .accessibilityLabel(viewModel.isColorExpanded ? "Show editor" : "Expand color preview")
                 }
 
                 #if os(iOS) || os(visionOS)
@@ -154,19 +171,6 @@ struct ColorEditorView: View {
                     .tint(viewModel.didCopyHex ? .green : .inverseTheme)
                     .accessibilityLabel(viewModel.didCopyHex ? "Hex code copied" : "Copy hex code")
                     .accessibilityValue(hexCopyManager.formattedHex(for: viewModel.tempColor))
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        HapticsManager.shared.impact()
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                            viewModel.isColorExpanded.toggle()
-                        }
-                    } label: {
-                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
-                    }
-                    .toolbarButtonTint()
-                    .accessibilityLabel(viewModel.isColorExpanded ? "Show editor" : "Expand color preview")
                 }
 
                 ToolbarItem(placement: .cancellationAction) {
@@ -194,6 +198,29 @@ struct ColorEditorView: View {
                 }
 
                 #elseif os(macOS)
+                if canShowPaletteStripToggle {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                viewModel.isShowingPaletteStrip.toggle()
+                            }
+                        } label: {
+                            Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                            viewModel.isColorExpanded.toggle()
+                        }
+                    } label: {
+                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
+                    }
+                    .toolbarButtonTint()
+                }
+                
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         hexCopyManager.copyHex(for: viewModel.tempColor)
@@ -209,29 +236,6 @@ struct ColorEditorView: View {
                     } label: {
                         Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
                             .contentTransition(.symbolEffect(.replace))
-                    }
-                    .toolbarButtonTint()
-                }
-
-                if canShowPaletteStripToggle {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                viewModel.isShowingPaletteStrip.toggle()
-                            }
-                        } label: {
-                            Image(systemName: viewModel.isShowingPaletteStrip ? "swatchpalette.fill" : "swatchpalette")
-                        }
-                    }
-                }
-
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                            viewModel.isColorExpanded.toggle()
-                        }
-                    } label: {
-                        Image(systemName: viewModel.isColorExpanded ? "pencil" : "rectangle.expand.diagonal")
                     }
                     .toolbarButtonTint()
                 }

@@ -252,16 +252,6 @@ struct ColorDetailView: View {
             // Info menu with color values and actions
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button {
-                        HapticsManager.shared.selection()
-                        isShowingContrastChecker = true
-                    } label: {
-                        Label("Check Contrast", systemImage: "circle.righthalf.filled")
-                    }
-                    .toolbarButtonTint()
-                    .accessibilityLabel("Check WCAG contrast")
-                    .accessibilityHint("Opens contrast checker to compare this color against others")
-                    
                     // Color values section - copyable
                     Section("Color Values") {
                         Button {
@@ -271,7 +261,7 @@ struct ColorDetailView: View {
                         } label: {
                             Label(color.hexString, systemImage: "number")
                         }
-
+                        
                         Button {
                             HapticsManager.shared.selection()
                             copyToClipboard(color.rgbString)
@@ -279,7 +269,7 @@ struct ColorDetailView: View {
                         } label: {
                             Label(color.rgbString, systemImage: "slider.horizontal.3")
                         }
-
+                        
                         Button {
                             HapticsManager.shared.selection()
                             copyToClipboard(color.hslString)
@@ -288,8 +278,18 @@ struct ColorDetailView: View {
                             Label(color.hslString, systemImage: "circle.lefthalf.filled")
                         }
                     }
-
+                    
                     Section {
+                        Button {
+                            HapticsManager.shared.selection()
+                            isShowingContrastChecker = true
+                        } label: {
+                            Label("Check Contrast", systemImage: "circle.righthalf.filled")
+                        }
+                        .toolbarButtonTint()
+                        .accessibilityLabel("Check WCAG contrast")
+                        .accessibilityHint("Opens contrast checker to compare this color against others")
+                        
                         Button {
                             HapticsManager.shared.selection()
                             withAnimation {
@@ -298,9 +298,7 @@ struct ColorDetailView: View {
                         } label: {
                             Label("Rename", systemImage: "character.cursor.ibeam")
                         }
-                    }
-
-                    Section {
+                        
                         Button(role: .destructive) {
                             HapticsManager.shared.selection()
                             showDeleteConfirmation = true

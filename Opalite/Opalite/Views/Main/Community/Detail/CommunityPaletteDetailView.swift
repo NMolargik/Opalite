@@ -91,45 +91,23 @@ struct CommunityPaletteDetailView: View {
 
             // More menu
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    // Palette info section
-                    Section("Palette Info") {
-                        Label("\(palette.colorCount) colors", systemImage: "swatchpalette")
-                        Label("Published \(formattedDate(palette.publishedAt))", systemImage: "globe")
-                        Label("By \(palette.publisherName)", systemImage: "person")
+                if isOwnContent {
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        isShowingRemoveConfirmation = true
+                    } label: {
+                        Label("Remove From Community", systemImage: "trash")
                     }
-
-                    if !palette.tags.isEmpty {
-                        Section("Tags") {
-                            ForEach(palette.tags, id: \.self) { tag in
-                                Label(tag, systemImage: "tag")
-                            }
-                        }
+                    .tint(.red)
+                    
+                } else {
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        isShowingReportSheet = true
+                    } label: {
+                        Label("Report", systemImage: "flag")
                     }
-
-                    if isOwnContent {
-                        Section {
-                            Button(role: .destructive) {
-                                HapticsManager.shared.selection()
-                                isShowingRemoveConfirmation = true
-                            } label: {
-                                Label("Remove From Community", systemImage: "trash")
-                            }
-                        }
-                    } else {
-                        Section {
-                            Button(role: .destructive) {
-                                HapticsManager.shared.selection()
-                                isShowingReportSheet = true
-                            } label: {
-                                Label("Report", systemImage: "flag")
-                            }
-                        }
-                    }
-                } label: {
-                    Label("More", systemImage: "ellipsis")
                 }
-                .toolbarButtonTint()
             }
         }
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)

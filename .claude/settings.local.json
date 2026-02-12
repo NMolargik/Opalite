@@ -20,7 +20,8 @@
       "Bash(git mv:*)",
       "Bash(echo:*)",
       "Bash(wc:*)",
-      "Bash(xargs dirname:*)"
+      "Bash(xargs dirname:*)",
+      "Bash(cd /Users/nickmolargik/Developer/Molargik\\\\ Software\\\\ LLC/Opalite && grep -l \"SwatchView\" ./Opalite/Opalite/Views/Main/Portfolio/Detail/*.swift ./Opalite/Opalite/Views/Main/Portfolio/Detail/**/*.swift 2>/dev/null:*)"
     ]
   }
 }

@@ -99,20 +99,20 @@ struct PaletteRowHeaderView: View {
                 PaletteDetailView(palette: palette)
                     .tint(.none)
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     Text(palette.name)
-                        .bold()
-                        .padding()
-                    
+                        .font(.title2)
+
                     Image(systemName: "chevron.right")
-                        .imageScale(.small)
+                        .font(.body)
                         .foregroundStyle(.blue)
+                    
+                    Spacer()
                 }
-                .frame(height: 20)
-                .padding(8)
-                .glassIfAvailable(
-                    GlassConfiguration(style: .regular)
-                )
+                .frame(maxWidth: 300)
+                .frame(height: 40)
+                .bold()
+                .padding(.leading)
                 .contentShape(RoundedRectangle(cornerRadius: 16))
                 .hoverEffect(.lift)
             }
