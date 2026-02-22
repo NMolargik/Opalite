@@ -102,6 +102,7 @@ struct CanvasSectionView: View {
             } label: {
                 Image(systemName: "xmark")
                     .frame(width: 20, height: 20)
+                    .foregroundStyle(.white)
             }
             .buttonStyle(.borderedProminent)
             .tint(.red)
