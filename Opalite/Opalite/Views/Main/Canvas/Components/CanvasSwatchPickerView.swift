@@ -15,15 +15,25 @@ struct CanvasSwatchPickerView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
 
+    let canvasFile: CanvasFile
     let onColorSelected: (OpaliteColor) -> Void
     private let swatchSize: CGFloat = 44
     private let itemSpacing: CGFloat = 8
 
     // Track which color was just selected for checkmark animation
     @State private var selectedColorID: UUID?
+    @State private var showAllColors: Bool = false
 
-    /// All colors flattened for the haptic scroll view
+    /// Whether this canvas has an associated palette
+    private var hasAssociatedPalette: Bool {
+        canvasFile.palette != nil
+    }
+
+    /// Colors to show — filtered by palette if associated and not showing all
     private var allColors: [OpaliteColor] {
+        if !showAllColors, let palette = canvasFile.palette {
+            return palette.sortedColors
+        }
         var colors: [OpaliteColor] = []
         colors.append(contentsOf: colorManager.looseColors)
         for palette in colorManager.palettes {
@@ -33,32 +43,54 @@ struct CanvasSwatchPickerView: View {
     }
 
     var body: some View {
-        HapticSwatchScrollView(
-            colors: allColors,
-            swatchSize: swatchSize,
-            itemSpacing: itemSpacing,
-            selectedColorID: selectedColorID,
-            onColorSelected: { color in
-                HapticsManager.shared.selection()
-                onColorSelected(color)
+        HStack(spacing: 0) {
+            HapticSwatchScrollView(
+                colors: allColors,
+                swatchSize: swatchSize,
+                itemSpacing: itemSpacing,
+                selectedColorID: selectedColorID,
+                onColorSelected: { color in
+                    HapticsManager.shared.selection()
+                    onColorSelected(color)
 
-                // Show toast with color name or hex
-                let colorLabel = color.name?.isEmpty == false ? color.name! : color.hexString
-                toastManager.show(ToastItem(message: colorLabel, style: .info, icon: "paintbrush.fill", duration: 1.5))
+                    // Show toast with color name or hex
+                    let colorLabel = color.name?.isEmpty == false ? color.name! : color.hexString
+                    toastManager.show(ToastItem(message: colorLabel, style: .info, icon: "paintbrush.fill", duration: 1.5))
 
-                // Show checkmark briefly
-                withAnimation(.linear(duration: 0.15)) {
-                    selectedColorID = color.id
-                }
-
-                // Hide checkmark after delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    // Show checkmark briefly
                     withAnimation(.linear(duration: 0.15)) {
-                        selectedColorID = nil
+                        selectedColorID = color.id
+                    }
+
+                    // Hide checkmark after delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation(.linear(duration: 0.15)) {
+                            selectedColorID = nil
+                        }
                     }
                 }
+            )
+
+            if hasAssociatedPalette {
+                Divider()
+                    .frame(height: swatchSize)
+
+                Button {
+                    HapticsManager.shared.selection()
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showAllColors.toggle()
+                    }
+                } label: {
+                    Image(systemName: showAllColors ? "swatchpalette.fill" : "paintpalette.fill")
+                        .font(.title3)
+                        .foregroundColor(showAllColors ? .secondary : .red)
+                        .frame(width: 44, height: swatchSize)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 8)
             }
-        )
+        }
         .frame(height: swatchSize + 16)
         .background(.ultraThinMaterial)
         .clipShape(Rectangle())
@@ -395,6 +427,7 @@ class PencilHapticSwatchView: UIView, UIPointerInteractionDelegate {
     let container = try! ModelContainer(
         for: OpaliteColor.self,
         OpalitePalette.self,
+        CanvasFile.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     let colorManager = ColorManager(context: container.mainContext)
@@ -404,9 +437,10 @@ class PencilHapticSwatchView: UIView, UIPointerInteractionDelegate {
         print("Failed to load samples")
     }
 
-    return CanvasSwatchPickerView { color in
+    return CanvasSwatchPickerView(canvasFile: CanvasFile()) { color in
         print("Selected: \(color.hexString)")
     }
     .environment(colorManager)
+    .environment(ToastManager())
     .padding(.top, 50)
 }

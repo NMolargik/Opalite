@@ -25,8 +25,9 @@ final class OpalitePalette {
     // Preview background color (stored as raw value)
     var previewBackgroundRaw: String?
 
-    // Relationship
+    // Relationships
     @Relationship var colors: [OpaliteColor]? = []
+    @Relationship var canvasFile: CanvasFile?
 
     /// Colors sorted by creation date (newest first)
     var sortedColors: [OpaliteColor] {

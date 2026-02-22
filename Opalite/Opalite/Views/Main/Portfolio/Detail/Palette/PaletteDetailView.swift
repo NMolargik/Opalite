@@ -14,6 +14,9 @@ struct PaletteDetailView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #if canImport(PencilKit)
+    @Environment(CanvasManager.self) private var canvasManager
+    #endif
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
 
@@ -28,6 +31,7 @@ struct PaletteDetailView: View {
     @State private var currentColorIndex: Int = 0
     @State private var lastSqueezeTime: Date = .distantPast
     @State private var lastDoubleTapTime: Date = .distantPast
+    @State private var isShowingPaywall: Bool = false
 
     @Namespace private var heroNamespace
 
@@ -57,6 +61,16 @@ struct PaletteDetailView: View {
 
                     // MARK: - Content Sections
                     VStack(spacing: 20) {
+                        // Canvas section
+                        #if canImport(PencilKit)
+                        CanvasSectionView(
+                            palette: palette,
+                            onOpenCanvas: { canvas in
+                                openCanvas(canvas)
+                            }
+                        )
+                        #endif
+
                         // Notes section
                         NotesSectionView(
                             notes: $notesDraft,
@@ -244,6 +258,9 @@ struct PaletteDetailView: View {
                 }
             )
         }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView(featureContext: "Unlimited canvases require Onyx")
+        }
     }
 
     // MARK: - Full Screen Overlay
@@ -399,6 +416,16 @@ struct PaletteDetailView: View {
 
     // MARK: - Helper Functions
 
+    #if canImport(PencilKit)
+    private func openCanvas(_ canvas: CanvasFile) {
+        if subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
+            canvasManager.pendingCanvasToOpen = canvas
+        } else {
+            isShowingPaywall = true
+        }
+    }
+    #endif
+
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -475,12 +502,15 @@ private struct PaletteInfoTilesRow: View {
     let container = try! ModelContainer(
         for: OpalitePalette.self,
         OpaliteColor.self,
+        CanvasFile.self,
         configurations: config
     )
 
     let manager = ColorManager(context: container.mainContext)
+    let canvasManager = CanvasManager(context: container.mainContext)
     do {
         try manager.loadSamples()
+        try canvasManager.loadSamples()
     } catch {
         print("Failed to load samples into context")
     }
@@ -488,6 +518,7 @@ private struct PaletteInfoTilesRow: View {
     return NavigationStack {
         PaletteDetailView(palette: OpalitePalette.sample)
             .environment(manager)
+            .environment(canvasManager)
             .environment(ToastManager())
             .environment(SubscriptionManager())
             .environment(HexCopyManager())

@@ -223,13 +223,20 @@ struct MainView: View {
         }
         .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
             if let canvas = newCanvas {
-                canvasManager.pendingCanvasToOpen = nil
                 // Check if this canvas is accessible
                 if subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
-                    DispatchQueue.main.async {
-                        selectedTab = .canvasBody(canvas)
+                    if horizontalSizeClass == .compact {
+                        // On compact, switch to canvas tab; CanvasListView observes pendingCanvasToOpen
+                        selectedTab = .canvas
+                    } else {
+                        // On regular, directly switch to the canvas body tab
+                        canvasManager.pendingCanvasToOpen = nil
+                        DispatchQueue.main.async {
+                            selectedTab = .canvasBody(canvas)
+                        }
                     }
                 } else {
+                    canvasManager.pendingCanvasToOpen = nil
                     isShowingPaywall = true
                 }
             }

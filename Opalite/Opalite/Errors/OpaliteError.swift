@@ -31,6 +31,8 @@ enum OpaliteError: LocalizedError, Equatable {
     // MARK: - Relationship Operations
     case colorAttachFailed
     case colorDetachFailed
+    case canvasAttachFailed
+    case canvasDetachFailed
 
     // MARK: - Import/Export Operations
     case importFailed(reason: String)
@@ -102,6 +104,10 @@ enum OpaliteError: LocalizedError, Equatable {
             return "Unable to add color to palette"
         case .colorDetachFailed:
             return "Unable to remove color from palette"
+        case .canvasAttachFailed:
+            return "Unable to link canvas to palette"
+        case .canvasDetachFailed:
+            return "Unable to unlink canvas from palette"
 
         // Import/Export
         case .importFailed(let reason):
@@ -169,7 +175,8 @@ enum OpaliteError: LocalizedError, Equatable {
             return "arrow.down.circle.fill"
         case .canvasSaveFailed, .saveFailed:
             return "externaldrive.fill.badge.xmark"
-        case .colorAttachFailed, .colorDetachFailed:
+        case .colorAttachFailed, .colorDetachFailed,
+             .canvasAttachFailed, .canvasDetachFailed:
             return "link.circle.fill"
         case .importFailed:
             return "square.and.arrow.down.fill"

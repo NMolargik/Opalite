@@ -201,6 +201,64 @@ class ColorManager {
         color.updatedAt = .now
     }
 
+    // MARK: - Private helpers: Canvas–Palette relationship management
+
+    /// Attaches a canvas to the given palette, enforcing a one-to-one relationship.
+    /// Clears any existing associations on both sides first.
+    func attachCanvas(_ canvas: CanvasFile, to palette: OpalitePalette, onError: ((OpaliteError) -> Void)? = nil) {
+        // If already linked to this palette, nothing to do
+        if canvas.palette?.id == palette.id {
+            palette.updatedAt = .now
+            canvas.updatedAt = .now
+        } else {
+            // If the canvas was linked to a different palette, clear that
+            if let oldPalette = canvas.palette, oldPalette.id != palette.id {
+                oldPalette.canvasFile = nil
+                oldPalette.updatedAt = .now
+            }
+
+            // If the palette already had a different canvas, clear that
+            if let oldCanvas = palette.canvasFile, oldCanvas.id != canvas.id {
+                oldCanvas.palette = nil
+                oldCanvas.updatedAt = .now
+            }
+
+            // Establish the new relationship
+            palette.canvasFile = canvas
+            canvas.palette = palette
+            palette.updatedAt = .now
+            canvas.updatedAt = .now
+        }
+
+        do {
+            try saveContext()
+            Task {
+                await refreshAll()
+            }
+        } catch {
+            onError?(.canvasAttachFailed)
+        }
+    }
+
+    /// Detaches the canvas from the given palette.
+    func detachCanvasFromPalette(_ palette: OpalitePalette, onError: ((OpaliteError) -> Void)? = nil) {
+        if let canvas = palette.canvasFile {
+            canvas.palette = nil
+            canvas.updatedAt = .now
+        }
+        palette.canvasFile = nil
+        palette.updatedAt = .now
+
+        do {
+            try saveContext()
+            Task {
+                await refreshAll()
+            }
+        } catch {
+            onError?(.canvasDetachFailed)
+        }
+    }
+
     // MARK: - Public API: Refresh
     /// Refreshes in-memory caches by fetching the latest data from the ModelContext.
     /// Marked async to align with call sites that await this work, even though the fetches are synchronous.

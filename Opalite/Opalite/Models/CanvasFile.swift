@@ -42,6 +42,10 @@ final class CanvasFile {
     @Attribute(.externalStorage)
     var thumbnailData: Data?
 
+    // MARK: - Palette Relationship
+    @Relationship(inverse: \OpalitePalette.canvasFile)
+    var palette: OpalitePalette?
+
     // MARK: - Init
 
     /// Basic initializer for platforms without PencilKit (tvOS)

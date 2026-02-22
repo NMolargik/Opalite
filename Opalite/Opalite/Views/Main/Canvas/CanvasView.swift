@@ -139,7 +139,7 @@ struct CanvasView: View {
             }
         }
         .overlay(alignment: .top) {
-            CanvasSwatchPickerView { color in
+            CanvasSwatchPickerView(canvasFile: canvasFile) { color in
                 selectedInkColor = color.uiColor
                 forceColorUpdate = UUID()
                 // Force tool picker to reappear after selecting a swatch
