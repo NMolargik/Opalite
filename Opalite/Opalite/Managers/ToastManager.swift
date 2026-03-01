@@ -92,7 +92,18 @@ struct ToastView: View {
 
     @ViewBuilder
     private var toastContent: some View {
-        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+        #if os(visionOS)
+        toastBody
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(toast.style.backgroundColor.gradient)
+                    .shadow(color: toast.style.backgroundColor.opacity(0.3), radius: 8, y: 4)
+            )
+        #else
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             toastBody
                 .foregroundStyle(.white)
                 .padding(.horizontal, 16)
@@ -109,6 +120,7 @@ struct ToastView: View {
                         .shadow(color: toast.style.backgroundColor.opacity(0.3), radius: 8, y: 4)
                 )
         }
+        #endif
     }
 
     private var toastBody: some View {
