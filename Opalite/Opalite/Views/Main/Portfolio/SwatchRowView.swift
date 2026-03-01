@@ -254,6 +254,7 @@ struct SwatchRowView: View {
                     )
                     .padding(6)
                     .contentTransition(.symbolEffect(.replace))
+                    .accessibilityHidden(true)
             }
         }
     }

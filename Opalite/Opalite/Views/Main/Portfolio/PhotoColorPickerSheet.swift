@@ -131,6 +131,8 @@ struct PhotoColorPickerSheet: View {
         .frame(maxWidth: .infinity)
         .frame(height: 200)
         .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No image selected. Choose or capture a photo to start picking colors.")
     }
 
     // MARK: - Image Content
@@ -184,6 +186,8 @@ struct PhotoColorPickerSheet: View {
                                 handleSample(at: value.location, imageRect: imageRect, image: uiImage)
                             }
                     )
+                    .accessibilityLabel("Image sampling area")
+                    .accessibilityHint("Tap or drag on the image to sample a color")
                 }
                 .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: outerGeometry.size.width))
 
@@ -226,6 +230,8 @@ struct PhotoColorPickerSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
+            .accessibilityLabel("Stage color \(color.hexString)")
+            .accessibilityHint("Adds this color to the staged import list")
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
@@ -239,9 +245,11 @@ struct PhotoColorPickerSheet: View {
             HStack {
                 Text("Staged Colors")
                     .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
 
                 Text("(\(stagedColors.count))")
                     .foregroundStyle(.secondary)
+                    .accessibilityLabel("\(stagedColors.count) staged")
 
                 Spacer()
 
@@ -254,6 +262,7 @@ struct PhotoColorPickerSheet: View {
                     Text("Clear All")
                         .font(.caption)
                 }
+                .accessibilityHint("Removes all staged colors from the import list")
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -276,6 +285,7 @@ struct PhotoColorPickerSheet: View {
                                             .font(.caption)
                                             .foregroundStyle(.white, .red)
                                     }
+                                    .accessibilityLabel("Remove \(color.hexString)")
                                     .offset(x: 6, y: -6)
                                 }
 

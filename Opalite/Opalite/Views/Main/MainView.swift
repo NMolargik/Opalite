@@ -19,6 +19,12 @@ struct MainView: View {
     private var intentNavigationManager = IntentNavigationManager.shared
 
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
+    @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
+
+    private var settingsTabIcon: String {
+        let mode = ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
+        return mode != .off ? "eye.trianglebadge.exclamationmark" : Tabs.settings.symbol
+    }
 
     @State private var selectedTab: Tabs = .portfolio
     @State private var isShowingPaywall: Bool = false
@@ -64,7 +70,7 @@ struct MainView: View {
             .defaultVisibility(.hidden, for: .tabBar)
 
             // MARK: - Settings Tab - All screens
-            Tab(Tabs.settings.name, systemImage: Tabs.settings.symbol, value: .settings) {
+            Tab(Tabs.settings.name, systemImage: settingsTabIcon, value: .settings) {
                 SettingsView()
                     .tint(.none)
             }
@@ -133,7 +139,7 @@ struct MainView: View {
                 }
 
             } header: {
-                Label("Canvas", systemImage: "pencil")
+                Label("Canvases", systemImage: "pencil")
             }
             .sectionActions {
                 Button {

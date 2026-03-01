@@ -50,6 +50,10 @@ struct SettingsView: View {
         Bundle.main.bundleIdentifier ?? "—"
     }
 
+    private var isColorBlindnessActive: Bool {
+        (ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off) != .off
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -64,6 +68,7 @@ struct SettingsView: View {
                                 .multilineTextAlignment(.trailing)
                                 .textInputAutocapitalization(.words)
                                 .disableAutocorrection(true)
+                                .accessibilityLabel("Display name")
                                 .onChange(of: userName) { _, _ in
                                     // Mark that user has manually edited their display name
                                     // Skip if we're setting the name programmatically (e.g., from iCloud)
@@ -125,6 +130,36 @@ struct SettingsView: View {
                     swatchBarConfirmationToggle
                     #endif
                 }
+                
+                Section {
+                    Picker(selection: Binding<ColorBlindnessMode>(
+                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
+                        set: { colorBlindnessModeRaw = $0.rawValue }
+                    )) {
+                        ForEach(ColorBlindnessMode.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Label("Color Vision", systemImage: isColorBlindnessActive ? "eye.trianglebadge.exclamationmark" : "eye")
+                                .foregroundStyle(isColorBlindnessActive ? .orange : .primary)
+
+                            if isColorBlindnessActive {
+                                Text("Active")
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().fill(.orange))
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Accessibility")
+                } footer: {
+                    Text("Simulate how colors appear to people with color vision deficiencies. The Settings tab icon will change when simulation is active.")
+                }
 
                 #if os(iOS)
                 if UIDevice.current.userInterfaceIdiom == .pad {
@@ -169,8 +204,11 @@ struct SettingsView: View {
                                 Image(systemName: "chevron.right")
                                     .font(.footnote)
                                     .foregroundStyle(.inverseTheme)
+                                    .accessibilityHidden(true)
                             }
                         }
+                        .accessibilityLabel("Upgrade to Onyx")
+                        .accessibilityHint("Opens subscription options for unlimited features")
                     }
 
                     Button {
@@ -202,6 +240,8 @@ struct SettingsView: View {
                         }
                     }
                     .disabled(isRestoringPurchases)
+                    .accessibilityLabel("Restore Purchases")
+                    .accessibilityHint("Checks for previously purchased subscriptions")
                 } header: {
                     Text("Subscription")
                 }
@@ -218,24 +258,6 @@ struct SettingsView: View {
                     } header: {
                         Text("Administration")
                     }
-                }
-
-                Section {
-                    Picker(selection: Binding<ColorBlindnessMode>(
-                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
-                        set: { colorBlindnessModeRaw = $0.rawValue }
-                    )) {
-                        ForEach(ColorBlindnessMode.allCases) { option in
-                            Text(option.title).tag(option)
-                        }
-                    } label: {
-                        Label("Color Vision", systemImage: "eye")
-                            .foregroundStyle(.primary)
-                    }
-                } header: {
-                    Text("Accessibility")
-                } footer: {
-                    Text("Simulate how colors appear to people with color vision deficiencies. A banner will appear when simulation is active.")
                 }
 
                 #if os(iOS)
@@ -255,6 +277,7 @@ struct SettingsView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        .accessibilityElement(children: .combine)
 
                         if PhoneSessionManager.shared.isPaired {
                             HStack {
@@ -269,6 +292,7 @@ struct SettingsView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .accessibilityElement(children: .combine)
                         }
 
                         if PhoneSessionManager.shared.isWatchAppInstalled {

@@ -59,12 +59,15 @@ struct TVSearchView: View {
                                 )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Filter by \(filter.title)")
+                        .accessibilityHint(selectedFilter == filter ? "Currently selected" : "Double-click to filter results by \(filter.title.lowercased())")
                     }
                 }
                 .padding(.top, 20)
 
                 Divider()
                     .padding(.vertical, 16)
+                    .accessibilityHidden(true)
 
                 // Results
                 if searchText.isEmpty {
@@ -91,6 +94,8 @@ struct TVSearchView: View {
                                         .font(.title3)
                                         .fontWeight(.bold)
                                         .padding(.leading, 48)
+                                        .accessibilityAddTraits(.isHeader)
+                                        .accessibilityLabel("Colors, \(filteredColors.count) results")
 
                                     TVSwatchRowView(
                                         colors: filteredColors,
@@ -106,6 +111,8 @@ struct TVSearchView: View {
                                         .font(.title3)
                                         .fontWeight(.bold)
                                         .padding(.leading, 48)
+                                        .accessibilityAddTraits(.isHeader)
+                                        .accessibilityLabel("Palettes, \(filteredPalettes.count) results")
 
                                     ForEach(filteredPalettes) { palette in
                                         TVPaletteRowView(palette: palette, swatchSize: .medium)

@@ -33,6 +33,8 @@ struct NotesSectionView: View {
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(.white.opacity(0.08), lineWidth: 1)
                         )
+                        .accessibilityLabel("Notes")
+                        .accessibilityHint("Enter notes about this item")
 
                     if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         Text("Add any notes for this color…")
@@ -40,6 +42,7 @@ struct NotesSectionView: View {
                             .padding(.horizontal, 18)
                             .padding(.vertical, 20)
                             .allowsHitTesting(false)
+                            .accessibilityHidden(true)
                     }
                 }
             }

@@ -159,6 +159,8 @@ struct CanvasView: View {
                         .lineLimit(1)
                         .frame(maxWidth: 150)
                 }
+                .accessibilityLabel("Canvas: \(canvasFile.title)")
+                .accessibilityHint("Double tap to rename this canvas")
             }
 
             if horizontalSizeClass == .compact {
@@ -772,6 +774,8 @@ private struct ColorSamplingOverlay: View {
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .padding(.top, 80)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Tap to sample color. Touch and drag to preview colors.")
     }
 
     private var gestureOverlay: some View {
@@ -803,6 +807,7 @@ private struct ColorSamplingOverlay: View {
                     .padding(.vertical, 12)
                     .background(.red, in: RoundedRectangle(cornerRadius: 12))
             }
+            .accessibilityLabel("Cancel color sampling")
 
             if let color = sampledColor {
                 Button {
@@ -825,6 +830,8 @@ private struct ColorSamplingOverlay: View {
                     .padding(.vertical, 12)
                     .background(.blue, in: RoundedRectangle(cornerRadius: 12))
                 }
+                .accessibilityLabel("Save sampled color \(color.hexString)")
+                .accessibilityHint("Saves the sampled color to your portfolio")
             }
         }
         .padding()

@@ -72,6 +72,7 @@ struct WatchColorDetailView: View {
                 Text(colorManager.formattedHex(for: color))
                     .fontDesign(.monospaced)
                 Image(systemName: showCopiedFeedback ? "checkmark" : "doc.on.doc")
+                    .accessibilityHidden(true)
             }
             .font(.caption)
             .frame(maxWidth: .infinity)
@@ -80,6 +81,7 @@ struct WatchColorDetailView: View {
         .accessibilityLabel(showCopiedFeedback
             ? "Copied, \(colorManager.formattedHex(for: color))"
             : "Copy hex, \(colorManager.formattedHex(for: color))")
+        .accessibilityHint("Sends hex code to your iPhone clipboard")
     }
 
     // MARK: - Value Sections

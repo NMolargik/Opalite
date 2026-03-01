@@ -54,6 +54,7 @@ struct PaletteSelectionSheet: View {
                             TextField("Palette name", text: $newPaletteName)
                                 .textInputAutocapitalization(.words)
                                 .submitLabel(.done)
+                                .accessibilityLabel("Palette name")
                                 .onSubmit {
                                     if canCreate && canCreatePalette {
                                         createNewPaletteAndAttach()
@@ -80,8 +81,13 @@ struct PaletteSelectionSheet: View {
                                     Label("Create New Palette", systemImage: "plus")
                                         .font(.headline)
                                 } else {
-                                    Label("Create New Palette", systemImage: "lock.fill")
-                                        .font(.headline)
+                                    Label {
+                                        Text("Create New Palette")
+                                    } icon: {
+                                        Image(systemName: "lock.fill")
+                                            .accessibilityHidden(true)
+                                    }
+                                    .font(.headline)
                                 }
                                 Spacer()
                             }
@@ -90,6 +96,7 @@ struct PaletteSelectionSheet: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(!canCreate)
+                        .accessibilityHint(canCreatePalette ? "Creates a new palette and adds selected colors" : "Requires Onyx subscription to create more palettes")
                     }
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
@@ -146,16 +153,20 @@ struct PaletteSelectionSheet: View {
                                                         .padding(.leading, 2)
                                                 }
                                             }
+                                            .accessibilityHidden(true)
                                         }
                                     }
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .foregroundStyle(.secondary)
+                                        .accessibilityHidden(true)
                                 }
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
                             .disabled(isCreating)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("\(palette.name), \(palette.sortedColors.count) colors")
                         }
                     }
                 } header: {

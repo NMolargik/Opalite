@@ -205,6 +205,7 @@ struct PaletteDetailView: View {
                 } label: {
                     Label("Add Color", systemImage: "plus.square.dashed")
                 }
+                .accessibilityHint("Creates a new color and adds it to this palette")
             }
             
             // Ellipsis menu with palette info and actions
@@ -298,13 +299,19 @@ struct PaletteDetailView: View {
                                 .onTapGesture {
                                     goToPreviousColor()
                                 }
-                            
+                                .accessibilityLabel("Previous color")
+                                .accessibilityHint("Shows the previous color in the palette")
+                                .accessibilityAddTraits(.isButton)
+
                             // Right half - go to next
                             Color.clear
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     goToNextColor()
                                 }
+                                .accessibilityLabel("Next color")
+                                .accessibilityHint("Shows the next color in the palette")
+                                .accessibilityAddTraits(.isButton)
                         }
                     }
                 }
@@ -334,6 +341,7 @@ struct PaletteDetailView: View {
                                     .glassIfAvailable()
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Exit full screen")
                         }
 
                         HStack {
@@ -403,6 +411,7 @@ struct PaletteDetailView: View {
                 GlassConfiguration(style: .clear)
             )
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .accessibilityLabel("Color \(currentColorIndex + 1) of \(palette.sortedColors.count)")
     }
 
     private func dismissFullScreen() {

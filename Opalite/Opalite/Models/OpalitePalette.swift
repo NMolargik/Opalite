@@ -24,6 +24,9 @@ final class OpalitePalette {
 
     // Preview background color (stored as raw value)
     var previewBackgroundRaw: String?
+    
+    // Whether or not palette has been archived
+    var isArchived: Bool = false
 
     // Relationships
     @Relationship var colors: [OpaliteColor]? = []
@@ -63,7 +66,9 @@ final class OpalitePalette {
         createdByDisplayName: String? = nil,
         notes: String? = nil,
         tags: [String] = [],
-        colors: [OpaliteColor] = []
+        isArchived: Bool = false,
+        colors: [OpaliteColor] = [],
+        canvasFile: CanvasFile? = nil,
     ) {
         self.id = id
         self.name = name
@@ -72,7 +77,9 @@ final class OpalitePalette {
         self.createdByDisplayName = createdByDisplayName
         self.notes = notes
         self.tags = tags
+        self.isArchived = isArchived
         self.colors = colors
+        self.canvasFile = canvasFile
     }
 }
 
@@ -89,11 +96,17 @@ extension OpalitePalette {
             "createdByDisplayName": createdByDisplayName as Any,
             "notes": notes as Any,
             "tags": tags,
+            "isArchived": isArchived,
             "colors": (colors ?? []).map { $0.dictionaryRepresentation }
         ]
         if let previewBackgroundRaw {
             dict["previewBackground"] = previewBackgroundRaw
         }
+        if let canvasFile {
+            dict["canvasFileId"] = canvasFile.id.uuidString
+            dict["canvasFileTitle"] = canvasFile.title
+        }
+        
         return dict
     }
 

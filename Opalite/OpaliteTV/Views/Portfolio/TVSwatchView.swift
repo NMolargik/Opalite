@@ -21,6 +21,7 @@ struct TVSwatchView: View {
     private var swatchSize: CGFloat {
         // tvOS needs larger sizes for visibility at TV viewing distance
         switch size {
+        case .extraSmall: return 80
         case .small: return 120
         case .medium: return 180
         case .large: return 280
@@ -58,18 +59,25 @@ struct TVSwatchView: View {
         }
         .buttonStyle(.card)
         .focused($isFocused)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(color.name?.isEmpty == false ? color.name! : "Color") \(color.hexString)")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Opens color details. Long press for more options.")
         .contextMenu {
             Button {
                 showPresentation = true
             } label: {
                 Label("Present on TV", systemImage: "tv")
             }
+            .accessibilityLabel("Present \(color.name ?? color.hexString) on TV")
+            .accessibilityHint("Displays the color full screen")
 
             Button {
                 // Navigation happens via the NavigationLink
             } label: {
                 Label("View Details", systemImage: "info.circle")
             }
+            .accessibilityLabel("View details for \(color.name ?? color.hexString)")
         }
         .fullScreenCover(isPresented: $showPresentation) {
             NavigationStack {

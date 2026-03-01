@@ -14,16 +14,25 @@ struct TVSwatchRowView: View {
     let swatchSize: SwatchSize
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 40) {
-                ForEach(colors) { color in
-                    TVSwatchView(color: color, size: swatchSize)
+        if colors.isEmpty {
+            Text("No colors")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel("No colors available")
+                .padding(.leading, 48)
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 40) {
+                    ForEach(colors) { color in
+                        TVSwatchView(color: color, size: swatchSize)
+                    }
                 }
+                .padding(.horizontal, 48)
+                .padding(.vertical, 32)
             }
-            .padding(.horizontal, 48)
-            .padding(.vertical, 32)
+            .focusSection()
+            .accessibilityLabel("\(colors.count) color swatches")
         }
-        .focusSection()
     }
 }
 

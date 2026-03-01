@@ -195,6 +195,7 @@ struct ColorEditorView: View {
                         }
                     } label: {
                         Label("Save", systemImage: "checkmark")
+                            .labelStyle(.titleOnly)
                     }
                     .tint(.blue)
                 }

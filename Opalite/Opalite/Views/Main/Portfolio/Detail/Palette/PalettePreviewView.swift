@@ -135,6 +135,7 @@ struct PalettePreviewView: View {
             .foregroundStyle(currentBackground.idealTextColor.opacity(0.6))
             .font(.subheadline)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityLabel("Empty palette")
     }
 
     private func swatchGridView(columns: Int) -> some View {
@@ -204,6 +205,9 @@ struct PalettePreviewView: View {
                             isEditingName = true
                         }
                     }
+                    .accessibilityLabel("Palette name: \(cachedName)")
+                    .accessibilityHint("Double tap to edit the palette name")
+                    .accessibilityAddTraits(.isButton)
             } else {
                 // Editing state
                 HStack(spacing: 8) {
@@ -227,6 +231,7 @@ struct PalettePreviewView: View {
                     }
                     .contentShape(Circle())
                     .hoverEffect(.lift)
+                    .accessibilityLabel("Save name")
                 }
             }
         }
@@ -287,6 +292,8 @@ struct PalettePreviewView: View {
                 .contentShape(Circle())
                 .hoverEffect(.lift)
         }
+        .accessibilityLabel("Preview background")
+        .accessibilityHint("Choose a background color for the palette preview")
     }
 
     private func setBackground(_ background: PreviewBackground) {

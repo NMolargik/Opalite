@@ -85,6 +85,33 @@ struct ToastView: View {
     let onDismiss: () -> Void
 
     var body: some View {
+        toastContent
+            .padding(.horizontal, 16)
+            .frame(maxWidth: 300)
+    }
+
+    @ViewBuilder
+    private var toastContent: some View {
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 2.0, *) {
+            toastBody
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .glassEffect(.regular.tint(toast.style.backgroundColor).interactive())
+        } else {
+            toastBody
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(toast.style.backgroundColor.gradient)
+                        .shadow(color: toast.style.backgroundColor.opacity(0.3), radius: 8, y: 4)
+                )
+        }
+    }
+
+    private var toastBody: some View {
         HStack(spacing: 12) {
             Image(systemName: toast.icon ?? toast.style.iconName)
                 .font(.title3)
@@ -110,16 +137,6 @@ struct ToastView: View {
             }
             .buttonStyle(.plain)
         }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(toast.style.backgroundColor.gradient)
-                .shadow(color: toast.style.backgroundColor.opacity(0.3), radius: 8, y: 4)
-        )
-        .padding(.horizontal, 16)
-        .frame(maxWidth: 300)
     }
 }
 
@@ -135,8 +152,8 @@ struct ToastContainerModifier: ViewModifier {
                     ToastView(toast: toast) {
                         toastManager.dismiss()
                     }
+                    .id(toastManager.currentToast?.message)
                     .transition(.move(edge: .top).combined(with: .opacity))
-                    .padding(.top, 8)
                     .zIndex(999)
                 }
             }

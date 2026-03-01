@@ -187,6 +187,8 @@ struct CommunityPaletteDetailView: View {
             }
         }
         .frame(height: 300)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Palette preview, \(palette.name), \(palette.colorCount) colors")
     }
 
     @ViewBuilder
@@ -223,6 +225,7 @@ struct CommunityPaletteDetailView: View {
                     Image(systemName: "person.circle.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(palette.publisherName)
@@ -237,10 +240,13 @@ struct CommunityPaletteDetailView: View {
 
                     Image(systemName: "chevron.right")
                         .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 16)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Publisher, \(palette.publisherName)")
+            .accessibilityHint("Opens the publisher's profile")
         }
     }
 

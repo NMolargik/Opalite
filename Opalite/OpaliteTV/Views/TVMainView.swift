@@ -19,18 +19,24 @@ struct TVMainView: View {
                     Label("Portfolio", systemImage: "paintpalette.fill")
                 }
                 .tag(TVTab.portfolio)
+                .accessibilityLabel("Portfolio")
+                .accessibilityHint("View your saved colors and palettes")
 
             TVSearchView()
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
                 }
                 .tag(TVTab.search)
+                .accessibilityLabel("Search")
+                .accessibilityHint("Search for colors and palettes")
 
             TVSettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
                 .tag(TVTab.settings)
+                .accessibilityLabel("Settings")
+                .accessibilityHint("Manage app settings")
         }
     }
 }

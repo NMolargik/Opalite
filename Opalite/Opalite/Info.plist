@@ -53,6 +53,8 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpaliteColorDocument</string>
 			<key>CFBundleTypeName</key>
 			<string>Opalite Color</string>
 			<key>CFBundleTypeRole</key>
@@ -65,6 +67,8 @@
 			</array>
 		</dict>
 		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpalitePaletteDocument</string>
 			<key>CFBundleTypeName</key>
 			<string>Opalite Palette</string>
 			<key>CFBundleTypeRole</key>
@@ -141,6 +145,11 @@
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Opalite Color</string>
+			<key>UTTypeIcons</key>
+			<dict>
+				<key>UTTypeIconName</key>
+				<string>OpaliteColorDocument</string>
+			</dict>
 			<key>UTTypeIdentifier</key>
 			<string>com.molargiksoftware.opalite.color</string>
 			<key>UTTypeTagSpecification</key>
@@ -161,6 +170,11 @@
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Opalite Palette</string>
+			<key>UTTypeIcons</key>
+			<dict>
+				<key>UTTypeIconName</key>
+				<string>OpalitePaletteDocument</string>
+			</dict>
 			<key>UTTypeIdentifier</key>
 			<string>com.molargiksoftware.opalite.palette</string>
 			<key>UTTypeTagSpecification</key>

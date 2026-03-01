@@ -30,6 +30,20 @@ struct TVOLEDRefreshView: View {
         .black
     ]
 
+    private let refreshColorNames: [String] = [
+        "Red",
+        "Green",
+        "Blue",
+        "White",
+        "Cyan",
+        "Magenta",
+        "Yellow",
+        "Orange",
+        "Purple",
+        "Pink",
+        "Black"
+    ]
+
     /// Time interval between color changes (in seconds)
     private let cycleInterval: TimeInterval = 4.0
 
@@ -40,6 +54,8 @@ struct TVOLEDRefreshView: View {
     var body: some View {
         currentColor
             .ignoresSafeArea()
+            .accessibilityLabel("OLED refresh, currently displaying \(refreshColorNames[currentColorIndex])")
+            .accessibilityHint("Press Back to exit OLED refresh mode")
             .onAppear {
                 startCycling()
             }

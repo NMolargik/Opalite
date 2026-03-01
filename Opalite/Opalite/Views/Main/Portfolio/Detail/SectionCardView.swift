@@ -35,9 +35,11 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
             HStack(spacing: 10) {
                 Image(systemName: systemImage)
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 Text(title)
                     .font(.headline)
                     .bold()
+                    .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 0)
                 trailing
                 if isCollapsible {
@@ -46,6 +48,7 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
                         .rotationEffect(.degrees(isExpanded ? 0 : -90))
+                        .accessibilityHidden(true)
                 }
             }
             .padding(16)
@@ -56,6 +59,10 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
                     isExpanded.toggle()
                 }
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(title), \(isExpanded ? "expanded" : "collapsed")")
+            .accessibilityHint(isCollapsible ? "Double tap to \(isExpanded ? "collapse" : "expand")" : "")
+            .accessibilityAddTraits(isCollapsible ? .isButton : [])
 
             if isExpanded {
                 content

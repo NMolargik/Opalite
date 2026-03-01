@@ -30,6 +30,7 @@ struct TVQuickAddHexSheet: View {
             Text("Add Color")
                 .font(.title2)
                 .fontWeight(.bold)
+                .accessibilityAddTraits(.isHeader)
 
             // Content
             HStack(spacing: 60) {
@@ -42,11 +43,13 @@ struct TVQuickAddHexSheet: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 2)
                         )
+                        .accessibilityLabel(isValidHex ? "Color preview for \(hexInput.uppercased())" : "No color preview")
 
                     if isValidHex {
                         Text(hexInput.uppercased())
                             .font(.title3.monospaced())
                             .foregroundStyle(.secondary)
+                            .accessibilityLabel("Hex code: \(hexInput.uppercased())")
                     } else {
                         Text("Enter hex code")
                             .font(.callout)
@@ -66,6 +69,8 @@ struct TVQuickAddHexSheet: View {
                             .textFieldStyle(.plain)
                             .padding()
                             .background(Color.secondary.opacity(0.15), in: RoundedRectangle(cornerRadius: 12))
+                            .accessibilityLabel("Hex code input")
+                            .accessibilityHint("Enter a hex color code, for example #FF5733")
                             .onChange(of: hexInput) { _, newValue in
                                 // Auto-format: ensure # prefix
                                 if newValue.isEmpty {
@@ -86,6 +91,8 @@ struct TVQuickAddHexSheet: View {
                             .textFieldStyle(.plain)
                             .padding()
                             .background(Color.secondary.opacity(0.15), in: RoundedRectangle(cornerRadius: 12))
+                            .accessibilityLabel("Color name input")
+                            .accessibilityHint("Optional. Enter a name for this color.")
                     }
                 }
                 .frame(width: 350)
@@ -96,11 +103,15 @@ struct TVQuickAddHexSheet: View {
                 Button("Cancel") {
                     dismiss()
                 }
+                .accessibilityLabel("Cancel")
+                .accessibilityHint("Dismisses the add color sheet without saving")
 
                 Button("Save Color") {
                     addColor()
                 }
                 .disabled(!isValidHex)
+                .accessibilityLabel("Save Color")
+                .accessibilityHint(isValidHex ? "Saves the color \(hexInput.uppercased()) to your portfolio" : "Enter a valid hex code to save")
             }
             .padding(.top, 20)
         }

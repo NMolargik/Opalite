@@ -98,6 +98,9 @@ struct RandomColorWidgetView: View {
                 }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(entry.color.displayName), \(entry.color.hexString)")
+        .accessibilityHint("Opens color details in Opalite")
         .widgetURL(URL(string: "opalite://color/\(entry.color.id.uuidString)"))
     }
 

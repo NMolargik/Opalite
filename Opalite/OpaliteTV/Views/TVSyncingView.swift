@@ -44,11 +44,13 @@ struct TVSyncingView: View {
                 Text("Opalite is Syncing with iCloud")
                     .font(.title)
                     .bold()
+                    .accessibilityAddTraits(.isHeader)
 
                 Text(statusMessage + animatedDots)
                     .font(.title3)
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText())
+                    .accessibilityLabel(statusMessage)
             }
 
             Spacer()
@@ -57,6 +59,7 @@ struct TVSyncingView: View {
             ProgressView()
                 .scaleEffect(1.5)
                 .padding(.bottom, 80)
+                .accessibilityLabel("Syncing in progress")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)

@@ -48,6 +48,54 @@ struct PublishToCommunityButton: View {
     }
 }
 
+// MARK: - Save to File Button
+
+struct SaveToFileButton: View {
+    var description: String = "Save as a native Opalite file."
+    let isExporting: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            HapticsManager.shared.selection()
+            action()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "folder")
+                    .font(.title2)
+                    .frame(width: 32)
+                    .foregroundStyle(.blue)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Save to File")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text(description)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer()
+
+                if isExporting {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding()
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(isExporting)
+    }
+}
+
 // MARK: - Export Format Button
 
 struct ExportFormatButton<F: ExportFormat & Equatable>: View {

@@ -34,6 +34,7 @@ struct TVPresentationModeView: View {
             if let color = currentColor {
                 color.swiftUIColor
                     .ignoresSafeArea()
+                    .accessibilityHidden(true)
             }
 
             // Color info overlay
@@ -66,9 +67,12 @@ struct TVPresentationModeView: View {
                                 }
                             }
                             .padding(.top, 24)
+                            .accessibilityHidden(true)
                         }
                     }
                     .padding(.bottom, 140)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(colorAccessibilityLabel(for: color))
                 }
             }
 
@@ -81,12 +85,15 @@ struct TVPresentationModeView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "chevron.left")
+                                .accessibilityHidden(true)
                             Text("Back")
                         }
                         .font(.callout)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                     }
+                    .accessibilityLabel("Back")
+                    .accessibilityHint("Exits presentation mode")
 
                     Spacer()
 
@@ -98,6 +105,7 @@ struct TVPresentationModeView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(Color.black.opacity(0.3), in: Capsule())
+                            .accessibilityLabel("Color \(currentIndex + 1) of \(colors.count)")
                     }
                 }
                 .padding(40)
@@ -117,6 +125,20 @@ struct TVPresentationModeView: View {
         }
         .navigationBarBackButtonHidden(true)
         .animation(.easeInOut(duration: 0.3), value: currentIndex)
+    }
+
+    // MARK: - Accessibility
+
+    private func colorAccessibilityLabel(for color: OpaliteColor) -> String {
+        var parts: [String] = []
+        if let name = color.name, !name.isEmpty {
+            parts.append(name)
+        }
+        parts.append(color.hexString)
+        if colors.count > 1 {
+            parts.append("Color \(currentIndex + 1) of \(colors.count)")
+        }
+        return parts.joined(separator: ", ")
     }
 
     // MARK: - Navigation

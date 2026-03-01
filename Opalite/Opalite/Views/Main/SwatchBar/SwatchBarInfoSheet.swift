@@ -112,9 +112,9 @@ struct SwatchBarInfoSheet: View {
                     HapticsManager.shared.selection()
                     dismiss()
                 } label: {
-                    Text("Not now")
+                    Text("Not Now")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.blue)
                 }
                 .padding(.top, 16)
                 .padding(.bottom, 30)

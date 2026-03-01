@@ -22,6 +22,7 @@ struct InfoTileView: View {
                 .font(.title3)
                 .foregroundStyle(.inverseTheme)
                 .frame(height: 30)
+                .accessibilityHidden(true)
 
             Text(value)
                 .font(.subheadline.bold())
@@ -37,6 +38,8 @@ struct InfoTileView: View {
         .padding(12)
         .frame(maxWidth: maxWidth, maxHeight: 85)
         .modifier(GlassTileBackground(style: glassStyle))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label), \(value)")
     }
 }
 

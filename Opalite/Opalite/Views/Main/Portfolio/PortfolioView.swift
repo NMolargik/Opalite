@@ -64,7 +64,7 @@ struct PortfolioView: View {
 
     private var orderedPalettes: [OpalitePalette] {
         viewModel.orderedPalettes(
-            palettes: colorManager.palettes,
+            palettes: colorManager.activePalettes,
             paletteOrderData: paletteOrderData,
             colorManager: colorManager
         )
@@ -266,34 +266,19 @@ private extension PortfolioView {
             copiedColorID: $viewModel.copiedColorID
         )
     }
-
+    
     var palettesSection: some View {
-        VStack(alignment: .leading) {
-            palettesSectionHeader
+        VStack(alignment: .leading, spacing: 8) {
+            PaletteSectionHeaderView()
 
-            if colorManager.palettes.isEmpty {
+            if colorManager.activePalettes.isEmpty {
                 emptyPalettesPrompt
             } else {
                 palettesContent
             }
         }
     }
-
-    var palettesSectionHeader: some View {
-        HStack {
-            Image(systemName: "swatchpalette.fill")
-                .foregroundStyle(.purple.gradient, .orange.gradient, .red.gradient)
-                .accessibilityHidden(true)
-
-            Text("Palettes")
-        }
-        .font(.title)
-        .bold()
-        .padding(.leading, 20)
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityLabel("Palettes, \(colorManager.palettes.count) items")
-    }
-
+    
     var emptyPalettesPrompt: some View {
         HStack(spacing: 10) {
             Image(systemName: "arrow.turn.down.right")
@@ -535,7 +520,7 @@ private extension PortfolioView {
             }
         }
         
-        if colorManager.palettes.count >= 3 {
+        if colorManager.activePalettes.count >= 3 {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticsManager.shared.selection()
@@ -620,7 +605,7 @@ private extension PortfolioView {
                 } icon: {
                     Image(systemName: "macwindow.on.rectangle")
                 }
-                .tint(.white)
+                .tint(.green)
             })
             #endif
 

@@ -102,6 +102,9 @@ struct CommunityPaletteCardView: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(palette.name), \(palette.colorCount) colors, by \(palette.publisherName)")
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Swatch Cell (SwatchView-style for CommunityColor)

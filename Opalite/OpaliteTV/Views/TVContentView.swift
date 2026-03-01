@@ -23,9 +23,11 @@ struct TVContentView: View {
                     }
                 }
                 .transition(.opacity)
+                .accessibilityIdentifier("tvSyncingView")
             } else {
                 TVMainView()
                     .transition(.opacity)
+                    .accessibilityIdentifier("tvMainView")
             }
         }
     }

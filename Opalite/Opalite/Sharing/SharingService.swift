@@ -34,7 +34,7 @@ enum ColorExportFormat: String, CaseIterable, Identifiable, ExportFormat {
 
     var displayName: String {
         switch self {
-        case .image: return "Image"
+        case .image: return "Save As Image"
         case .opalite: return "Opalite Color"
         case .ase: return "Adobe Swatch Exchange"
         case .procreate: return "Procreate Swatch"
@@ -120,7 +120,7 @@ enum PaletteExportFormat: String, CaseIterable, Identifiable, ExportFormat {
 
     var displayName: String {
         switch self {
-        case .image: return "Image"
+        case .image: return "Save As Image"
         case .pdf: return "PDF Document"
         case .opalite: return "Opalite Palette"
         case .ase: return "Adobe Swatch Exchange"

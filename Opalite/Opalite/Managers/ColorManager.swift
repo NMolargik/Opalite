@@ -38,6 +38,16 @@ class ColorManager {
         colors.filter { $0.palette == nil }
     }
 
+    /// Palettes that are not archived (active palettes)
+    var activePalettes: [OpalitePalette] {
+        palettes.filter { !$0.isArchived }
+    }
+
+    /// Palettes that have been archived
+    var archivedPalettes: [OpalitePalette] {
+        palettes.filter { $0.isArchived }
+    }
+
     /// Color selected from SwatchBar to apply to canvas drawing tool.
     /// CanvasView observes this to update the current ink color.
     var selectedCanvasColor: OpaliteColor?
@@ -435,6 +445,20 @@ class ColorManager {
     func renameColor(_ color: OpaliteColor, to newName: String?) throws {
         try updateColor(color) { c in
             c.name = newName
+        }
+    }
+    
+    // MARK: - Archiving
+    /// Archives a palette
+    func archivePalette(_ palette: OpalitePalette) throws {
+        try updatePalette(palette) { p in
+            p.isArchived = true
+        }
+    }
+    
+    func unarchivePalette(_ palette: OpalitePalette) throws {
+        try updatePalette(palette) { p in
+            p.isArchived = false
         }
     }
 

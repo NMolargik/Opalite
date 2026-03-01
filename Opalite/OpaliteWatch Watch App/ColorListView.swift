@@ -21,6 +21,8 @@ struct ColorListView: View {
                     systemImage: "paintpalette",
                     description: Text("Add colors to this palette in Opalite on your iPhone, iPad, or Mac and they'll appear here.")
                 )
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("No colors. Add colors to this palette in Opalite on your iPhone, iPad, or Mac and they'll appear here.")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 8) {
@@ -30,6 +32,7 @@ struct ColorListView: View {
                     }
                     .padding(.horizontal, 4)
                 }
+                .accessibilityLabel("\(colors.count) color\(colors.count == 1 ? "" : "s") in \(title)")
             }
         }
         .navigationTitle(title)

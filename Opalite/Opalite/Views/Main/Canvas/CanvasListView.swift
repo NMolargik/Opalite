@@ -55,6 +55,7 @@ struct CanvasListView: View {
                                 Image(systemName: "lock.fill")
                                     .font(.footnote)
                                     .foregroundStyle(.secondary)
+                                    .accessibilityHidden(true)
                             }
                         }
                         .bold()
@@ -62,6 +63,8 @@ struct CanvasListView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(canvasFile.title)
+                    .accessibilityHint(subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) ? "Opens this canvas for drawing" : "Locked, requires Onyx subscription")
                     .contextMenu {
                         Button {
                             HapticsManager.shared.impact()
@@ -132,6 +135,7 @@ struct CanvasListView: View {
                         Label("New Canvas", systemImage: "plus")
                     })
                     .tint(.red)
+                    .accessibilityHint("Creates a new drawing canvas")
                 }
             }
             .sheet(isPresented: $isShowingPaywall) {

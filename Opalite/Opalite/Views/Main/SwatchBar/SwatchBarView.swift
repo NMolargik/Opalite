@@ -139,6 +139,7 @@ struct SwatchBarView: View {
                         )
                     }
                     .tint(.purple)
+                    .accessibilityHint(allSectionsExpanded ? "Collapses all palette sections" : "Expands all palette sections")
                 }
 
                 ToolbarItem {
@@ -149,6 +150,7 @@ struct SwatchBarView: View {
                         Label("Info", systemImage: "info.circle")
                     }
                     .tint(.blue)
+                    .accessibilityHint("Shows information about SwatchBar")
                 }
             }
             .sheet(isPresented: $showingSwatchBarInfo) {
@@ -218,12 +220,16 @@ struct SwatchBarView: View {
                     .font(.caption)
                     .fontWeight(.semibold)
                     .rotationEffect(isExpanded ? .degrees(90) : .zero)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal)
             .padding(.vertical, 10)
             .background(.regularMaterial)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(title), \(isExpanded ? "expanded" : "collapsed")")
+        .accessibilityHint("Double tap to \(isExpanded ? "collapse" : "expand")")
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Info Sheet
@@ -370,6 +376,7 @@ struct SwatchBarView: View {
             .onTapGesture {
                 handleTap(for: color)
             }
+            .accessibilityHint("Copies hex code to clipboard")
             .contextMenu {
                 Text(labelText)
 

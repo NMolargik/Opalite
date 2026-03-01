@@ -126,6 +126,7 @@ struct CommunityColorDetailView: View {
             Label("Save to Portfolio", systemImage: "square.and.arrow.down")
         }
         .tint(.teal)
+        .accessibilityHint("Saves this community color to your portfolio")
     }
 
     private var reportButton: some View {
@@ -136,6 +137,7 @@ struct CommunityColorDetailView: View {
             Label("Report", systemImage: "flag")
         }
         .tint(.red)
+        .accessibilityHint("Reports this color for inappropriate content")
     }
 
     private var removeFromCommunityButton: some View {
@@ -182,6 +184,8 @@ struct CommunityColorDetailView: View {
                     .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Copy \(label) value")
+            .accessibilityHint("Copies \(value) to the clipboard")
         }
     }
 
@@ -206,6 +210,8 @@ struct CommunityColorDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .padding(8)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Color preview, \(color.name ?? color.hexString)")
     }
 
     // MARK: - Publisher Section
@@ -217,6 +223,7 @@ struct CommunityColorDetailView: View {
                     Image(systemName: "person.circle.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(color.publisherName)
@@ -231,10 +238,13 @@ struct CommunityColorDetailView: View {
 
                     Image(systemName: "chevron.right")
                         .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 16)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Publisher, \(color.publisherName)")
+            .accessibilityHint("Opens the publisher's profile")
         }
     }
 

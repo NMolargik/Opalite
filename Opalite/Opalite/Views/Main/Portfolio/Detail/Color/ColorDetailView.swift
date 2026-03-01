@@ -304,13 +304,15 @@ struct ColorDetailView: View {
                         } label: {
                             Label("Rename", systemImage: "character.cursor.ibeam")
                         }
-                        
+                        .accessibilityHint("Opens the name editor for this color")
+
                         Button(role: .destructive) {
                             HapticsManager.shared.selection()
                             showDeleteConfirmation = true
                         } label: {
                             Label("Delete", systemImage: "trash.fill")
                         }
+                        .accessibilityHint("Permanently deletes this color")
                     }
                 } label: {
                     Label("More", systemImage: "ellipsis")
@@ -362,6 +364,7 @@ struct ColorDetailView: View {
                         GlassConfiguration(style: .clear)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .accessibilityAddTraits(.isHeader)
 
                 #if os(visionOS)
                 Button {
@@ -382,6 +385,8 @@ struct ColorDetailView: View {
                         .glassIfAvailable()
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(immersiveColorManager.isImmersed ? "Exit immersive view" : "Enter immersive view")
+                .accessibilityHint(immersiveColorManager.isImmersed ? "Exits the immersive color experience" : "Opens an immersive color experience in your space")
                 #endif
 
                 Button {
@@ -396,6 +401,7 @@ struct ColorDetailView: View {
                         .glassIfAvailable()
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Exit full screen")
             }
             .padding()
             .opacity(showFullScreenControls ? 1 : 0)

@@ -20,5 +20,7 @@
 	<array>
 		<string>group.com.molargiksoftware.Opalite</string>
 	</array>
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
 </dict>
 </plist>

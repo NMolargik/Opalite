@@ -134,6 +134,8 @@ struct ColorImagePickerView: View {
                         handleSample(at: value.location, imageRect: imageRect, image: uiImage)
                     }
             )
+            .accessibilityLabel("Image sampling area")
+            .accessibilityHint("Tap or drag on the image to sample a color")
         }
         .aspectRatio(uiImage.size, contentMode: .fit)
         .frame(maxHeight: horizontalSizeClass == .compact ? 350 : nil)

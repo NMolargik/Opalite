@@ -27,6 +27,7 @@ struct TVPortfolioView: View {
                         Text("Opalite")
                             .font(.largeTitle)
                             .fontWeight(.bold)
+                            .accessibilityAddTraits(.isHeader)
 
                         Spacer()
 
@@ -37,6 +38,8 @@ struct TVPortfolioView: View {
                                 Image(systemName: "plus")
                                     .font(.title3)
                             }
+                            .accessibilityLabel("Add color by hex code")
+                            .accessibilityHint("Opens a sheet to enter a hex color code")
 
                             Button {
                                 Task {
@@ -47,6 +50,8 @@ struct TVPortfolioView: View {
                                 Image(systemName: "arrow.clockwise")
                                     .font(.title3)
                             }
+                            .accessibilityLabel("Sync with iCloud")
+                            .accessibilityHint("Refreshes colors and palettes from iCloud")
                         }
                     }
                     .padding(.horizontal, 48)
@@ -58,6 +63,7 @@ struct TVPortfolioView: View {
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .padding(.leading, 48)
+                                .accessibilityAddTraits(.isHeader)
 
                             TVSwatchRowView(
                                 colors: colorManager.looseColors,
@@ -73,6 +79,7 @@ struct TVPortfolioView: View {
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .padding(.leading, 48)
+                                .accessibilityAddTraits(.isHeader)
 
                             ForEach(colorManager.palettes) { palette in
                                 TVPaletteRowView(

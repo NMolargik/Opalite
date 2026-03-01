@@ -32,10 +32,13 @@ struct TVColorDetailView: View {
                                         .font(.title2)
                                         .foregroundStyle(color.idealTextColor().opacity(0.6))
                                         .padding(16)
+                                        .accessibilityHidden(true)
                                 }
                             }
                         )
                 }
+                .accessibilityLabel("Present \(color.name ?? color.hexString) full screen")
+                .accessibilityHint("Displays the color in presentation mode")
 
                 VStack(spacing: 8) {
                     if let name = color.name, !name.isEmpty {
@@ -49,6 +52,8 @@ struct TVColorDetailView: View {
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(color.name?.isEmpty == false ? color.name! : "Color") \(color.hexString)")
             }
             .padding(.leading, 60)
 
@@ -62,8 +67,11 @@ struct TVColorDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(maxWidth: 400)
+                .accessibilityLabel("Detail section")
+                .accessibilityValue(selectedTab.title)
 
                 Divider()
+                    .accessibilityHidden(true)
 
                 // Tab Content
                 ScrollView {
@@ -94,6 +102,7 @@ struct TVColorDetailView: View {
 
             Divider()
                 .padding(.vertical, 8)
+                .accessibilityHidden(true)
 
             if let author = color.createdByDisplayName {
                 TVInfoRowView(label: "Created By", value: author)
@@ -188,6 +197,7 @@ struct TVColorHarmonyRowView: View {
             Text(title)
                 .font(.headline)
                 .foregroundStyle(.secondary)
+                .accessibilityAddTraits(.isHeader)
 
             HStack(spacing: 16) {
                 ForEach(colors.indices, id: \.self) { index in
@@ -202,6 +212,8 @@ struct TVColorHarmonyRowView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(title) color \(harmonyColor.hexString)")
                 }
             }
         }

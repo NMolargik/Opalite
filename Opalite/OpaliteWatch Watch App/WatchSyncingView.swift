@@ -33,6 +33,7 @@ struct WatchSyncingView: View {
 
             ProgressView()
                 .tint(colorManager.isPhoneReachable ? .blue : .orange)
+                .accessibilityLabel(colorManager.isPhoneReachable ? "Syncing with iPhone" : "Waiting for iPhone connection")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
@@ -57,6 +58,7 @@ struct WatchSyncingView: View {
                     .easeInOut(duration: 1.0).repeatForever(autoreverses: true),
                     value: pulseScale
                 )
+                .accessibilityHidden(true)
 
             VStack(spacing: 6) {
                 Text("Syncing")
@@ -69,6 +71,8 @@ struct WatchSyncingView: View {
                     .frame(height: 16)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Syncing colors with iPhone")
     }
 
     // MARK: - Unreachable State
@@ -78,6 +82,7 @@ struct WatchSyncingView: View {
             Image(systemName: "iphone.slash")
                 .font(.system(size: 44))
                 .foregroundStyle(.orange)
+                .accessibilityHidden(true)
 
             VStack(spacing: 6) {
                 Text("iPhone Not Connected")
@@ -97,6 +102,10 @@ struct WatchSyncingView: View {
                 }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(colorManager.hasCachedData
+            ? "iPhone not connected. Loading cached colors."
+            : "iPhone not connected. Open Opalite on your iPhone to sync your colors.")
     }
 
     /// Animates the loading dots using async/await instead of Timer

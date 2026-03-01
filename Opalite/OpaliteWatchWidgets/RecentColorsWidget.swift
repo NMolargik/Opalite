@@ -100,6 +100,7 @@ struct RecentColorsRectangularView: View {
                             RoundedRectangle(cornerRadius: 3)
                                 .strokeBorder(.white.opacity(0.3), lineWidth: 0.5)
                         )
+                        .accessibilityHidden(true)
 
                     Text(color.name ?? color.hexString)
                         .font(.caption2)
@@ -107,10 +108,12 @@ struct RecentColorsRectangularView: View {
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                 }
+                .accessibilityElement(children: .combine)
                 .accessibilityLabel(color.voiceOverDescription)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel("Recent colors, \(entry.colors.prefix(3).count) color\(entry.colors.prefix(3).count == 1 ? "" : "s")")
     }
 
     private var emptyState: some View {
@@ -118,11 +121,14 @@ struct RecentColorsRectangularView: View {
             Image(systemName: "paintpalette")
                 .font(.title3)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
             Text("No Colors")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No colors saved")
     }
 }
 
@@ -132,8 +138,10 @@ struct RecentColorsInlineView: View {
     var body: some View {
         if let first = entry.colors.first {
             Label(first.name ?? first.hexString, systemImage: "paintpalette.fill")
+                .accessibilityLabel("Recent color: \(first.voiceOverDescription)")
         } else {
             Label("No Colors", systemImage: "paintpalette")
+                .accessibilityLabel("No colors saved")
         }
     }
 }

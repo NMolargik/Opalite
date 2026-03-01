@@ -138,6 +138,8 @@ struct PaletteOrderSheet: View {
                                     selectedPaletteIDs.insert(palette.id)
                                 }
                             }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("\(palette.name), \(palette.sortedColors.count) colors\(isForExport ? ", \(selectedPaletteIDs.contains(palette.id) ? "selected" : "not selected")" : "")")
                         }
                         .onMove(perform: movePalettes)
                     }
@@ -181,6 +183,7 @@ struct PaletteOrderSheet: View {
                             exportPDF()
                         }
                         .disabled(selectedPaletteIDs.isEmpty && !includeLooseColors)
+                        .accessibilityHint("Exports the selected palettes and loose colors as a PDF document")
                     } else {
                         Button("Done") {
                             HapticsManager.shared.selection()

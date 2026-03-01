@@ -17,6 +17,7 @@ struct DetailRowView: View {
             Image(systemName: icon)
                 .foregroundColor(.secondary)
                 .frame(width: 20, height: 20)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.footnote)
@@ -26,6 +27,8 @@ struct DetailRowView: View {
                     .foregroundColor(.primary)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title), \(value)")
     }
 }
 #Preview("DetailRowView") {

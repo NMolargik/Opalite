@@ -46,6 +46,8 @@ struct QuickAddHexSheet: View {
                             }
                         }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(previewColor != nil ? "Color preview, \(previewColor!.hexString)" : "Color preview, no color entered")
 
                 // Hex input field
                 VStack(alignment: .leading, spacing: 8) {
@@ -67,6 +69,7 @@ struct QuickAddHexSheet: View {
                             .keyboardType(.asciiCapable)
                             #endif
                             .focused($isTextFieldFocused)
+                            .accessibilityLabel("Hex code input")
                             .onChange(of: hexInput) { _, newValue in
                                 let sanitized = sanitizeHexInput(newValue)
                                 if sanitized != newValue {

@@ -20,6 +20,7 @@ struct PaletteExportSheet: View {
     @State private var exportError: String?
     @State private var shareFileURL: URL?
     @State private var isShowingShareSheet = false
+    @State private var isShowingFileSave = false
     @State private var isShowingPaywall = false
     @State private var isShowingPublishSheet = false
 
@@ -27,14 +28,16 @@ struct PaletteExportSheet: View {
         palette.previewBackground ?? PreviewBackground.defaultFor(colorScheme: colorScheme)
     }
 
+    private var shareFormats: [PaletteExportFormat] {
+        [.image, .ase, .procreate, .gpl, .css, .swiftui]
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Preview of the palette being exported
                     palettePreview
 
-                    // Color count
                     Text("\(palette.colors?.count ?? 0) colors")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -42,17 +45,24 @@ struct PaletteExportSheet: View {
                     Text("Choose Share Format")
                         .font(.headline)
                         .padding(.top, 8)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(spacing: 12) {
-                        // Publish to Community option
+                        // Save To File
+                        SaveToFileButton(
+                            description: "Save as a native Opalite palette file.",
+                            isExporting: isExporting && selectedFormat == .opalite
+                        ) {
+                            exportOpaliteFile()
+                        }
+
+                        // Publish to Community
                         PublishToCommunityButton(isOffline: !communityManager.isConnectedToNetwork) {
                             isShowingPublishSheet = true
                         }
 
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        ForEach(PaletteExportFormat.allCases) { format in
+                        // Share formats
+                        ForEach(shareFormats) { format in
                             ExportFormatButton(
                                 format: format,
                                 hasOnyx: subscriptionManager.hasOnyxEntitlement,
@@ -92,6 +102,11 @@ struct PaletteExportSheet: View {
         .background(
             FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingShareSheet)
         )
+        .background(
+            FileSavePresenter(fileURL: shareFileURL, isPresented: $isShowingFileSave) {
+                dismiss()
+            }
+        )
         .onChange(of: isShowingShareSheet) { _, isShowing in
             if !isShowing && shareFileURL != nil {
                 dismiss()
@@ -102,6 +117,34 @@ struct PaletteExportSheet: View {
         }
         .sheet(isPresented: $isShowingPublishSheet) {
             PublishPaletteSheet(palette: palette)
+        }
+    }
+
+    // MARK: - Export Actions
+
+    private func exportOpaliteFile() {
+        selectedFormat = .opalite
+        isExporting = true
+        exportError = nil
+
+        Task {
+            do {
+                let url = try SharingService.exportPalette(palette, format: .opalite)
+                await MainActor.run {
+                    shareFileURL = url
+                    #if targetEnvironment(macCatalyst)
+                    isShowingFileSave = true
+                    #else
+                    isShowingShareSheet = true
+                    #endif
+                    isExporting = false
+                }
+            } catch {
+                await MainActor.run {
+                    exportError = "Export failed: \(error.localizedDescription)"
+                    isExporting = false
+                }
+            }
         }
     }
 
@@ -193,6 +236,8 @@ struct PaletteExportSheet: View {
                 .padding(8)
         }
         .frame(height: previewHeight)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(palette.name) palette preview, \(palette.colors?.count ?? 0) colors")
     }
 
 }

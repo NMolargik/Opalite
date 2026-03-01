@@ -128,11 +128,13 @@ struct SearchView: View {
                     Image(systemName: "lock.fill")
                         .font(.caption)
                         .foregroundStyle(.red)
+                        .accessibilityHidden(true)
                 }
 
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundStyle(.red)
+                    .accessibilityHidden(true)
             }
         }
         .buttonStyle(.plain)
@@ -178,6 +180,8 @@ struct SearchView: View {
                                             }
                                         }
                                         .buttonStyle(.plain)
+                                        .accessibilityLabel("\(color.name ?? color.hexString)")
+                                        .accessibilityHint("Opens color details")
                                     }
                                 }
                                 .padding(.vertical, 4)

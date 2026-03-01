@@ -19,13 +19,7 @@ struct ContentView: View {
     @State private var appStage: AppStage = .splash
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
-    @State private var isColorBlindnessBannerVisible: Bool = true
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
-    @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
-
-    private var colorBlindnessMode: ColorBlindnessMode {
-        ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off
-    }
 
     private var preferredColorScheme: ColorScheme? {
         let option = AppThemeOption(rawValue: appThemeRaw) ?? .system
@@ -100,20 +94,6 @@ struct ContentView: View {
                 .zIndex(0)
                 .preferredColorScheme(preferredColorScheme)
                 .accessibilityIdentifier("mainView")
-                .safeAreaInset(edge: .top) {
-                    if colorBlindnessMode != .off && isColorBlindnessBannerVisible {
-                        ColorBlindnessBannerView(mode: colorBlindnessMode) {
-                            withAnimation(.easeInOut) {
-                                isColorBlindnessBannerVisible = false
-                            }
-                        }
-                    }
-                }
-                .onChange(of: colorBlindnessMode) { _, newValue in
-                    if newValue != .off {
-                        isColorBlindnessBannerVisible = true
-                    }
-                }
             }
         }
         .task {

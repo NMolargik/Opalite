@@ -22,7 +22,12 @@
       "Bash(wc:*)",
       "Bash(xargs dirname:*)",
       "Bash(cd /Users/nickmolargik/Developer/Molargik\\\\ Software\\\\ LLC/Opalite && grep -l \"SwatchView\" ./Opalite/Opalite/Views/Main/Portfolio/Detail/*.swift ./Opalite/Opalite/Views/Main/Portfolio/Detail/**/*.swift 2>/dev/null:*)",
-      "Bash(xcrun simctl:*)"
+      "Bash(xcrun simctl:*)",
+      "Bash(/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister:*)",
+      "Bash(python3 -m json.tool echo \"\" echo \"=== Full CFBundleDocumentTypes from built plist ===\" plutil -extract CFBundleDocumentTypes json -o - \"$APP/Contents/Info.plist\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(APP=\"/Users/nickmolargik/Library/Developer/Xcode/DerivedData/Opalite-dmsykpvtuvtazydhidtbfyuhxcun/Build/Products/Debug-maccatalyst/Opalite.app\" echo \"=== Resources in bundle ===\" ls \"$APP/Contents/Resources/\")",
+      "Bash(__NEW_LINE_dd616ed8488267dc__ echo:*)"
     ]
   }
 }

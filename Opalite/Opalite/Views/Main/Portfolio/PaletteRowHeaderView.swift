@@ -16,6 +16,7 @@ struct PaletteRowHeaderView: View {
 
     private let paletteMenuTip = PaletteMenuTip()
 
+    @State private var showArchiveConfirmation = false
     @State private var showDeleteConfirmation = false
     @State private var showRenameAlert = false
     @State private var renameText: String = ""
@@ -72,6 +73,13 @@ struct PaletteRowHeaderView: View {
                 .disabled(palette.sortedColors.isEmpty)
                 
                 Divider()
+                
+                Button(role: .destructive) {
+                    HapticsManager.shared.selection()
+                    showArchiveConfirmation = true
+                } label: {
+                    Label("Archive Palette", systemImage: "archivebox.fill")
+                }
                 
                 Button(role: .destructive) {
                     HapticsManager.shared.selection()
@@ -151,6 +159,22 @@ struct PaletteRowHeaderView: View {
             }
         } message: {
             Text("This action cannot be undone.")
+        }
+        .alert("Archive this palette? It will no longer appear immediately within your portfolio tab.", isPresented: $showArchiveConfirmation) {
+            Button("Cancel", role: .cancel) {
+                HapticsManager.shared.selection()
+            }
+
+            Button("Archive Palette", role: .destructive) {
+                withAnimation {
+                    HapticsManager.shared.selection()
+                    do {
+                        try colorManager.archivePalette(palette)
+                    } catch {
+                        toastManager.show(error: .paletteUpdateFailed)
+                    }
+                }
+            }
         }
         .alert("Rename Palette", isPresented: $showRenameAlert) {
             TextField("Palette name", text: $renameText)

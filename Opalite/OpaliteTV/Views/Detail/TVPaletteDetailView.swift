@@ -42,6 +42,8 @@ struct TVPaletteDetailView: View {
                                 .strokeBorder(Color.white.opacity(0.3), lineWidth: 2)
                         )
                     }
+                    .accessibilityLabel("Present \(palette.name) as slideshow")
+                    .accessibilityHint("Displays palette colors in full screen presentation mode")
                 } else {
                     HStack(spacing: 3) {
                         Rectangle()
@@ -49,12 +51,14 @@ struct TVPaletteDetailView: View {
                             .frame(width: 24, height: 60)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .accessibilityHidden(true)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(palette.name)
                         .font(.largeTitle)
                         .fontWeight(.bold)
+                        .accessibilityAddTraits(.isHeader)
 
                     Text("\(palette.colors?.count ?? 0) colors")
                         .font(.title3)
@@ -75,9 +79,12 @@ struct TVPaletteDetailView: View {
             .pickerStyle(.segmented)
             .frame(maxWidth: 400)
             .padding(.horizontal, 48)
+            .accessibilityLabel("Detail section")
+            .accessibilityValue(selectedTab.title)
 
             Divider()
                 .padding(.horizontal, 48)
+                .accessibilityHidden(true)
 
             // Tab Content
             ScrollView {

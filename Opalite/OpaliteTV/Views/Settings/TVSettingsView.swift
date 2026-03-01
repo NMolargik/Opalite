@@ -23,12 +23,14 @@ struct TVSettingsView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.bottom, 8)
+                    .accessibilityAddTraits(.isHeader)
 
                 // MARK: - Sync Section
                 VStack(alignment: .leading, spacing: 24) {
                     Text("Sync")
                         .font(.title3)
                         .foregroundStyle(.secondary)
+                        .accessibilityAddTraits(.isHeader)
 
                     Button {
                         Task {
@@ -38,6 +40,8 @@ struct TVSettingsView: View {
                     } label: {
                         Label("Refresh from iCloud", systemImage: "arrow.clockwise")
                     }
+                    .accessibilityLabel("Refresh from iCloud")
+                    .accessibilityHint("Syncs your colors and palettes from iCloud")
 
                     VStack(spacing: 12) {
                         TVSettingsInfoRow(label: "Colors", value: "\(colorManager.colors.count)")
@@ -50,12 +54,15 @@ struct TVSettingsView: View {
                     Text("Display")
                         .font(.title3)
                         .foregroundStyle(.secondary)
+                        .accessibilityAddTraits(.isHeader)
 
                     Button {
                         showOLEDRefresh = true
                     } label: {
                         Label("OLED Refresh Mode", systemImage: "tv.fill")
                     }
+                    .accessibilityLabel("OLED Refresh Mode")
+                    .accessibilityHint("Opens a full-screen color cycle to reduce OLED image retention. Press Back to exit.")
 
                     Text("Cycles through colors to help reduce temporary image retention on OLED displays. Press Back to exit.")
                         .font(.callout)
@@ -67,6 +74,7 @@ struct TVSettingsView: View {
                     Text("About")
                         .font(.title3)
                         .foregroundStyle(.secondary)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(spacing: 12) {
                         TVSettingsInfoRow(label: "Version", value: appVersion)
@@ -115,6 +123,8 @@ struct TVSettingsInfoRow: View {
                 .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 

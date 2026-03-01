@@ -19,14 +19,18 @@ struct ColorExportSheet: View {
     @State private var exportError: String?
     @State private var shareFileURL: URL?
     @State private var isShowingShareSheet = false
+    @State private var isShowingFileSave = false
     @State private var isShowingPaywall = false
     @State private var isShowingPublishSheet = false
+
+    private var shareFormats: [ColorExportFormat] {
+        [.image, .ase, .procreate, .gpl, .css, .swiftui]
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Preview of the color being exported
                     SwatchView(
                         color: color,
                         height: 100,
@@ -38,17 +42,24 @@ struct ColorExportSheet: View {
                     Text("Choose Share Format")
                         .font(.headline)
                         .padding(.top, 8)
+                        .accessibilityAddTraits(.isHeader)
 
                     VStack(spacing: 12) {
-                        // Publish to Community option
+                        // Save To File
+                        SaveToFileButton(
+                            description: "Save as a native Opalite color file.",
+                            isExporting: isExporting && selectedFormat == .opalite
+                        ) {
+                            exportOpaliteFile()
+                        }
+
+                        // Publish to Community
                         PublishToCommunityButton(isOffline: !communityManager.isConnectedToNetwork) {
                             isShowingPublishSheet = true
                         }
 
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        ForEach(ColorExportFormat.allCases) { format in
+                        // Share formats
+                        ForEach(shareFormats) { format in
                             ExportFormatButton(
                                 format: format,
                                 hasOnyx: subscriptionManager.hasOnyxEntitlement,
@@ -88,9 +99,13 @@ struct ColorExportSheet: View {
         .background(
             FileShareSheetPresenter(fileURL: shareFileURL, isPresented: $isShowingShareSheet)
         )
+        .background(
+            FileSavePresenter(fileURL: shareFileURL, isPresented: $isShowingFileSave) {
+                dismiss()
+            }
+        )
         .onChange(of: isShowingShareSheet) { _, isShowing in
             if !isShowing && shareFileURL != nil {
-                // Share sheet was dismissed, close the export sheet
                 dismiss()
             }
         }
@@ -99,6 +114,34 @@ struct ColorExportSheet: View {
         }
         .sheet(isPresented: $isShowingPublishSheet) {
             PublishColorSheet(color: color)
+        }
+    }
+
+    // MARK: - Export Actions
+
+    private func exportOpaliteFile() {
+        selectedFormat = .opalite
+        isExporting = true
+        exportError = nil
+
+        Task {
+            do {
+                let url = try SharingService.exportColor(color, format: .opalite)
+                await MainActor.run {
+                    shareFileURL = url
+                    #if targetEnvironment(macCatalyst)
+                    isShowingFileSave = true
+                    #else
+                    isShowingShareSheet = true
+                    #endif
+                    isExporting = false
+                }
+            } catch {
+                await MainActor.run {
+                    exportError = "Export failed: \(error.localizedDescription)"
+                    isExporting = false
+                }
+            }
         }
     }
 

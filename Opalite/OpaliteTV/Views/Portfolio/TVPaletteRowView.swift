@@ -29,6 +29,7 @@ struct TVPaletteRowView: View {
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .accessibilityHidden(true)
 
                     Text(palette.name)
                         .font(.title3)
@@ -43,6 +44,7 @@ struct TVPaletteRowView: View {
                     Image(systemName: "chevron.right")
                         .font(.title3)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 48)
             }
@@ -50,6 +52,10 @@ struct TVPaletteRowView: View {
             .focused($isHeaderFocused)
             .scaleEffect(isHeaderFocused ? 1.02 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: isHeaderFocused)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(palette.name), \(palette.colors?.count ?? 0) colors")
+            .accessibilityHint("Opens palette details")
+            .accessibilityAddTraits(.isButton)
 
             // Colors Row
             if let colors = palette.colors, !colors.isEmpty {
@@ -62,6 +68,7 @@ struct TVPaletteRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.leading, 48)
+                    .accessibilityLabel("No colors in this palette")
             }
         }
     }

@@ -110,6 +110,65 @@ struct FileShareSheetPresenter: UIViewControllerRepresentable {
     }
 }
 
+// MARK: - File Save Presenter (Document Picker for Save-to-Directory)
+
+struct FileSavePresenter: UIViewControllerRepresentable {
+    let fileURL: URL?
+    @Binding var isPresented: Bool
+    var onCompletion: (() -> Void)?
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isPresented: $isPresented, sourceURL: fileURL, onCompletion: onCompletion)
+    }
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        UIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        guard isPresented, let url = fileURL else { return }
+
+        // Ensure the file exists before presenting the picker
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+
+        let picker = UIDocumentPickerViewController(forExporting: [url], asCopy: true)
+        picker.delegate = context.coordinator
+
+        if uiViewController.presentedViewController == nil {
+            uiViewController.present(picker, animated: true)
+        }
+    }
+
+    final class Coordinator: NSObject, UIDocumentPickerDelegate {
+        @Binding var isPresented: Bool
+        let sourceURL: URL?
+        let onCompletion: (() -> Void)?
+
+        init(isPresented: Binding<Bool>, sourceURL: URL?, onCompletion: (() -> Void)?) {
+            self._isPresented = isPresented
+            self.sourceURL = sourceURL
+            self.onCompletion = onCompletion
+        }
+
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            DispatchQueue.main.async {
+                self.isPresented = false
+                // Clean up temp file after saving
+                if let sourceURL = self.sourceURL {
+                    try? FileManager.default.removeItem(at: sourceURL)
+                }
+                self.onCompletion?()
+            }
+        }
+
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+            DispatchQueue.main.async {
+                self.isPresented = false
+            }
+        }
+    }
+}
+
 // MARK: - Image Rendering Helpers
 
 /// Renders a gradient image from an array of colors.

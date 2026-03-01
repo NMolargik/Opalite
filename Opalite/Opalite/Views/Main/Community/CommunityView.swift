@@ -180,6 +180,7 @@ struct CommunityView: View {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                             .padding()
+                            .accessibilityLabel("Loading more colors")
                             .onAppear {
                                 Task {
                                     try? await communityManager.fetchMoreColors(sortBy: viewModel.sortOption)
@@ -229,6 +230,7 @@ struct CommunityView: View {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                             .padding()
+                            .accessibilityLabel("Loading more palettes")
                             .onAppear {
                                 Task {
                                     try? await communityManager.fetchMorePalettes(sortBy: viewModel.sortOption)
@@ -273,6 +275,8 @@ struct CommunityView: View {
         } label: {
             Label("Sort", systemImage: "arrow.up.arrow.down")
         }
+        .accessibilityLabel("Sort by \(viewModel.sortOption.rawValue)")
+        .accessibilityHint("Changes the sort order for community content")
     }
 
     /// Sorts the cached colors/palettes locally without network fetch
