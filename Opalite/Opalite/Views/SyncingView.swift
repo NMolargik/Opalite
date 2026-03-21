@@ -24,7 +24,10 @@ struct SyncingView: View {
     @State private var dotCount: Int = 0
 
     /// Maximum time to wait for sync before continuing (in seconds)
-    private let syncTimeout: TimeInterval = 8
+    private let syncTimeout: TimeInterval = 30
+
+    /// How often to re-check for newly synced data (in seconds)
+    private let pollInterval: TimeInterval = 2
 
     /// Animated dots for the loading indicator
     private var animatedDots: String {
@@ -97,80 +100,74 @@ struct SyncingView: View {
         }
     }
 
-    /// Performs the iCloud sync with timeout
+    /// Performs the iCloud sync with polling and timeout.
+    ///
+    /// CloudKit imports records into the local SwiftData store asynchronously.
+    /// `refreshAll()` only reads the local store, so we poll repeatedly to pick
+    /// up records as they arrive. We also track whether the count is still growing
+    /// — if it stabilises for two consecutive polls, we consider sync complete.
     private func performSync() async {
         let startTime = Date()
-
-        // Refresh data from CloudKit
-        await MainActor.run {
-            statusMessage = "Looking for colors and palettes"
-        }
-
-        await colorManager.refreshAll()
+        var previousCount = 0
+        var stablePolls = 0
 
         await MainActor.run {
-            statusMessage = "Looking for canvases"
+            statusMessage = "Checking for your data"
         }
 
-        await canvasManager.refreshAll()
-
-        // Small delay to ensure CloudKit has time to process
-        try? await Task.sleep(for: .seconds(1))
-
-        // Check if we found any data
-        let hasColors = !colorManager.colors.isEmpty
-        let hasPalettes = !colorManager.palettes.isEmpty
-        let hasCanvases = !canvasManager.canvases.isEmpty
-        let foundData = hasColors || hasPalettes || hasCanvases
-
-        await MainActor.run {
-            if foundData {
-                var found: [String] = []
-                if hasColors { found.append("\(colorManager.colors.count) color\(colorManager.colors.count == 1 ? "" : "s")") }
-                if hasPalettes { found.append("\(colorManager.palettes.count) palette\(colorManager.palettes.count == 1 ? "" : "s")") }
-                if hasCanvases { found.append("\(canvasManager.canvases.count) canvas\(canvasManager.canvases.count == 1 ? "" : "es")") }
-                statusMessage = "Found " + found.joined(separator: ", ")
-            } else {
-                statusMessage = "Waiting for iCloud"
-            }
-        }
-
-        // If no data found, wait for the full timeout period to give CloudKit more time
-        // This is important for fresh installs where data may still be syncing
-        if !foundData {
-            let elapsed = Date().timeIntervalSince(startTime)
-            let remainingTime = syncTimeout - elapsed
-            if remainingTime > 0 {
-                try? await Task.sleep(for: .seconds(remainingTime))
-            }
-
-            // Check one more time after waiting
+        // Poll until data stabilises or we hit the timeout
+        while Date().timeIntervalSince(startTime) < syncTimeout {
             await colorManager.refreshAll()
             await canvasManager.refreshAll()
 
-            let hasColorsNow = !colorManager.colors.isEmpty
-            let hasPalettesNow = !colorManager.palettes.isEmpty
-            let hasCanvasesNow = !canvasManager.canvases.isEmpty
-            let foundDataNow = hasColorsNow || hasPalettesNow || hasCanvasesNow
+            let colorCount = colorManager.colors.count
+            let paletteCount = colorManager.palettes.count
+            let canvasCount = canvasManager.canvases.count
+            let currentCount = colorCount + paletteCount + canvasCount
 
-            await MainActor.run {
-                if foundDataNow {
+            if currentCount > 0 {
+                await MainActor.run {
                     var found: [String] = []
-                    if hasColorsNow { found.append("\(colorManager.colors.count) color\(colorManager.colors.count == 1 ? "" : "s")") }
-                    if hasPalettesNow { found.append("\(colorManager.palettes.count) palette\(colorManager.palettes.count == 1 ? "" : "s")") }
-                    if hasCanvasesNow { found.append("\(canvasManager.canvases.count) canvas\(canvasManager.canvases.count == 1 ? "" : "es")") }
+                    if colorCount > 0 { found.append("\(colorCount) color\(colorCount == 1 ? "" : "s")") }
+                    if paletteCount > 0 { found.append("\(paletteCount) palette\(paletteCount == 1 ? "" : "s")") }
+                    if canvasCount > 0 { found.append("\(canvasCount) canvas\(canvasCount == 1 ? "" : "es")") }
                     statusMessage = "Found " + found.joined(separator: ", ")
+                }
+
+                // If the count hasn't changed since last poll, it may be done
+                if currentCount == previousCount {
+                    stablePolls += 1
+                    if stablePolls >= 2 {
+                        // Count stable for 2 consecutive polls — sync likely complete
+                        break
+                    }
                 } else {
-                    statusMessage = "Ready to create"
+                    stablePolls = 0
+                }
+            } else {
+                await MainActor.run {
+                    statusMessage = "Waiting for iCloud"
                 }
             }
 
-            // Brief pause to show the result
-            try? await Task.sleep(for: .seconds(1.5))
-        } else {
-            // Data was found quickly, just pause briefly to show the result
-            try? await Task.sleep(for: .seconds(1.5))
+            previousCount = currentCount
+            try? await Task.sleep(for: .seconds(pollInterval))
         }
+
+        // Final refresh to catch any last-moment arrivals
+        await colorManager.refreshAll()
+        await canvasManager.refreshAll()
+
+        let hasData = !colorManager.colors.isEmpty || !colorManager.palettes.isEmpty || !canvasManager.canvases.isEmpty
+
+        await MainActor.run {
+            if !hasData {
+                statusMessage = "Ready to create"
+            }
+        }
+
+        // Brief pause to show the final result
+        try? await Task.sleep(for: .seconds(1.5))
 
         await MainActor.run {
             hasTimedOut = true

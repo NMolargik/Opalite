@@ -27,7 +27,10 @@
       "Bash(python3 -m json.tool echo \"\" echo \"=== Full CFBundleDocumentTypes from built plist ===\" plutil -extract CFBundleDocumentTypes json -o - \"$APP/Contents/Info.plist\")",
       "Bash(python3 -m json.tool)",
       "Bash(APP=\"/Users/nickmolargik/Library/Developer/Xcode/DerivedData/Opalite-dmsykpvtuvtazydhidtbfyuhxcun/Build/Products/Debug-maccatalyst/Opalite.app\" echo \"=== Resources in bundle ===\" ls \"$APP/Contents/Resources/\")",
-      "Bash(__NEW_LINE_dd616ed8488267dc__ echo:*)"
+      "Bash(__NEW_LINE_dd616ed8488267dc__ echo:*)",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(npx tsc:*)",
+      "Bash(kill %1)"
     ]
   }
 }

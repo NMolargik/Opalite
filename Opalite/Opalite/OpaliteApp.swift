@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import TipKit
 import WidgetKit
+import CoreData
 
 @main
 @MainActor
@@ -55,6 +56,18 @@ struct OpaliteApp: App {
 
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
         canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
+
+        // Listen for remote CloudKit changes so the in-memory cache stays current
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name.NSPersistentStoreRemoteChange,
+            object: nil,
+            queue: .main
+        ) { [colorManager, canvasManager] _ in
+            Task { @MainActor in
+                await colorManager.refreshAll()
+                await canvasManager.refreshAll()
+            }
+        }
 
         #if os(iOS)
         phoneSessionManager.colorManager = colorManager
