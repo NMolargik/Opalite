@@ -317,11 +317,14 @@ struct MainView: View {
 
 private struct TabBarMinimizeBehaviorModifier: ViewModifier {
     func body(content: Content) -> some View {
+        #if os(visionOS)
+        content
+        #else
         if #available(iOS 26.0, macOS 26.0, *) {
             content.tabBarMinimizeBehavior(.onScrollDown)
         } else {
             content
         }
+        #endif
     }
 }
-

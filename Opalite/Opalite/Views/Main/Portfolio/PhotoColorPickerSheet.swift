@@ -265,69 +265,65 @@ struct PhotoColorPickerSheet: View {
 
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
-        GeometryReader { outerGeometry in
-            let imageHeight = calculateImageDisplayHeight(for: uiImage, availableWidth: outerGeometry.size.width)
-            
-            VStack(spacing: 8) {
-                GeometryReader { geometry in
-                    let viewSize = geometry.size
-                    // Calculate where the image actually appears within the view when using scaledToFit
-                    let imageRect = calculateImageRect(for: uiImage, in: viewSize)
+        VStack(spacing: 8) {
+            GeometryReader { geometry in
+                let viewSize = geometry.size
+                // Calculate where the image actually appears within the view when using scaledToFit
+                let imageRect = calculateImageRect(for: uiImage, in: viewSize)
 
-                    ZStack {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: viewSize.width, height: viewSize.height)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                ZStack {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: viewSize.width, height: viewSize.height)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(.secondary.opacity(0.3))
+                        )
+
+                    if let point = sampledPoint {
+                        Circle()
+                            .fill(currentColor?.swiftUIColor ?? .clear)
+                            .frame(width: 32, height: 32)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(.secondary.opacity(0.3))
+                                Circle()
+                                    .strokeBorder(.white, lineWidth: 3)
                             )
-
-                        if let point = sampledPoint {
-                            Circle()
-                                .fill(currentColor?.swiftUIColor ?? .clear)
-                                .frame(width: 32, height: 32)
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(.white, lineWidth: 3)
-                                )
-                                .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
-                                .position(point)
-                        }
+                            .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
+                            .position(point)
                     }
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                handleSample(at: value.location, imageRect: imageRect, image: uiImage)
-                            }
-                            .onEnded { value in
-                                handleSample(at: value.location, imageRect: imageRect, image: uiImage)
-                            }
-                    )
-                    .accessibilityLabel("Image sampling area")
-                    .accessibilityHint("Tap or drag on the image to sample a color")
                 }
-                .frame(height: imageHeight)
-
-                HStack(spacing: 6) {
-                    Image(systemName: "hand.tap.fill")
-                        .font(.caption)
-                        .foregroundStyle(.blue)
-                    
-                    Text("Tap or drag on the image to pick a color")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.blue.opacity(0.1), in: Capsule())
-                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            handleSample(at: value.location, imageRect: imageRect, image: uiImage)
+                        }
+                        .onEnded { value in
+                            handleSample(at: value.location, imageRect: imageRect, image: uiImage)
+                        }
+                )
+                .accessibilityLabel("Image sampling area")
+                .accessibilityHint("Tap or drag on the image to sample a color")
             }
+            .aspectRatio(uiImage.size.width / uiImage.size.height, contentMode: .fit)
+            .frame(maxHeight: 400)
+
+            HStack(spacing: 6) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+                
+                Text("Tap or drag on the image to pick a color")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.blue.opacity(0.1), in: Capsule())
+            .frame(maxWidth: .infinity)
         }
-        .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: UIScreen.main.bounds.width - 32) + 30)
     }
 
     // MARK: - Current Color Preview
