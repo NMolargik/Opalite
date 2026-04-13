@@ -32,17 +32,6 @@ struct TVSettingsView: View {
                         .foregroundStyle(.secondary)
                         .accessibilityAddTraits(.isHeader)
 
-                    Button {
-                        Task {
-                            await colorManager.refreshAll()
-                            toastManager.showSuccess("Synced with iCloud")
-                        }
-                    } label: {
-                        Label("Refresh from iCloud", systemImage: "arrow.clockwise")
-                    }
-                    .accessibilityLabel("Refresh from iCloud")
-                    .accessibilityHint("Syncs your colors and palettes from iCloud")
-
                     VStack(spacing: 12) {
                         TVSettingsInfoRow(label: "Colors", value: "\(colorManager.colors.count)")
                         TVSettingsInfoRow(label: "Palettes", value: "\(colorManager.palettes.count)")

@@ -35,239 +35,240 @@ struct MainView: View {
     @State private var renameText: String = ""
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // MARK: - Portfolio Tab - All screens
-            Tab(Tabs.portfolio.name, systemImage: Tabs.portfolio.symbol, value: .portfolio) {
-                PortfolioView()
-                    .tint(.none)
-            }
-
-            // MARK: - Community Tab - All screens
-            Tab(Tabs.community.name, systemImage: Tabs.community.symbol, value: .community) {
-                CommunityView()
-                    .tint(.none)
-            }
-
-            // MARK: - Canvas Tab - Compact Only, "regular" has a TabSection
-            Tab(Tabs.canvas.name, systemImage: Tabs.canvas.symbol, value: .canvas) {
-                CanvasListView()
-                    .tint(.none)
-            }
-            .hidden(horizontalSizeClass == .regular)
-
-            // MARK: - Search Tab - All screens
-            Tab(Tabs.search.name, systemImage: Tabs.search.symbol, value: .search, role: .search) {
-                SearchView(selectedTab: $selectedTab)
-                    .tint(.none)
-            }
-
-            // MARK: - SwatchBar Tab - Regular size class only (iPad/Mac), hidden when already open
-            Tab(Tabs.swatchBar.name, systemImage: Tabs.swatchBar.symbol, value: .swatchBar) {
-                // Empty view - this tab just opens the window
-                Color.clear
-            }
-            .hidden(horizontalSizeClass == .compact || colorManager.isSwatchBarOpen)
-            .defaultVisibility(.hidden, for: .tabBar)
-
-            // MARK: - Settings Tab - All screens
-            Tab(Tabs.settings.name, systemImage: settingsTabIcon, value: .settings) {
-                SettingsView()
-                    .tint(.none)
-            }
-
-            // MARK: - Canvas Body Tab - All screens
-            TabSection {
-                if canvasManager.canvases.isEmpty {
-                    // Keep the section visible so the "New Canvas" section action is always available.
-                    Tab("No Canvases", systemImage: "scribble", value: Tabs.canvas) {
-                        NavigationStack {
-                            VStack(spacing: 12) {
-                                Image(systemName: "scribble")
-                                    .font(.system(size: 44))
-                                    .foregroundStyle(.secondary)
-                                    .accessibilityHidden(true)
-
-                                Text("No canvases yet")
-                                    .font(.headline)
-                                    .accessibilityAddTraits(.isHeader)
-
-                                Text("Use the \"New Canvas\" button in the sidebar section to create one.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding()
-                            .navigationTitle("Canvas")
-                        }
-                    }
-                    .disabled(true)
-                } else {
-                    ForEach(canvasManager.canvases) { canvasFile in
-                        Tab(canvasFile.title, systemImage: subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) ? "scribble" : "lock.fill", value: Tabs.canvasBody(canvasFile)) {
+            TabView(selection: $selectedTab) {
+                // MARK: - Portfolio Tab - All screens
+                Tab(Tabs.portfolio.name, systemImage: Tabs.portfolio.symbol, value: .portfolio) {
+                    PortfolioView()
+                        .tint(.none)
+                }
+                
+                // MARK: - Community Tab - All screens
+                Tab(Tabs.community.name, systemImage: Tabs.community.symbol, value: .community) {
+                    CommunityView()
+                        .tint(.none)
+                }
+                
+                // MARK: - Canvas Tab - Compact Only, "regular" has a TabSection
+                Tab(Tabs.canvas.name, systemImage: Tabs.canvas.symbol, value: .canvas) {
+                    CanvasListView()
+                        .tint(.none)
+                }
+                .hidden(horizontalSizeClass == .regular)
+                
+                // MARK: - Search Tab - All screens
+                Tab(Tabs.search.name, systemImage: Tabs.search.symbol, value: .search, role: .search) {
+                    SearchView(selectedTab: $selectedTab)
+                        .tint(.none)
+                }
+                
+                // MARK: - SwatchBar Tab - Regular size class only (iPad/Mac), hidden when already open
+                Tab(Tabs.swatchBar.name, systemImage: Tabs.swatchBar.symbol, value: .swatchBar) {
+                    // Empty view - this tab just opens the window
+                    Color.clear
+                }
+                .hidden(horizontalSizeClass == .compact || colorManager.isSwatchBarOpen)
+                .defaultVisibility(.hidden, for: .tabBar)
+                
+                // MARK: - Settings Tab - All screens
+                Tab(Tabs.settings.name, systemImage: settingsTabIcon, value: .settings) {
+                    SettingsView()
+                        .tint(.none)
+                }
+                
+                // MARK: - Canvas Body Tab - All screens
+                TabSection {
+                    if canvasManager.canvases.isEmpty {
+                        // Keep the section visible so the "New Canvas" section action is always available.
+                        Tab("No Canvases", systemImage: "scribble", value: Tabs.canvas) {
                             NavigationStack {
-                                CanvasView(canvasFile: canvasFile)
-                                    .tint(.none)
-                            }
-                        }
-                        .contextMenu {
-                            Button {
-                                HapticsManager.shared.selection()
-                                renameText = canvasFile.title
-                                canvasToRename = canvasFile
-                            } label: {
-                                Label("Rename Canvas", systemImage: "pencil")
-                            }
-                            .tint(.none)
-
-                            Button(role: .destructive) {
-                                HapticsManager.shared.selection()
-                                do {
-                                    try canvasManager.deleteCanvas(canvasFile)
-                                } catch {
-                                    #if DEBUG
-                                    print("[MainView] Failed to delete canvas '\(canvasFile.title)': \(error.localizedDescription)")
-                                    #endif
+                                VStack(spacing: 12) {
+                                    Image(systemName: "scribble")
+                                        .font(.system(size: 44))
+                                        .foregroundStyle(.secondary)
+                                        .accessibilityHidden(true)
+                                    
+                                    Text("No canvases yet")
+                                        .font(.headline)
+                                        .accessibilityAddTraits(.isHeader)
+                                    
+                                    Text("Use the \"New Canvas\" button in the sidebar section to create one.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal)
                                 }
-                            } label: {
-                                Label("Delete Canvas", systemImage: "trash.fill")
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .padding()
+                                .navigationTitle("Canvas")
                             }
-                            .tint(.red)
                         }
-                    }
-                }
-
-            } header: {
-                Label("Canvases", systemImage: "pencil")
-            }
-            .sectionActions {
-                Button {
-                    HapticsManager.shared.selection()
-                    if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
-                        do {
-                            let newCanvas = try canvasManager.createCanvas()
-                            // Defer tab selection to allow view hierarchy to update first
-                            DispatchQueue.main.async {
-                                selectedTab = .canvasBody(newCanvas)
-                            }
-                        } catch {
-                            #if DEBUG
-                            print("[MainView] Failed to create canvas: \(error.localizedDescription)")
-                            #endif
-                        }
+                        .disabled(true)
                     } else {
-                        isShowingPaywall = true
-                    }
-                } label: {
-                    Label("New Canvas", systemImage: "plus")
-                }
-                .accessibilityLabel("New Canvas")
-                .accessibilityHint(subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) ? "Creates a new drawing canvas" : "Opens Onyx subscription options")
-            }
-            .defaultVisibility(.hidden, for: .tabBar)
-            .hidden(horizontalSizeClass == .compact)
-        }
-        .tabViewStyle(.sidebarAdaptable)
-        .tint(selectedTab.symbolColor)
-        .alert("Rename Canvas", isPresented: Binding(
-            get: { canvasToRename != nil },
-            set: { if !$0 { canvasToRename = nil } }
-        )) {
-            TextField("Canvas name", text: $renameText)
-            Button("Cancel", role: .cancel) {
-                HapticsManager.shared.selection()
-                canvasToRename = nil
-            }
-            Button("Rename") {
-                HapticsManager.shared.selection()
-                if let canvas = canvasToRename {
-                    let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !trimmed.isEmpty {
-                        do {
-                            try canvasManager.updateCanvas(canvas) { c in
-                                c.title = trimmed
+                        ForEach(canvasManager.canvases) { canvasFile in
+                            Tab(canvasFile.title, systemImage: subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) ? "scribble" : "lock.fill", value: Tabs.canvasBody(canvasFile)) {
+                                NavigationStack {
+                                    CanvasView(canvasFile: canvasFile)
+                                        .tint(.none)
+                                }
                             }
-                        } catch {
-                            #if DEBUG
-                            print("[MainView] Failed to rename canvas: \(error.localizedDescription)")
-                            #endif
+                            .contextMenu {
+                                Button {
+                                    HapticsManager.shared.selection()
+                                    renameText = canvasFile.title
+                                    canvasToRename = canvasFile
+                                } label: {
+                                    Label("Rename Canvas", systemImage: "pencil")
+                                }
+                                .tint(.none)
+                                
+                                Button(role: .destructive) {
+                                    HapticsManager.shared.selection()
+                                    do {
+                                        try canvasManager.deleteCanvas(canvasFile)
+                                    } catch {
+#if DEBUG
+                                        print("[MainView] Failed to delete canvas '\(canvasFile.title)': \(error.localizedDescription)")
+#endif
+                                    }
+                                } label: {
+                                    Label("Delete Canvas", systemImage: "trash.fill")
+                                }
+                                .tint(.red)
+                            }
                         }
                     }
+                    
+                } header: {
+                    Label("Canvases", systemImage: "pencil")
                 }
-                canvasToRename = nil
+                .sectionActions {
+                    Button {
+                        HapticsManager.shared.selection()
+                        if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
+                            do {
+                                let newCanvas = try canvasManager.createCanvas()
+                                // Defer tab selection to allow view hierarchy to update first
+                                DispatchQueue.main.async {
+                                    selectedTab = .canvasBody(newCanvas)
+                                }
+                            } catch {
+#if DEBUG
+                                print("[MainView] Failed to create canvas: \(error.localizedDescription)")
+#endif
+                            }
+                        } else {
+                            isShowingPaywall = true
+                        }
+                    } label: {
+                        Label("New Canvas", systemImage: "plus")
+                    }
+                    .accessibilityLabel("New Canvas")
+                    .accessibilityHint(subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) ? "Creates a new drawing canvas" : "Opens Onyx subscription options")
+                }
+                .defaultVisibility(.hidden, for: .tabBar)
+                .hidden(horizontalSizeClass == .compact)
             }
-        }
-        .onChange(of: selectedTab) { oldTab, newTab in
-            // Check if user is trying to open a locked canvas
-            if case .canvasBody(let canvas) = newTab {
-                if !subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
-                    // Block access and show paywall
+            .tabViewStyle(.sidebarAdaptable)
+            .modifier(TabBarMinimizeBehaviorModifier())
+            .tint(selectedTab.symbolColor)
+            .alert("Rename Canvas", isPresented: Binding(
+                get: { canvasToRename != nil },
+                set: { if !$0 { canvasToRename = nil } }
+            )) {
+                TextField("Canvas name", text: $renameText)
+                Button("Cancel", role: .cancel) {
                     HapticsManager.shared.selection()
+                    canvasToRename = nil
+                }
+                Button("Rename") {
+                    HapticsManager.shared.selection()
+                    if let canvas = canvasToRename {
+                        let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmed.isEmpty {
+                            do {
+                                try canvasManager.updateCanvas(canvas) { c in
+                                    c.title = trimmed
+                                }
+                            } catch {
+#if DEBUG
+                                print("[MainView] Failed to rename canvas: \(error.localizedDescription)")
+#endif
+                            }
+                        }
+                    }
+                    canvasToRename = nil
+                }
+            }
+            .onChange(of: selectedTab) { oldTab, newTab in
+                // Check if user is trying to open a locked canvas
+                if case .canvasBody(let canvas) = newTab {
+                    if !subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
+                        // Block access and show paywall
+                        HapticsManager.shared.selection()
+                        selectedTab = oldTab
+                        isShowingPaywall = true
+                        return
+                    }
+                }
+                
+                if newTab == .swatchBar {
                     selectedTab = oldTab
-                    isShowingPaywall = true
+                    if skipSwatchBarConfirmation {
+                        // Skip the info sheet and launch directly
+#if os(iOS)
+                        AppDelegate.openSwatchBarWindow()
+#else
+                        openWindow(id: "swatchBar")
+#endif
+                    } else {
+                        // Show SwatchBar info sheet
+                        isShowingSwatchBarInfo = true
+                    }
                     return
                 }
+                
             }
-
-            if newTab == .swatchBar {
-                selectedTab = oldTab
-                if skipSwatchBarConfirmation {
-                    // Skip the info sheet and launch directly
-                    #if os(iOS)
-                    AppDelegate.openSwatchBarWindow()
-                    #else
-                    openWindow(id: "swatchBar")
-                    #endif
-                } else {
-                    // Show SwatchBar info sheet
-                    isShowingSwatchBarInfo = true
-                }
-                return
-            }
-
-        }
-        .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
-            if let canvas = newCanvas {
-                // Check if this canvas is accessible
-                if subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
-                    if horizontalSizeClass == .compact {
-                        // On compact, switch to canvas tab; CanvasListView observes pendingCanvasToOpen
-                        selectedTab = .canvas
-                    } else {
-                        // On regular, directly switch to the canvas body tab
-                        canvasManager.pendingCanvasToOpen = nil
-                        DispatchQueue.main.async {
-                            selectedTab = .canvasBody(canvas)
+            .onChange(of: canvasManager.pendingCanvasToOpen) { _, newCanvas in
+                if let canvas = newCanvas {
+                    // Check if this canvas is accessible
+                    if subscriptionManager.canAccessCanvas(canvas, oldestCanvasID: canvasManager.oldestCanvas?.id) {
+                        if horizontalSizeClass == .compact {
+                            // On compact, switch to canvas tab; CanvasListView observes pendingCanvasToOpen
+                            selectedTab = .canvas
+                        } else {
+                            // On regular, directly switch to the canvas body tab
+                            canvasManager.pendingCanvasToOpen = nil
+                            DispatchQueue.main.async {
+                                selectedTab = .canvasBody(canvas)
+                            }
                         }
+                    } else {
+                        canvasManager.pendingCanvasToOpen = nil
+                        isShowingPaywall = true
                     }
-                } else {
-                    canvasManager.pendingCanvasToOpen = nil
-                    isShowingPaywall = true
                 }
             }
-        }
-        .onChange(of: canvasManager.canvases) { _, newCanvases in
-            handleCanvasListChange(newCanvases)
-        }
-        .onChange(of: intentNavigationManager.pendingColorID) { _, colorID in
-            // Switch to Portfolio tab when intent requests color navigation
-            if colorID != nil {
-                selectedTab = .portfolio
+            .onChange(of: canvasManager.canvases) { _, newCanvases in
+                handleCanvasListChange(newCanvases)
             }
-        }
-        .onChange(of: intentNavigationManager.pendingPaletteID) { _, paletteID in
-            // Switch to Portfolio tab when intent requests palette navigation
-            if paletteID != nil {
-                selectedTab = .portfolio
+            .onChange(of: intentNavigationManager.pendingColorID) { _, colorID in
+                // Switch to Portfolio tab when intent requests color navigation
+                if colorID != nil {
+                    selectedTab = .portfolio
+                }
             }
-        }
-        .sheet(isPresented: $isShowingPaywall) {
-            PaywallView(featureContext: "Unlimited canvases require Onyx")
-        }
-        .sheet(isPresented: $isShowingSwatchBarInfo) {
-            SwatchBarInfoSheet()
-        }
+            .onChange(of: intentNavigationManager.pendingPaletteID) { _, paletteID in
+                // Switch to Portfolio tab when intent requests palette navigation
+                if paletteID != nil {
+                    selectedTab = .portfolio
+                }
+            }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView(featureContext: "Unlimited canvases require Onyx")
+            }
+            .sheet(isPresented: $isShowingSwatchBarInfo) {
+                SwatchBarInfoSheet()
+            }
     }
 
     // MARK: - Helpers
@@ -312,3 +313,15 @@ struct MainView: View {
         .environment(ImportCoordinator())
         .environment(ToastManager())
 }
+// MARK: - Tab Bar Minimize Behavior Modifier
+
+private struct TabBarMinimizeBehaviorModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            content.tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            content
+        }
+    }
+}
+

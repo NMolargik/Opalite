@@ -16,6 +16,8 @@ struct ArchivedPalettesSheet: View {
     @State private var isProcessing: Bool = false
     @State private var paletteToDelete: OpalitePalette?
     @State private var isShowingDeleteConfirmation: Bool = false
+    @State private var paletteToUnarchive: OpalitePalette?
+    @State private var isShowingUnarchiveConfirmation: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -33,7 +35,8 @@ struct ArchivedPalettesSheet: View {
                         ForEach(colorManager.archivedPalettes) { palette in
                             Button {
                                 HapticsManager.shared.selection()
-                                unarchivePalette(palette)
+                                paletteToUnarchive = palette
+                                isShowingUnarchiveConfirmation = true
                             } label: {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 6) {
@@ -68,7 +71,7 @@ struct ArchivedPalettesSheet: View {
                                     }
                                     Spacer()
                                     
-                                    Label("Unarchive", systemImage: "arrow.uturn.backward")
+                                    Label("Unarchive", systemImage: "shippingbox.and.arrow.backward.fill")
                                         .font(.subheadline)
                                         .foregroundStyle(.blue)
                                         .labelStyle(.iconOnly)
@@ -134,6 +137,32 @@ struct ArchivedPalettesSheet: View {
                     }
                 } else {
                     Text("This action cannot be undone.")
+                }
+            }
+            .alert(
+                "Unarchive \(paletteToUnarchive?.name ?? "Palette")?",
+                isPresented: $isShowingUnarchiveConfirmation
+            ) {
+                Button("Cancel", role: .cancel) {
+                    HapticsManager.shared.selection()
+                    paletteToUnarchive = nil
+                }
+                Button("Unarchive") {
+                    HapticsManager.shared.selection()
+                    if let palette = paletteToUnarchive {
+                        unarchivePalette(palette)
+                    }
+                    paletteToUnarchive = nil
+                }
+            } message: {
+                if let palette = paletteToUnarchive {
+                    if palette.sortedColors.isEmpty {
+                        Text("This palette will be returned to your active palettes.")
+                    } else {
+                        Text("This palette and its \(palette.sortedColors.count) color\(palette.sortedColors.count == 1 ? "" : "s") will be returned to your active palettes.")
+                    }
+                } else {
+                    Text("This palette will be returned to your active palettes.")
                 }
             }
         }

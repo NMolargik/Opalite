@@ -107,20 +107,23 @@ struct SwatchBarInfoSheet: View {
                 .scaleEffect(appearAnimation ? 1 : 0.9)
                 .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.5), value: appearAnimation)
 
-                // Cancel link
-                Button {
-                    HapticsManager.shared.selection()
-                    dismiss()
-                } label: {
-                    Text("Not Now")
-                        .font(.subheadline)
-                        .foregroundStyle(.blue)
-                }
-                .padding(.top, 16)
-                .padding(.bottom, 30)
-                .opacity(appearAnimation ? 1 : 0)
-                .animation(.easeOut.delay(0.6), value: appearAnimation)
             }
+            .padding(.bottom, 30)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                HapticsManager.shared.selection()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 30, height: 30)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(16)
+            .accessibilityLabel("Close")
         }
         .background {
             LinearGradient(

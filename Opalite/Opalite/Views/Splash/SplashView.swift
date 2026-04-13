@@ -24,10 +24,10 @@ struct SplashView: View {
 
     private static func makeRowConfigs() -> [SwatchRowConfig] {
         var result: [SwatchRowConfig] = []
-        for index in 0..<7 {
+        for index in 0..<12 {
             let colors: [OpaliteColor] = generateRowColors(seed: index)
             let scrollsRight: Bool = index.isMultiple(of: 2)
-            let speed: Double = Double(18 + (index * 3))
+            let speed: Double = Double(28 + (index * 5))
             let swatchHeight: CGFloat = CGFloat(60 + (index % 3) * 15)
             let config = SwatchRowConfig(
                 colors: colors,
@@ -43,25 +43,17 @@ struct SplashView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Background
-                Color.black.ignoresSafeArea()
+//                // Background
+//                Color.black.ignoresSafeArea()
 
                 // Scrolling swatch rows - single Canvas for all rows
                 SwatchRowsCanvas(
                     configs: Self.rowConfigs,
                     isAnimating: startAnimations
                 )
-                .blur(radius: 2)
                 .opacity(hasAppeared ? 1 : 0)
                 .ignoresSafeArea()
                 .accessibilityHidden(true)
-
-                // Material overlay
-                Rectangle()
-                    .fill(.ultraThickMaterial)
-                    .ignoresSafeArea()
-                    .opacity(showContent ? 0.2 : 0)
-                    .accessibilityHidden(true)
 
                 // Content
                 VStack(spacing: 32) {
@@ -86,7 +78,7 @@ struct SplashView: View {
                             .frame(width: 200, height: 200)
                             .accessibilityLabel("Opalite gemstone sqyaress")
                             .scaleEffect(pulse ? 1.06 : 0.94)
-                            .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: pulse)
+                            .animation(.easeInOut(duration: 4.0).repeatForever(autoreverses: true), value: pulse)
 
                         // Gem icon
                         Image("gemstone")
@@ -95,7 +87,7 @@ struct SplashView: View {
                             .frame(width: 200, height: 200)
                             .accessibilityLabel("Opalite gemstone")
                             .scaleEffect(pulse ? 1.06 : 0.94)
-                            .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: pulse)
+                            .animation(.easeInOut(duration: 4.0).repeatForever(autoreverses: true), value: pulse)
                     }
                     .scaleEffect(showContent ? 1 : 0.5)
                     .opacity(showContent ? 1 : 0)
@@ -103,7 +95,7 @@ struct SplashView: View {
                     // Title and subtitle
                     VStack(spacing: 12) {
                         Text("Opalite")
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .font(.system(size: 52, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .accessibilityAddTraits(.isHeader)
 
@@ -197,87 +189,153 @@ struct SplashView: View {
         var colors: [OpaliteColor] = []
 
         // Each row gets a different color theme for variety
-        let theme = RowColorTheme(rawValue: seed % RowColorTheme.allCases.count) ?? .vibrant
+        let theme = RowColorTheme(rawValue: seed % RowColorTheme.allCases.count) ?? .neons
 
         for i in 0..<16 {
             let color = generateThemedColor(theme: theme, index: i)
             colors.append(color)
         }
 
-        return colors.shuffled()
+        // Don't shuffle - keep colors in gradient order for cohesive palette
+        return colors
     }
 
     private enum RowColorTheme: Int, CaseIterable {
-        case vibrant      // Bright, saturated rainbow
-        case pastel       // Soft, light colors
-        case warm         // Reds, oranges, yellows
-        case cool         // Blues, greens, purples
-        case earth        // Browns, tans, olives
-        case jewel        // Deep, rich gemstone colors
-        case neutral      // Grays and muted tones
+        case neons        // Bright neon colors
+        case pinks        // Pink gradient palette
+        case earthyGreens // Earth-y greens and browns
+        case blues        // Blue gradient palette
+        case sunset       // Warm sunset colors
+        case purples      // Purple gradient palette
+        case oceanic      // Teal, aqua, ocean blues
+        case reds         // Red gradient palette
+        case pastels      // Soft pastel rainbow
+        case autumn       // Autumn oranges, reds, browns
+        case mint         // Mint and sage greens
+        case monochrome   // Black to white grayscale
     }
 
     private static func generateThemedColor(theme: RowColorTheme, index: Int) -> OpaliteColor {
-        // Use index to spread hues evenly, with some randomness
-        let baseHue = Double(index) / 16.0
-        let hueVariation = Double.random(in: -0.05...0.05)
-
+        // Progress through the palette (0.0 to 1.0)
+        let progress = Double(index) / 15.0
+        
         switch theme {
-        case .vibrant:
-            // Full spectrum, high saturation
-            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
-            let (r, g, b) = hsbToRGB(h: abs(hue), s: Double.random(in: 0.75...1.0), b: Double.random(in: 0.85...1.0))
+        case .neons:
+            // Bright neon colors - electric pinks, greens, yellows, oranges
+            let hue = progress * 0.9  // Cycle through most of spectrum
+            let (r, g, b) = hsbToRGB(h: hue, s: 1.0, b: 1.0)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .pastel:
-            // Full spectrum, low saturation, high brightness
-            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
-            let (r, g, b) = hsbToRGB(h: abs(hue), s: Double.random(in: 0.2...0.4), b: Double.random(in: 0.9...1.0))
+        
+        case .pinks:
+            // Pink gradient - from magenta to light pink to coral
+            let hue = 0.9 + (progress * 0.1)  // Magenta to red range
+            let saturation = 0.95 - (progress * 0.3)  // Decrease saturation
+            let brightness = 0.7 + (progress * 0.3)  // Increase brightness
+            let (r, g, b) = hsbToRGB(h: hue.truncatingRemainder(dividingBy: 1.0), s: saturation, b: brightness)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .warm:
-            // Reds, oranges, yellows (hue 0.0 - 0.15)
-            let hue = Double.random(in: 0.0...0.12)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.6...1.0), b: Double.random(in: 0.7...1.0))
+        
+        case .earthyGreens:
+            // Earth-y greens and browns - sage, olive, brown, tan
+            let hueRange: [(h: Double, s: Double, b: Double)] = [
+                (0.08, 0.45, 0.35),   // Deep brown
+                (0.10, 0.40, 0.45),   // Medium brown
+                (0.12, 0.35, 0.55),   // Tan
+                (0.15, 0.38, 0.50),   // Olive
+                (0.25, 0.42, 0.48),   // Moss green
+                (0.28, 0.40, 0.52),   // Sage
+                (0.30, 0.35, 0.60),   // Light sage
+                (0.32, 0.30, 0.68)    // Pale green
+            ]
+            let segmentIndex = Int(progress * Double(hueRange.count - 1))
+            let segmentProgress = (progress * Double(hueRange.count - 1)) - Double(segmentIndex)
+            let nextIndex = min(segmentIndex + 1, hueRange.count - 1)
+            
+            let h = hueRange[segmentIndex].h + (hueRange[nextIndex].h - hueRange[segmentIndex].h) * segmentProgress
+            let s = hueRange[segmentIndex].s + (hueRange[nextIndex].s - hueRange[segmentIndex].s) * segmentProgress
+            let b = hueRange[segmentIndex].b + (hueRange[nextIndex].b - hueRange[segmentIndex].b) * segmentProgress
+            let (r, g, bl) = hsbToRGB(h: h, s: s, b: b)
+            return OpaliteColor(red: r, green: g, blue: bl, alpha: 1.0)
+        
+        case .blues:
+            // Blue gradient - navy to sky blue to cyan
+            let hue = 0.55 + (progress * 0.08)  // Blue to cyan range
+            let saturation = 0.95 - (progress * 0.25)
+            let brightness = 0.3 + (progress * 0.7)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .cool:
-            // Blues, teals, purples (hue 0.5 - 0.85)
-            let hue = Double.random(in: 0.5...0.85)
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.5...0.9), b: Double.random(in: 0.6...1.0))
+        
+        case .sunset:
+            // Warm sunset - deep red to orange to yellow to pink
+            let hueStops: [Double] = [0.95, 0.02, 0.08, 0.12, 0.15, 0.92]
+            let stopProgress = progress * Double(hueStops.count - 1)
+            let stopIndex = Int(stopProgress)
+            let nextStopIndex = min(stopIndex + 1, hueStops.count - 1)
+            let localProgress = stopProgress - Double(stopIndex)
+            
+            let hue = hueStops[stopIndex] + (hueStops[nextStopIndex] - hueStops[stopIndex]) * localProgress
+            let saturation = 0.85 + (sin(progress * .pi) * 0.15)
+            let brightness = 0.75 + (progress * 0.25)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .earth:
-            // Browns, tans, olives, greens
-            let earthHues: [Double] = [0.05, 0.08, 0.1, 0.12, 0.2, 0.25, 0.3, 0.35]
-            let hue = earthHues[index % earthHues.count]
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.3...0.7), b: Double.random(in: 0.25...0.65))
+        
+        case .purples:
+            // Purple gradient - deep purple to lavender to lilac
+            let hue = 0.72 + (progress * 0.1)  // Purple to magenta range
+            let saturation = 0.9 - (progress * 0.4)
+            let brightness = 0.4 + (progress * 0.55)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .jewel:
-            // Deep, rich colors - ruby, emerald, sapphire, amethyst
-            let jewelHues: [Double] = [0.0, 0.08, 0.33, 0.45, 0.55, 0.65, 0.75, 0.85]
-            let hue = jewelHues[index % jewelHues.count]
-            let (r, g, b) = hsbToRGB(h: hue, s: Double.random(in: 0.7...0.95), b: Double.random(in: 0.4...0.7))
+        
+        case .oceanic:
+            // Teal, aqua, ocean blues - tropical ocean palette
+            let hue = 0.48 + (progress * 0.12)  // Teal to cyan range
+            let saturation = 0.65 + (sin(progress * .pi) * 0.25)
+            let brightness = 0.55 + (progress * 0.35)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
             return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
-
-        case .neutral:
-            // Grays, warm grays, cool grays
-            let style = index % 3
-            switch style {
-            case 0:
-                // Pure gray
-                let gray = Double.random(in: 0.2...0.85)
-                return OpaliteColor(red: gray, green: gray, blue: gray, alpha: 1.0)
-            case 1:
-                // Warm gray
-                let base = Double.random(in: 0.3...0.8)
-                return OpaliteColor(red: base + 0.05, green: base, blue: base - 0.05, alpha: 1.0)
-            default:
-                // Cool gray
-                let base = Double.random(in: 0.3...0.8)
-                return OpaliteColor(red: base - 0.03, green: base, blue: base + 0.06, alpha: 1.0)
-            }
+        
+        case .reds:
+            // Red gradient - burgundy to crimson to rose
+            let hue = 0.97 + (progress * 0.06)  // Red to pink-red range
+            let saturation = 0.9 - (progress * 0.3)
+            let brightness = 0.35 + (progress * 0.55)
+            let (r, g, b) = hsbToRGB(h: hue.truncatingRemainder(dividingBy: 1.0), s: saturation, b: brightness)
+            return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
+        
+        case .pastels:
+            // Soft pastel rainbow - gentle colors across spectrum
+            let hue = progress * 0.85  // Cycle through spectrum
+            let saturation = 0.25 + (sin(progress * .pi * 2) * 0.1)
+            let brightness = 0.92 - (sin(progress * .pi) * 0.05)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
+            return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
+        
+        case .autumn:
+            // Autumn oranges, reds, browns - fall foliage
+            let hueStops: [Double] = [0.02, 0.05, 0.08, 0.10, 0.06, 0.03]
+            let stopProgress = progress * Double(hueStops.count - 1)
+            let stopIndex = Int(stopProgress)
+            let nextStopIndex = min(stopIndex + 1, hueStops.count - 1)
+            let localProgress = stopProgress - Double(stopIndex)
+            
+            let hue = hueStops[stopIndex] + (hueStops[nextStopIndex] - hueStops[stopIndex]) * localProgress
+            let saturation = 0.7 + (sin(progress * .pi) * 0.2)
+            let brightness = 0.4 + (progress * 0.35)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
+            return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
+        
+        case .mint:
+            // Mint and sage greens - fresh and cool
+            let hue = 0.38 + (progress * 0.08)  // Green to cyan-green
+            let saturation = 0.45 - (progress * 0.15)
+            let brightness = 0.65 + (progress * 0.3)
+            let (r, g, b) = hsbToRGB(h: hue, s: saturation, b: brightness)
+            return OpaliteColor(red: r, green: g, blue: b, alpha: 1.0)
+        
+        case .monochrome:
+            // Black to white grayscale
+            let gray = progress
+            return OpaliteColor(red: gray, green: gray, blue: gray, alpha: 1.0)
         }
     }
 

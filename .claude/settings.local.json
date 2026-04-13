@@ -30,7 +30,8 @@
       "Bash(__NEW_LINE_dd616ed8488267dc__ echo:*)",
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(npx tsc:*)",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

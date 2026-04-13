@@ -25,6 +25,9 @@ struct OnboardingPageView: View {
     @State private var titleAnimated: Bool = false
     @State private var featuresAnimated: [Bool] = []
     @State private var mainIconBounce: Bool = false
+    @State private var rotationAngle: Double = 0
+    @State private var glowPulse: Bool = false
+    @State private var floatOffset: CGFloat = 0
 
     var body: some View {
         ScrollView {
@@ -33,19 +36,37 @@ struct OnboardingPageView: View {
 
                 // Animated icon
                 ZStack {
-                    // Glow effect
-                    iconImage(size: 80)
-                        .blur(radius: 5)
-                        .opacity(iconAnimated ? 0.6 : 0)
+                    // Rotating gradient background
+                    if page.iconColors.count >= 2 {
+                        AngularGradient(
+                            colors: page.iconColors + [page.iconColors.first!],
+                            center: .center,
+                            angle: .degrees(rotationAngle)
+                        )
+                        .frame(width: 140, height: 140)
+                        .blur(radius: 30)
+                        .opacity(iconAnimated ? 0.5 : 0)
+                        .accessibilityHidden(true)
+                    }
+                    
+                    // Pulsing glow effect
+                    iconImage(size: 84)
+                        .blur(radius: 8)
+                        .opacity(iconAnimated ? (glowPulse ? 0.7 : 0.5) : 0)
                         .accessibilityHidden(true)
 
-                    // Main icon
+                    // Main icon with floating animation
                     iconImage(size: 72)
                         .symbolEffect(.bounce, options: .nonRepeating.speed(1.1), value: mainIconBounce)
+                        .offset(y: floatOffset)
                         .accessibilityHidden(true)
                 }
                 .scaleEffect(iconAnimated ? 1 : 0.5)
                 .opacity(iconAnimated ? 1 : 0)
+                .rotation3DEffect(
+                    .degrees(iconAnimated ? 0 : 15),
+                    axis: (x: 1, y: 1, z: 0)
+                )
 
                 // Title and subtitle
                 VStack(spacing: 12) {
@@ -98,8 +119,8 @@ struct OnboardingPageView: View {
     }
 
     private func animateContent() {
-        // Icon animation
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1)) {
+        // Icon animation with 3D rotation
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1)) {
             iconAnimated = true
         }
         mainIconBounce.toggle()
@@ -117,9 +138,36 @@ struct OnboardingPageView: View {
                 }
             }
         }
+        
+        // Start continuous animations
+        startContinuousAnimations()
+    }
+    
+    private func startContinuousAnimations() {
+        // Rotating gradient
+        withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
+            rotationAngle = 360
+        }
+        
+        // Pulsing glow
+        withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+            glowPulse = true
+        }
+        
+        // Gentle floating motion
+        withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+            floatOffset = -8
+        }
+    }
+    
+    private func stopContinuousAnimations() {
+        rotationAngle = 0
+        glowPulse = false
+        floatOffset = 0
     }
 
     private func resetAnimations() {
+        stopContinuousAnimations()
         iconAnimated = false
         titleAnimated = false
         mainIconBounce = false

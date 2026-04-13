@@ -52,6 +52,10 @@ struct PortfolioView: View {
 
     var isCompact: Bool { hSizeClass == .compact }
 
+    private var swatchSize: SwatchSize {
+        SwatchSize(rawValue: swatchSizeRaw) ?? .medium
+    }
+
     private var isIPadOrMac: Bool {
         #if os(macOS)
         return true
@@ -82,13 +86,6 @@ struct PortfolioView: View {
                 .navigationDestination(for: PortfolioNavigationNode.self) { node in
                     destinationView(for: node)
                 }
-        }
-        .onAppear(perform: handleOnAppear)
-        .onChange(of: viewModel.swatchSize) { _, newValue in
-            swatchSizeRaw = newValue.rawValue
-        }
-        .onChange(of: hSizeClass) { _, newValue in
-            handleSizeClassChange(newValue)
         }
         .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
             handleQuickActionTrigger(newValue)
@@ -159,6 +156,26 @@ struct PortfolioView: View {
         .sheet(isPresented: $viewModel.isShowingPaywall) {
             PaywallView(featureContext: "This feature requires Onyx")
         }
+        .sheet(item: $viewModel.colorToExport) { color in
+            ColorExportSheet(color: color)
+                .interactiveDismissDisabled()
+                .presentationDragIndicator(.hidden)
+        }
+        .sheet(isPresented: $viewModel.isShowingSwatchBarInfo) {
+            SwatchBarInfoSheet()
+                .interactiveDismissDisabled()
+                .presentationDragIndicator(.hidden)
+        }
+        .sheet(isPresented: $viewModel.isShowingQuickAddHex) {
+            QuickAddHexSheet()
+                .interactiveDismissDisabled()
+                .presentationDragIndicator(.hidden)
+        }
+        .sheet(isPresented: $viewModel.isShowingPaletteOrder) {
+            PaletteOrderSheet(isForExport: false)
+                .interactiveDismissDisabled()
+                .presentationDragIndicator(.hidden)
+        }
         #if os(iOS) && !targetEnvironment(macCatalyst)
         .fullScreenCover(isPresented: $viewModel.isShowingPhotoColorPicker) {
             PhotoColorPickerSheet()
@@ -167,18 +184,6 @@ struct PortfolioView: View {
             PhotoColorPickerSheet(initialImage: item.image)
         }
         #endif
-        .sheet(item: $viewModel.colorToExport) { color in
-            ColorExportSheet(color: color)
-        }
-        .sheet(isPresented: $viewModel.isShowingSwatchBarInfo) {
-            SwatchBarInfoSheet()
-        }
-        .sheet(isPresented: $viewModel.isShowingQuickAddHex) {
-            QuickAddHexSheet()
-        }
-        .sheet(isPresented: $viewModel.isShowingPaletteOrder) {
-            PaletteOrderSheet(isForExport: false)
-        }
     }
 }
 
@@ -253,10 +258,10 @@ private extension PortfolioView {
         SwatchRowView(
             colors: colorManager.looseColors,
             palette: viewModel.pendingPaletteToAddTo,
-            swatchWidth: viewModel.swatchSize.size,
-            swatchHeight: viewModel.swatchSize.size,
-            swatchCornerRadius: viewModel.swatchSize.cornerRadius,
-            showOverlays: viewModel.looseColorShowOverlays(swatchShowsOverlays: viewModel.swatchSize.showOverlays),
+            swatchWidth: swatchSize.size,
+            swatchHeight: swatchSize.size,
+            swatchCornerRadius: swatchSize.cornerRadius,
+            showOverlays: viewModel.looseColorShowOverlays(swatchShowsOverlays: swatchSize.showOverlays),
             showsNavigation: viewModel.looseColorShowsNavigation,
             onTap: viewModel.isEditingColors ? { color in viewModel.handleColorTap(color) } : nil,
             menuContent: { color in looseColorMenuContent(color) },
@@ -342,12 +347,12 @@ private extension PortfolioView {
             SwatchRowView(
                 colors: palette.sortedColors,
                 palette: palette,
-                swatchWidth: viewModel.swatchSize.size,
-                swatchHeight: viewModel.swatchSize.size,
-                swatchCornerRadius: viewModel.swatchSize.cornerRadius,
-                showOverlays: viewModel.swatchSize.showOverlays,
+                swatchWidth: swatchSize.size,
+                swatchHeight: swatchSize.size,
+                swatchCornerRadius: swatchSize.cornerRadius,
+                showOverlays: swatchSize.showOverlays,
                 menuContent: { color in
-                    if viewModel.swatchSize.showOverlays {
+                    if swatchSize.showOverlays {
                         return menuContent(color: color, palette: palette)
                     } else {
                         return AnyView(EmptyView())
@@ -401,7 +406,7 @@ private extension PortfolioView {
 
 private extension PortfolioView {
     func looseColorMenuContent(_ color: OpaliteColor) -> AnyView {
-        if viewModel.swatchSize.showOverlays && !viewModel.isEditingColors {
+        if swatchSize.showOverlays && !viewModel.isEditingColors {
             return menuContent(color: color)
         } else {
             return AnyView(EmptyView())
@@ -501,25 +506,6 @@ private extension PortfolioView {
             #endif
         }
 
-        if !colorManager.colors.isEmpty {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    HapticsManager.shared.selection()
-                    withAnimation(.bouncy) {
-                        viewModel.swatchSize = isCompact ? viewModel.swatchSize.nextCompact : viewModel.swatchSize.next
-                    }
-                }) {
-                    Image(systemName: viewModel.nextSwatchSizeWillIncrease(isCompact: isCompact)
-                          ? "arrow.down.left.and.arrow.up.right.square"
-                          : "arrow.up.right.and.arrow.down.left.square")
-                }
-                .toolbarButtonTint()
-                .accessibilityLabel("Change swatch size")
-                .accessibilityHint(isCompact ? "Cycles between small and medium swatch sizes" : "Cycles through small, medium, and large swatch sizes")
-                .accessibilityValue(viewModel.swatchSize.accessibilityName)
-            }
-        }
-        
         if colorManager.activePalettes.count >= 3 {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -797,20 +783,6 @@ private extension PortfolioView {
 // MARK: - Event Handlers
 
 private extension PortfolioView {
-    func handleOnAppear() {
-        if let stored = SwatchSize(rawValue: swatchSizeRaw) {
-            viewModel.swatchSize = stored
-        }
-    }
-
-    func handleSizeClassChange(_ newValue: UserInterfaceSizeClass?) {
-        if newValue == .compact && viewModel.swatchSize == .large {
-            withAnimation(.bouncy) {
-                viewModel.swatchSize = .medium
-            }
-        }
-    }
-
     func handleQuickActionTrigger(_ newValue: UUID?) {
         guard let token = newValue else { return }
         viewModel.quickActionTrigger = token

@@ -89,33 +89,30 @@ struct WatchAppInfoSheet: View {
                             text: "Pull to refresh on the Watch to manually sync anytime"
                         )
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.inverseTheme)
                     .padding(.horizontal, 20)
                 }
                 .padding(.top, 24)
                 .opacity(appearAnimation ? 1 : 0)
                 .animation(.easeOut.delay(0.5), value: appearAnimation)
 
-                // Done button
-                Button {
-                    HapticsManager.shared.selection()
-                    dismiss()
-                } label: {
-                    Text("Got It")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(.blue, in: RoundedRectangle(cornerRadius: 14))
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 20)
-                .padding(.top, 28)
-                .padding(.bottom, 30)
-                .opacity(appearAnimation ? 1 : 0)
-                .scaleEffect(appearAnimation ? 1 : 0.9)
-                .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.6), value: appearAnimation)
             }
+            .padding(.bottom, 30)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                HapticsManager.shared.selection()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 30, height: 30)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(16)
+            .accessibilityLabel("Close")
         }
         .background {
             LinearGradient(

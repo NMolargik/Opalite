@@ -233,9 +233,6 @@ class ShapeDrawingView: UIView, UIGestureRecognizerDelegate {
             }
         }
 
-        let originX = min(drawOrigin.x, currentPoint.x)
-        let originY = min(drawOrigin.y, currentPoint.y)
-
         // Re-derive origin so the rect always grows away from drawOrigin
         let x: CGFloat
         let y: CGFloat

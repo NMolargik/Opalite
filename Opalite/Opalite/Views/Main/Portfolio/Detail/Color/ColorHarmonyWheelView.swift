@@ -163,7 +163,7 @@ struct ColorHarmonyWheelView: View {
     }
 
     var body: some View {
-        SectionCard(title: "Harmonies", systemImage: "paintpalette", isCollapsible: true) {
+        SectionCard(title: "Harmonies", systemImage: "paintpalette", isCollapsible: true, initiallyExpanded: false) {
             VStack(spacing: 16) {
                 harmonyPicker
 
@@ -185,6 +185,7 @@ struct ColorHarmonyWheelView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about color harmonies")
+            .padding(.trailing)
         }
         .sheet(isPresented: $isShowingInfo) {
             ColorHarmoniesInfoSheet()

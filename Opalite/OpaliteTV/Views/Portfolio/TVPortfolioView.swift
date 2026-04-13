@@ -13,8 +13,6 @@ struct TVPortfolioView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
 
-    @State private var showQuickAddHex: Bool = false
-
     /// Fixed swatch size for tvOS
     private let swatchSize: SwatchSize = .medium
 
@@ -22,39 +20,12 @@ struct TVPortfolioView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
-                    // Header with inline action buttons
-                    HStack {
-                        Text("Opalite")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .accessibilityAddTraits(.isHeader)
-
-                        Spacer()
-
-                        HStack(spacing: 24) {
-                            Button {
-                                showQuickAddHex = true
-                            } label: {
-                                Image(systemName: "plus")
-                                    .font(.title3)
-                            }
-                            .accessibilityLabel("Add color by hex code")
-                            .accessibilityHint("Opens a sheet to enter a hex color code")
-
-                            Button {
-                                Task {
-                                    await colorManager.refreshAll()
-                                    toastManager.showSuccess("Synced with iCloud")
-                                }
-                            } label: {
-                                Image(systemName: "arrow.clockwise")
-                                    .font(.title3)
-                            }
-                            .accessibilityLabel("Sync with iCloud")
-                            .accessibilityHint("Refreshes colors and palettes from iCloud")
-                        }
-                    }
-                    .padding(.horizontal, 48)
+                    // Header
+                    Text("Opalite")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .accessibilityAddTraits(.isHeader)
+                        .padding(.horizontal, 48)
 
                     // Loose Colors Section
                     if !colorManager.looseColors.isEmpty {
@@ -101,9 +72,6 @@ struct TVPortfolioView: View {
                     }
                 }
                 .padding(.vertical, 40)
-            }
-            .sheet(isPresented: $showQuickAddHex) {
-                TVQuickAddHexSheet()
             }
         }
     }

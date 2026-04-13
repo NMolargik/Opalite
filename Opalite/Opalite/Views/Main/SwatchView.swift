@@ -239,12 +239,11 @@ struct SwatchView: View {
                     onDragStarted?()
                     return provideDragItem()
                 } preview: {
-                    // Clean preview without material overlay that doesn't render well during drag
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(displayColor.swiftUIColor)
-                        .frame(width: width ?? 100, height: height ?? 100)
+                    dragPreviewView
                 }
             }
+            .opacity(isDragging ? 0.2 : 1)
+            .animation(.easeIn(duration: 0.2), value: isDragging)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(accessibilityDescription)
             .accessibilityAddTraits(.isButton)
@@ -440,6 +439,52 @@ struct SwatchView: View {
         } else {
             EmptyView()
         }
+    }
+
+    // MARK: - Drag Preview
+
+    /// A static replica of the swatch's visual appearance for the drag preview.
+    /// Uses solid colors to approximate material effects that don't render in drag previews.
+    private var dragPreviewView: some View {
+        let previewWidth = width ?? 100
+        let previewHeight = height ?? 100
+
+        return RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(displayColor.swiftUIColor)
+            .overlay {
+                if showBorder {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(.white.opacity(0.3), lineWidth: 5)
+                }
+            }
+            .overlay(alignment: .topLeading) {
+                if showOverlays && !badgeText.isEmpty {
+                    Text(badgeText)
+                        .foregroundStyle(displayColor.idealTextColor())
+                        .bold()
+                        .padding(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                        )
+                        .padding(8)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if showOverlays && menu != nil {
+                    Image(systemName: "ellipsis")
+                        .imageScale(.large)
+                        .foregroundStyle(displayColor.idealTextColor())
+                        .frame(width: 8, height: 8)
+                        .padding(12)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        )
+                        .padding(8)
+                }
+            }
+            .frame(width: previewWidth, height: previewHeight)
     }
 
     // MARK: - Drag Support

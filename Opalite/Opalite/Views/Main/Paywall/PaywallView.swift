@@ -211,17 +211,17 @@ struct PaywallView: View {
         Button {
             Task {
                 await subscriptionManager.restorePurchases()
-
+                dismiss()
+                
                 if let error = subscriptionManager.error {
                     // Restore failed - show error
                     toastManager.show(error: error)
                 } else if subscriptionManager.hasOnyxEntitlement {
                     // Restore succeeded and found purchases
                     toastManager.showSuccess("Purchases restored")
-                    dismiss()
                 } else {
                     // Restore succeeded but no purchases found
-                    toastManager.show(message: "No purchases to restore", style: .info, icon: "info.circle.fill")
+                    toastManager.show(message: "No purchases to restore", style: .error, icon: "info.circle.fill")
                 }
             }
         } label: {

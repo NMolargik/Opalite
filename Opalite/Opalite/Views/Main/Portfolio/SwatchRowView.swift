@@ -139,6 +139,10 @@ struct SwatchRowView: View {
         }
         .if(acceptsDrops) { view in
             view.onDrop(of: [UTType.opaliteColor, UTType.opaliteColorID], isTargeted: $isDropTargeted) { providers in
+                // Clear drag state immediately so the source swatch reappears
+                dragResetTask?.cancel()
+                draggingColorID = nil
+
                 // Try to handle full JSON color data first (cross-device drops)
                 if let jsonProvider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.opaliteColor.identifier) }) {
                     jsonProvider.loadDataRepresentation(forTypeIdentifier: UTType.opaliteColor.identifier) { data, _ in
@@ -225,12 +229,15 @@ struct SwatchRowView: View {
             onDragStarted: {
                 draggingColorID = color.id
                 // Set up fallback reset in case drop doesn't complete normally
+                // (e.g. context menu intercepts the long press gesture)
                 dragResetTask?.cancel()
                 dragResetTask = Task {
-                    try? await Task.sleep(for: .seconds(5))
+                    try? await Task.sleep(for: .seconds(1))
                     if !Task.isCancelled {
                         await MainActor.run {
-                            draggingColorID = nil
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                draggingColorID = nil
+                            }
                         }
                     }
                 }
@@ -281,12 +288,10 @@ struct SwatchRowView: View {
             }
             guard let color = droppedColor else { return }
 
-            withAnimation(.spring()) {
-                if let palette {
-                    colorManager.attachColor(color, to: palette)
-                } else {
-                    colorManager.detachColorFromPalette(color)
-                }
+            if let palette {
+                colorManager.attachColor(color, to: palette)
+            } else {
+                colorManager.detachColorFromPalette(color)
             }
         }
     }
@@ -318,12 +323,10 @@ struct SwatchRowView: View {
 
                 if let color = existingColor {
                     // Color exists locally, just attach/detach
-                    withAnimation(.spring()) {
-                        if let palette {
-                            colorManager.attachColor(color, to: palette)
-                        } else {
-                            colorManager.detachColorFromPalette(color)
-                        }
+                    if let palette {
+                        colorManager.attachColor(color, to: palette)
+                    } else {
+                        colorManager.detachColorFromPalette(color)
                     }
                     return
                 }
@@ -357,10 +360,8 @@ struct SwatchRowView: View {
 
             do {
                 let createdColor = try colorManager.createColor(existing: newColor)
-                withAnimation(.spring()) {
-                    if let palette {
-                        colorManager.attachColor(createdColor, to: palette)
-                    }
+                if let palette {
+                    colorManager.attachColor(createdColor, to: palette)
                 }
             } catch {
                 #if DEBUG

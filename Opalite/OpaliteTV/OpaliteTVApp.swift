@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import CoreData
 
 @main
 @MainActor
@@ -40,6 +41,17 @@ struct OpaliteTVApp: App {
         }
 
         colorManager = ColorManager(context: sharedModelContainer.mainContext)
+
+        // Listen for remote CloudKit changes so the in-memory cache stays current
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name.NSPersistentStoreRemoteChange,
+            object: nil,
+            queue: .main
+        ) { [colorManager] _ in
+            Task { @MainActor in
+                await colorManager.refreshAll()
+            }
+        }
     }
 
     var body: some Scene {

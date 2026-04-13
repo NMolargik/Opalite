@@ -32,12 +32,12 @@ final class OpalitePalette {
     @Relationship var colors: [OpaliteColor]? = []
     @Relationship var canvasFile: CanvasFile?
 
-    /// Colors sorted by creation date (newest first)
+    /// Colors sorted by last updated date (most recently updated first)
     var sortedColors: [OpaliteColor] {
         guard let colors = colors, !colors.isEmpty else { return [] }
         // Create a stable copy with captured dates to avoid sorting issues during SwiftData mutations
         let snapshot = colors.compactMap { color -> (color: OpaliteColor, date: Date, id: UUID)? in
-            return (color: color, date: color.createdAt, id: color.id)
+            return (color: color, date: color.updatedAt, id: color.id)
         }
         return snapshot
             .sorted { $0.date > $1.date || ($0.date == $1.date && $0.id.uuidString > $1.id.uuidString) }

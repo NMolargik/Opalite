@@ -11,23 +11,27 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
     let title: String
     let systemImage: String
     let isCollapsible: Bool
+    let initiallyExpanded: Bool
     @ViewBuilder var content: Content
     @ViewBuilder var trailing: TrailingContent
 
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded: Bool
 
     init(
         title: String,
         systemImage: String,
         isCollapsible: Bool = false,
+        initiallyExpanded: Bool = true,
         @ViewBuilder content: () -> Content,
         @ViewBuilder trailing: () -> TrailingContent
     ) {
         self.title = title
         self.systemImage = systemImage
         self.isCollapsible = isCollapsible
+        self.initiallyExpanded = initiallyExpanded
         self.content = content()
         self.trailing = trailing()
+        self._isExpanded = State(initialValue: initiallyExpanded)
     }
 
     var body: some View {
@@ -104,13 +108,16 @@ extension SectionCard where TrailingContent == EmptyView {
         title: String,
         systemImage: String,
         isCollapsible: Bool = false,
+        initiallyExpanded: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.systemImage = systemImage
         self.isCollapsible = isCollapsible
+        self.initiallyExpanded = initiallyExpanded
         self.content = content()
         self.trailing = EmptyView()
+        self._isExpanded = State(initialValue: initiallyExpanded)
     }
 }
 

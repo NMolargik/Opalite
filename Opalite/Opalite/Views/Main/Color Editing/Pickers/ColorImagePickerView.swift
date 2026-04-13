@@ -44,7 +44,7 @@ struct ColorImagePickerView: View {
                         HapticsManager.shared.impact()
                         isShowingImagePicker = true
                     } label: {
-                        Label("Choose Photo", systemImage: "photo.on.rectangle")
+                        Label("Import", systemImage: "photo.on.rectangle")
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)

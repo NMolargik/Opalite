@@ -75,6 +75,7 @@ struct PaletteDetailView: View {
                         NotesSectionView(
                             notes: $notesDraft,
                             isSaving: $isSavingNotes,
+                            isPalette: true,
                             onSave: {
                                 isSavingNotes = true
                                 defer { isSavingNotes = false }

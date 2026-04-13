@@ -91,7 +91,7 @@ class ColorManager {
 
     private var colorSort: [SortDescriptor<OpaliteColor>] {
         [
-            SortDescriptor(\OpaliteColor.createdAt, order: .reverse)
+            SortDescriptor(\OpaliteColor.updatedAt, order: .reverse)
         ]
     }
 
@@ -149,10 +149,13 @@ class ColorManager {
             let exists = palette.colors?.contains(where: { $0.id == color.id }) ?? false
             if !exists {
                 palette.colors?.append(color)
+                // Only touch timestamps if the relationship list actually changed
+                palette.updatedAt = .now
+                color.updatedAt = .now
+            } else {
+                // Color is already in this palette — no-op
+                return
             }
-            // Touch timestamps since the relationship list may have changed
-            palette.updatedAt = .now
-            color.updatedAt = .now
         } else {
             // If attached to a different palette, remove it from there first
             if let old = color.palette, old.id != palette.id {
@@ -188,6 +191,9 @@ class ColorManager {
     /// Detaches a color from its current palette (if any), keeping both sides of the relationship in sync.
     /// Optionally accepts an error handler.
     func detachColorFromPalette(_ color: OpaliteColor, onError: ((OpaliteError) -> Void)? = nil) {
+        // Already loose — no-op
+        guard color.palette != nil else { return }
+
         if let palette = color.palette {
             if let idx = palette.colors?.firstIndex(where: { $0.id == color.id }) {
                 palette.colors?.remove(at: idx)
@@ -195,6 +201,11 @@ class ColorManager {
             palette.updatedAt = .now
         }
         color.palette = nil
+
+        #if canImport(DeviceKit)
+        color.updatedOnDeviceName = Device.current.safeDescription
+        #endif
+        color.updatedAt = .now
 
         do {
             try saveContext()
@@ -204,11 +215,6 @@ class ColorManager {
         } catch {
             onError?(.colorDetachFailed)
         }
-
-        #if canImport(DeviceKit)
-        color.updatedOnDeviceName = Device.current.safeDescription
-        #endif
-        color.updatedAt = .now
     }
 
     // MARK: - Private helpers: Canvas–Palette relationship management

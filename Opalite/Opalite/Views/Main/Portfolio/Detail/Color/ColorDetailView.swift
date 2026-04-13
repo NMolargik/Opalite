@@ -135,9 +135,30 @@ struct ColorDetailView: View {
                             }
                         )
 
+                        ColorShadesView(
+                            baseColor: color,
+                            onCreateColor: { suggested in
+                                do {
+                                    _ = try colorManager.createColor(
+                                        name: nil,
+                                        notes: nil,
+                                        device: nil,
+                                        red: suggested.red,
+                                        green: suggested.green,
+                                        blue: suggested.blue,
+                                        alpha: suggested.alpha,
+                                        palette: color.palette
+                                    )
+                                } catch {
+                                    toastManager.show(error: .colorCreationFailed)
+                                }
+                            }
+                        )
+
                         NotesSectionView(
                             notes: $viewModel.notesDraft,
                             isSaving: $viewModel.isSavingNotes,
+                            isPalette: false,
                             onSave: {
                                 viewModel.saveNotes(using: colorManager) { error in
                                     toastManager.show(error: error)
@@ -501,7 +522,7 @@ private struct HarmoniesRow: View {
     @State private var harmonyColors: [OpaliteColor] = []
 
     var body: some View {
-        SectionCard(title: "Harmonies", systemImage: "paintpalette") {
+        SectionCard(title: "Harmonies", systemImage: "paintpalette", isCollapsible: true, initiallyExpanded: false) {
             SwatchRowView(
                 colors: harmonyColors,
                 palette: nil,

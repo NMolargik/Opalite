@@ -75,6 +75,12 @@ struct SyncingView: View {
                 // Progress indicator
                 ProgressView()
                     .controlSize(.large)
+
+                Text("Free iCloud storage space is required to sync between devices.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
                     .padding(.bottom, 40)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

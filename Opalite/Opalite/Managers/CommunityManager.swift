@@ -545,7 +545,7 @@ final class CommunityManager {
                 for (index, recordID) in colorRecordIDs.enumerated() {
                     group.addTask {
                         guard let record = try? await self.publicDatabase.record(for: recordID),
-                              let color = try? CommunityColor(record: record) else {
+                              let color = try? await CommunityColor(record: record) else {
                             return (index, nil)
                         }
                         return (index, color)

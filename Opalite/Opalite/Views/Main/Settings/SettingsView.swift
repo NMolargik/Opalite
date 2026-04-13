@@ -18,10 +18,12 @@ struct SettingsView: View {
     @Environment(CommunityManager.self) private var communityManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.appIcon) private var appIconRaw: String = AppIconOption.dark.rawValue
+    @AppStorage(AppStorageKeys.swatchSize) private var swatchSizeRaw: String = SwatchSize.medium.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw: String = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix: Bool = true
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation: Bool = false
@@ -52,6 +54,15 @@ struct SettingsView: View {
 
     private var isColorBlindnessActive: Bool {
         (ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off) != .off
+    }
+
+    /// Available swatch sizes based on device — compact screens exclude Large
+    private var availableSwatchSizes: [SwatchSize] {
+        if horizontalSizeClass == .compact {
+            return [.extraSmall, .small, .medium]
+        } else {
+            return SwatchSize.allCases
+        }
     }
 
     var body: some View {
@@ -95,6 +106,18 @@ struct SettingsView: View {
                             .foregroundStyle(.primary)
                     }
                     #endif
+
+                    Picker(selection: Binding<SwatchSize>(
+                        get: { SwatchSize(rawValue: swatchSizeRaw) ?? .medium },
+                        set: { swatchSizeRaw = $0.rawValue }
+                    )) {
+                        ForEach(availableSwatchSizes, id: \.self) { size in
+                            Text(size.accessibilityName).tag(size)
+                        }
+                    } label: {
+                        Label("Swatch Size", systemImage: "square.resize")
+                            .foregroundStyle(.primary)
+                    }
 
                     #if canImport(UIKit) && !os(visionOS)
                     VStack(alignment: .leading, spacing: 8) {
@@ -226,7 +249,7 @@ struct SettingsView: View {
                             } else if subscriptionManager.hasOnyxEntitlement {
                                 toastManager.showSuccess("Onyx is already active")
                             } else {
-                                toastManager.show(message: "No purchases to restore", style: .info)
+                                toastManager.show(message: "No purchases to restore", style: .error)
                             }
                         }
                     } label: {

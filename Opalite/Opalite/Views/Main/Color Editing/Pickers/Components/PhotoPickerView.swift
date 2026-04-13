@@ -65,7 +65,7 @@ struct PhotoPickerView: View {
 
     var body: some View {
         PhotosPicker(selection: $selection, matching: .images, photoLibrary: .shared()) {
-            Label("Choose Photo", systemImage: "photo.on.rectangle")
+            Label("Import", systemImage: "photo.on.rectangle")
         }
         .onChange(of: selection) { _, newValue in
             guard let newValue else { return }

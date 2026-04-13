@@ -29,11 +29,16 @@ struct PhotoColorPickerSheet: View {
     @State private var stagedColors: [OpaliteColor] = []
     @State private var isShowingImagePicker = false
     @State private var isShowingCamera = false
+    @State private var isShowingInstructions = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Instructions section
+                    instructionsSection
+                    
+                    // Image source buttons
                     imageSourceButtons
 
                     if let uiImage = selectedImage {
@@ -69,6 +74,7 @@ struct PhotoColorPickerSheet: View {
                         importStagedColors()
                     }
                     .disabled(stagedColors.isEmpty)
+                    .tint(.green)
                 }
             }
         }
@@ -90,6 +96,94 @@ struct PhotoColorPickerSheet: View {
         }
     }
 
+    // MARK: - Instructions Section
+    
+    @ViewBuilder
+    private var instructionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                HapticsManager.shared.selection()
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    isShowingInstructions.toggle()
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundStyle(.blue)
+                    
+                    Text("How to Use")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(isShowingInstructions ? 90 : 0))
+                }
+            }
+            .buttonStyle(.plain)
+            
+            if isShowingInstructions {
+                VStack(alignment: .leading, spacing: 10) {
+                    instructionRow(
+                        number: "1",
+                        text: "Choose or capture a photo",
+                        icon: "photo"
+                    )
+                    
+                    instructionRow(
+                        number: "2",
+                        text: "Tap or drag on the image to sample colors",
+                        icon: "hand.tap"
+                    )
+                    
+                    instructionRow(
+                        number: "3",
+                        text: "Stage colors you want to import",
+                        icon: "plus.circle"
+                    )
+                    
+                    instructionRow(
+                        number: "4",
+                        text: "Tap Import to add all staged colors",
+                        icon: "square.and.arrow.down"
+                    )
+                }
+                .padding(.top, 4)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(16)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+    
+    @ViewBuilder
+    private func instructionRow(number: String, text: String, icon: String) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(.blue.opacity(0.15))
+                    .frame(width: 28, height: 28)
+                
+                Text(number)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.blue)
+            }
+            
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            Spacer()
+            
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundStyle(.tertiary)
+        }
+    }
+
     // MARK: - Image Source Buttons
 
     @ViewBuilder
@@ -99,19 +193,29 @@ struct PhotoColorPickerSheet: View {
                 HapticsManager.shared.impact()
                 isShowingImagePicker = true
             } label: {
-                Label("Choose Photo", systemImage: "photo.on.rectangle")
+                HStack {
+                    Image(systemName: "photo.on.rectangle")
+                    Text("Import")
+                }
+                .frame(maxWidth: .infinity)
             }
             .tint(.blue)
             .buttonStyle(.borderedProminent)
+            .controlSize(.large)
 
             Button {
                 HapticsManager.shared.impact()
                 isShowingCamera = true
             } label: {
-                Label("Capture Photo", systemImage: "camera")
+                HStack {
+                    Image(systemName: "camera.fill")
+                    Text("Capture")
+                }
+                .frame(maxWidth: .infinity)
             }
             .tint(.blue)
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.bordered)
+            .controlSize(.large)
         }
     }
 
@@ -119,18 +223,33 @@ struct PhotoColorPickerSheet: View {
 
     @ViewBuilder
     private var placeholderView: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Image(systemName: "photo.badge.plus")
-                .font(.largeTitle)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 50))
+                .foregroundStyle(.blue.gradient)
+                .symbolEffect(.bounce, value: selectedImage == nil)
 
-            Text("Select an image to start picking colors")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(spacing: 6) {
+                Text("No Image Selected")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                
+                Text("Choose or capture a photo to start sampling colors")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 200)
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .frame(height: 240)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.blue.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.blue.opacity(0.2), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+        )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("No image selected. Choose or capture a photo to start picking colors.")
     }
@@ -147,6 +266,8 @@ struct PhotoColorPickerSheet: View {
     @ViewBuilder
     private func imagePickerContent(for uiImage: UIImage) -> some View {
         GeometryReader { outerGeometry in
+            let imageHeight = calculateImageDisplayHeight(for: uiImage, availableWidth: outerGeometry.size.width)
+            
             VStack(spacing: 8) {
                 GeometryReader { geometry in
                     let viewSize = geometry.size
@@ -189,65 +310,113 @@ struct PhotoColorPickerSheet: View {
                     .accessibilityLabel("Image sampling area")
                     .accessibilityHint("Tap or drag on the image to sample a color")
                 }
-                .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: outerGeometry.size.width))
+                .frame(height: imageHeight)
 
-                Text("Tap or drag on the image to pick a color")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap.fill")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                    
+                    Text("Tap or drag on the image to pick a color")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.blue.opacity(0.1), in: Capsule())
+                .frame(maxWidth: .infinity)
             }
         }
+        .frame(height: calculateImageDisplayHeight(for: uiImage, availableWidth: UIScreen.main.bounds.width - 32) + 30)
     }
 
     // MARK: - Current Color Preview
 
     @ViewBuilder
     private func currentColorPreview(_ color: OpaliteColor) -> some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(color.swiftUIColor)
-                .frame(width: 50, height: 50)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(.secondary.opacity(0.3))
-                )
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(color.hexString)
-                    .font(.headline.monospaced())
-
-                Text("Tap 'Stage' to add to import list")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "eyedropper.halffull")
+                    .foregroundStyle(.blue)
+                
+                Text("Sampled Color")
+                    .font(.subheadline.weight(.semibold))
+                
+                Spacer()
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            
+            Divider()
+            
+            // Color preview
+            HStack(spacing: 16) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(color.swiftUIColor)
+                    .frame(width: 70, height: 70)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(.primary.opacity(0.1), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
 
-            Spacer()
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(color.hexString)
+                        .font(.title3.monospaced().weight(.semibold))
+                        .foregroundStyle(.primary)
+                    
+                    HStack(spacing: 4) {
+                        Text("RGB:")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("\(Int(color.red * 255)), \(Int(color.green * 255)), \(Int(color.blue * 255))")
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
 
-            Button {
-                HapticsManager.shared.selection()
-                stageCurrentColor()
-            } label: {
-                Label("Stage", systemImage: "plus.circle.fill")
+                    Text("Tap Stage to add to list")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+
+                Spacer()
+
+                Button {
+                    HapticsManager.shared.selection()
+                    stageCurrentColor()
+                } label: {
+                    Text("Stage")
+                        .font(.caption.weight(.medium))
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .accessibilityLabel("Stage color \(color.hexString)")
+                .accessibilityHint("Adds this color to the staged import list")
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .accessibilityLabel("Stage color \(color.hexString)")
-            .accessibilityHint("Adds this color to the staged import list")
+            .padding(16)
         }
-        .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .transition(.scale.combined(with: .opacity))
     }
 
     // MARK: - Staged Colors Section
 
     @ViewBuilder
     private var stagedColorsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
+                Image(systemName: "tray.full.fill")
+                    .foregroundStyle(.green)
+                
                 Text("Staged Colors")
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
                     .accessibilityAddTraits(.isHeader)
 
                 Text("(\(stagedColors.count))")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .accessibilityLabel("\(stagedColors.count) staged")
 
@@ -255,50 +424,77 @@ struct PhotoColorPickerSheet: View {
 
                 Button(role: .destructive) {
                     HapticsManager.shared.selection()
-                    withAnimation {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         stagedColors.removeAll()
                     }
                 } label: {
-                    Text("Clear All")
-                        .font(.caption)
+                    HStack(spacing: 4) {
+                        Image(systemName: "trash")
+                            .font(.caption)
+                        Text("Clear All")
+                            .font(.caption.weight(.medium))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.red.opacity(0.1), in: Capsule())
                 }
+                .tint(.red)
                 .accessibilityHint("Removes all staged colors from the import list")
             }
+            
+            Divider()
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     ForEach(Array(stagedColors.enumerated()), id: \.element.id) { index, color in
-                        VStack(spacing: 4) {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(color.swiftUIColor)
-                                .frame(width: 60, height: 60)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .strokeBorder(.secondary.opacity(0.3))
-                                )
-                                .overlay(alignment: .topTrailing) {
-                                    Button {
-                                        HapticsManager.shared.selection()
+                        VStack(spacing: 6) {
+                            ZStack(alignment: .topTrailing) {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(color.swiftUIColor)
+                                    .frame(width: 70, height: 70)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .strokeBorder(.primary.opacity(0.15), lineWidth: 1)
+                                    )
+                                    .shadow(color: .black.opacity(0.08), radius: 3, y: 1)
+                                
+                                Button {
+                                    HapticsManager.shared.selection()
+                                    _ = withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                         stagedColors.remove(at: index)
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.caption)
-                                            .foregroundStyle(.white, .red)
                                     }
-                                    .accessibilityLabel("Remove \(color.hexString)")
-                                    .offset(x: 6, y: -6)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title3)
+                                        .foregroundStyle(.white, .red)
+                                        .shadow(color: .black.opacity(0.2), radius: 2)
                                 }
+                                .accessibilityLabel("Remove \(color.hexString)")
+                                .offset(x: 8, y: -8)
+                            }
 
                             Text(color.hexString)
-                                .font(.caption2.monospaced())
-                                .foregroundStyle(.secondary)
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.primary)
                         }
+                        .transition(.scale.combined(with: .opacity))
                     }
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, 12)
             }
+            
+            HStack {
+                Image(systemName: "info.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+                
+                Text("Tap Import in the top-right to add all staged colors")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.top, 4)
         }
-        .padding()
+        .padding(16)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
@@ -324,21 +520,19 @@ struct PhotoColorPickerSheet: View {
     }
 
     private func importStagedColors() {
-        withAnimation {
-            var successCount = 0
+        var successCount = 0
 
-            for color in stagedColors {
-                do {
-                    _ = try colorManager.createColor(existing: color)
-                    successCount += 1
-                } catch {
-                    // Continue importing other colors
-                }
+        for color in stagedColors {
+            do {
+                _ = try colorManager.createColor(existing: color)
+                successCount += 1
+            } catch {
+                // Continue importing other colors
             }
+        }
 
-            if successCount > 0 {
-                OpaliteTipActions.advanceTipsAfterContentCreation()
-            }
+        if successCount > 0 {
+            OpaliteTipActions.advanceTipsAfterContentCreation()
         }
 
         dismiss()

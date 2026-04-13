@@ -29,6 +29,7 @@ struct OnboardingFeature: Identifiable {
 struct OnboardingView: View {
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
     var onContinue: () -> Void
+    var onBack: (() -> Void)?
 
     @State private var currentPage: Int = 0
     @State private var hasAppeared: Bool = false
@@ -91,12 +92,13 @@ struct OnboardingView: View {
             icon: "square.and.arrow.up.fill",
             iconColors: [.green],
             title: "Share Your Work",
-            subtitle: "Share colors in versatile formats",
+            subtitle: "Export palettes in multiple professional formats",
             features: [
-                OnboardingFeature(icon: "photo.fill", iconColor: .blue, text: "Share colors as flat images"),
-                OnboardingFeature(icon: "arrow.down.doc.fill", iconColor: .purple, text: "Import colors and palettes", requiresOnyx: true),
-                OnboardingFeature(icon: "arrow.up.doc.fill", iconColor: .indigo, text: "Share colors and palettes", requiresOnyx: true),
-                OnboardingFeature(icon: "doc.richtext.fill", iconColor: .red, text: "Generate detailed PDFs", requiresOnyx: true)
+                OnboardingFeature(icon: "photo.fill", iconColor: .blue, text: "Export as images"),
+                OnboardingFeature(icon: "paintbrush.fill", iconColor: .orange, text: "Adobe ASE and Procreate formats", requiresOnyx: true),
+                OnboardingFeature(icon: "doc.text.fill", iconColor: .purple, text: "CSS, SwiftUI, and GIMP formats", requiresOnyx: true),
+                OnboardingFeature(icon: "doc.richtext.fill", iconColor: .red, text: "Generate detailed PDF documents", requiresOnyx: true),
+                OnboardingFeature(icon: "arrow.down.circle.fill", iconColor: .teal, text: "Import .opalite files from others", requiresOnyx: true)
             ]
         ),
         OnboardingPage(
@@ -119,30 +121,6 @@ struct OnboardingView: View {
         GeometryReader { geometry in
             ZStack {
                 VStack(spacing: 0) {
-                    // Skip button
-                    HStack {
-                        Spacer()
-
-                        Button {
-                            HapticsManager.shared.selection()
-                            completeOnboarding()
-                        } label: {
-                            Text("Skip")
-                                .font(.subheadline)
-                                .foregroundStyle(.inverseTheme)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(.ultraThinMaterial, in: Capsule())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Skip introduction")
-                        .accessibilityHint("Skips remaining pages and enters the app")
-                        .opacity(currentPage < pages.count - 1 ? 1 : 0)
-                        .accessibilityHidden(currentPage >= pages.count - 1)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
-
                     // Page content
                     TabView(selection: $currentPage) {
                         ForEach(Array(pages.enumerated()), id: \.element.id) { index, page in
@@ -162,11 +140,15 @@ struct OnboardingView: View {
                         // Navigation buttons
                         HStack(spacing: 8) {
                             // Back button
-                            if currentPage > 0 {
+                            if currentPage > 0 || onBack != nil {
                                 Button {
                                     HapticsManager.shared.selection()
-                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                        currentPage -= 1
+                                    if currentPage > 0 {
+                                        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                                            currentPage -= 1
+                                        }
+                                    } else {
+                                        onBack?()
                                     }
                                 } label: {
                                     HStack(spacing: 6) {
@@ -181,7 +163,7 @@ struct OnboardingView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityLabel("Back")
-                                .accessibilityHint("Goes to the previous page")
+                                .accessibilityHint(currentPage > 0 ? "Goes to the previous page" : "Returns to splash screen")
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                             }
 
@@ -235,6 +217,7 @@ struct OnboardingView: View {
                 }
             }
         }
+        .ignoresSafeArea()
         .onAppear {
             withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
                 hasAppeared = true

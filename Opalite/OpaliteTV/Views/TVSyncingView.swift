@@ -22,7 +22,10 @@ struct TVSyncingView: View {
     @State private var dotCount: Int = 0
 
     /// Maximum time to wait for sync before continuing (in seconds)
-    private let syncTimeout: TimeInterval = 10
+    private let syncTimeout: TimeInterval = 30
+
+    /// How often to re-check for newly synced data (in seconds)
+    private let pollInterval: TimeInterval = 2
 
     /// Animated dots for the loading indicator
     private var animatedDots: String {
@@ -58,8 +61,14 @@ struct TVSyncingView: View {
             // Progress indicator
             ProgressView()
                 .scaleEffect(1.5)
-                .padding(.bottom, 80)
                 .accessibilityLabel("Syncing in progress")
+
+            Text("Free iCloud storage space is required to sync between devices.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 60)
+                .padding(.bottom, 80)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
@@ -84,54 +93,74 @@ struct TVSyncingView: View {
         }
     }
 
-    /// Performs the iCloud sync with timeout
+    /// Performs the iCloud sync with polling and timeout.
+    ///
+    /// CloudKit imports records into the local SwiftData store asynchronously.
+    /// `refreshAll()` only reads the local store, so we poll repeatedly to pick
+    /// up records as they arrive. We also track whether the count is still growing
+    /// — if it stabilises for two consecutive polls, we consider sync complete.
     private func performSync() async {
-        // Start a timeout task
-        let timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(syncTimeout))
-            if !Task.isCancelled {
+        let startTime = Date()
+        var previousCount = 0
+        var stablePolls = 0
+
+        await MainActor.run {
+            statusMessage = "Checking for your data"
+        }
+
+        // Poll until data stabilises or we hit the timeout
+        while Date().timeIntervalSince(startTime) < syncTimeout {
+            await colorManager.refreshAll()
+
+            let colorCount = colorManager.colors.count
+            let paletteCount = colorManager.palettes.count
+            let currentCount = colorCount + paletteCount
+
+            if currentCount > 0 {
                 await MainActor.run {
-                    hasTimedOut = true
-                    completeSync()
+                    var found: [String] = []
+                    if colorCount > 0 { found.append("\(colorCount) color\(colorCount == 1 ? "" : "s")") }
+                    if paletteCount > 0 { found.append("\(paletteCount) palette\(paletteCount == 1 ? "" : "s")") }
+                    statusMessage = "Found " + found.joined(separator: ", ")
+                }
+
+                // If the count hasn't changed since last poll, it may be done
+                if currentCount == previousCount {
+                    stablePolls += 1
+                    if stablePolls >= 2 {
+                        // Count stable for 2 consecutive polls — sync likely complete
+                        break
+                    }
+                } else {
+                    stablePolls = 0
+                }
+            } else {
+                await MainActor.run {
+                    statusMessage = "Waiting for iCloud"
                 }
             }
+
+            previousCount = currentCount
+            try? await Task.sleep(for: .seconds(pollInterval))
         }
 
-        // Refresh data from CloudKit
-        await MainActor.run {
-            statusMessage = "Looking for colors and palettes"
-        }
-
+        // Final refresh to catch any last-moment arrivals
         await colorManager.refreshAll()
 
-        // Small delay to ensure CloudKit has time to process
-        try? await Task.sleep(for: .seconds(1))
-
-        // Check if we found any data
-        let hasColors = !colorManager.colors.isEmpty
-        let hasPalettes = !colorManager.palettes.isEmpty
+        let hasData = !colorManager.colors.isEmpty || !colorManager.palettes.isEmpty
 
         await MainActor.run {
-            if hasColors || hasPalettes {
-                var found: [String] = []
-                if hasColors { found.append("\(colorManager.colors.count) color\(colorManager.colors.count == 1 ? "" : "s")") }
-                if hasPalettes { found.append("\(colorManager.palettes.count) palette\(colorManager.palettes.count == 1 ? "" : "s")") }
-                statusMessage = "Found " + found.joined(separator: ", ")
-            } else {
-                statusMessage = "No colors found yet"
+            if !hasData {
+                statusMessage = "Ready to create"
             }
         }
 
-        // Brief pause to show the result
+        // Brief pause to show the final result
         try? await Task.sleep(for: .seconds(1.5))
 
-        // Cancel the timeout and complete
-        timeoutTask.cancel()
-
         await MainActor.run {
-            if !hasTimedOut {
-                completeSync()
-            }
+            hasTimedOut = true
+            completeSync()
         }
     }
 

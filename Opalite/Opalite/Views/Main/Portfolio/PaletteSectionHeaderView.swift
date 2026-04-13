@@ -55,8 +55,10 @@ struct PaletteSectionHeaderView: View {
             .accessibilityLabel("Palettes, \(colorManager.palettes.count) items")
         }
         .padding(.horizontal)
-        .fullScreenCover(isPresented: $isShowingArchivedPalettes) {
+        .sheet(isPresented: $isShowingArchivedPalettes) {
             ArchivedPalettesSheet()
+                .presentationDetents([.medium])
+                .interactiveDismissDisabled()
         }
     }
 }

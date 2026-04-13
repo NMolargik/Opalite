@@ -61,6 +61,11 @@ struct ContentView: View {
                         withAnimation {
                             appStage = .syncing
                         }
+                    },
+                    onBack: {
+                        withAnimation {
+                            appStage = .splash
+                        }
                     }
                 )
                 .environment(colorManager)

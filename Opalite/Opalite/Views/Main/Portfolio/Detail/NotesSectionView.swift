@@ -10,6 +10,7 @@ import SwiftUI
 struct NotesSectionView: View {
     @Binding var notes: String
     @Binding var isSaving: Bool
+    let isPalette: Bool
     let onSave: () -> Void
 
     @State private var originalNotes: String = ""
@@ -17,7 +18,7 @@ struct NotesSectionView: View {
     @State private var lastSavedAt: Date?
 
     var body: some View {
-        SectionCard(title: "Notes", systemImage: "note.text", isCollapsible: true) {
+        SectionCard(title: "Notes", systemImage: "note.text", isCollapsible: true, initiallyExpanded: false) {
             VStack(alignment: .leading, spacing: 10) {
 
                 ZStack(alignment: .topLeading) {
@@ -37,7 +38,7 @@ struct NotesSectionView: View {
                         .accessibilityHint("Enter notes about this item")
 
                     if notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text("Add any notes for this color…")
+                        Text("Add any notes for this \(isPalette ? "palette" : "color")…")
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 18)
                             .padding(.vertical, 20)
@@ -108,6 +109,7 @@ struct NotesSectionView: View {
             NotesSectionView(
                 notes: $notes,
                 isSaving: $isSaving,
+                isPalette: false,
                 onSave: {
                     // Simulate a save cycle
                     isSaving = true

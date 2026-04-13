@@ -124,7 +124,7 @@ struct TVSearchView: View {
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search colors, or palettes...")
+            .searchable(text: $searchText, prompt: "Search colors or palettes...")
             .navigationTitle("Search")
         }
     }
