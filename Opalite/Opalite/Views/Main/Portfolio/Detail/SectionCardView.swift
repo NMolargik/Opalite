@@ -56,7 +56,7 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
                 }
             }
             .padding(16)
-            .contentShape(Rectangle())
+            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .onTapGesture {
                 guard isCollapsible else { return }
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
@@ -76,7 +76,7 @@ struct SectionCard<Content: View, TrailingContent: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .modifier(SectionCardBackground())
-        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 
