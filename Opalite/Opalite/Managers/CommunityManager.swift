@@ -43,13 +43,7 @@ final class CommunityManager {
     /// Whether the device has network connectivity
     private(set) var isConnectedToNetwork: Bool = true
 
-    /// Whether the current user is an admin
-    private(set) var isAdmin: Bool = false
-
     // MARK: - Private
-
-    /// Admin email for Community moderation
-    private let adminEmail = "nick@molargiksoftware.com"
 
     @ObservationIgnored
     private let container: CKContainer
@@ -123,46 +117,6 @@ final class CommunityManager {
     /// Checks if the current user is signed into iCloud
     var isUserSignedIn: Bool {
         currentUserRecordID != nil
-    }
-
-    /// Discovers the current user's name from iCloud user identity
-    /// Returns a formatted display name (first + last) or nil if unavailable
-    @available(iOS, deprecated: 17.0, message: "Using deprecated CloudKit user discoverability APIs")
-    func discoverCurrentUserName() async -> String? {
-        guard let userRecordID = currentUserRecordID else {
-            #if DEBUG
-            print("[CommunityManager] No user record ID available for name discovery")
-            #endif
-            return nil
-        }
-
-        do {
-            let status = try await container.requestApplicationPermission(.userDiscoverability)
-            guard status == .granted else {
-                #if DEBUG
-                print("[CommunityManager] User discoverability not granted for name discovery")
-                #endif
-                return nil
-            }
-
-            let identity = try await container.userIdentity(forUserRecordID: userRecordID)
-
-            if let nameComponents = identity?.nameComponents {
-                let formatter = PersonNameComponentsFormatter()
-                formatter.style = .default
-                let formattedName = formatter.string(from: nameComponents)
-                if !formattedName.isEmpty {
-                    return formattedName
-                }
-            }
-
-            return nil
-        } catch {
-            #if DEBUG
-            print("[CommunityManager] Failed to discover user name: \(error)")
-            #endif
-            return nil
-        }
     }
 
     // MARK: - Publishing Colors
@@ -948,61 +902,10 @@ final class CommunityManager {
         }
     }
 
-    // MARK: - Admin
+    // MARK: - Moderation
 
-    /// Check if current user is admin (by email)
-    func checkAdminStatus() async {
-        guard let userRecordID = currentUserRecordID else {
-            isAdmin = false
-            #if DEBUG
-            print("[CommunityManager] No user record ID available")
-            #endif
-            return
-        }
-
-        do {
-            let result = try await performAdminCheck(userRecordID: userRecordID)
-            isAdmin = result
-            #if DEBUG
-            print("[CommunityManager] Admin status: \(result ? "confirmed" : "not admin")")
-            #endif
-        } catch {
-            isAdmin = false
-            #if DEBUG
-            print("[CommunityManager] Failed to check admin status: \(error)")
-            #endif
-        }
-    }
-
-    /// Helper to perform admin check using deprecated CloudKit APIs
-    /// These APIs are deprecated but still functional; no modern replacement exists for email-based user lookup
-    @available(iOS, deprecated: 17.0, message: "Using deprecated CloudKit user discoverability APIs")
-    private func performAdminCheck(userRecordID: CKRecord.ID) async throws -> Bool {
-        // Request permission to discover user identity
-        let status = try await container.requestApplicationPermission(.userDiscoverability)
-        guard status == .granted else {
-            #if DEBUG
-            print("[CommunityManager] User discoverability not granted: \(status)")
-            #endif
-            return false
-        }
-
-        // Look up the admin by email and check if it matches current user
-        let adminIdentities = try await container.userIdentities(forEmailAddresses: [adminEmail])
-
-        // Check if the admin email's identity matches the current user's record ID
-        if let adminIdentity = adminIdentities[adminEmail],
-           adminIdentity.userRecordID == userRecordID {
-            return true
-        }
-
-        return false
-    }
-
-    /// Fetch all reported colors (admin only)
+    /// Fetch all reported colors
     func fetchReportedColors() async throws -> [CommunityColor] {
-        guard isAdmin else { throw OpaliteError.communityAdminRequired }
-
         let predicate = NSPredicate(format: "reportCount > 0")
         let query = CKQuery(recordType: CommunityColor.recordType, predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "reportCount", ascending: false)]
@@ -1014,10 +917,8 @@ final class CommunityManager {
         }
     }
 
-    /// Fetch all reported palettes (admin only)
+    /// Fetch all reported palettes
     func fetchReportedPalettes() async throws -> [CommunityPalette] {
-        guard isAdmin else { throw OpaliteError.communityAdminRequired }
-
         let predicate = NSPredicate(format: "reportCount > 0")
         let query = CKQuery(recordType: CommunityPalette.recordType, predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "reportCount", ascending: false)]
@@ -1029,10 +930,8 @@ final class CommunityManager {
         }
     }
 
-    /// Clear reports for an item (admin only)
+    /// Clear reports for an item
     func clearReports(recordID: CKRecord.ID) async throws {
-        guard isAdmin else { throw OpaliteError.communityAdminRequired }
-
         let record = try await publicDatabase.record(for: recordID)
         record["reportCount"] = Int64(0)
         record["isHidden"] = Int64(0)
@@ -1050,10 +949,8 @@ final class CommunityManager {
         }
     }
 
-    /// Delete an entity and its reports (admin only)
-    func adminDeleteEntity(recordID: CKRecord.ID, type: CommunityItemType) async throws {
-        guard isAdmin else { throw OpaliteError.communityAdminRequired }
-
+    /// Delete an entity and its reports
+    func deleteEntity(recordID: CKRecord.ID, type: CommunityItemType) async throws {
         // Delete associated reports first
         let predicate = NSPredicate(format: "targetRecordID == %@", CKRecord.Reference(recordID: recordID, action: .none))
         let query = CKQuery(recordType: "CommunityReport", predicate: predicate)

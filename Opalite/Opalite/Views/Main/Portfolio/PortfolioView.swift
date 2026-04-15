@@ -90,10 +90,18 @@ struct PortfolioView: View {
         .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
             handleQuickActionTrigger(newValue)
         }
-        .onChange(of: intentNavigationManager.pendingColorID) { _, colorID in
+        .onChange(of: quickActionManager.samplePhotoTrigger) { _, newValue in
+            handleSamplePhotoTrigger(newValue)
+        }
+        .onChange(of: intentNavigationManager.pendingColorID, initial: true) { _, colorID in
+            // `initial: true` ensures we handle pending navigation that was set
+            // before PortfolioView mounted — e.g. when a home screen widget is
+            // tapped while the app is fully closed, the URL is consumed during
+            // `.splash`/`.syncing` but the NavigationStack isn't live yet.
             handlePendingColorNavigation(colorID)
         }
-        .onChange(of: intentNavigationManager.pendingPaletteID) { _, paletteID in
+        .onChange(of: intentNavigationManager.pendingPaletteID, initial: true) { _, paletteID in
+            // See note above on `initial: true` for the cold-launch rationale.
             handlePendingPaletteNavigation(paletteID)
         }
         #if os(iOS) && !targetEnvironment(macCatalyst)
@@ -182,6 +190,12 @@ struct PortfolioView: View {
         }
         .fullScreenCover(item: $viewModel.droppedImageItem) { item in
             PhotoColorPickerSheet(initialImage: item.image)
+        }
+        .onChange(of: intentNavigationManager.shouldShowPhotoSampler) { _, shouldShow in
+            if shouldShow {
+                viewModel.isShowingPhotoColorPicker = true
+                intentNavigationManager.shouldShowPhotoSampler = false
+            }
         }
         #endif
     }
@@ -771,11 +785,19 @@ private extension PortfolioView {
     func destinationView(for node: PortfolioNavigationNode) -> some View {
         switch node {
         case .color(let color):
+            // `.id(color.id)` forces SwiftUI to treat different colors as distinct
+            // view identities. Without it, replacing navigationPath from [.color(A)]
+            // to [.color(B)] reuses the same ColorDetailView instance — the `color`
+            // parameter updates but `@State var viewModel` (seeded with A) doesn't,
+            // so badge text, notes draft, and the stored color reference stay stale.
+            // This manifests when a widget tap re-navigates to a different color.
             ColorDetailView(color: color)
                 .tint(.none)
+                .id(color.id)
         case .palette(let palette):
             PaletteDetailView(palette: palette)
                 .tint(.none)
+                .id(palette.id)
         }
     }
 }
@@ -788,6 +810,11 @@ private extension PortfolioView {
         viewModel.quickActionTrigger = token
         viewModel.pendingPaletteToAddTo = nil
         viewModel.isShowingColorEditor = true
+    }
+
+    func handleSamplePhotoTrigger(_ newValue: UUID?) {
+        guard newValue != nil else { return }
+        viewModel.isShowingPhotoColorPicker = true
     }
 
     func handlePendingColorNavigation(_ colorID: UUID?) {

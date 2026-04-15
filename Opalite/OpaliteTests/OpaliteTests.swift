@@ -1007,7 +1007,6 @@ struct OpaliteErrorTests {
         #expect(OpaliteError.communityColorAlreadyExists.errorDescription == "Color already saved")
         #expect(OpaliteError.communityPaletteAlreadyExists.errorDescription == "Palette already saved")
         #expect(OpaliteError.communityNotSignedIn.errorDescription == "Sign in to iCloud")
-        #expect(OpaliteError.communityAdminRequired.errorDescription == "Admin required")
     }
 
     @Test func creationSystemImages() {
@@ -1071,7 +1070,6 @@ struct OpaliteErrorTests {
         #expect(OpaliteError.communityColorAlreadyExists.systemImage == "doc.on.doc.fill")
         #expect(OpaliteError.communityPaletteAlreadyExists.systemImage == "doc.on.doc.fill")
         #expect(OpaliteError.communityNotSignedIn.systemImage == "icloud.slash.fill")
-        #expect(OpaliteError.communityAdminRequired.systemImage == "lock.shield.fill")
     }
 
     @Test func equalitySameCase() {
@@ -1586,7 +1584,7 @@ struct SwatchSizeTests {
 struct TabsTests {
 
     @Test func uniqueIDs() {
-        let tabs: [Tabs] = [.portfolio, .community, .canvas, .settings, .search, .swatchBar]
+        let tabs: [Tabs] = [.portfolio, .community, .canvas, .settings, .search]
         let ids = Set(tabs.map(\.id))
         #expect(ids.count == tabs.count)
     }
@@ -1597,7 +1595,6 @@ struct TabsTests {
         #expect(Tabs.canvas.name == "Canvas")
         #expect(Tabs.settings.name == "Settings")
         #expect(Tabs.search.name == "Search")
-        #expect(Tabs.swatchBar.name == "SwatchBar")
     }
 
     @Test func symbols() {
@@ -1606,16 +1603,6 @@ struct TabsTests {
         #expect(Tabs.canvas.symbol == "pencil.and.scribble")
         #expect(Tabs.settings.symbol == "gear")
         #expect(Tabs.search.symbol == "magnifyingglass")
-        #expect(Tabs.swatchBar.symbol == "square.stack")
-    }
-
-    @Test func isSecondary() {
-        #expect(Tabs.portfolio.isSecondary == false)
-        #expect(Tabs.community.isSecondary == false)
-        #expect(Tabs.canvas.isSecondary == false)
-        #expect(Tabs.settings.isSecondary == false)
-        #expect(Tabs.search.isSecondary == false)
-        #expect(Tabs.swatchBar.isSecondary == false)
     }
 }
 

@@ -129,6 +129,14 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>CreateNewColorAction</string>
 		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>eyedropper.halffull</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Sample Photo</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>SamplePhotoAction</string>
+		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

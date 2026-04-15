@@ -15,9 +15,8 @@ struct CanvasListView: View {
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    @State private var path = NavigationPath()
+    @State private var path: [CanvasFile] = []
     @State private var searchText = ""
-    @State private var selectedCanvasFile: CanvasFile?
     @State private var isShowingPaywall: Bool = false
 
     // Rename canvas state
@@ -38,7 +37,7 @@ struct CanvasListView: View {
                     Button {
                         HapticsManager.shared.impact()
                         if subscriptionManager.canAccessCanvas(canvasFile, oldestCanvasID: canvasManager.oldestCanvas?.id) {
-                            selectedCanvasFile = canvasFile
+                            path.append(canvasFile)
                         } else {
                             isShowingPaywall = true
                         }
@@ -80,9 +79,7 @@ struct CanvasListView: View {
                             HapticsManager.shared.impact()
                             do {
                                 try canvasManager.deleteCanvas(canvasFile)
-                                if selectedCanvasFile?.id == canvasFile.id {
-                                    selectedCanvasFile = nil
-                                }
+                                path.removeAll { $0.id == canvasFile.id }
                             } catch {
                                 toastManager.show(error: .canvasDeletionFailed)
                             }
@@ -101,21 +98,8 @@ struct CanvasListView: View {
             }
             .navigationTitle("Canvas")
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
-            .fullScreenCover(item: $selectedCanvasFile, onDismiss: { selectedCanvasFile = nil }) { file in
-                NavigationStack {
-                    CanvasView(canvasFile: file)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarLeading) {
-                                Button {
-                                    HapticsManager.shared.impact()
-                                    selectedCanvasFile = nil
-                                } label: {
-                                    Label("Close", systemImage: "xmark")
-                                }
-                                .tint(.red)
-                            }
-                        }
-                }
+            .navigationDestination(for: CanvasFile.self) { file in
+                CanvasView(canvasFile: file)
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -124,7 +108,7 @@ struct CanvasListView: View {
                         if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
                             do {
                                 let newCanvasFile = try canvasManager.createCanvas(title: "New Canvas")
-                                selectedCanvasFile = newCanvasFile
+                                path.append(newCanvasFile)
                             } catch {
                                 toastManager.show(error: .canvasCreationFailed)
                             }
@@ -167,13 +151,13 @@ struct CanvasListView: View {
             }
             .onAppear {
                 if let canvas = canvasManager.pendingCanvasToOpen {
-                    selectedCanvasFile = canvas
+                    path.append(canvas)
                     canvasManager.pendingCanvasToOpen = nil
                 }
             }
             .onChange(of: canvasManager.pendingCanvasToOpen) { _, newValue in
                 if let canvas = newValue {
-                    selectedCanvasFile = canvas
+                    path.append(canvas)
                     canvasManager.pendingCanvasToOpen = nil
                 }
             }
@@ -187,9 +171,7 @@ struct CanvasListView: View {
             let file = items[index]
             do {
                 try canvasManager.deleteCanvas(file)
-                if selectedCanvasFile?.id == file.id {
-                    selectedCanvasFile = nil
-                }
+                path.removeAll { $0.id == file.id }
             } catch {
                 toastManager.show(error: .canvasDeletionFailed)
             }

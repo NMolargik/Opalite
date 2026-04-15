@@ -12,7 +12,7 @@ struct WatchColorDetailView: View {
 
     @Environment(WatchColorManager.self) private var colorManager
     @Environment(\.colorSchemeContrast) private var systemContrast
-    @State private var showCopiedFeedback: Bool = false
+    @State private var copyFeedback: HexCopyResult?
 
     @ScaledMetric(relativeTo: .body) private var previewHeight: CGFloat = 100
 
@@ -65,23 +65,71 @@ struct WatchColorDetailView: View {
     // MARK: - Copy Hex
 
     private var copyHexButton: some View {
-        Button {
-            copyHex()
-        } label: {
-            HStack(spacing: 6) {
-                Text(colorManager.formattedHex(for: color))
-                    .fontDesign(.monospaced)
-                Image(systemName: showCopiedFeedback ? "checkmark" : "doc.on.doc")
-                    .accessibilityHidden(true)
+        VStack(spacing: 4) {
+            Button {
+                copyHex()
+            } label: {
+                HStack(spacing: 6) {
+                    Text(colorManager.formattedHex(for: color))
+                        .fontDesign(.monospaced)
+                    Image(systemName: copyFeedbackIcon)
+                        .accessibilityHidden(true)
+                }
+                .font(.caption)
+                .frame(maxWidth: .infinity)
             }
-            .font(.caption)
-            .frame(maxWidth: .infinity)
+            .tint(copyFeedbackTint)
+            .accessibilityLabel(copyFeedbackAccessibilityLabel)
+            .accessibilityHint("Copies hex code to your clipboard via iPhone")
+
+            if copyFeedback == .queued {
+                Text("Tap the notification on your iPhone to copy")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
-        .tint(showCopiedFeedback ? .green : .white)
-        .accessibilityLabel(showCopiedFeedback
-            ? "Copied, \(colorManager.formattedHex(for: color))"
-            : "Copy hex, \(colorManager.formattedHex(for: color))")
-        .accessibilityHint("Sends hex code to your iPhone clipboard")
+        .onChange(of: WatchSessionManager.shared.lastCopyResult) { _, newResult in
+            guard let result = newResult else { return }
+            withAnimation(.easeIn(duration: 0.15)) {
+                copyFeedback = result
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    copyFeedback = nil
+                }
+                WatchSessionManager.shared.lastCopyResult = nil
+            }
+        }
+    }
+
+    private var copyFeedbackIcon: String {
+        switch copyFeedback {
+        case .copiedImmediately: "checkmark"
+        case .queued: "clock.arrow.circlepath"
+        case .failed: "xmark"
+        case nil: "doc.on.doc"
+        }
+    }
+
+    private var copyFeedbackTint: Color {
+        switch copyFeedback {
+        case .copiedImmediately: .green
+        case .queued: .orange
+        case .failed: .red
+        case nil: .white
+        }
+    }
+
+    private var copyFeedbackAccessibilityLabel: String {
+        let hex = colorManager.formattedHex(for: color)
+        switch copyFeedback {
+        case .copiedImmediately: return "Copied, \(hex)"
+        case .queued: return "Queued, \(hex) will be copied when iPhone is available"
+        case .failed: return "Copy failed for \(hex)"
+        case nil: return "Copy hex, \(hex)"
+        }
     }
 
     // MARK: - Value Sections
@@ -165,19 +213,8 @@ struct WatchColorDetailView: View {
 
     private func copyHex() {
         colorManager.playTapHaptic()
-
         let hex = colorManager.formattedHex(for: color)
         WatchSessionManager.shared.copyHexToiPhone(hex, colorName: color.name)
-
-        withAnimation(.easeIn(duration: 0.15)) {
-            showCopiedFeedback = true
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            withAnimation(.easeOut(duration: 0.2)) {
-                showCopiedFeedback = false
-            }
-        }
     }
 }
 

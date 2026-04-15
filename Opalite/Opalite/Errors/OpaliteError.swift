@@ -60,7 +60,6 @@ enum OpaliteError: LocalizedError, Equatable {
     case communityColorAlreadyExists
     case communityPaletteAlreadyExists
     case communityNotSignedIn
-    case communityAdminRequired
 
     // MARK: - Generic
     case unknownError(String)
@@ -154,8 +153,6 @@ enum OpaliteError: LocalizedError, Equatable {
             return "Palette already saved"
         case .communityNotSignedIn:
             return "Sign in to iCloud"
-        case .communityAdminRequired:
-            return "Admin required"
 
         // Generic
         case .unknownError(let message):
@@ -198,8 +195,6 @@ enum OpaliteError: LocalizedError, Equatable {
             return "doc.on.doc.fill"
         case .communityNotSignedIn:
             return "icloud.slash.fill"
-        case .communityAdminRequired:
-            return "lock.shield.fill"
         case .unknownError:
             return "exclamationmark.triangle.fill"
         }

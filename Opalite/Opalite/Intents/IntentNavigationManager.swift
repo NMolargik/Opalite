@@ -23,6 +23,9 @@ final class IntentNavigationManager {
     /// Trigger to show the color editor for creating a new color (set by deep link)
     var shouldShowColorEditor: Bool = false
 
+    /// Trigger to show the photo color sampler (set by shortcut action)
+    var shouldShowPhotoSampler: Bool = false
+
     private init() {}
 
     func navigateToColor(id: UUID) {
@@ -38,9 +41,15 @@ final class IntentNavigationManager {
         shouldShowColorEditor = true
     }
 
+    /// Triggers the photo color sampler sheet
+    func showPhotoSampler() {
+        shouldShowPhotoSampler = true
+    }
+
     func clearNavigation() {
         pendingColorID = nil
         pendingPaletteID = nil
         shouldShowColorEditor = false
+        shouldShowPhotoSampler = false
     }
 }

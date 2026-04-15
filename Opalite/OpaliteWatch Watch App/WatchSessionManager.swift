@@ -10,6 +10,12 @@ import WatchConnectivity
 import WatchKit
 import WidgetKit
 
+enum HexCopyResult: Equatable {
+    case copiedImmediately
+    case queued
+    case failed
+}
+
 @MainActor
 @Observable
 class WatchSessionManager: NSObject {
@@ -18,7 +24,7 @@ class WatchSessionManager: NSObject {
     private var session: WCSession?
 
     var isReachable: Bool = false
-    var lastCopySucceeded: Bool?
+    var lastCopyResult: HexCopyResult?
     var isSyncing: Bool = false
     var lastSyncTimestamp: Date?
 
@@ -148,41 +154,65 @@ class WatchSessionManager: NSObject {
     // MARK: - Copy Hex to iPhone
 
     /// Sends a hex code to the iPhone to be copied to clipboard.
+    /// Uses `sendMessage` when the iPhone is reachable, falls back to `transferUserInfo`
+    /// to queue the request for later delivery when the iPhone is unavailable.
     func copyHexToiPhone(_ hex: String, colorName: String?) {
-        guard let session = session, session.isReachable else {
+        guard let session = session else {
             WKInterfaceDevice.current().play(.failure)
-            lastCopySucceeded = false
+            lastCopyResult = .failed
             return
         }
 
-        var message: [String: Any] = [
+        let payload: [String: Any] = [
             "action": "copyHex",
-            "hex": hex
+            "hex": hex,
+            "colorName": colorName ?? ""
         ]
 
-        if let name = colorName {
-            message["colorName"] = name
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: { [weak self] reply in
+                Task { @MainActor in
+                    if let success = reply["success"] as? Bool, success {
+                        if let queued = reply["queued"] as? Bool, queued {
+                            self?.lastCopyResult = .queued
+                            WKInterfaceDevice.current().play(.start)
+                        } else {
+                            self?.lastCopyResult = .copiedImmediately
+                            WKInterfaceDevice.current().play(.success)
+                        }
+                    } else {
+                        self?.lastCopyResult = .failed
+                        WKInterfaceDevice.current().play(.failure)
+                    }
+                }
+            }, errorHandler: { [weak self] error in
+                Task { @MainActor in
+                    #if DEBUG
+                    print("[WatchSessionManager] sendMessage failed, falling back to transferUserInfo: \(error)")
+                    #endif
+                    self?.queueCopyViaTransfer(session: session, payload: payload)
+                }
+            })
+        } else {
+            queueCopyViaTransfer(session: session, payload: payload)
+        }
+    }
+
+    /// Queues a hex copy request via `transferUserInfo` for delivery when the iPhone is next available.
+    private func queueCopyViaTransfer(session: WCSession, payload: [String: Any]) {
+        // Cancel any outstanding copyHex transfers to avoid duplicates
+        for transfer in session.outstandingUserInfoTransfers {
+            if let action = transfer.userInfo["action"] as? String, action == "copyHex" {
+                transfer.cancel()
+            }
         }
 
-        session.sendMessage(message, replyHandler: { [weak self] reply in
-            Task { @MainActor in
-                if let success = reply["success"] as? Bool, success {
-                    self?.lastCopySucceeded = true
-                    WKInterfaceDevice.current().play(.success)
-                } else {
-                    self?.lastCopySucceeded = false
-                    WKInterfaceDevice.current().play(.failure)
-                }
-            }
-        }, errorHandler: { [weak self] error in
-            Task { @MainActor in
-                self?.lastCopySucceeded = false
-                WKInterfaceDevice.current().play(.failure)
-                #if DEBUG
-                print("[WatchSessionManager] Error sending message: \(error)")
-                #endif
-            }
-        })
+        session.transferUserInfo(payload)
+        lastCopyResult = .queued
+        WKInterfaceDevice.current().play(.start)
+        #if DEBUG
+        print("[WatchSessionManager] Queued hex copy via transferUserInfo: \(payload["hex"] ?? "")")
+        #endif
     }
 }
 

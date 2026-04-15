@@ -140,7 +140,7 @@ struct CommunityAdminSheet: View {
     private func deleteEntity(recordID: CKRecord.ID, type: CommunityItemType) {
         Task {
             do {
-                try await communityManager.adminDeleteEntity(recordID: recordID, type: type)
+                try await communityManager.deleteEntity(recordID: recordID, type: type)
                 await loadReports()
                 toastManager.showSuccess("Entity deleted")
             } catch {

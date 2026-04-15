@@ -31,7 +31,9 @@
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(npx tsc:*)",
       "Bash(kill %1)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(xcrun --sdk iphoneos --show-sdk-path)",
+      "Bash(xargs -I{} find {}/System -name \"AppShortcut*.swiftinterface\")"
     ]
   }
 }

@@ -25,7 +25,6 @@ struct ColorDetailView: View {
     @Environment(ColorManager.self) private var colorManager
     @Environment(ToastManager.self) private var toastManager
     @Environment(SubscriptionManager.self) private var subscriptionManager
-    @Environment(HexCopyManager.self) private var hexCopyManager
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     #if os(visionOS)
@@ -155,6 +154,8 @@ struct ColorDetailView: View {
                             }
                         )
 
+                        CodesSectionView(color: color)
+
                         NotesSectionView(
                             notes: $viewModel.notesDraft,
                             isSaving: $viewModel.isSavingNotes,
@@ -276,65 +277,36 @@ struct ColorDetailView: View {
                 }
             }
 
-            // Info menu with color values and actions
+            // Overflow menu
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    // Color values section - copyable
-                    Section("Color Values") {
-                        Button {
-                            HapticsManager.shared.selection()
-                            hexCopyManager.copyHex(for: color)
-                            toastManager.show(message: "Code Copied", style: .success)
-                        } label: {
-                            Label(color.hexString, systemImage: "number")
-                        }
-                        
-                        Button {
-                            HapticsManager.shared.selection()
-                            copyToClipboard(color.rgbString)
-                            toastManager.show(message: "Code Copied", style: .success)
-                        } label: {
-                            Label(color.rgbString, systemImage: "slider.horizontal.3")
-                        }
-                        
-                        Button {
-                            HapticsManager.shared.selection()
-                            copyToClipboard(color.hslString)
-                            toastManager.show(message: "Code Copied", style: .success)
-                        } label: {
-                            Label(color.hslString, systemImage: "circle.lefthalf.filled")
-                        }
+                    Button {
+                        HapticsManager.shared.selection()
+                        isShowingContrastChecker = true
+                    } label: {
+                        Label("Check Contrast", systemImage: "circle.righthalf.filled")
                     }
-                    
-                    Section {
-                        Button {
-                            HapticsManager.shared.selection()
-                            isShowingContrastChecker = true
-                        } label: {
-                            Label("Check Contrast", systemImage: "circle.righthalf.filled")
-                        }
-                        .toolbarButtonTint()
-                        .accessibilityLabel("Check WCAG contrast")
-                        .accessibilityHint("Opens contrast checker to compare this color against others")
-                        
-                        Button {
-                            HapticsManager.shared.selection()
-                            withAnimation {
-                                isEditingName = true
-                            }
-                        } label: {
-                            Label("Rename", systemImage: "character.cursor.ibeam")
-                        }
-                        .accessibilityHint("Opens the name editor for this color")
+                    .toolbarButtonTint()
+                    .accessibilityLabel("Check WCAG contrast")
+                    .accessibilityHint("Opens contrast checker to compare this color against others")
 
-                        Button(role: .destructive) {
-                            HapticsManager.shared.selection()
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete", systemImage: "trash.fill")
+                    Button {
+                        HapticsManager.shared.selection()
+                        withAnimation {
+                            isEditingName = true
                         }
-                        .accessibilityHint("Permanently deletes this color")
+                    } label: {
+                        Label("Rename", systemImage: "character.cursor.ibeam")
                     }
+                    .accessibilityHint("Opens the name editor for this color")
+
+                    Button(role: .destructive) {
+                        HapticsManager.shared.selection()
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash.fill")
+                    }
+                    .accessibilityHint("Permanently deletes this color")
                 } label: {
                     Label("More", systemImage: "ellipsis")
                 }
@@ -373,6 +345,7 @@ struct ColorDetailView: View {
         .onTapGesture {
             dismissFullScreen()
         }
+        .ignoresSafeArea()
         .overlay(alignment: .top) {
             HStack(spacing: 12) {
                 Spacer()
@@ -427,7 +400,6 @@ struct ColorDetailView: View {
             .padding()
             .opacity(showFullScreenControls ? 1 : 0)
         }
-        .ignoresSafeArea()
     }
 
     private func dismissFullScreen() {
@@ -445,16 +417,6 @@ struct ColorDetailView: View {
         }
     }
 
-    // MARK: - Helper Functions
-
-    private func copyToClipboard(_ text: String) {
-        #if canImport(UIKit)
-        UIPasteboard.general.string = text
-        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(text, forType: .string)
-        #endif
-    }
 }
 
 // MARK: - Info Tiles Row
@@ -506,6 +468,92 @@ private struct InfoTilesRow: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d"
         return formatter.string(from: date)
+    }
+}
+
+// MARK: - Codes Section
+
+private struct CodesSectionView: View {
+    @Environment(ToastManager.self) private var toastManager
+    @Environment(HexCopyManager.self) private var hexCopyManager
+
+    let color: OpaliteColor
+
+    @State private var isShowingInfo = false
+
+    var body: some View {
+        SectionCard(title: "Codes", systemImage: "curlybraces", isCollapsible: true, initiallyExpanded: false) {
+            VStack(spacing: 0) {
+                codeRow(label: "Hex", value: color.hexString, icon: "number") {
+                    hexCopyManager.copyHex(for: color)
+                }
+                Divider()
+                    .padding(.horizontal, 16)
+                codeRow(label: "RGB", value: color.rgbString, icon: "slider.horizontal.3") {
+                    copyToClipboard(color.rgbString)
+                }
+                Divider()
+                    .padding(.horizontal, 16)
+                codeRow(label: "HSL", value: color.hslString, icon: "circle.lefthalf.filled") {
+                    copyToClipboard(color.hslString)
+                }
+            }
+        } trailing: {
+            Button {
+                HapticsManager.shared.selection()
+                isShowingInfo = true
+            } label: {
+                Image(systemName: "questionmark.circle")
+                    .foregroundStyle(.gray)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Learn about color codes")
+            .padding(.trailing)
+        }
+        .sheet(isPresented: $isShowingInfo) {
+            ColorCodesInfoSheet()
+        }
+    }
+
+    @ViewBuilder
+    private func codeRow(label: String, value: String, icon: String, onCopy: @escaping () -> Void) -> some View {
+        Button {
+            HapticsManager.shared.selection()
+            onCopy()
+            toastManager.show(message: "Code Copied", style: .success)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 20)
+                Text(label)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Spacer()
+                Text(value)
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                Image(systemName: "doc.on.doc")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Copy \(label) \(value)")
+        .accessibilityHint("Copies the \(label) code to the clipboard")
+    }
+
+    private func copyToClipboard(_ text: String) {
+        #if canImport(UIKit)
+        UIPasteboard.general.string = text
+        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #endif
     }
 }
 
@@ -680,6 +728,164 @@ struct ColorHarmoniesInfoSheet: View {
 
     @ViewBuilder
     private func harmonySection(
+        name: String,
+        icon: String,
+        color: Color,
+        description: String,
+        example: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 30)
+
+                Text(name)
+                    .font(.headline)
+            }
+
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+
+            Text("Example: \(example)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Color Codes Info Sheet
+
+struct ColorCodesInfoSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text("Color codes are standardized ways to describe a color numerically. Each format expresses the same color differently depending on how it will be used — in code, on the web, or in design tools.")
+                        .foregroundStyle(.secondary)
+
+                    infoSection(
+                        name: "Hex",
+                        icon: "number",
+                        color: .purple,
+                        description: "A six-character hexadecimal string prefixed with '#'. The pairs represent red, green, and blue channels from 00 to FF. Compact and widely used in web development, CSS, and design handoffs.",
+                        example: "#3366CC"
+                    )
+
+                    infoSection(
+                        name: "RGB",
+                        icon: "slider.horizontal.3",
+                        color: .red,
+                        description: "Red, Green, and Blue channel values from 0 to 255. Mirrors how digital displays render color by mixing these three primaries. Common in APIs, graphics frameworks, and image editors.",
+                        example: "rgb(51, 102, 204)"
+                    )
+
+                    infoSection(
+                        name: "HSL",
+                        icon: "circle.lefthalf.filled",
+                        color: .teal,
+                        description: "Hue (0–360° on the color wheel), Saturation (0–100% intensity), and Lightness (0–100% from black to white). More intuitive for adjustments — shifting hue, desaturating, or tinting a color feels natural.",
+                        example: "hsl(220, 60%, 50%)"
+                    )
+                }
+                .padding()
+            }
+            .navigationTitle("Color Codes")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func infoSection(
+        name: String,
+        icon: String,
+        color: Color,
+        description: String,
+        example: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 30)
+
+                Text(name)
+                    .font(.headline)
+            }
+
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+
+            Text("Example: \(example)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Tints & Shades Info Sheet
+
+struct TintsAndShadesInfoSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text("Tints and shades are variations of a color created by mixing it with white or black. They're essential for building depth, contrast, and visual hierarchy in design.")
+                        .foregroundStyle(.secondary)
+
+                    infoSection(
+                        name: "Tints",
+                        icon: "sun.max",
+                        color: .orange,
+                        description: "Created by mixing a color with white. Tints are lighter versions of the original color, producing softer, pastel-like variations. Higher percentages add more white.",
+                        example: "+20% is subtle, +80% is nearly white"
+                    )
+
+                    infoSection(
+                        name: "Shades",
+                        icon: "moon.fill",
+                        color: .indigo,
+                        description: "Created by mixing a color with black. Shades are darker versions of the original color, producing deeper, richer variations. Higher percentages add more black.",
+                        example: "-20% is slightly darker, -80% is nearly black"
+                    )
+                }
+                .padding()
+            }
+            .navigationTitle("Tints & Shades")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func infoSection(
         name: String,
         icon: String,
         color: Color,

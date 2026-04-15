@@ -12,35 +12,38 @@ struct ColorShadesView: View {
     let onCreateColor: (OpaliteColor) -> Void
     
     @State private var shadeColors: [ShadeVariation] = []
+    @State private var isShowingInfo = false
     
     var body: some View {
-        SectionCard(title: "Shades", systemImage: "circle.lefthalf.filled", isCollapsible: true, initiallyExpanded: false) {
+        SectionCard(title: "Tints & Shades", systemImage: "circle.lefthalf.filled", isCollapsible: true, initiallyExpanded: false) {
             VStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 12) {
                     // Tints (lighter - adding white)
                     shadeRow(title: "Tints", colors: shadeColors.filter { $0.type == .tint })
-                    
+
                     Divider()
                         .padding(.vertical, 4)
-                    
-                    // Base color
-                    shadeRow(title: "Base", colors: [ShadeVariation(color: baseColor, type: .base, label: "Original")])
-                    
-                    Divider()
-                        .padding(.vertical, 4)
-                    
+
                     // Shades (darker - adding black)
                     shadeRow(title: "Shades", colors: shadeColors.filter { $0.type == .shade })
-                    
-                    Divider()
-                        .padding(.vertical, 4)
-                    
-                    // Opacity variations
-                    shadeRow(title: "Opacity", colors: shadeColors.filter { $0.type == .opacity })
                 }
                 .padding(.horizontal, 12)
             }
             .padding(.vertical, 12)
+        } trailing: {
+            Button {
+                HapticsManager.shared.selection()
+                isShowingInfo = true
+            } label: {
+                Image(systemName: "questionmark.circle")
+                    .foregroundStyle(.gray)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Learn about tints and shades")
+            .padding(.trailing)
+        }
+        .sheet(isPresented: $isShowingInfo) {
+            TintsAndShadesInfoSheet()
         }
         .onAppear {
             generateShadeVariations()
@@ -68,16 +71,8 @@ struct ColorShadesView: View {
     @ViewBuilder
     private func shadeButton(for variation: ShadeVariation) -> some View {
         VStack(spacing: 6) {
-            ZStack {
-                // Show checkerboard pattern for opacity variations
-                if variation.type == .opacity {
-                    checkerboardPattern
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(variation.color.swiftUIColor)
-            }
+            RoundedRectangle(cornerRadius: 10)
+                .fill(variation.color.swiftUIColor)
             .frame(width: 70, height: 70)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
@@ -111,32 +106,6 @@ struct ColorShadesView: View {
         }
     }
     
-    private var checkerboardPattern: some View {
-        GeometryReader { geometry in
-            let squareSize: CGFloat = 8
-            let columns = Int(ceil(geometry.size.width / squareSize))
-            let rows = Int(ceil(geometry.size.height / squareSize))
-            
-            Canvas { context, size in
-                for row in 0..<rows {
-                    for col in 0..<columns {
-                        let isLight = (row + col) % 2 == 0
-                        let rect = CGRect(
-                            x: CGFloat(col) * squareSize,
-                            y: CGFloat(row) * squareSize,
-                            width: squareSize,
-                            height: squareSize
-                        )
-                        context.fill(
-                            Path(rect),
-                            with: .color(isLight ? .white : .gray.opacity(0.3))
-                        )
-                    }
-                }
-            }
-        }
-    }
-    
     private func generateShadeVariations() {
         var variations: [ShadeVariation] = []
         
@@ -159,23 +128,6 @@ struct ColorShadesView: View {
                 color: shadedColor,
                 type: .shade,
                 label: "-\(Int(amount * 100))%"
-            ))
-        }
-        
-        // Opacity variations
-        let opacitySteps = [0.8, 0.6, 0.4, 0.2]
-        for opacity in opacitySteps {
-            let opacityColor = OpaliteColor(
-                name: nil,
-                red: baseColor.red,
-                green: baseColor.green,
-                blue: baseColor.blue,
-                alpha: opacity
-            )
-            variations.append(ShadeVariation(
-                color: opacityColor,
-                type: .opacity,
-                label: "\(Int(opacity * 100))%"
             ))
         }
         
@@ -221,9 +173,7 @@ private struct ShadeVariation: Identifiable {
     
     enum VariationType {
         case tint
-        case base
         case shade
-        case opacity
     }
 }
 

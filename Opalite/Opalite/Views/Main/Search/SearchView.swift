@@ -65,14 +65,8 @@ struct SearchView: View {
             return
         }
 
-        if horizontalSizeClass == .compact {
-            // On iPhone, switch to canvas tab and request opening the canvas
-            canvasManager.pendingCanvasToOpen = canvas
-            selectedTab = .canvas
-        } else {
-            // On iPad, directly switch to the canvas body tab
-            selectedTab = .canvasBody(canvas)
-        }
+        canvasManager.pendingCanvasToOpen = canvas
+        selectedTab = .canvas
     }
 
     // MARK: - Row Helpers

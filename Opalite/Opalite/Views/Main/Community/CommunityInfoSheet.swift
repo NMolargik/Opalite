@@ -17,7 +17,7 @@ struct CommunityInfoSheet: View {
                     // Hero icon
                     Image(systemName: "person.2")
                         .font(.system(size: 60))
-                        .foregroundStyle(.blue.gradient)
+                        .foregroundStyle(.teal.gradient)
                         .padding(.top, 20)
 
                     // Title and description
@@ -36,7 +36,7 @@ struct CommunityInfoSheet: View {
                     VStack(spacing: 16) {
                         CommunityInfoCard(
                             icon: "arrow.down.circle.fill",
-                            iconColor: .teal,
+                            iconColor: .blue,
                             title: "Save to Your Portfolio",
                             description: "Found a color or palette you love? Save it directly to your portfolio with a single tap."
                         )

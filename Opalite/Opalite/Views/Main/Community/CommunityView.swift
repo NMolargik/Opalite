@@ -15,7 +15,10 @@ struct CommunityView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(ToastManager.self) private var toastManager
 
+    @AppStorage(AppStorageKeys.hasPromptedForCommunityName) private var hasPromptedForCommunityName: Bool = false
+
     @State private var viewModel = ViewModel()
+    @State private var isShowingNamePrompt: Bool = false
 
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
@@ -69,6 +72,11 @@ struct CommunityView: View {
             .sheet(isPresented: $viewModel.isShowingCommunityInfo) {
                 CommunityInfoSheet()
             }
+            .sheet(isPresented: $isShowingNamePrompt, onDismiss: {
+                hasPromptedForCommunityName = true
+            }) {
+                CommunityNamePromptSheet()
+            }
             .searchable(text: $viewModel.searchText, prompt: "Search \(viewModel.selectedSegment.rawValue)")
             .onSubmit(of: .search) {
                 Task {
@@ -90,6 +98,9 @@ struct CommunityView: View {
                 }
             }
             .task {
+                if !hasPromptedForCommunityName {
+                    isShowingNamePrompt = true
+                }
                 await initialLoad()
             }
             .navigationDestination(for: CommunityNavigationNode.self) { node in

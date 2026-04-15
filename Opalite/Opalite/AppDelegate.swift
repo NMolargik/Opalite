@@ -34,6 +34,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 AppDelegate.openSwatchBarWindow()
             } else if shortcutType == "CreateNewColorAction" {
                 IntentNavigationManager.shared.showColorEditor()
+            } else if shortcutType == "SamplePhotoAction" {
+                IntentNavigationManager.shared.showPhotoSampler()
             }
         }
 

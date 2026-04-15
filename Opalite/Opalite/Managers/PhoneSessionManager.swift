@@ -7,6 +7,7 @@
 
 import Foundation
 import WatchConnectivity
+import UserNotifications
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -74,6 +75,25 @@ class PhoneSessionManager: NSObject {
         set { UserDefaults.standard.set(newValue, forKey: "pendingWatchHexCopy") }
     }
 
+    /// Queues a hex copy for when the app becomes active and sends a local notification
+    /// so the user can tap it to bring the app to foreground and trigger the copy.
+    func queueHexCopyWithNotification(hex: String, colorName: String) {
+        pendingHexCopy = hex
+
+        let content = UNMutableNotificationContent()
+        content.title = "Color from Apple Watch"
+        content.body = "Tap to copy \(hex) to clipboard"
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "watchHexCopy",
+            content: content,
+            trigger: nil
+        )
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
     /// Processes any pending hex copy from Watch (call when app becomes active)
     /// Returns the hex that was copied, or nil if nothing was pending
     @discardableResult
@@ -100,6 +120,9 @@ class PhoneSessionManager: NSObject {
             session = WCSession.default
             session?.delegate = self
             session?.activate()
+
+            // Request notification permission for Watch hex copy notifications
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
         }
         #endif
     }
@@ -247,6 +270,32 @@ extension PhoneSessionManager: WCSessionDelegate {
         session.activate()
     }
 
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        guard let action = userInfo["action"] as? String else { return }
+
+        switch action {
+        case "copyHex":
+            guard let hex = userInfo["hex"] as? String else { return }
+            let colorName = userInfo["colorName"] as? String ?? "Unknown"
+            Task { @MainActor in
+                if UIApplication.shared.applicationState == .active {
+                    UIPasteboard.general.string = hex
+                    HapticsManager.shared.impact(.light)
+                    #if DEBUG
+                    print("[PhoneSessionManager] Copied hex '\(hex)' for color '\(colorName)' via transferUserInfo")
+                    #endif
+                } else {
+                    self.queueHexCopyWithNotification(hex: hex, colorName: colorName)
+                    #if DEBUG
+                    print("[PhoneSessionManager] Queued hex '\(hex)' for color '\(colorName)' via transferUserInfo - app in background, notification sent")
+                    #endif
+                }
+            }
+        default:
+            break
+        }
+    }
+
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         guard let action = message["action"] as? String else {
             replyHandler(["success": false, "error": "No action specified"])
@@ -298,9 +347,7 @@ extension PhoneSessionManager: WCSessionDelegate {
         Task { @MainActor in
             let colorName = message["colorName"] as? String ?? "Unknown"
 
-            // Check if app is in foreground - pasteboard requires foreground access
-            let appState = UIApplication.shared.applicationState
-            if appState == .active {
+            if UIApplication.shared.applicationState == .active {
                 UIPasteboard.general.string = hex
                 HapticsManager.shared.impact(.light)
                 #if DEBUG
@@ -308,12 +355,10 @@ extension PhoneSessionManager: WCSessionDelegate {
                 #endif
                 replyHandler(["success": true])
             } else {
-                // App is in background, queue the copy for when app becomes active
-                self.pendingHexCopy = hex
+                self.queueHexCopyWithNotification(hex: hex, colorName: colorName)
                 #if DEBUG
-                print("[PhoneSessionManager] Queued hex '\(hex)' for color '\(colorName)' - app in background")
+                print("[PhoneSessionManager] Queued hex '\(hex)' for color '\(colorName)' - app in background, notification sent")
                 #endif
-                // Still report success - the copy will complete when user opens the app
                 replyHandler(["success": true, "queued": true])
             }
         }

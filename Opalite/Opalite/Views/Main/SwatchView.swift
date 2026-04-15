@@ -315,6 +315,9 @@ struct SwatchView: View {
                         .bold()
                         .submitLabel(.done)
                         .focused($badgeFocused)
+                        #if !os(macOS)
+                        .textInputAutocapitalization(.words)
+                        #endif
                         .onSubmit {
                             saveBadgeText()
                         }
@@ -325,7 +328,7 @@ struct SwatchView: View {
                     } label: {
                         Image(systemName: "checkmark.circle.fill")
                             .imageScale(.large)
-                            .foregroundStyle(.black, .green)
+                            .foregroundStyle(.white, .green)
                     }
                     .contentShape(Circle())
                     .hoverEffect(.lift)

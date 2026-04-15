@@ -26,6 +26,8 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
             } else if shortcutType == "CreateNewColorAction" {
                 // Use IntentNavigationManager - PortfolioView already observes this
                 IntentNavigationManager.shared.showColorEditor()
+            } else if shortcutType == "SamplePhotoAction" {
+                IntentNavigationManager.shared.showPhotoSampler()
             }
         }
 

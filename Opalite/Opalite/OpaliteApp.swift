@@ -264,6 +264,8 @@ struct OpaliteApp: App {
                     AppDelegate.openSwatchBarWindow()
                 } else if shortcutType == "CreateNewColorAction" {
                     quickActionManager.requestCreateNewColor()
+                } else if shortcutType == "SamplePhotoAction" {
+                    quickActionManager.requestSamplePhoto()
                 }
             }
         }

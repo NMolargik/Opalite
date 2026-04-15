@@ -80,22 +80,19 @@ struct RandomColorWidgetView: View {
             // Color name in bottom right on capsule
             VStack {
                 Spacer()
-                HStack {
-                    Spacer()
-                    Text(entry.color.displayName)
-                        .font(fontForFamily)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(entry.color.idealTextColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                        .padding(.horizontal, paddingForFamily)
-                        .padding(.vertical, verticalPaddingForFamily)
-                        .background(
-                            Capsule()
-                                .fill(entry.color.idealTextColor == .white ? .black.opacity(0.3) : .white.opacity(0.3))
-                        )
-                        .padding(paddingForFamily)
-                }
+                Text(entry.color.displayName)
+                    .font(fontForFamily)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(entry.color.idealTextColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .padding(.horizontal, paddingForFamily)
+                    .padding(.vertical, verticalPaddingForFamily)
+                    .background(
+                        Capsule()
+                            .fill(entry.color.idealTextColor == .white ? .black.opacity(0.3) : .white.opacity(0.3))
+                    )
+                    .padding(paddingForFamily)
             }
         }
         .accessibilityElement(children: .combine)

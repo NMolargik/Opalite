@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AppIntents
 #if canImport(DeviceKit)
 import DeviceKit
 #endif
@@ -107,6 +108,17 @@ class ColorManager {
             print("[ColorManager] reloadCache error: \(error)")
             #endif
         }
+        notifyShortcutsIndexDidChange()
+    }
+
+    /// Asks Siri to re-query `OpaliteColorQuery.suggestedEntities()` and
+    /// `OpalitePaletteQuery.suggestedEntities()` so its voice-recognition
+    /// vocabulary stays in sync with the current named colors/palettes.
+    /// Without this, Siri matches against a stale cached vocabulary and
+    /// falls back to a "Which one?" disambiguation picker when the user
+    /// voices a recently-added or renamed entity.
+    private func notifyShortcutsIndexDidChange() {
+        OpaliteShortcuts.updateAppShortcutParameters()
     }
 
     // MARK: - Targeted Cache Updates
@@ -116,27 +128,37 @@ class ColorManager {
     private func insertPaletteIntoCache(_ palette: OpalitePalette) {
         // Insert at beginning since it's most recently updated
         palettes.insert(palette, at: 0)
+        notifyShortcutsIndexDidChange()
     }
 
     private func insertColorIntoCache(_ color: OpaliteColor) {
         // Insert at beginning since it's most recently updated
         colors.insert(color, at: 0)
+        notifyShortcutsIndexDidChange()
     }
 
     private func removePaletteFromCache(_ palette: OpalitePalette) {
         palettes.removeAll { $0.id == palette.id }
+        notifyShortcutsIndexDidChange()
     }
 
     private func removeColorFromCache(_ color: OpaliteColor) {
         colors.removeAll { $0.id == color.id }
+        notifyShortcutsIndexDidChange()
     }
 
     private func resortPalettesCache() {
         palettes.sort { $0.createdAt > $1.createdAt }
+        // `updatePalette` funnels through here — covers rename, which changes
+        // Siri's vocabulary. Non-name updates also fire this, but
+        // `updateAppShortcutParameters()` is idempotent/cheap so that's fine.
+        notifyShortcutsIndexDidChange()
     }
 
     private func resortColorsCache() {
         colors.sort { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
+        // See note on resortPalettesCache — covers renames via updateColor.
+        notifyShortcutsIndexDidChange()
     }
 
     // MARK: - Private helpers: Relationship management
