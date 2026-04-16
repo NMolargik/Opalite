@@ -109,7 +109,7 @@ struct SettingsView: View {
                             .foregroundStyle(.primary)
                     }
 
-                    #if canImport(UIKit) && !os(visionOS)
+                    #if canImport(UIKit) && !os(visionOS) && !targetEnvironment(macCatalyst)
                     VStack(alignment: .leading, spacing: 8) {
                         Label("App Icon", systemImage: "app")
                             .foregroundStyle(.primary)

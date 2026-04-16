@@ -170,7 +170,9 @@ struct ColorEditorView: View {
                         Image(systemName: viewModel.didCopyHex ? "checkmark" : "number")
                             .contentTransition(.symbolEffect(.replace))
                     }
+                    #if os(iOS)
                     .tint(viewModel.didCopyHex ? .green : .inverseTheme)
+                    #endif
                     .accessibilityLabel(viewModel.didCopyHex ? "Hex code copied" : "Copy hex code")
                     .accessibilityValue(hexCopyManager.formattedHex(for: viewModel.tempColor))
                 }

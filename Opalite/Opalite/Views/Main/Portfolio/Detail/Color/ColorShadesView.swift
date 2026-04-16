@@ -35,8 +35,8 @@ struct ColorShadesView: View {
                 HapticsManager.shared.selection()
                 isShowingInfo = true
             } label: {
-                Image(systemName: "questionmark.circle")
-                    .foregroundStyle(.gray)
+                Image(systemName: "questionmark.circle.fill")
+                    .foregroundStyle(.blue, .white)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about tints and shades")

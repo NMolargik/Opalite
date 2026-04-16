@@ -471,7 +471,6 @@ private extension PortfolioView {
                 } label: {
                     Label("Share Color", systemImage: "square.and.arrow.up")
                 }
-                .tint(.blue)
 
                 Divider()
 
@@ -647,6 +646,7 @@ private extension PortfolioView {
         } label: {
             Label("Create", systemImage: "plus")
                 .imageScale(.large)
+                .labelStyle(.titleOnly)
                 .bold()
         }
         .tint(.blue)

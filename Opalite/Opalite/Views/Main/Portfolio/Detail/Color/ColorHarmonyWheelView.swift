@@ -180,8 +180,8 @@ struct ColorHarmonyWheelView: View {
                 HapticsManager.shared.selection()
                 isShowingInfo = true
             } label: {
-                Image(systemName: "questionmark.circle")
-                    .foregroundStyle(.gray)
+                Image(systemName: "questionmark.circle.fill")
+                    .foregroundStyle(.blue, .white)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about color harmonies")
