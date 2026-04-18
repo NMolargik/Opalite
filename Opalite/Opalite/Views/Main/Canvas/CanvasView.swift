@@ -52,69 +52,79 @@ struct CanvasView: View {
     @State private var canvasZoomScale: CGFloat = 1.0
 
     var body: some View {
-        ZStack {
-            // Background layer
-            Color.white
-                .ignoresSafeArea()
-
-            // Drawing canvas with Apple Pencil support
-            PencilKitCanvas(
-                drawing: $drawing,
-                inkColor: $selectedInkColor,
-                forceColorUpdate: forceColorUpdate,
-                appearTrigger: appearTrigger,
-                canvasSize: effectiveCanvasSize,
-                contentOffset: $canvasContentOffset,
-                zoomScale: $canvasZoomScale,
-                showToolPickerTrigger: showToolPickerTrigger,
-                externalTool: $externalTool
-            )
-
-            // Shape placement overlay — drag-to-define with 3-phase state machine
-            if let shape = pendingShape {
-                ShapePlacementOverlay(
-                    shape: shape,
-                    onPlace: { rect, rotation in
-                        placeShape(shape, in: rect, rotation: rotation)
-                        pendingShape = nil
-                    },
-                    onCancel: {
-                        pendingShape = nil
-                    }
-                )
+        VStack(spacing: 0) {
+            CanvasSwatchPickerView(canvasFile: canvasFile) { color in
+                selectedInkColor = color.uiColor
+                forceColorUpdate = UUID()
+                // Force tool picker to reappear after selecting a swatch
+                showToolPickerTrigger = UUID()
             }
 
-            // SVG placement overlay — drag-to-define with 3-phase state machine
-            if let paths = pendingSVGPaths, let bounds = pendingSVGBounds {
-                SVGPlacementOverlay(
-                    paths: paths,
-                    svgBounds: bounds,
-                    onPlace: { rect, rotation in
-                        placeSVG(paths: paths, bounds: bounds, in: rect, rotation: rotation)
-                        pendingSVGPaths = nil
-                        pendingSVGBounds = nil
-                    },
-                    onCancel: {
-                        pendingSVGPaths = nil
-                        pendingSVGBounds = nil
-                    }
-                )
-            }
+            ZStack {
+                // Background layer
+                Color.white
+                    .ignoresSafeArea(edges: .bottom)
 
-            // Color sampling overlay - isolated view for performance
-            if isColorSamplingMode {
-                ColorSamplingOverlay(
-                    drawing: drawing,
+                // Drawing canvas with Apple Pencil support
+                PencilKitCanvas(
+                    drawing: $drawing,
+                    inkColor: $selectedInkColor,
+                    forceColorUpdate: forceColorUpdate,
+                    appearTrigger: appearTrigger,
                     canvasSize: effectiveCanvasSize,
-                    canvasContentOffset: canvasContentOffset,
-                    canvasZoomScale: canvasZoomScale,
-                    onSave: { color in
-                        saveColorFromSample(color)
-                    },
-                    onCancel: {
-                        isColorSamplingMode = false
-                    }
+                    contentOffset: $canvasContentOffset,
+                    zoomScale: $canvasZoomScale,
+                    showToolPickerTrigger: showToolPickerTrigger,
+                    externalTool: $externalTool,
+                    suppressToolPicker: showRenameTitleAlert
                 )
+
+                // Shape placement overlay — drag-to-define with 3-phase state machine
+                if let shape = pendingShape {
+                    ShapePlacementOverlay(
+                        shape: shape,
+                        onPlace: { rect, rotation in
+                            placeShape(shape, in: rect, rotation: rotation)
+                            pendingShape = nil
+                        },
+                        onCancel: {
+                            pendingShape = nil
+                        }
+                    )
+                }
+
+                // SVG placement overlay — drag-to-define with 3-phase state machine
+                if let paths = pendingSVGPaths, let bounds = pendingSVGBounds {
+                    SVGPlacementOverlay(
+                        paths: paths,
+                        svgBounds: bounds,
+                        onPlace: { rect, rotation in
+                            placeSVG(paths: paths, bounds: bounds, in: rect, rotation: rotation)
+                            pendingSVGPaths = nil
+                            pendingSVGBounds = nil
+                        },
+                        onCancel: {
+                            pendingSVGPaths = nil
+                            pendingSVGBounds = nil
+                        }
+                    )
+                }
+
+                // Color sampling overlay - isolated view for performance
+                if isColorSamplingMode {
+                    ColorSamplingOverlay(
+                        drawing: drawing,
+                        canvasSize: effectiveCanvasSize,
+                        canvasContentOffset: canvasContentOffset,
+                        canvasZoomScale: canvasZoomScale,
+                        onSave: { color in
+                            saveColorFromSample(color)
+                        },
+                        onCancel: {
+                            isColorSamplingMode = false
+                        }
+                    )
+                }
             }
         }
         .environment(\.colorScheme, .light)
@@ -136,14 +146,6 @@ struct CanvasView: View {
                 try canvasManager.saveDrawing(newValue, to: canvasFile)
             } catch {
                 toastManager.show(error: .canvasSaveFailed)
-            }
-        }
-        .overlay(alignment: .top) {
-            CanvasSwatchPickerView(canvasFile: canvasFile) { color in
-                selectedInkColor = color.uiColor
-                forceColorUpdate = UUID()
-                // Force tool picker to reappear after selecting a swatch
-                showToolPickerTrigger = UUID()
             }
         }
         .toolbar {

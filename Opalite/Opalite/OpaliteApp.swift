@@ -245,6 +245,10 @@ struct OpaliteApp: App {
         Task { @MainActor in
             await colorManager.refreshAll()
             await canvasManager.refreshAll()
+            if newPhase == .active {
+                await subscriptionManager.processUnfinishedTransactions()
+                await subscriptionManager.updatePurchasedProducts()
+            }
             syncColorsToWidgetStorage()
 
             #if os(iOS)

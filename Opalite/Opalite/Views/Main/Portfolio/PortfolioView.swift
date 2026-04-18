@@ -48,6 +48,9 @@ struct PortfolioView: View {
     @Namespace private var namespace
     @Namespace private var swatchNS
 
+    // MARK: - Layout Tracking
+    @State private var containerSize: CGSize = .zero
+
     // MARK: - Computed Properties
 
     var isCompact: Bool { hSizeClass == .compact }
@@ -63,6 +66,17 @@ struct PortfolioView: View {
         return true
         #else
         return UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+    }
+
+    /// True when running on a real iPad whose window is taller than wide.
+    /// Catalyst/macOS are excluded because the user specified iPad portrait only.
+    private var isIPadPortrait: Bool {
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        return containerSize.width > 0 && containerSize.height > containerSize.width
+        #else
+        return false
         #endif
     }
 
@@ -86,6 +100,11 @@ struct PortfolioView: View {
                 .navigationDestination(for: PortfolioNavigationNode.self) { node in
                     destinationView(for: node)
                 }
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newSize in
+            containerSize = newSize
         }
         .onChange(of: quickActionManager.newColorTrigger) { _, newValue in
             handleQuickActionTrigger(newValue)
@@ -499,6 +518,17 @@ private extension PortfolioView {
 // MARK: - Toolbar
 
 private extension PortfolioView {
+    /// Applies `.iconOnly` label style on iPad in portrait; otherwise leaves the default.
+    /// SwiftUI's label styles have different types, so we can't ternary them inline.
+    @ViewBuilder
+    func iconOnlyIfIPadPortrait<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        if isIPadPortrait {
+            content().labelStyle(.iconOnly)
+        } else {
+            content()
+        }
+    }
+
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
         if isIPadOrMac {
@@ -507,11 +537,13 @@ private extension PortfolioView {
                     HapticsManager.shared.selection()
                     viewModel.isShowingSwatchBarInfo = true
                 } label: {
-                    Label("SwatchBar", systemImage: "square.stack")
+                    iconOnlyIfIPadPortrait {
+                        Label("SwatchBar", systemImage: "square.stack")
+                    }
                 }
                 .toolbarButtonTint()
             }
-            
+
             #if !os(visionOS)
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
@@ -525,7 +557,9 @@ private extension PortfolioView {
                     HapticsManager.shared.selection()
                     viewModel.isShowingPaletteOrder = true
                 } label: {
-                    Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
+                    iconOnlyIfIPadPortrait {
+                        Label("Reorder Palettes", systemImage: "arrow.up.arrow.down")
+                    }
                 }
                 .toolbarButtonTint()
                 .accessibilityLabel("Reorder palettes")
@@ -644,13 +678,25 @@ private extension PortfolioView {
                 .tint(.indigo)
             })
         } label: {
+            createMenuLabel
+        }
+        .tint(.blue)
+        .labelStyle(.titleAndIcon)
+    }
+
+    @ViewBuilder
+    var createMenuLabel: some View {
+        if isIPadPortrait {
+            Label("Create", systemImage: "plus")
+                .imageScale(.large)
+                .labelStyle(.iconOnly)
+                .bold()
+        } else {
             Label("Create", systemImage: "plus")
                 .imageScale(.large)
                 .labelStyle(.titleOnly)
                 .bold()
         }
-        .tint(.blue)
-        .labelStyle(.titleAndIcon)
     }
 }
 

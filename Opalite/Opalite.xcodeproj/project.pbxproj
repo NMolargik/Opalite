@@ -13,7 +13,6 @@
 		EB1A15552F37955300A8B6EF /* OpaliteWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = EB224D022EF38D9B00F350D4 /* DeviceKit */; };
 		EB3BCAD62EF8B58F0059764A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAD52EF8B58F0059764A /* QuickLook.framework */; };
-		EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */; platformFilters = (ios, maccatalyst, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB3BCAF02EF8B7F40059764A /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */; };
 		EB3BCAF72EF8B7F40059764A /* OpaliteThumbnail.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB92BF9F2F1D565200305170 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */; };
@@ -22,6 +21,7 @@
 		EB92BFC52F1D5CEF00305170 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB92BFC42F1D5CEF00305170 /* Messages.framework */; };
 		EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */; platformFilters = (ios, maccatalyst, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EBAD2C2A2F06D37800EB94EB /* OpaliteShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EBD5E30B2F927B3700136ADD /* OpaliteQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,13 +52,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = EB1A15472F37955200A8B6EF;
 			remoteInfo = OpaliteWatchWidgetsExtension;
-		};
-		EB3BCAE02EF8B58F0059764A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EBD4AD142EE48DF300012D16 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = EB3BCAD32EF8B58F0059764A;
-			remoteInfo = OpaliteQuickLook;
 		};
 		EB3BCAF52EF8B7F40059764A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -102,6 +95,13 @@
 			remoteGlobalIDString = EBD4AD1B2EE48DF300012D16;
 			remoteInfo = Opalite;
 		};
+		EBD5E30C2F927B3700136ADD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBD4AD142EE48DF300012D16 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EB3BCAD32EF8B58F0059764A;
+			remoteInfo = OpaliteQuickLook;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -134,9 +134,9 @@
 			dstSubfolderSpec = 13;
 			files = (
 				EB3BCAF72EF8B7F40059764A /* OpaliteThumbnail.appex in Embed Foundation Extensions */,
-				EB3BCAE22EF8B58F0059764A /* OpaliteQuickLook.appex in Embed Foundation Extensions */,
 				EB92BFD12F1D5CF000305170 /* OpaliteMessages.appex in Embed Foundation Extensions */,
 				EBAD2C2A2F06D37800EB94EB /* OpaliteShareExtension.appex in Embed Foundation Extensions */,
+				EBD5E30B2F927B3700136ADD /* OpaliteQuickLook.appex in Embed Foundation Extensions */,
 				EB92BFAB2F1D565300305170 /* OpaliteWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -304,6 +304,20 @@
 			);
 			target = EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */;
 		};
+		EBB7A0D32F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "Opalite" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SceneDelegate.swift,
+			);
+			target = EBD4AD1B2EE48DF300012D16 /* Opalite */;
+		};
+		EBB7A0D42F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "OpaliteTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SceneDelegate.swift,
+			);
+			target = EBD4AD2C2EE48DF400012D16 /* OpaliteTests */;
+		};
 		EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -405,6 +419,10 @@
 		};
 		EBD4AD302EE48DF400012D16 /* OpaliteTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EBB7A0D32F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "Opalite" target */,
+				EBB7A0D42F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "OpaliteTests" target */,
+			);
 			path = OpaliteTests;
 			sourceTree = "<group>";
 		};
@@ -814,12 +832,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				EB3BCAE12EF8B58F0059764A /* PBXTargetDependency */,
 				EB3BCAF62EF8B7F40059764A /* PBXTargetDependency */,
 				EB17AA102F02F88800D00D03 /* PBXTargetDependency */,
 				EBAD2C292F06D37800EB94EB /* PBXTargetDependency */,
 				EB92BFAA2F1D565300305170 /* PBXTargetDependency */,
 				EB92BFD02F1D5CF000305170 /* PBXTargetDependency */,
+				EBD5E30D2F927B3700136ADD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				EBD4AD1E2EE48DF300012D16 /* Opalite */,
@@ -1178,15 +1196,6 @@
 			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
 			targetProxy = EB1A15532F37955300A8B6EF /* PBXContainerItemProxy */;
 		};
-		EB3BCAE12EF8B58F0059764A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilters = (
-				ios,
-				maccatalyst,
-			);
-			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
-			targetProxy = EB3BCAE02EF8B58F0059764A /* PBXContainerItemProxy */;
-		};
 		EB3BCAF62EF8B7F40059764A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
@@ -1221,6 +1230,11 @@
 			target = EBD4AD1B2EE48DF300012D16 /* Opalite */;
 			targetProxy = EBD4AD382EE48DF400012D16 /* PBXContainerItemProxy */;
 		};
+		EBD5E30D2F927B3700136ADD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
+			targetProxy = EBD5E30C2F927B3700136ADD /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1242,7 +1256,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1276,7 +1290,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1404,7 +1418,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp.OpaliteWatchWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1438,7 +1452,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.watchkitapp.OpaliteWatchWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1470,7 +1484,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteQuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1504,7 +1518,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteQuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1540,7 +1554,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteThumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1577,7 +1591,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteThumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1619,7 +1633,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1656,7 +1670,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1700,7 +1714,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1747,7 +1761,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1784,7 +1798,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteMessages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1820,7 +1834,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteMessages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1856,7 +1870,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1891,7 +1905,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite.OpaliteShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1951,7 +1965,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -2012,7 +2026,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

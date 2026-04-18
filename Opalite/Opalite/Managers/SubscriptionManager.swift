@@ -55,6 +55,7 @@ final class SubscriptionManager {
         transactionListener = listenForTransactions()
         Task {
             await loadProducts()
+            await processUnfinishedTransactions()
             await updatePurchasedProducts()
         }
     }
@@ -150,20 +151,41 @@ final class SubscriptionManager {
     /// Updates the set of purchased product IDs by checking current entitlements.
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
+        var verificationFailures: [String] = []
 
         for await result in Transaction.currentEntitlements {
-            do {
-                let transaction = try checkVerified(result)
-                // Only count if not revoked
+            switch result {
+            case .verified(let transaction):
                 if transaction.revocationDate == nil {
                     purchased.insert(transaction.productID)
                 }
-            } catch {
-                // Skip unverified transactions
+            case .unverified(let transaction, let error):
+                verificationFailures.append("\(transaction.productID): \(error)")
             }
         }
 
+        #if DEBUG
+        print("[Subscription] current entitlements: \(purchased.isEmpty ? "none" : purchased.sorted().joined(separator: ", "))")
+        if !verificationFailures.isEmpty {
+            print("[Subscription] verification failures: \(verificationFailures.joined(separator: "; "))")
+        }
+        print("[Subscription] expected product IDs: \(OnyxSubscription.productIDs.sorted().joined(separator: ", "))")
+        #endif
+
         purchasedProductIDs = purchased
+    }
+
+    /// Finishes any pending unfinished transactions. Apple recommends this on startup.
+    /// An unfinished lifetime purchase can otherwise remain invisible to `currentEntitlements`.
+    func processUnfinishedTransactions() async {
+        for await result in Transaction.unfinished {
+            if case .verified(let transaction) = result {
+                #if DEBUG
+                print("[Subscription] finishing unfinished transaction: \(transaction.productID)")
+                #endif
+                await transaction.finish()
+            }
+        }
     }
 
     // MARK: - Private Helpers

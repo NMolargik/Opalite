@@ -169,7 +169,7 @@ struct ColorHarmonyWheelView: View {
 
                 wheelView
                     .aspectRatio(1, contentMode: .fit)
-                    .frame(maxWidth: 300)
+                    .frame(maxWidth: 220)
                     .frame(maxWidth: .infinity)
 
                 swatchRow
@@ -181,7 +181,7 @@ struct ColorHarmonyWheelView: View {
                 isShowingInfo = true
             } label: {
                 Image(systemName: "questionmark.circle.fill")
-                    .foregroundStyle(.blue, .white)
+                    .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about color harmonies")

@@ -35,6 +35,7 @@ struct SettingsView: View {
     @State private var isRestoringPurchases: Bool = false
     @State private var isShowingWatchAppInfo: Bool = false
     @State private var isShowingCommunityAdmin: Bool = false
+    @State private var isShowingOnyxInfo: Bool = false
 
     @State private var exportPDFURL: IdentifiableURL?
     @State private var isShowingExportSelection: Bool = false
@@ -65,6 +66,16 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "icloud")
+                            .foregroundStyle(.blue)
+                        Text("Free iCloud space must be available to sync your colors, palettes, and canvases between devices.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
                 Section {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
@@ -145,48 +156,6 @@ struct SettingsView: View {
                 }
                 
                 Section {
-                    Picker(selection: Binding<ColorBlindnessMode>(
-                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
-                        set: { colorBlindnessModeRaw = $0.rawValue }
-                    )) {
-                        ForEach(ColorBlindnessMode.allCases) { option in
-                            Text(option.title).tag(option)
-                        }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Label("Color Vision", systemImage: isColorBlindnessActive ? "eye.trianglebadge.exclamationmark" : "eye")
-                                .foregroundStyle(isColorBlindnessActive ? .orange : .primary)
-
-                            if isColorBlindnessActive {
-                                Text("Active")
-                                    .font(.caption2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Capsule().fill(.orange))
-                            }
-                        }
-                    }
-                } header: {
-                    Text("Accessibility")
-                } footer: {
-                    Text("Simulate how colors appear to people with color vision deficiencies. The Settings tab icon will change when simulation is active.")
-                }
-
-                #if os(iOS)
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    Section {
-                        Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    } header: {
-                        Text("iPad Tip")
-                    }
-                }
-                #endif
-
-                Section {
                     if subscriptionManager.hasOnyxEntitlement {
                         HStack {
                             Label("Onyx", systemImage: "inset.filled.oval")
@@ -255,9 +224,69 @@ struct SettingsView: View {
                     .disabled(isRestoringPurchases)
                     .accessibilityLabel("Restore Purchases")
                     .accessibilityHint("Checks for previously purchased subscriptions")
+                    #if DEBUG
+                    .simultaneousGesture(
+                        LongPressGesture(minimumDuration: 0.6)
+                            .onEnded { _ in
+                                HapticsManager.shared.impact()
+                                isShowingPaywall = true
+                            }
+                    )
+                    #endif
+
+                    Button {
+                        HapticsManager.shared.selection()
+                        isShowingOnyxInfo = true
+                    } label: {
+                        Label("About Onyx", systemImage: "info.circle")
+                            .foregroundStyle(.blue)
+                    }
+                    .accessibilityHint("Learn what Onyx unlocks in Opalite")
                 } header: {
                     Text("Subscription")
                 }
+
+                Section {
+                    Picker(selection: Binding<ColorBlindnessMode>(
+                        get: { ColorBlindnessMode(rawValue: colorBlindnessModeRaw) ?? .off },
+                        set: { colorBlindnessModeRaw = $0.rawValue }
+                    )) {
+                        ForEach(ColorBlindnessMode.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Label("Color Vision", systemImage: isColorBlindnessActive ? "eye.trianglebadge.exclamationmark" : "eye")
+                                .foregroundStyle(isColorBlindnessActive ? .orange : .primary)
+
+                            if isColorBlindnessActive {
+                                Text("Active")
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().fill(.orange))
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Accessibility")
+                } footer: {
+                    Text("Simulate how colors appear to people with color vision deficiencies. The Settings tab icon will change when simulation is active.")
+                }
+
+                #if os(iOS)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    Section {
+                        Text("On iPad Pro, colors may appear more accurate by enabling Settings → Display & Brightness → Advanced → Reference Mode, if available.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        Text("iPad Tip")
+                    }
+                }
+                #endif
 
                 #if os(iOS)
                 // Apple Watch section - iPhone only
@@ -499,6 +528,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $isShowingWatchAppInfo) {
             WatchAppInfoSheet()
+        }
+        .sheet(isPresented: $isShowingOnyxInfo) {
+            OnyxInfoSheet()
         }
         .sheet(isPresented: $isShowingCommunityAdmin) {
             CommunityAdminSheet()

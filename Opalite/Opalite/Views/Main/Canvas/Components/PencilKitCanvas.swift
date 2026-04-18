@@ -19,6 +19,7 @@ struct PencilKitCanvas: View {
     @Binding var zoomScale: CGFloat
     var showToolPickerTrigger: UUID
     @Binding var externalTool: PKTool?
+    var suppressToolPicker: Bool = false
 
     var body: some View {
         CanvasDetail_PencilKitRepresentable(
@@ -30,7 +31,8 @@ struct PencilKitCanvas: View {
             contentOffset: $contentOffset,
             zoomScale: $zoomScale,
             showToolPickerTrigger: showToolPickerTrigger,
-            externalTool: $externalTool
+            externalTool: $externalTool,
+            suppressToolPicker: suppressToolPicker
         )
         .ignoresSafeArea(edges: .bottom)
     }
@@ -67,6 +69,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
     @Binding var zoomScale: CGFloat
     var showToolPickerTrigger: UUID
     @Binding var externalTool: PKTool?
+    var suppressToolPicker: Bool
 
     func makeUIView(context: Context) -> OpaliteCanvasView {
         let view = OpaliteCanvasView()
@@ -147,6 +150,18 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
             context.coordinator.reattachToolPicker()
         }
 
+        // Suppress tool picker while an alert/sheet with a keyboard is presented.
+        // Otherwise toolPickerVisibilityDidChange steals first responder from the TextField.
+        if context.coordinator.suppressToolPicker != suppressToolPicker {
+            context.coordinator.suppressToolPicker = suppressToolPicker
+            if suppressToolPicker {
+                context.coordinator.toolPicker?.setVisible(false, forFirstResponder: uiView)
+                uiView.resignFirstResponder()
+            } else {
+                context.coordinator.reattachToolPicker()
+            }
+        }
+
         // Apply external tool changes (from Mac Catalyst custom tool picker)
         if let tool = externalTool {
             context.coordinator.isProgrammaticToolChange = true
@@ -202,6 +217,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         var lastShowToolPickerTrigger: UUID?
         var storedCanvasSize: CGSize?
         var viewSize: CGSize = .zero
+        var suppressToolPicker: Bool = false
 
         init(drawing: Binding<PKDrawing>, contentOffset: Binding<CGPoint>, zoomScale: Binding<CGFloat>) {
             _drawing = drawing
@@ -224,6 +240,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         #if targetEnvironment(macCatalyst)
         @objc private func windowDidBecomeKey(_ notification: Notification) {
             guard let canvasView, canvasView.window != nil else { return }
+            guard !suppressToolPicker else { return }
             forceToolPickerVisible()
         }
         #endif
@@ -334,6 +351,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                     guard let self, let canvasView = self.canvasView, let toolPicker = self.toolPicker else { return }
                     guard canvasView.window != nil else { return }
+                    guard !self.suppressToolPicker else { return }
                     if !toolPicker.isVisible || !canvasView.isFirstResponder {
                         toolPicker.setVisible(true, forFirstResponder: canvasView)
                         _ = canvasView.becomeFirstResponder()
@@ -352,6 +370,7 @@ private struct CanvasDetail_PencilKitRepresentable: UIViewRepresentable {
         func toolPickerVisibilityDidChange(_ toolPicker: PKToolPicker) {
             // If the tool picker became hidden unexpectedly, try to re-show it
             guard let canvasView = canvasView else { return }
+            guard !suppressToolPicker else { return }
 
             if !toolPicker.isVisible && canvasView.window != nil {
                 #if targetEnvironment(macCatalyst)

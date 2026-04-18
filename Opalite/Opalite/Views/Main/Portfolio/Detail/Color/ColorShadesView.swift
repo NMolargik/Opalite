@@ -36,7 +36,7 @@ struct ColorShadesView: View {
                 isShowingInfo = true
             } label: {
                 Image(systemName: "questionmark.circle.fill")
-                    .foregroundStyle(.blue, .white)
+                    .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Learn about tints and shades")
