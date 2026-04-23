@@ -157,9 +157,20 @@ struct ToastView: View {
 struct ToastContainerModifier: ViewModifier {
     @Environment(ToastManager.self) private var toastManager
 
+    /// iPad (but not iPhone, Mac Catalyst, or visionOS) anchors toasts to the
+    /// top-leading corner so they don't crowd the split-view title area.
+    private var isIPad: Bool {
+        #if os(iOS)
+        UIDevice.current.userInterfaceIdiom == .pad
+            && !ProcessInfo.processInfo.isMacCatalystApp
+        #else
+        false
+        #endif
+    }
+
     func body(content: Content) -> some View {
         content
-            .overlay(alignment: .top) {
+            .overlay(alignment: isIPad ? .topLeading : .top) {
                 if let toast = toastManager.currentToast {
                     ToastView(toast: toast) {
                         toastManager.dismiss()

@@ -10,7 +10,6 @@ import Foundation
 enum AppStage: String, Identifiable {
     case splash
     case onboarding
-    case syncing
     case main
 
     var id: String { self.rawValue }

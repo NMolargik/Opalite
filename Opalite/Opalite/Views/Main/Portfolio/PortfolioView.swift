@@ -116,7 +116,7 @@ struct PortfolioView: View {
             // `initial: true` ensures we handle pending navigation that was set
             // before PortfolioView mounted — e.g. when a home screen widget is
             // tapped while the app is fully closed, the URL is consumed during
-            // `.splash`/`.syncing` but the NavigationStack isn't live yet.
+            // `.splash` but the NavigationStack isn't live yet.
             handlePendingColorNavigation(colorID)
         }
         .onChange(of: intentNavigationManager.pendingPaletteID, initial: true) { _, paletteID in
@@ -246,7 +246,16 @@ private extension PortfolioView {
             .hidden()
         }
         .refreshable {
-            Task { await colorManager.refreshAll() }
+            toastManager.show(
+                message: "Syncing with iCloud…",
+                style: .info,
+                icon: "icloud.fill"
+            )
+            await colorManager.refreshAll()
+            // Give any in-flight CloudKit remote-change notifications a moment
+            // to land so freshly-synced records appear before the spinner retracts.
+            try? await Task.sleep(for: .seconds(1))
+            await colorManager.refreshAll()
         }
     }
 

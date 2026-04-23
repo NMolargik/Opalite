@@ -14,11 +14,14 @@ struct ContentView: View {
     @Environment(CommunityManager.self) private var communityManager: CommunityManager
     @Environment(QuickActionManager.self) private var quickActionManager: QuickActionManager
     @Environment(HexCopyManager.self) private var hexCopyManager: HexCopyManager
+    @Environment(ToastManager.self) private var toastManager: ToastManager
     @AppStorage(AppStorageKeys.isOnboardingComplete) private var isOnboardingComplete: Bool = false
 
     @State private var appStage: AppStage = .splash
     @State private var isShowingPaywall: Bool = false
     @State private var paywallContext: String = ""
+    @State private var didShowSyncToast: Bool = false
+    @State private var wasReturningUser: Bool = false
     @AppStorage(AppStorageKeys.appTheme) private var appThemeRaw: String = AppThemeOption.system.rawValue
 
     private var preferredColorScheme: ColorScheme? {
@@ -59,7 +62,7 @@ struct ContentView: View {
                 OnboardingView(
                     onContinue: {
                         withAnimation {
-                            appStage = .syncing
+                            appStage = .main
                         }
                     },
                     onBack: {
@@ -75,21 +78,6 @@ struct ContentView: View {
                 .zIndex(1)
                 .preferredColorScheme(preferredColorScheme)
                 .accessibilityIdentifier("onboardingView")
-            case .syncing:
-                SyncingView(
-                    onComplete: {
-                        withAnimation {
-                            appStage = .main
-                        }
-                    }
-                )
-                .environment(colorManager)
-                .environment(canvasManager)
-                .id("syncing")
-                .transition(leadingTransition)
-                .zIndex(1)
-                .preferredColorScheme(preferredColorScheme)
-                .accessibilityIdentifier("syncingView")
             case .main:
                 MainView()
                 .environment(colorManager)
@@ -111,6 +99,7 @@ struct ContentView: View {
                     try? await communityManager.fetchPublishedColors()
                     try? await communityManager.fetchPublishedPalettes()
                 }
+                handleMainEntry()
             }
         }
         .onAppear {
@@ -143,9 +132,28 @@ struct ContentView: View {
             isOnboardingComplete = false
         }
 
-        // For returning users, go to syncing view to check for iCloud data
-        // For new users, go to splash/onboarding first
-        appStage = isOnboardingComplete ? .syncing : .splash
+        wasReturningUser = isOnboardingComplete
+        appStage = isOnboardingComplete ? .main : .splash
+    }
+
+    /// On first entry to MainView for a returning user, surface a lightweight
+    /// toast so they understand iCloud sync is running in the background, and
+    /// nudge the local cache in case the scene-phase refresh in `OpaliteApp`
+    /// fired before the managers were ready.
+    private func handleMainEntry() {
+        guard !didShowSyncToast, wasReturningUser else { return }
+        didShowSyncToast = true
+
+        toastManager.show(
+            message: "Syncing with iCloud…",
+            style: .info,
+            icon: "icloud.fill"
+        )
+
+        Task { @MainActor in
+            await colorManager.refreshAll()
+            await canvasManager.refreshAll()
+        }
     }
 }
 

@@ -7,29 +7,13 @@
 
 import SwiftUI
 
-/// Root view for OpaliteTV.
-/// Shows syncing screen on launch, then transitions to main view.
+/// Root view for OpaliteTV. CloudKit hydration happens in the background via
+/// the `NSPersistentStoreRemoteChange` observer in `OpaliteTVApp`, so the
+/// portfolio populates as records arrive — no launch gate required.
 struct TVContentView: View {
-    @Environment(ColorManager.self) private var colorManager
-
-    @State private var isSyncing: Bool = true
-
     var body: some View {
-        ZStack {
-            if isSyncing {
-                TVSyncingView {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        isSyncing = false
-                    }
-                }
-                .transition(.opacity)
-                .accessibilityIdentifier("tvSyncingView")
-            } else {
-                TVMainView()
-                    .transition(.opacity)
-                    .accessibilityIdentifier("tvMainView")
-            }
-        }
+        TVMainView()
+            .accessibilityIdentifier("tvMainView")
     }
 }
 

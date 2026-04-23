@@ -14,21 +14,23 @@ struct ContentView: View {
     @State private var deepLinkColor: WatchColor?
 
     var body: some View {
-        Group {
-            if !colorManager.hasCompletedInitialSync {
-                WatchSyncingView()
-            } else {
-                mainContent
+        mainContent
+            .task {
+                // Kick the initial WatchConnectivity sync in the background.
+                // Cached data from UserDefaults is already loaded in WatchColorManager.init,
+                // so the UI renders immediately; fresh data streams in via the session callback.
+                if !colorManager.hasCompletedInitialSync {
+                    await colorManager.performInitialSync()
+                }
             }
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                colorManager.hasCompletedInitialSync = false
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    Task { await colorManager.refreshAll() }
+                }
             }
-        }
-        .onOpenURL { url in
-            handleDeepLink(url)
-        }
+            .onOpenURL { url in
+                handleDeepLink(url)
+            }
     }
 
     private func handleDeepLink(_ url: URL) {
@@ -38,11 +40,6 @@ struct ContentView: View {
               let colorID = UUID(uuidString: url.pathComponents[1]) else { return }
 
         colorManager.pendingDeepLinkColorID = colorID
-
-        // Skip sync view so the user immediately sees content
-        if !colorManager.hasCompletedInitialSync {
-            colorManager.hasCompletedInitialSync = true
-        }
     }
 
     private func handlePendingDeepLink() {
