@@ -13,7 +13,7 @@ struct MainView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(ColorManager.self) private var colorManager: ColorManager
     @Environment(CanvasManager.self) private var canvasManager: CanvasManager
-    @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager: SubscriptionManager
 
     // MARK: - Intent Navigation
     private var intentNavigationManager = IntentNavigationManager.shared

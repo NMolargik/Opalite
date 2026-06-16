@@ -166,149 +166,9 @@ struct CanvasView: View {
             }
 
             if horizontalSizeClass == .compact {
-                // Compact: Single "Tools" menu containing everything
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Section("Shapes") {
-                            ForEach(CanvasShape.allCases, id: \.self) { shape in
-                                Button {
-                                    HapticsManager.shared.impact()
-                                    pendingShape = shape
-                                } label: {
-                                    Label(shape.displayName, systemImage: shape.systemImage)
-                                }
-                            }
-                        }
-
-                        Section("Tools") {
-                            Button {
-                                HapticsManager.shared.impact()
-                                isShowingSVGImporter = true
-                            } label: {
-                                Label("Place SVG Shape", systemImage: "square.on.circle")
-                            }
-
-                            Button {
-                                HapticsManager.shared.impact()
-                                isColorSamplingMode = true
-                            } label: {
-                                Label("Sample Color From Canvas", systemImage: "eyedropper")
-                            }
-
-                            Button {
-                                HapticsManager.shared.impact()
-                                exportCanvasAsImage()
-                            } label: {
-                                Label("Export as Image", systemImage: "square.and.arrow.up")
-                            }
-                        }
-
-                        #if targetEnvironment(macCatalyst)
-                        Section("Drawing Tools") {
-                            drawingToolMenuItems
-                        }
-                        #endif
-
-                        Section {
-                            Button(role: .destructive) {
-                                HapticsManager.shared.impact()
-                                showClearConfirmation = true
-                            } label: {
-                                Label("Clear Canvas", systemImage: "eraser")
-                            }
-
-                            Button(role: .destructive) {
-                                HapticsManager.shared.impact()
-                                showDeleteConfirmation = true
-                            } label: {
-                                Label("Delete Canvas", systemImage: "trash.fill")
-                            }
-                        }
-                    } label: {
-                        Label("Tools", systemImage: "ellipsis.circle")
-                    }
-                    .toolbarButtonTint()
-                }
+                compactToolbarItems
             } else {
-                #if targetEnvironment(macCatalyst)
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        drawingToolMenuItems
-                    } label: {
-                        Label("Drawing Tools", systemImage: "pencil.and.ruler")
-                    }
-                    .toolbarButtonTint()
-                }
-                #endif
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        HapticsManager.shared.impact()
-                        isColorSamplingMode = true
-                    } label: {
-                        Label("Sample Color", systemImage: "eyedropper")
-                    }
-                    .toolbarButtonTint()
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Section("Shapes") {
-                            ForEach(CanvasShape.allCases, id: \.self) { shape in
-                                Button {
-                                    HapticsManager.shared.impact()
-                                    pendingShape = shape
-                                } label: {
-                                    Label(shape.displayName, systemImage: shape.systemImage)
-                                }
-                            }
-                        }
-                        
-                        Section {
-                            Button {
-                                HapticsManager.shared.impact()
-                                isShowingSVGImporter = true
-                            } label: {
-                                Label("Place SVG Shape", systemImage: "square.on.circle")
-                            }
-                        }
-                    } label: {
-                        Label("Shapes", systemImage: "xmark.triangle.circle.square.fill")
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Section {
-                            Button(role: .destructive) {
-                                HapticsManager.shared.impact()
-                                showClearConfirmation = true
-                            } label: {
-                                Label("Clear Canvas", systemImage: "eraser")
-                            }
-
-                            Button(role: .destructive) {
-                                HapticsManager.shared.impact()
-                                showDeleteConfirmation = true
-                            } label: {
-                                Label("Delete Canvas", systemImage: "trash.fill")
-                            }
-                        }
-                    } label: {
-                        Label("Options", systemImage: "ellipsis.circle")
-                    }
-                    .toolbarButtonTint()
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        HapticsManager.shared.impact()
-                        exportCanvasAsImage()
-                    } label: {
-                        Label("Export as Image", systemImage: "square.and.arrow.up")
-                    }
-                    .tint(.blue)
-                }
+                expandedToolbarItems
             }
 
             #if !os(visionOS)
@@ -388,6 +248,152 @@ struct CanvasView: View {
                 title: canvasFile.title,
                 isPresented: $showShareSheet
             )
+        }
+    }
+
+    // MARK: - Toolbar Content
+
+    /// Compact layout: a single "Tools" menu containing every action.
+    @ToolbarContentBuilder
+    private var compactToolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Section("Shapes") {
+                    shapesMenuItems
+                }
+
+                Section("Tools") {
+                    Button {
+                        HapticsManager.shared.impact()
+                        isShowingSVGImporter = true
+                    } label: {
+                        Label("Place SVG Shape", systemImage: "square.on.circle")
+                    }
+
+                    Button {
+                        HapticsManager.shared.impact()
+                        isColorSamplingMode = true
+                    } label: {
+                        Label("Sample Color From Canvas", systemImage: "eyedropper")
+                    }
+
+                    Button {
+                        HapticsManager.shared.impact()
+                        exportCanvasAsImage()
+                    } label: {
+                        Label("Export as Image", systemImage: "square.and.arrow.up")
+                    }
+                }
+
+                #if targetEnvironment(macCatalyst)
+                Section("Drawing Tools") {
+                    drawingToolMenuItems
+                }
+                #endif
+
+                Section {
+                    destructiveMenuItems
+                }
+            } label: {
+                Label("Tools", systemImage: "ellipsis.circle")
+            }
+            .toolbarButtonTint()
+        }
+    }
+
+    /// Regular layout: separate toolbar items for tools, shapes, and options.
+    @ToolbarContentBuilder
+    private var expandedToolbarItems: some ToolbarContent {
+        #if targetEnvironment(macCatalyst)
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                drawingToolMenuItems
+            } label: {
+                Label("Drawing Tools", systemImage: "pencil.and.ruler")
+            }
+            .toolbarButtonTint()
+        }
+        #endif
+
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                HapticsManager.shared.impact()
+                isColorSamplingMode = true
+            } label: {
+                Label("Sample Color", systemImage: "eyedropper")
+            }
+            .toolbarButtonTint()
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Section("Shapes") {
+                    shapesMenuItems
+                }
+
+                Section {
+                    Button {
+                        HapticsManager.shared.impact()
+                        isShowingSVGImporter = true
+                    } label: {
+                        Label("Place SVG Shape", systemImage: "square.on.circle")
+                    }
+                }
+            } label: {
+                Label("Shapes", systemImage: "xmark.triangle.circle.square.fill")
+            }
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Section {
+                    destructiveMenuItems
+                }
+            } label: {
+                Label("Options", systemImage: "ellipsis.circle")
+            }
+            .toolbarButtonTint()
+        }
+
+        ToolbarItem(placement: .confirmationAction) {
+            Button {
+                HapticsManager.shared.impact()
+                exportCanvasAsImage()
+            } label: {
+                Label("Export as Image", systemImage: "square.and.arrow.up")
+            }
+            .tint(.blue)
+        }
+    }
+
+    /// Buttons for placing each available canvas shape.
+    @ViewBuilder
+    private var shapesMenuItems: some View {
+        ForEach(CanvasShape.allCases, id: \.self) { shape in
+            Button {
+                HapticsManager.shared.impact()
+                pendingShape = shape
+            } label: {
+                Label(shape.displayName, systemImage: shape.systemImage)
+            }
+        }
+    }
+
+    /// Destructive actions for clearing or deleting the canvas.
+    @ViewBuilder
+    private var destructiveMenuItems: some View {
+        Button(role: .destructive) {
+            HapticsManager.shared.impact()
+            showClearConfirmation = true
+        } label: {
+            Label("Clear Canvas", systemImage: "eraser")
+        }
+
+        Button(role: .destructive) {
+            HapticsManager.shared.impact()
+            showDeleteConfirmation = true
+        } label: {
+            Label("Delete Canvas", systemImage: "trash.fill")
         }
     }
 

@@ -13,6 +13,16 @@ struct ColorSpectrumPickerView: View {
     @State private var dragLocation: CGPoint = CGPoint(x: 0.5, y: 0.5)
     @State private var hasInitialized: Bool = false
 
+    private static let spectrumGradient = Gradient(stops: [
+        Gradient.Stop(color: .red, location: 0.0),
+        Gradient.Stop(color: .yellow, location: 0.17),
+        Gradient.Stop(color: .green, location: 0.33),
+        Gradient.Stop(color: .cyan, location: 0.5),
+        Gradient.Stop(color: .blue, location: 0.67),
+        Gradient.Stop(color: Color(red: 1, green: 0, blue: 1), location: 0.83),
+        Gradient.Stop(color: .red, location: 1.0)
+    ])
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
@@ -30,45 +40,8 @@ struct ColorSpectrumPickerView: View {
             VStack(alignment: .leading, spacing: 16) {
                 GeometryReader { proxy in
                     ZStack {
-                        LinearGradient(
-                            gradient: Gradient(stops: [
-                                .init(color: .red, location: 0.0),
-                                .init(color: .yellow, location: 0.17),
-                                .init(color: .green, location: 0.33),
-                                .init(color: .cyan, location: 0.5),
-                                .init(color: .blue, location: 0.67),
-                                .init(color: Color(red: 1, green: 0, blue: 1), location: 0.83),
-                                .init(color: .red, location: 1.0)
-                            ]),
-                            startPoint: .leading, endPoint: .trailing
-                        )
-                        .overlay(
-                            LinearGradient(
-                                colors: [.white, .black],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            .blendMode(.multiply)
-                        )
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    updateColor(with: value.location, in: proxy.size)
-                                }
-                                .onEnded { value in
-                                    updateColor(with: value.location, in: proxy.size)
-                                }
-                        )
-
-                        // Handle
-                        Circle()
-                            .strokeBorder(Color.white, lineWidth: 2)
-                            .background(Circle().fill(Color.clear))
-                            .frame(width: 24, height: 24)
-                            .position(
-                                x: dragLocation.x * proxy.size.width,
-                                y: dragLocation.y * proxy.size.height
-                            )
+                        spectrumLayer(size: proxy.size)
+                        handle(size: proxy.size)
                     }
                 }
                 .frame(minHeight: 200)
@@ -124,6 +97,42 @@ struct ColorSpectrumPickerView: View {
             // Sync when the color binding changes to a different color
             syncDragLocationFromColor()
         }
+    }
+
+    private func spectrumLayer(size: CGSize) -> some View {
+        LinearGradient(
+            gradient: Self.spectrumGradient,
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .overlay(
+            LinearGradient(
+                colors: [.white, .black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(BlendMode.multiply)
+        )
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    updateColor(with: value.location, in: size)
+                }
+                .onEnded { value in
+                    updateColor(with: value.location, in: size)
+                }
+        )
+    }
+
+    private func handle(size: CGSize) -> some View {
+        Circle()
+            .strokeBorder(Color.white, lineWidth: 2)
+            .background(Circle().fill(Color.clear))
+            .frame(width: 24, height: 24)
+            .position(
+                x: dragLocation.x * size.width,
+                y: dragLocation.y * size.height
+            )
     }
 
     private var currentColorDescription: String {
