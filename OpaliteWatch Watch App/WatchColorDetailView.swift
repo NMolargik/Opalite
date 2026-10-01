@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import OpaliteCore
+import OpaliteDesignSystem
 
 struct WatchColorDetailView: View {
     let color: WatchColor
@@ -31,7 +33,7 @@ struct WatchColorDetailView: View {
             }
             .padding(.horizontal, 4)
         }
-        .navigationTitle(color.name ?? "Color")
+        .navigationTitle(color.displayName)
         .onAppear {
             colorManager.playNavigationHaptic()
         }
@@ -90,7 +92,7 @@ struct WatchColorDetailView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .onChange(of: WatchSessionManager.shared.lastCopyResult) { _, newResult in
+        .onChange(of: colorManager.session.lastCopyResult) { _, newResult in
             guard let result = newResult else { return }
             withAnimation(.easeIn(duration: 0.15)) {
                 copyFeedback = result
@@ -99,7 +101,7 @@ struct WatchColorDetailView: View {
                 withAnimation(.easeOut(duration: 0.2)) {
                     copyFeedback = nil
                 }
-                WatchSessionManager.shared.lastCopyResult = nil
+                colorManager.session.lastCopyResult = nil
             }
         }
     }
@@ -148,7 +150,7 @@ struct WatchColorDetailView: View {
     }
 
     private var hslSection: some View {
-        let hsl = color.hsl
+        let hsl = color.rgba.hsl
         let h = Int(round(hsl.hue))
         let s = Int(round(hsl.saturation * 100))
         let l = Int(round(hsl.lightness * 100))
@@ -162,7 +164,7 @@ struct WatchColorDetailView: View {
     }
 
     private var cmykSection: some View {
-        let cmyk = color.cmyk
+        let cmyk = color.rgba.cmyk
         let c = Int(round(cmyk.cyan * 100))
         let m = Int(round(cmyk.magenta * 100))
         let y = Int(round(cmyk.yellow * 100))
@@ -212,9 +214,7 @@ struct WatchColorDetailView: View {
     // MARK: - Actions
 
     private func copyHex() {
-        colorManager.playTapHaptic()
-        let hex = colorManager.formattedHex(for: color)
-        WatchSessionManager.shared.copyHexToiPhone(hex, colorName: color.name)
+        colorManager.copyHex(for: color)
     }
 }
 

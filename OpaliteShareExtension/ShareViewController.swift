@@ -2,151 +2,69 @@
 //  ShareViewController.swift
 //  OpaliteShareExtension
 //
-//  Created by Nick Molargik on 1/1/26.
+//  Receives one image from the share sheet, drops it in the App Group hand-off file,
+//  and opens the app on the photo sampler.
 //
 
 import UIKit
 import UniformTypeIdentifiers
+import OpaliteCore
+import os
 
-class ShareViewController: UIViewController {
-
-    private let appGroupIdentifier = "group.com.molargiksoftware.Opalite"
-    private let sharedImageFileName = "shared_image.png"
+final class ShareViewController: UIViewController {
+    private let store = SharedImageStore()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        handleSharedContent()
+        view.backgroundColor = .clear
+        Task { await handleSharedContent() }
     }
 
-    private func handleSharedContent() {
-        guard let extensionContext = extensionContext,
-              let inputItems = extensionContext.inputItems as? [NSExtensionItem] else {
-            completeRequest(success: false)
+    private func handleSharedContent() async {
+        let items = (extensionContext?.inputItems as? [NSExtensionItem]) ?? []
+        let attachment = items.lazy.compactMap(\.attachments).joined().first { $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) }
+        guard let attachment, let image = await loadImage(from: attachment), let png = image.pngData(), store.save(pngData: png) else {
+            complete(success: false)
             return
         }
+        open(DeepLink.sharedImage.url)
+        complete(success: true)
+    }
 
-        // Find the first image attachment
-        for inputItem in inputItems {
-            guard let attachments = inputItem.attachments else { continue }
-
-            for attachment in attachments {
-                // Check for image types
-                if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                    loadImage(from: attachment)
-                    return
+    private func loadImage(from provider: NSItemProvider) async -> UIImage? {
+        await withCheckedContinuation { continuation in
+            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, error in
+                if let error { Log.sharing.error("Share image load failed: \(error.localizedDescription)") }
+                let image: UIImage?
+                switch item {
+                case let url as URL: image = (try? Data(contentsOf: url)).flatMap(UIImage.init(data:))
+                case let data as Data: image = UIImage(data: data)
+                case let uiImage as UIImage: image = uiImage
+                default: image = nil
                 }
-            }
-        }
-
-        // No image found
-        completeRequest(success: false)
-    }
-
-    private func loadImage(from attachment: NSItemProvider) {
-        attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { [weak self] (item, error) in
-            guard let self = self else { return }
-
-            if let error = error {
-                #if DEBUG
-                print("[ShareExtension] Error loading image: \(error)")
-                #endif
-                self.completeRequest(success: false)
-                return
-            }
-
-            var image: UIImage?
-
-            if let url = item as? URL {
-                // Image provided as file URL
-                if let data = try? Data(contentsOf: url) {
-                    image = UIImage(data: data)
-                }
-            } else if let data = item as? Data {
-                // Image provided as raw data
-                image = UIImage(data: data)
-            } else if let uiImage = item as? UIImage {
-                // Image provided directly
-                image = uiImage
-            }
-
-            if let image = image {
-                self.saveAndOpenApp(image: image)
-            } else {
-                self.completeRequest(success: false)
+                continuation.resume(returning: image)
             }
         }
     }
 
-    private func saveAndOpenApp(image: UIImage) {
-        // Save the image to the shared App Group container
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) else {
-            completeRequest(success: false)
-            return
-        }
-
-        let fileURL = containerURL.appendingPathComponent(sharedImageFileName)
-
-        guard let pngData = image.pngData() else {
-            completeRequest(success: false)
-            return
-        }
-
-        do {
-            try pngData.write(to: fileURL, options: .atomic)
-        } catch {
-            #if DEBUG
-            print("[ShareExtension] Failed to save image: \(error)")
-            #endif
-            completeRequest(success: false)
-            return
-        }
-
-        // Open the main app
-        openMainApp()
-    }
-
-    private func openMainApp() {
-        // Use the app's URL scheme to open it
-        let urlString = "opalite://sharedImage"
-        guard let url = URL(string: urlString) else {
-            completeRequest(success: true)
-            return
-        }
-
-        // Open the containing app via responder chain
+    /// Extensions can't call `UIApplication.shared`; walk the responder chain instead.
+    private func open(_ url: URL) {
         var responder: UIResponder? = self
-        while responder != nil {
-            if let application = responder as? UIApplication {
-                application.open(url, options: [:]) { [weak self] _ in
-                    self?.completeRequest(success: true)
-                }
+        let selector = sel_registerName("openURL:")
+        while let current = responder {
+            if current.responds(to: selector) {
+                current.perform(selector, with: url)
                 return
             }
-            responder = responder?.next
+            responder = current.next
         }
-
-        // Fallback: use openURL selector if available
-        let selector = sel_registerName("openURL:")
-        responder = self
-        while responder != nil {
-            if responder!.responds(to: selector) {
-                responder!.perform(selector, with: url)
-                break
-            }
-            responder = responder?.next
-        }
-
-        completeRequest(success: true)
     }
 
-    private func completeRequest(success: Bool) {
-        DispatchQueue.main.async { [weak self] in
-            if success {
-                self?.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
-            } else {
-                let error = NSError(domain: "com.molargiksoftware.OpaliteShareExtension", code: 1, userInfo: nil)
-                self?.extensionContext?.cancelRequest(withError: error)
-            }
+    private func complete(success: Bool) {
+        if success {
+            extensionContext?.completeRequest(returningItems: nil)
+        } else {
+            extensionContext?.cancelRequest(withError: NSError(domain: "com.molargiksoftware.OpaliteShareExtension", code: 1))
         }
     }
 }

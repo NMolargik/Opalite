@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import OpaliteCore
+import OpaliteDesignSystem
 
 struct ColorListView: View {
     @Environment(WatchColorManager.self) private var colorManager

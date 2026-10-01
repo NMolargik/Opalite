@@ -3,5 +3,5 @@ import Testing
 
 @Suite("OpaliteComposition placeholder")
 struct OpaliteCompositionPlaceholderTests {
-    @Test func moduleLinks() { #expect(OpaliteCompositionModule.name == "OpaliteComposition") }
+    @Test func moduleLinks() { #expect(SwatchBarScene.windowID == "swatchBar") }
 }

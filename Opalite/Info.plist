@@ -2,6 +2,37 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpaliteColorDocument</string>
+			<key>CFBundleTypeName</key>
+			<string>Opalite Color</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.molargiksoftware.opalite.color</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpalitePaletteDocument</string>
+			<key>CFBundleTypeName</key>
+			<string>Opalite Palette</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.molargiksoftware.opalite.palette</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundleAlternateIcons</key>
@@ -50,37 +81,6 @@
 			<false/>
 		</dict>
 	</dict>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeIconFile</key>
-			<string>OpaliteColorDocument</string>
-			<key>CFBundleTypeName</key>
-			<string>Opalite Color</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.molargiksoftware.opalite.color</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeIconFile</key>
-			<string>OpalitePaletteDocument</string>
-			<key>CFBundleTypeName</key>
-			<string>Opalite Palette</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.molargiksoftware.opalite.palette</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -94,40 +94,24 @@
 	</array>
 	<key>NSUserActivityTypes</key>
 	<array>
+		<string>com.molargiksoftware.Opalite.viewingColor</string>
+		<string>com.molargiksoftware.Opalite.viewingPalette</string>
 		<string>com.molargiksoftware.Opalite.swatchBar</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UIWindowSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>Default Configuration</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-				</dict>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>SwatchBar</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
 	</dict>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeCompose</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>plus.circle.fill</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Create New Color</string>
+			<string>New Color</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>CreateNewColorAction</string>
+			<string>opalite://createColor</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconSymbolName</key>
@@ -135,7 +119,23 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Sample Photo</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>SamplePhotoAction</string>
+			<string>opalite://samplePhoto</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>swatchpalette.fill</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>New Palette</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>opalite://createPalette</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>square.stack.fill</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>SwatchBar</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>opalite://swatchBar</string>
 		</dict>
 	</array>
 	<key>UIBackgroundModes</key>

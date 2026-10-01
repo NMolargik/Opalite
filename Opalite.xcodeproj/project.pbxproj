@@ -7,11 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DEC0DE000000000000000013 /* OpaliteComposition in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000012 /* OpaliteComposition */; };
+		DEC0DE000000000000000015 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000014 /* OpaliteCore */; };
+		DEC0DE000000000000000017 /* OpaliteData in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000016 /* OpaliteData */; };
+		DEC0DE000000000000000019 /* OpaliteServices in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000018 /* OpaliteServices */; };
+		DEC0DE00000000000000001B /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000001A /* OpaliteDesignSystem */; };
+		DEC0DE00000000000000001D /* OpaliteFeatureShared in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000001C /* OpaliteFeatureShared */; };
+		DEC0DE00000000000000001F /* OpaliteFeatureImmersive in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000001E /* OpaliteFeatureImmersive */; };
+		DEC0DE000000000000000021 /* OpaliteComposition in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000020 /* OpaliteComposition */; };
+		DEC0DE000000000000000023 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000022 /* OpaliteCore */; };
+		DEC0DE000000000000000025 /* OpaliteData in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000024 /* OpaliteData */; };
+		DEC0DE000000000000000027 /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000026 /* OpaliteDesignSystem */; };
+		DEC0DE000000000000000029 /* OpaliteFeatureShared in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000028 /* OpaliteFeatureShared */; };
+		DEC0DE00000000000000002B /* OpaliteFeatureTV in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000002A /* OpaliteFeatureTV */; };
+		DEC0DE00000000000000002D /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000002C /* OpaliteCore */; };
+		DEC0DE00000000000000002F /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000002E /* OpaliteDesignSystem */; };
+		DEC0DE000000000000000031 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000030 /* OpaliteCore */; };
+		DEC0DE000000000000000033 /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000032 /* OpaliteDesignSystem */; };
+		DEC0DE000000000000000035 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000034 /* OpaliteCore */; };
+		DEC0DE000000000000000037 /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000036 /* OpaliteDesignSystem */; };
+		DEC0DE000000000000000039 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000038 /* OpaliteCore */; };
+		DEC0DE00000000000000003B /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000003A /* OpaliteCore */; };
+		DEC0DE00000000000000003D /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000003C /* OpaliteCore */; };
+		DEC0DE00000000000000003F /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE00000000000000003E /* OpaliteCore */; };
+		DEC0DE000000000000000041 /* OpaliteDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000040 /* OpaliteDesignSystem */; };
+		DEC0DE000000000000000043 /* OpaliteCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000042 /* OpaliteCore */; };
+		DEC0DE000000000000000045 /* OpaliteComposition in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000044 /* OpaliteComposition */; };
+		DEC0DE000000000000000047 /* OpaliteFeatureShared in Frameworks */ = {isa = PBXBuildFile; productRef = DEC0DE000000000000000046 /* OpaliteFeatureShared */; };
 		EB17AA112F02F88800D00D03 /* OpaliteWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB1A15492F37955200A8B6EF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6CE2EFF80C100D00D03 /* WidgetKit.framework */; };
 		EB1A154A2F37955200A8B6EF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB17A6D02EFF80C100D00D03 /* SwiftUI.framework */; };
 		EB1A15552F37955300A8B6EF /* OpaliteWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = EB224D022EF38D9B00F350D4 /* DeviceKit */; };
 		EB3BCAD62EF8B58F0059764A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAD52EF8B58F0059764A /* QuickLook.framework */; };
 		EB3BCAF02EF8B7F40059764A /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB3BCAEF2EF8B7F40059764A /* QuickLookThumbnailing.framework */; };
 		EB3BCAF72EF8B7F40059764A /* OpaliteThumbnail.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -169,52 +195,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Extensions/GlassIfAvailable.swift,
-				Models/CanvasFile.swift,
-				Models/OpaliteColor.swift,
-				Models/OpalitePalette.swift,
-			);
-			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
-		};
 		EB1A15592F37955300A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatchWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
-		};
-		EB1A15612F37966100A8B6EF /* Exceptions for "OpaliteWatch Watch App" folder in "OpaliteWatchWidgetsExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				WatchModels.swift,
-			);
-			target = EB1A15472F37955200A8B6EF /* OpaliteWatchWidgetsExtension */;
-		};
-		EB1A15632F37967800A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatch Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				RecentColorsWidget.swift,
-			);
-			target = EB17A9F02F02F88700D00D03 /* OpaliteWatch Watch App */;
-		};
-		EB1A156F2F37B93D00A8B6EF /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Errors/FileHandlerError.swift,
-				Utilities/OpaliteFileDecoder.swift,
-			);
-			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
-		};
-		EB1A15712F37B9C700A8B6EF /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Errors/FileHandlerError.swift,
-				Utilities/OpaliteFileDecoder.swift,
-			);
-			target = EB3BCAD32EF8B58F0059764A /* OpaliteQuickLook */;
 		};
 		EB3BCAE62EF8B58F0059764A /* Exceptions for "OpaliteQuickLook" folder in "OpaliteQuickLook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -230,56 +216,10 @@
 			);
 			target = EB3BCAED2EF8B7F40059764A /* OpaliteThumbnail */;
 		};
-		EB5ECA162F38B62900A2916E /* Exceptions for "Opalite" folder in "OpaliteWidgetsExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Utilities/WidgetColorStorage.swift,
-			);
-			target = EB92BF9D2F1D565200305170 /* OpaliteWidgetsExtension */;
-		};
-		EB5ECA182F38B64300A2916E /* Exceptions for "Opalite" folder in "OpaliteMessages" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Utilities/WidgetColorStorage.swift,
-			);
-			target = EB92BFC22F1D5CEF00305170 /* OpaliteMessages */;
-		};
 		EB92BF3B2F1D1F1D00305170 /* Exceptions for "OpaliteTV" folder in "OpaliteTV" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-			);
-			target = EB92BF2E2F1D1F1C00305170 /* OpaliteTV */;
-		};
-		EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				AppStorageKeys.swift,
-				Enumerations/ColorBlindnessMode.swift,
-				Enumerations/OnyxSubscription.swift,
-				Enumerations/PreviewBackground.swift,
-				Enumerations/SwatchSize.swift,
-				Enumerations/ToastStyle.swift,
-				Errors/OpaliteError.swift,
-				Intents/Entities/OpaliteColorEntity.swift,
-				Intents/Entities/OpalitePaletteEntity.swift,
-				Intents/IntentNavigationManager.swift,
-				Intents/Intents/ShowColorIntent.swift,
-				Intents/Intents/ShowPaletteIntent.swift,
-				Intents/OpaliteModelContainer.swift,
-				Intents/OpaliteShortcuts.swift,
-				Intents/Queries/OpaliteColorQuery.swift,
-				Intents/Queries/OpalitePaletteQuery.swift,
-				Managers/CanvasManager.swift,
-				Managers/ColorManager.swift,
-				Managers/HapticsManager.swift,
-				Managers/HexCopyManager.swift,
-				Managers/SubscriptionManager.swift,
-				Managers/ToastManager.swift,
-				Models/CanvasFile.swift,
-				Models/CanvasPlacedImage.swift,
-				Models/OpaliteColor.swift,
-				Models/OpalitePalette.swift,
 			);
 			target = EB92BF2E2F1D1F1C00305170 /* OpaliteTV */;
 		};
@@ -304,20 +244,6 @@
 			);
 			target = EBAD2C1F2F06D37800EB94EB /* OpaliteShareExtension */;
 		};
-		EBB7A0D32F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "Opalite" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				SceneDelegate.swift,
-			);
-			target = EBD4AD1B2EE48DF300012D16 /* Opalite */;
-		};
-		EBB7A0D42F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "OpaliteTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				SceneDelegate.swift,
-			);
-			target = EBD4AD2C2EE48DF400012D16 /* OpaliteTests */;
-		};
 		EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -331,7 +257,6 @@
 		EB17A9F22F02F88700D00D03 /* OpaliteWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				EB1A15612F37966100A8B6EF /* Exceptions for "OpaliteWatch Watch App" folder in "OpaliteWatchWidgetsExtension" target */,
 			);
 			path = "OpaliteWatch Watch App";
 			sourceTree = "<group>";
@@ -349,7 +274,6 @@
 		EB1A154B2F37955200A8B6EF /* OpaliteWatchWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				EB1A15632F37967800A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatch Watch App" target */,
 				EB1A15592F37955300A8B6EF /* Exceptions for "OpaliteWatchWidgets" folder in "OpaliteWatchWidgetsExtension" target */,
 			);
 			path = OpaliteWatchWidgets;
@@ -407,12 +331,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				EBD4AD3F2EE48DF400012D16 /* Exceptions for "Opalite" folder in "Opalite" target */,
-				EB17AA232F02FB2400D00D03 /* Exceptions for "Opalite" folder in "OpaliteWatch Watch App" target */,
-				EB92BF432F1D1F2D00305170 /* Exceptions for "Opalite" folder in "OpaliteTV" target */,
-				EB5ECA162F38B62900A2916E /* Exceptions for "Opalite" folder in "OpaliteWidgetsExtension" target */,
-				EB1A15712F37B9C700A8B6EF /* Exceptions for "Opalite" folder in "OpaliteQuickLook" target */,
-				EB1A156F2F37B93D00A8B6EF /* Exceptions for "Opalite" folder in "OpaliteThumbnail" target */,
-				EB5ECA182F38B64300A2916E /* Exceptions for "Opalite" folder in "OpaliteMessages" target */,
 			);
 			path = Opalite;
 			sourceTree = "<group>";
@@ -420,8 +338,6 @@
 		EBD4AD302EE48DF400012D16 /* OpaliteTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				EBB7A0D32F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "Opalite" target */,
-				EBB7A0D42F93E53500E66554 /* Exceptions for "OpaliteTests" folder in "OpaliteTests" target */,
 			);
 			path = OpaliteTests;
 			sourceTree = "<group>";
@@ -438,6 +354,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE00000000000000002D /* OpaliteCore in Frameworks */,
+				DEC0DE00000000000000002F /* OpaliteDesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +377,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE000000000000000031 /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000033 /* OpaliteDesignSystem in Frameworks */,
 				EB1A154A2F37955200A8B6EF /* SwiftUI.framework in Frameworks */,
 				EB1A15492F37955200A8B6EF /* WidgetKit.framework in Frameworks */,
 			);
@@ -468,6 +388,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE00000000000000003B /* OpaliteCore in Frameworks */,
 				EB3BCAD62EF8B58F0059764A /* QuickLook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,6 +397,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE00000000000000003D /* OpaliteCore in Frameworks */,
 				EB3BCAF02EF8B7F40059764A /* QuickLookThumbnailing.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -484,6 +406,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE000000000000000021 /* OpaliteComposition in Frameworks */,
+				DEC0DE000000000000000023 /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000025 /* OpaliteData in Frameworks */,
+				DEC0DE000000000000000027 /* OpaliteDesignSystem in Frameworks */,
+				DEC0DE000000000000000029 /* OpaliteFeatureShared in Frameworks */,
+				DEC0DE00000000000000002B /* OpaliteFeatureTV in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,6 +419,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE000000000000000035 /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000037 /* OpaliteDesignSystem in Frameworks */,
 				EB92BFA02F1D565200305170 /* SwiftUI.framework in Frameworks */,
 				EB92BF9F2F1D565200305170 /* WidgetKit.framework in Frameworks */,
 			);
@@ -500,6 +430,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE00000000000000003F /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000041 /* OpaliteDesignSystem in Frameworks */,
 				EB92BFC52F1D5CEF00305170 /* Messages.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -508,6 +440,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE000000000000000039 /* OpaliteCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,7 +448,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EB224D032EF38D9B00F350D4 /* DeviceKit in Frameworks */,
+				DEC0DE000000000000000013 /* OpaliteComposition in Frameworks */,
+				DEC0DE000000000000000015 /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000017 /* OpaliteData in Frameworks */,
+				DEC0DE000000000000000019 /* OpaliteServices in Frameworks */,
+				DEC0DE00000000000000001B /* OpaliteDesignSystem in Frameworks */,
+				DEC0DE00000000000000001D /* OpaliteFeatureShared in Frameworks */,
+				DEC0DE00000000000000001F /* OpaliteFeatureImmersive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,6 +462,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEC0DE000000000000000043 /* OpaliteCore in Frameworks */,
+				DEC0DE000000000000000045 /* OpaliteComposition in Frameworks */,
+				DEC0DE000000000000000047 /* OpaliteFeatureShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,6 +556,8 @@
 			);
 			name = "OpaliteWatch Watch App";
 			packageProductDependencies = (
+				DEC0DE00000000000000002C /* OpaliteCore */,
+				DEC0DE00000000000000002E /* OpaliteDesignSystem */,
 			);
 			productName = "OpaliteWatch Watch App";
 			productReference = EB17A9F12F02F88700D00D03 /* OpaliteWatch Watch App.app */;
@@ -682,6 +626,8 @@
 			);
 			name = OpaliteWatchWidgetsExtension;
 			packageProductDependencies = (
+				DEC0DE000000000000000030 /* OpaliteCore */,
+				DEC0DE000000000000000032 /* OpaliteDesignSystem */,
 			);
 			productName = OpaliteWatchWidgetsExtension;
 			productReference = EB1A15482F37955200A8B6EF /* OpaliteWatchWidgetsExtension.appex */;
@@ -704,6 +650,7 @@
 			);
 			name = OpaliteQuickLook;
 			packageProductDependencies = (
+				DEC0DE00000000000000003A /* OpaliteCore */,
 			);
 			productName = OpaliteQuickLook;
 			productReference = EB3BCAD42EF8B58F0059764A /* OpaliteQuickLook.appex */;
@@ -726,6 +673,7 @@
 			);
 			name = OpaliteThumbnail;
 			packageProductDependencies = (
+				DEC0DE00000000000000003C /* OpaliteCore */,
 			);
 			productName = OpaliteThumbnail;
 			productReference = EB3BCAEE2EF8B7F40059764A /* OpaliteThumbnail.appex */;
@@ -748,6 +696,12 @@
 			);
 			name = OpaliteTV;
 			packageProductDependencies = (
+				DEC0DE000000000000000020 /* OpaliteComposition */,
+				DEC0DE000000000000000022 /* OpaliteCore */,
+				DEC0DE000000000000000024 /* OpaliteData */,
+				DEC0DE000000000000000026 /* OpaliteDesignSystem */,
+				DEC0DE000000000000000028 /* OpaliteFeatureShared */,
+				DEC0DE00000000000000002A /* OpaliteFeatureTV */,
 			);
 			productName = OpaliteTV;
 			productReference = EB92BF2F2F1D1F1C00305170 /* OpaliteTV.app */;
@@ -770,6 +724,8 @@
 			);
 			name = OpaliteWidgetsExtension;
 			packageProductDependencies = (
+				DEC0DE000000000000000034 /* OpaliteCore */,
+				DEC0DE000000000000000036 /* OpaliteDesignSystem */,
 			);
 			productName = OpaliteWidgetsExtension;
 			productReference = EB92BF9E2F1D565200305170 /* OpaliteWidgetsExtension.appex */;
@@ -792,6 +748,8 @@
 			);
 			name = OpaliteMessages;
 			packageProductDependencies = (
+				DEC0DE00000000000000003E /* OpaliteCore */,
+				DEC0DE000000000000000040 /* OpaliteDesignSystem */,
 			);
 			productName = OpaliteMessages;
 			productReference = EB92BFC32F1D5CEF00305170 /* OpaliteMessages.appex */;
@@ -814,6 +772,7 @@
 			);
 			name = OpaliteShareExtension;
 			packageProductDependencies = (
+				DEC0DE000000000000000038 /* OpaliteCore */,
 			);
 			productName = OpaliteShareExtension;
 			productReference = EBAD2C202F06D37800EB94EB /* OpaliteShareExtension.appex */;
@@ -844,7 +803,13 @@
 			);
 			name = Opalite;
 			packageProductDependencies = (
-				EB224D022EF38D9B00F350D4 /* DeviceKit */,
+				DEC0DE000000000000000012 /* OpaliteComposition */,
+				DEC0DE000000000000000014 /* OpaliteCore */,
+				DEC0DE000000000000000016 /* OpaliteData */,
+				DEC0DE000000000000000018 /* OpaliteServices */,
+				DEC0DE00000000000000001A /* OpaliteDesignSystem */,
+				DEC0DE00000000000000001C /* OpaliteFeatureShared */,
+				DEC0DE00000000000000001E /* OpaliteFeatureImmersive */,
 			);
 			productName = Opalite;
 			productReference = EBD4AD1C2EE48DF300012D16 /* Opalite.app */;
@@ -868,6 +833,9 @@
 			);
 			name = OpaliteTests;
 			packageProductDependencies = (
+				DEC0DE000000000000000042 /* OpaliteCore */,
+				DEC0DE000000000000000044 /* OpaliteComposition */,
+				DEC0DE000000000000000046 /* OpaliteFeatureShared */,
 			);
 			productName = OpaliteTests;
 			productReference = EBD4AD2D2EE48DF400012D16 /* OpaliteTests.xctest */;
@@ -904,7 +872,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2630;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					EB17A9F02F02F88700D00D03 = {
 						CreatedOnToolsVersion = 26.2;
@@ -958,11 +926,14 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
+				"fr-CA",
+				ja,
 			);
 			mainGroup = EBD4AD132EE48DF300012D16;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EBD4AD1D2EE48DF300012D16 /* Products */;
@@ -1265,12 +1236,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -1299,12 +1270,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1325,9 +1296,10 @@
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpaliteWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpaliteWatch Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1348,9 +1320,10 @@
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpaliteWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpaliteWatch Watch App";
 				VALIDATE_PRODUCT = YES;
@@ -1371,9 +1344,10 @@
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_TARGET_NAME = "OpaliteWatch Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1393,9 +1367,10 @@
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_TARGET_NAME = "OpaliteWatch Watch App";
 				VALIDATE_PRODUCT = YES;
@@ -1427,11 +1402,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -1461,11 +1437,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1493,15 +1470,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1527,15 +1505,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1563,17 +1542,17 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "OpaliteThumbnail/OpaliteThumbnail-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
@@ -1600,16 +1579,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "OpaliteThumbnail/OpaliteThumbnail-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1641,12 +1620,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 18.4;
 			};
@@ -1678,12 +1657,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.molargiksoftware.Opalite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 18.4;
 				VALIDATE_PRODUCT = YES;
@@ -1724,14 +1703,15 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -1771,14 +1751,15 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -1807,15 +1788,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
@@ -1843,15 +1825,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1879,15 +1862,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
@@ -1914,15 +1898,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1974,7 +1959,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1983,7 +1968,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -2035,7 +2020,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -2044,7 +2029,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -2108,7 +2093,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -2165,7 +2150,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -2188,9 +2173,10 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Opalite.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Opalite";
 				XROS_DEPLOYMENT_TARGET = 26.2;
@@ -2215,9 +2201,10 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Opalite.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Opalite";
 				XROS_DEPLOYMENT_TARGET = 26.2;
@@ -2241,9 +2228,10 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = Opalite;
 				XROS_DEPLOYMENT_TARGET = 26.2;
@@ -2267,9 +2255,10 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = Opalite;
 				XROS_DEPLOYMENT_TARGET = 26.2;
@@ -2407,22 +2396,148 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Opalite;
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		EB224D022EF38D9B00F350D4 /* DeviceKit */ = {
+		DEC0DE000000000000000012 /* OpaliteComposition */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = EB224D002EF38D8200F350D4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
-			productName = DeviceKit;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteComposition;
+		};
+		DEC0DE000000000000000014 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000016 /* OpaliteData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteData;
+		};
+		DEC0DE000000000000000018 /* OpaliteServices */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteServices;
+		};
+		DEC0DE00000000000000001A /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE00000000000000001C /* OpaliteFeatureShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteFeatureShared;
+		};
+		DEC0DE00000000000000001E /* OpaliteFeatureImmersive */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteFeatureImmersive;
+		};
+		DEC0DE000000000000000020 /* OpaliteComposition */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteComposition;
+		};
+		DEC0DE000000000000000022 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000024 /* OpaliteData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteData;
+		};
+		DEC0DE000000000000000026 /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE000000000000000028 /* OpaliteFeatureShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteFeatureShared;
+		};
+		DEC0DE00000000000000002A /* OpaliteFeatureTV */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteFeatureTV;
+		};
+		DEC0DE00000000000000002C /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE00000000000000002E /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE000000000000000030 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000032 /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE000000000000000034 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000036 /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE000000000000000038 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE00000000000000003A /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE00000000000000003C /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE00000000000000003E /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000040 /* OpaliteDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteDesignSystem;
+		};
+		DEC0DE000000000000000042 /* OpaliteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteCore;
+		};
+		DEC0DE000000000000000044 /* OpaliteComposition */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteComposition;
+		};
+		DEC0DE000000000000000046 /* OpaliteFeatureShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC0DE000000000000000001 /* XCLocalSwiftPackageReference "Packages/Opalite" */;
+			productName = OpaliteFeatureShared;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -2,283 +2,99 @@
 //  OpaliteCommands.swift
 //  Opalite
 //
-//  Extracted from OpaliteApp.swift — all macOS/iPadOS menu bar commands.
+//  Menu-bar / hardware-keyboard commands (iPadOS 26+ menu bar and Mac Catalyst). Every
+//  action goes through the same `AppRouter` / shared models the app uses for widgets,
+//  quick actions, and App Intents, so every entry point behaves identically.
 //
 
 import SwiftUI
+import OpaliteComposition
+import OpaliteCore
+import OpaliteDesignSystem
+import OpaliteFeatureShared
 
-@MainActor
 struct OpaliteCommands: Commands {
-    let colorManager: ColorManager
-    let canvasManager: CanvasManager
-    let subscriptionManager: SubscriptionManager
-    let toastManager: ToastManager
-    let quickActionManager: QuickActionManager
-    let hexCopyManager: HexCopyManager
-    let reviewRequestManager: ReviewRequestManager
+    let session: SessionController
 
     @Environment(\.openWindow) private var openWindow
-    @AppStorage(AppStorageKeys.paletteOrder) private var paletteOrderData: Data = Data()
+
+    private var router: AppRouter { session.router }
+    private var portfolio: PortfolioModel { session.portfolio }
+    private var canvases: CanvasModel { session.canvases }
 
     var body: some Commands {
-        // Replace the New Item command group (Cmd+N)
         CommandGroup(replacing: .newItem) {
-            Button {
-                createNewColor()
-            } label: {
-                Label("New Color", systemImage: "paintpalette.fill")
-            }
-            .keyboardShortcut("n", modifiers: .command)
-
-            Button {
-                createNewPalette()
-            } label: {
-                Label("New Palette", systemImage: "swatchpalette.fill")
-            }
-            .keyboardShortcut("n", modifiers: [.command, .shift])
-
-            Button {
-                createNewCanvas()
-            } label: {
-                Label("New Canvas", systemImage: "pencil.and.outline")
+            Button("New Color") { router.open(.createColor) }
+                .keyboardShortcut("n", modifiers: .command)
+            Button("New Palette") { router.open(.createPalette) }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+            Button("New Canvas") {
+                router.select(.canvas)
+                _ = canvases.createCanvas()
             }
             .keyboardShortcut("n", modifiers: [.command, .option])
-
             Divider()
+            Button("Sample Photo…") { router.open(.samplePhoto) }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
         }
 
-        // Add to the existing View menu
         CommandGroup(after: .toolbar) {
             Divider()
-
-            Button {
-                HapticsManager.shared.selection()
-                #if os(iOS)
-                AppDelegate.openSwatchBarWindow()
-                #else
-                openWindow(id: "swatchBar")
-                #endif
-            } label: {
-                Label("SwatchBar", systemImage: "square.stack.fill")
-            }
-            .keyboardShortcut("s", modifiers: [.command, .shift])
-
+            Button("Show SwatchBar") { openWindow(id: SwatchBarScene.windowID) }
+                .keyboardShortcut("s", modifiers: [.command, .shift])
             Divider()
-
-            Button {
-                HapticsManager.shared.selection()
-                Task {
-                    await colorManager.refreshAll()
-                    await canvasManager.refreshAll()
-                }
-            } label: {
-                Label("Refresh All", systemImage: "arrow.clockwise")
+            Button("Refresh") {
+                portfolio.refresh()
+                canvases.refresh()
             }
             .keyboardShortcut("r", modifiers: .command)
         }
 
-        // Portfolio Menu
-        CommandMenu("Portfolio") {
-            Section("Colors") {
-                Button {
-                    createNewColor()
-                } label: {
-                    Label("New Color", systemImage: "paintpalette.fill")
-                }
-
-                Button {
-                    Task { await colorManager.refreshAll() }
-                } label: {
-                    Label("Refresh Colors", systemImage: "arrow.clockwise")
-                }
+        CommandMenu(Text("Go", comment: "Menu title for navigation commands")) {
+            ForEach(AppTab.available) { tab in
+                Button(tab.title) { router.select(tab) }
+                    .keyboardShortcut(KeyEquivalent(Character(String(tab.keyboardNumber))), modifiers: .command)
             }
-
             Divider()
+            Button("Onyx") { router.open(.onyx) }
+        }
 
-            Section("Palettes") {
-                Button {
-                    createNewPalette()
-                } label: {
-                    Label("New Palette", systemImage: "swatchpalette.fill")
-                }
+        CommandMenu(Text("Color", comment: "Menu title for the active color's actions")) {
+            Button("Copy Hex") {
+                if let color = portfolio.activeColor { session.hexCopy.copyHex(for: color) }
             }
+            .keyboardShortcut("c", modifiers: [.command, .shift])
+            .disabled(portfolio.activeColor == nil)
 
-            Divider()
-
-            // Active Color Actions (only enabled when viewing a color detail)
-            Section("Active Color") {
-                Button {
-                    HapticsManager.shared.selection()
-                    if let color = colorManager.activeColor {
-                        hexCopyManager.copyHex(for: color)
-                    }
-                } label: {
-                    Label("Copy Hex", systemImage: "number")
-                }
-                .disabled(colorManager.activeColor == nil)
-                .keyboardShortcut("c", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    colorManager.editColorTrigger = UUID()
-                } label: {
-                    Label("Edit Color", systemImage: "slider.horizontal.3")
-                }
-                .disabled(colorManager.activeColor == nil)
+            Button("Edit Color…") { portfolio.pendingCommand = .editActiveColor }
                 .keyboardShortcut("e", modifiers: .command)
+                .disabled(portfolio.activeColor == nil)
 
-                Button {
-                    HapticsManager.shared.selection()
-                    colorManager.addToPaletteTrigger = UUID()
-                } label: {
-                    Label("Move To Palette", systemImage: "swatchpalette")
-                }
-                .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette != nil)
+            Button("Move to Palette…") { portfolio.pendingCommand = .moveActiveColorToPalette }
+                .disabled(portfolio.activeColor == nil)
 
-                Button {
-                    HapticsManager.shared.selection()
-                    colorManager.removeFromPaletteTrigger = UUID()
-                } label: {
-                    Label("Remove from Palette", systemImage: "minus.circle")
-                }
-                .disabled(colorManager.activeColor == nil || colorManager.activeColor?.palette == nil)
-            }
+            Button("Remove from Palette") { portfolio.pendingCommand = .removeActiveColorFromPalette }
+                .disabled(portfolio.activeColor?.palette == nil)
 
             Divider()
 
-            // Active Palette Actions (only enabled when viewing a palette detail)
-            Section("Active Palette") {
+            Button("Rename Palette…") { portfolio.pendingCommand = .renameActivePalette }
+                .disabled(portfolio.activePalette == nil)
+        }
+
+        CommandMenu(Text("Canvas", comment: "Menu title for canvas actions")) {
+            ForEach(CanvasShape.allCases.filter { $0.keyboardNumber != nil }) { shape in
                 Button {
-                    HapticsManager.shared.selection()
-                    colorManager.renamePaletteTrigger = UUID()
+                    canvases.pendingShape = shape
                 } label: {
-                    Label("Rename Palette", systemImage: "character.cursor.ibeam")
+                    Label(shape.displayName, systemImage: shape.systemImage)
                 }
-                .disabled(colorManager.activePalette == nil)
+                .keyboardShortcut(KeyEquivalent(Character(String(shape.keyboardNumber ?? 0))), modifiers: [.command, .shift])
             }
         }
 
-        // Canvas Menu
-        CommandMenu("Canvas") {
-            Button {
-                createNewCanvas()
-            } label: {
-                Label("New Canvas", systemImage: "pencil.and.outline")
-            }
-
-            Button {
-                Task { await canvasManager.refreshAll() }
-            } label: {
-                Label("Refresh Canvases", systemImage: "arrow.clockwise")
-            }
-
-            Divider()
-
-            Section("Shapes") {
-                Button {
-                    HapticsManager.shared.selection()
-                    canvasManager.pendingShape = .square
-                } label: {
-                    Label("Square", systemImage: "square")
-                }
-                .keyboardShortcut("1", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    canvasManager.pendingShape = .circle
-                } label: {
-                    Label("Circle", systemImage: "circle")
-                }
-                .keyboardShortcut("2", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    canvasManager.pendingShape = .triangle
-                } label: {
-                    Label("Triangle", systemImage: "triangle")
-                }
-                .keyboardShortcut("3", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    canvasManager.pendingShape = .line
-                } label: {
-                    Label("Line", systemImage: "line.diagonal")
-                }
-                .keyboardShortcut("4", modifiers: [.command, .shift])
-
-                Button {
-                    HapticsManager.shared.selection()
-                    canvasManager.pendingShape = .arrow
-                } label: {
-                    Label("Arrow", systemImage: "arrow.right")
-                }
-                .keyboardShortcut("5", modifiers: [.command, .shift])
-            }
-        }
-    }
-
-    // MARK: - Shared Actions
-
-    private func createNewColor() {
-        HapticsManager.shared.selection()
-        if !colorManager.isMainWindowOpen {
-            openWindow(id: "main")
-        }
-        quickActionManager.requestCreateNewColor()
-    }
-
-    private func createNewPalette() {
-        HapticsManager.shared.selection()
-        if !colorManager.isMainWindowOpen {
-            openWindow(id: "main")
-        }
-        if subscriptionManager.canCreatePalette(currentCount: colorManager.palettes.count) {
-            withAnimation {
-                do {
-                    let newPalette = try colorManager.createPalette(name: "New Palette")
-                    prependPaletteToOrder(newPalette.id)
-                    OpaliteTipActions.advanceTipsAfterContentCreation()
-                    reviewRequestManager.evaluateReviewRequest(
-                        colorCount: colorManager.colors.count,
-                        paletteCount: colorManager.palettes.count
-                    )
-                } catch {
-                    toastManager.show(error: .paletteCreationFailed)
-                }
-            }
-        } else {
-            quickActionManager.requestPaywall(context: "Creating more palettes requires Onyx")
-        }
-    }
-
-    private func createNewCanvas() {
-        HapticsManager.shared.selection()
-        if !colorManager.isMainWindowOpen {
-            openWindow(id: "main")
-        }
-        if subscriptionManager.canCreateCanvas(currentCount: canvasManager.canvases.count) {
-            do {
-                let newCanvas = try canvasManager.createCanvas()
-                canvasManager.pendingCanvasToOpen = newCanvas
-            } catch {
-                toastManager.show(error: .canvasCreationFailed)
-            }
-        } else {
-            quickActionManager.requestPaywall(context: "Unlimited canvases require Onyx")
-        }
-    }
-
-    private func prependPaletteToOrder(_ paletteID: UUID) {
-        var currentOrder: [UUID] = []
-        if !paletteOrderData.isEmpty,
-           let decoded = try? JSONDecoder().decode([UUID].self, from: paletteOrderData) {
-            currentOrder = decoded
-        }
-        currentOrder.removeAll { $0 == paletteID }
-        currentOrder.insert(paletteID, at: 0)
-        if let encoded = try? JSONEncoder().encode(currentOrder) {
-            paletteOrderData = encoded
+        CommandGroup(replacing: .help) {
+            Link("Opalite Website", destination: URL(string: "https://www.molargiksoftware.com")!)
         }
     }
 }

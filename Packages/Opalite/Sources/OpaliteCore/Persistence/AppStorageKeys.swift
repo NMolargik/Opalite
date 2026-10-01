@@ -32,6 +32,7 @@ nonisolated public enum AppStorageKeys {
 
     // MARK: - SwatchBar
     public static let skipSwatchBarConfirmation = "skipSwatchBarConfirmation"
+    public static let swatchBarSwatchSize = "swatchBarSwatchSize"
 
     // MARK: - Watch relay
     public static let lastWatchSyncTimestamp = "lastWatchSyncTimestamp"

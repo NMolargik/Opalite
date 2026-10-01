@@ -140,6 +140,8 @@ let package = Package(
         .testTarget(name: "OpaliteFeatureSettingsTests", dependencies: ["OpaliteFeatureSettings"], swiftSettings: isolation),
         .testTarget(name: "OpaliteFeatureSwatchBarTests", dependencies: ["OpaliteFeatureSwatchBar"], swiftSettings: isolation),
         .testTarget(name: "OpaliteFeatureOnboardingTests", dependencies: ["OpaliteFeatureOnboarding"], swiftSettings: isolation),
+        .testTarget(name: "OpaliteFeatureImmersiveTests", dependencies: ["OpaliteFeatureImmersive"], swiftSettings: isolation),
+        .testTarget(name: "OpaliteFeatureTVTests", dependencies: ["OpaliteFeatureTV"], swiftSettings: isolation),
         .testTarget(name: "OpaliteCompositionTests", dependencies: ["OpaliteComposition"], swiftSettings: isolation),
     ]
 )

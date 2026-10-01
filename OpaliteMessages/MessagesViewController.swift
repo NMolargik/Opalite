@@ -2,216 +2,105 @@
 //  MessagesViewController.swift
 //  OpaliteMessages
 //
-//  Created by Nick Molargik on 1/18/26.
+//  The iMessage app: a grid of the user's colors (from the App Group snapshot); tapping
+//  one sends a rendered swatch with its name and hex.
 //
 
-import UIKit
 import Messages
 import SwiftUI
+import UIKit
+import OpaliteCore
+import OpaliteDesignSystem
+import os
 
-class MessagesViewController: MSMessagesAppViewController {
-
-    private var hostingController: UIHostingController<ColorPickerView>?
+final class MessagesViewController: MSMessagesAppViewController {
+    private var host: UIHostingController<MessageColorPicker>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupColorPicker()
+        let host = UIHostingController(rootView: makePicker())
+        self.host = host
+        addChild(host)
+        host.view.frame = view.bounds
+        host.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(host.view)
+        host.didMove(toParent: self)
     }
-
-    private func setupColorPicker() {
-        let colorPickerView = ColorPickerView(
-            onColorSelected: { [weak self] color in
-                self?.sendColor(color)
-            },
-            onRequestExpand: { [weak self] in
-                self?.requestPresentationStyle(.expanded)
-            }
-        )
-
-        let hostingController = UIHostingController(rootView: colorPickerView)
-        self.hostingController = hostingController
-
-        addChild(hostingController)
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(hostingController.view)
-
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-
-        hostingController.didMove(toParent: self)
-    }
-
-    private func sendColor(_ color: WidgetColor) {
-        guard let conversation = activeConversation else { return }
-
-        // Render the color swatch as an image
-        let swatchSize = CGSize(width: 300, height: 300)
-        let renderer = ImageRenderer(content: ColorSwatchImage(color: color, size: swatchSize))
-        renderer.scale = UIScreen.main.scale
-
-        guard let uiImage = renderer.uiImage else { return }
-
-        // Create the message layout
-        let layout = MSMessageTemplateLayout()
-        layout.image = uiImage
-        layout.caption = color.displayName
-        layout.subcaption = color.hexString
-
-        // Create and send the message
-        let message = MSMessage()
-        message.layout = layout
-
-        conversation.insert(message) { error in
-            if let error = error {
-                print("Failed to send color message: \(error.localizedDescription)")
-            }
-        }
-
-        // Dismiss to compact after sending
-        dismiss()
-    }
-
-    // MARK: - Conversation Handling
 
     override func willBecomeActive(with conversation: MSConversation) {
-        // Refresh colors when becoming active
-        hostingController?.rootView = ColorPickerView(
-            onColorSelected: { [weak self] color in
-                self?.sendColor(color)
-            },
-            onRequestExpand: { [weak self] in
-                self?.requestPresentationStyle(.expanded)
-            }
+        host?.rootView = makePicker()
+    }
+
+    private func makePicker() -> MessageColorPicker {
+        MessageColorPicker(
+            colors: WidgetColorStorage().loadColors(),
+            onSelect: { [weak self] in self?.send($0) },
+            onExpand: { [weak self] in self?.requestPresentationStyle(.expanded) }
         )
     }
 
-    override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-        // Update the view for the new presentation style
+    private func send(_ color: WidgetColor) {
+        guard let conversation = activeConversation else { return }
+        guard let image = ImageRendering.uiImage(MessageSwatchImage(color: color), size: CGSize(width: 300, height: 300), opaque: true) else { return }
+        let layout = MSMessageTemplateLayout()
+        layout.image = image
+        layout.caption = color.displayName
+        layout.subcaption = color.hexString
+        let message = MSMessage()
+        message.layout = layout
+        message.url = DeepLink.color(color.id).url
+        conversation.insert(message) { error in
+            if let error { Log.sharing.error("Message insert failed: \(error.localizedDescription)") }
+        }
+        dismiss()
     }
 }
 
-// MARK: - SwiftUI Color Picker View
-
-struct ColorPickerView: View {
-    let onColorSelected: (WidgetColor) -> Void
-    let onRequestExpand: () -> Void
-
-    @State private var colors: [WidgetColor] = []
-
-    private let columns = [
-        GridItem(.adaptive(minimum: 70, maximum: 100), spacing: 8)
-    ]
+struct MessageColorPicker: View {
+    let colors: [WidgetColor]
+    let onSelect: (WidgetColor) -> Void
+    let onExpand: () -> Void
 
     var body: some View {
-        Group {
-            if colors.isEmpty {
-                emptyState
-            } else {
-                colorGrid
-            }
-        }
-        .onAppear {
-            colors = WidgetColorStorage.loadColors()
-        }
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "paintpalette")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-
-            Text("No Colors")
-                .font(.headline)
-
-            Text("Open Opalite to create colors")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var colorGrid: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 8) {
-                ForEach(colors) { color in
-                    ColorCell(color: color)
-                        .onTapGesture {
-                            onColorSelected(color)
+        if colors.isEmpty {
+            ContentUnavailableView("No Colors", systemImage: "paintpalette", description: Text("Open Opalite to create colors."))
+        } else {
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 72, maximum: 110), spacing: Brand.Space.sm)], spacing: Brand.Space.sm) {
+                    ForEach(colors) { color in
+                        Button {
+                            onSelect(color)
+                        } label: {
+                            VStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
+                                    .fill(color.swiftUIColor)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .overlay(RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous).strokeBorder(.quaternary))
+                                Text(color.displayName)
+                                    .font(.caption2)
+                                    .lineLimit(1)
+                                    .foregroundStyle(.primary)
+                            }
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(color.displayName), \(color.hexString)")
+                        .accessibilityHint("Sends this color")
+                    }
                 }
+                .padding()
             }
-            .padding()
         }
     }
 }
 
-// MARK: - Color Cell
-
-struct ColorCell: View {
+struct MessageSwatchImage: View {
     let color: WidgetColor
 
     var body: some View {
-        VStack(spacing: 4) {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(color.swiftUIColor)
-                .aspectRatio(1, contentMode: .fit)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(.primary.opacity(0.1), lineWidth: 1)
-                )
-
-            Text(color.displayName)
-                .font(.caption2)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .foregroundStyle(.primary)
-        }
-    }
-}
-
-// MARK: - Color Swatch Image for Sending
-
-struct ColorSwatchImage: View {
-    let color: WidgetColor
-    let size: CGSize
-
-    var body: some View {
-        ZStack {
-            // Color fill
+        ZStack(alignment: .bottomTrailing) {
             color.swiftUIColor
-
-            // Name label in bottom right
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Text(color.displayName)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(color.idealTextColor)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(color.idealTextColor == .white ? .black.opacity(0.3) : .white.opacity(0.3))
-                        )
-                        .padding(12)
-                }
-            }
+            HexBadge(color.displayName, onDark: !color.prefersDarkText, font: .headline)
+                .padding(12)
         }
-        .frame(width: size.width, height: size.height)
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    ColorPickerView(
-        onColorSelected: { _ in },
-        onRequestExpand: { }
-    )
 }

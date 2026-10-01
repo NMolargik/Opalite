@@ -1,0 +1,194 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Show ${color} in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Show ${color} in ${applicationName}",
+              "Open ${color} in ${applicationName}",
+              "Show the color ${color} in ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar ${color} en ${applicationName}"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ${color} dans ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}で${color}を表示"
+          }
+        }
+      }
+    },
+    "Show ${palette} in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Show ${palette} in ${applicationName}",
+              "Open ${palette} in ${applicationName}",
+              "Show the palette ${palette} in ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar ${palette} en ${applicationName}"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ${palette} dans ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}で${palette}を表示"
+          }
+        }
+      }
+    },
+    "Create a color in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Create a color in ${applicationName}",
+              "Save a hex code in ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crear un color en ${applicationName}"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer une couleur dans ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}で色を作成"
+          }
+        }
+      }
+    },
+    "Copy ${color} from ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Copy ${color} from ${applicationName}",
+              "What is the hex code of ${color} in ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar ${color} de ${applicationName}"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier ${color} depuis ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}から${color}をコピー"
+          }
+        }
+      }
+    },
+    "Random color from ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Random color from ${applicationName}",
+              "Surprise me with a color from ${applicationName}"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Color aleatorio de ${applicationName}"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couleur aléatoire de ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}からランダムな色"
+          }
+        }
+      }
+    },
+    "How many colors do I have in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "How many colors do I have in ${applicationName}",
+              "My ${applicationName} portfolio summary"
+            ]
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cuántos colores tengo en ${applicationName}?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Combien de couleurs ai-je dans ${applicationName}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}に色はいくつある"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

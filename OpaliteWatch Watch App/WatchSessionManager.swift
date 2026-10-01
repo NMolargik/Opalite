@@ -2,13 +2,18 @@
 //  WatchSessionManager.swift
 //  OpaliteWatch Watch App
 //
-//  Created by Nick Molargik on 12/29/25.
+//  The watch side of the relay over the Core wire types: receives portfolio snapshots
+//  (application context or direct message), asks the phone to copy a hex, and caches the
+//  last snapshot so the app renders instantly while the phone is away.
 //
 
 import Foundation
+import Observation
 import WatchConnectivity
 import WatchKit
 import WidgetKit
+import OpaliteCore
+import os
 
 enum HexCopyResult: Equatable {
     case copiedImmediately
@@ -18,251 +23,149 @@ enum HexCopyResult: Equatable {
 
 @MainActor
 @Observable
-class WatchSessionManager: NSObject {
-    static let shared = WatchSessionManager()
-
-    private var session: WCSession?
-
-    var isReachable: Bool = false
+final class WatchSessionManager: NSObject {
+    private(set) var isReachable = false
+    private(set) var isSyncing = false
+    private(set) var snapshot: WatchPortfolioSnapshot
     var lastCopyResult: HexCopyResult?
-    var isSyncing: Bool = false
-    var lastSyncTimestamp: Date?
 
-    /// Callback when new data is received from iPhone
-    var onDataReceived: (([WatchColor], [WatchPalette]) -> Void)?
+    @ObservationIgnored private var session: WCSession?
+    @ObservationIgnored private let cache = WatchSnapshotCache(defaults: UserDefaults.standard)
+    @ObservationIgnored private let widgetStore = WatchWidgetStore()
 
     override init() {
+        snapshot = .empty
         super.init()
-        if WCSession.isSupported() {
-            session = WCSession.default
-            session?.delegate = self
-            session?.activate()
-        }
+        if let cached = cache.load() { snapshot = cached }
     }
 
-    // MARK: - Request Sync from iPhone
+    func activate() {
+        guard WCSession.isSupported(), session == nil else { return }
+        let session = WCSession.default
+        session.delegate = self
+        session.activate()
+        self.session = session
+    }
 
-    /// Requests a full sync from the iPhone
+    var hasCachedData: Bool { !snapshot.colors.isEmpty || !snapshot.palettes.isEmpty }
+    var lastSyncDate: Date? { snapshot.timestamp == .distantPast ? nil : snapshot.timestamp }
+
+    // MARK: - Sync
+
+    /// Asks the phone for the full portfolio; falls back to the last application context.
     func requestSync() {
-        guard let session = session, session.isReachable else {
-            #if DEBUG
-            print("[WatchSessionManager] Cannot request sync: iPhone not reachable")
-            #endif
-            // Try to load from application context if available
-            if let context = session?.receivedApplicationContext, !context.isEmpty {
-                processReceivedData(context)
+        guard let session, session.isReachable else {
+            if let context = session?.receivedApplicationContext, let received = WatchPortfolioSnapshot(payload: context) {
+                apply(received)
             }
             return
         }
-
         isSyncing = true
-
-        let message: [String: Any] = ["action": "requestSync"]
-
-        session.sendMessage(message, replyHandler: { [weak self] reply in
+        session.sendMessage([WatchMessageKey.action: WatchAction.requestSync.rawValue], replyHandler: { reply in
+            let received = WatchPortfolioSnapshot(payload: reply)
             Task { @MainActor in
-                self?.processReceivedData(reply)
-                self?.isSyncing = false
+                if let received { self.apply(received) }
+                self.isSyncing = false
             }
-        }, errorHandler: { [weak self] error in
-            Task { @MainActor in
-                self?.isSyncing = false
-                #if DEBUG
-                print("[WatchSessionManager] Sync request failed: \(error)")
-                #endif
-            }
+        }, errorHandler: { error in
+            Log.watch.error("Sync request failed: \(error.localizedDescription)")
+            Task { @MainActor in self.isSyncing = false }
         })
     }
 
-    // MARK: - Process Received Data
-
-    private func processReceivedData(_ data: [String: Any]) {
-        var colors: [WatchColor] = []
-        var palettes: [WatchPalette] = []
-
-        if let colorsArray = data["colors"] as? [[String: Any]] {
-            colors = colorsArray.compactMap { WatchColor(from: $0) }
+    /// Requests a sync and waits briefly for the reply. Returns whether data arrived.
+    @discardableResult
+    func refresh(timeout: Duration = .seconds(2)) async -> Bool {
+        let before = snapshot.timestamp
+        requestSync()
+        let deadline = ContinuousClock.now.advanced(by: timeout)
+        while ContinuousClock.now < deadline, snapshot.timestamp == before {
+            try? await Task.sleep(for: .milliseconds(100))
         }
+        return snapshot.timestamp != before
+    }
 
-        if let palettesArray = data["palettes"] as? [[String: Any]] {
-            palettes = palettesArray.compactMap { WatchPalette(from: $0) }
-        }
-
-        if let timestamp = data["syncTimestamp"] as? TimeInterval {
-            lastSyncTimestamp = Date(timeIntervalSince1970: timestamp)
-        }
-
-        #if DEBUG
-        print("[WatchSessionManager] Received \(colors.count) colors and \(palettes.count) palettes")
-        #endif
-
-        // Save to local storage
-        saveToLocalStorage(colors: colors, palettes: palettes)
-
-        // Save to widget shared storage and refresh widget timelines
-        WatchWidgetStorage.saveColors(colors)
+    private func apply(_ received: WatchPortfolioSnapshot) {
+        snapshot = received
+        cache.save(received)
+        widgetStore.save(received.colors)
         WidgetCenter.shared.reloadAllTimelines()
-
-        // Notify listeners
-        onDataReceived?(colors, palettes)
     }
 
-    // MARK: - Local Storage
+    // MARK: - Copy hex on the phone
 
-    private let colorsKey = "watchColors"
-    private let palettesKey = "watchPalettes"
-    private let lastSyncKey = "lastSyncTimestamp"
-
-    private func saveToLocalStorage(colors: [WatchColor], palettes: [WatchPalette]) {
-        let encoder = JSONEncoder()
-
-        if let colorsData = try? encoder.encode(colors) {
-            UserDefaults.standard.set(colorsData, forKey: colorsKey)
-        }
-
-        if let palettesData = try? encoder.encode(palettes) {
-            UserDefaults.standard.set(palettesData, forKey: palettesKey)
-        }
-
-        if let timestamp = lastSyncTimestamp {
-            UserDefaults.standard.set(timestamp.timeIntervalSince1970, forKey: lastSyncKey)
-        }
-    }
-
-    func loadFromLocalStorage() -> (colors: [WatchColor], palettes: [WatchPalette]) {
-        let decoder = JSONDecoder()
-        var colors: [WatchColor] = []
-        var palettes: [WatchPalette] = []
-
-        if let colorsData = UserDefaults.standard.data(forKey: colorsKey),
-           let decoded = try? decoder.decode([WatchColor].self, from: colorsData) {
-            colors = decoded
-        }
-
-        if let palettesData = UserDefaults.standard.data(forKey: palettesKey),
-           let decoded = try? decoder.decode([WatchPalette].self, from: palettesData) {
-            palettes = decoded
-        }
-
-        if let timestamp = UserDefaults.standard.object(forKey: lastSyncKey) as? TimeInterval {
-            lastSyncTimestamp = Date(timeIntervalSince1970: timestamp)
-        }
-
-        return (colors, palettes)
-    }
-
-    // MARK: - Copy Hex to iPhone
-
-    /// Sends a hex code to the iPhone to be copied to clipboard.
-    /// Uses `sendMessage` when the iPhone is reachable, falls back to `transferUserInfo`
-    /// to queue the request for later delivery when the iPhone is unavailable.
-    func copyHexToiPhone(_ hex: String, colorName: String?) {
-        guard let session = session else {
-            WKInterfaceDevice.current().play(.failure)
+    func copyHexToPhone(_ hex: String, colorName: String?) {
+        guard let session else {
             lastCopyResult = .failed
+            WKInterfaceDevice.current().play(.failure)
             return
         }
-
         let payload: [String: Any] = [
-            "action": "copyHex",
-            "hex": hex,
-            "colorName": colorName ?? ""
+            WatchMessageKey.action: WatchAction.copyHex.rawValue,
+            WatchMessageKey.hex: hex,
+            WatchMessageKey.colorName: colorName ?? "",
         ]
-
         if session.isReachable {
-            session.sendMessage(payload, replyHandler: { [weak self] reply in
-                Task { @MainActor in
-                    if let success = reply["success"] as? Bool, success {
-                        if let queued = reply["queued"] as? Bool, queued {
-                            self?.lastCopyResult = .queued
-                            WKInterfaceDevice.current().play(.start)
-                        } else {
-                            self?.lastCopyResult = .copiedImmediately
-                            WKInterfaceDevice.current().play(.success)
-                        }
-                    } else {
-                        self?.lastCopyResult = .failed
-                        WKInterfaceDevice.current().play(.failure)
-                    }
-                }
-            }, errorHandler: { [weak self] error in
-                Task { @MainActor in
-                    #if DEBUG
-                    print("[WatchSessionManager] sendMessage failed, falling back to transferUserInfo: \(error)")
-                    #endif
-                    self?.queueCopyViaTransfer(session: session, payload: payload)
-                }
+            session.sendMessage(payload, replyHandler: { reply in
+                let result = WatchReply(dictionary: reply)
+                Task { @MainActor in self.finishCopy(result) }
+            }, errorHandler: { _ in
+                Task { @MainActor in self.queueCopy(payload) }
             })
         } else {
-            queueCopyViaTransfer(session: session, payload: payload)
+            queueCopy(payload)
         }
     }
 
-    /// Queues a hex copy request via `transferUserInfo` for delivery when the iPhone is next available.
-    private func queueCopyViaTransfer(session: WCSession, payload: [String: Any]) {
-        // Cancel any outstanding copyHex transfers to avoid duplicates
-        for transfer in session.outstandingUserInfoTransfers {
-            if let action = transfer.userInfo["action"] as? String, action == "copyHex" {
-                transfer.cancel()
-            }
+    private func finishCopy(_ reply: WatchReply) {
+        switch reply {
+        case .success(let queued):
+            lastCopyResult = queued ? .queued : .copiedImmediately
+            WKInterfaceDevice.current().play(queued ? .start : .success)
+        case .failure:
+            lastCopyResult = .failed
+            WKInterfaceDevice.current().play(.failure)
         }
+    }
 
+    private func queueCopy(_ payload: [String: Any]) {
+        guard let session else { return }
+        for transfer in session.outstandingUserInfoTransfers where transfer.userInfo[WatchMessageKey.action] as? String == WatchAction.copyHex.rawValue {
+            transfer.cancel()
+        }
         session.transferUserInfo(payload)
         lastCopyResult = .queued
         WKInterfaceDevice.current().play(.start)
-        #if DEBUG
-        print("[WatchSessionManager] Queued hex copy via transferUserInfo: \(payload["hex"] ?? "")")
-        #endif
     }
 }
 
-// MARK: - WCSessionDelegate
-
 extension WatchSessionManager: WCSessionDelegate {
-    nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
+        if let error { Log.watch.error("Activation error: \(error.localizedDescription)") }
+        let reachable = session.isReachable
+        let received = WatchPortfolioSnapshot(payload: session.receivedApplicationContext)
         Task { @MainActor in
-            self.isReachable = session.isReachable
-
-            // Check for any pending application context
-            if !session.receivedApplicationContext.isEmpty {
-                self.processReceivedData(session.receivedApplicationContext)
-            }
+            self.isReachable = reachable
+            if let received { self.apply(received) }
         }
-        #if DEBUG
-        if let error = error {
-            print("[WatchSessionManager] Activation error: \(error)")
-        } else {
-            print("[WatchSessionManager] Activated with state: \(activationState.rawValue)")
-        }
-        #endif
     }
 
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        let reachable = session.isReachable
         Task { @MainActor in
-            self.isReachable = session.isReachable
-
-            // When iPhone becomes reachable, request a sync
-            if session.isReachable {
-                self.requestSync()
-            }
+            self.isReachable = reachable
+            if reachable { self.requestSync() }
         }
     }
 
-    /// Called when iPhone sends new application context
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        Task { @MainActor in
-            self.processReceivedData(applicationContext)
-        }
+        let received = WatchPortfolioSnapshot(payload: applicationContext)
+        Task { @MainActor in if let received { self.apply(received) } }
     }
 
-    /// Called when iPhone sends a direct message
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        guard let action = message["action"] as? String else { return }
-
-        if action == "syncData" {
-            Task { @MainActor in
-                self.processReceivedData(message)
-            }
-        }
+        guard message[WatchMessageKey.action] as? String == WatchAction.syncData.rawValue else { return }
+        let received = WatchPortfolioSnapshot(payload: message)
+        Task { @MainActor in if let received { self.apply(received) } }
     }
 }

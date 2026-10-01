@@ -1,332 +1,119 @@
-import SwiftUI
+//
+//  OpaliteApp.swift
+//  Opalite
+//
+//  Thin shell: builds the SessionController (composition root in OpaliteComposition),
+//  registers it for App Intents, hosts the main window, the SwatchBar window, and the
+//  visionOS immersive space, and owns what only an app process can: scene-phase work,
+//  Home Screen quick actions, and TipKit configuration. All feature code lives in
+//  Packages/Opalite.
+//
+
+import AppIntents
 import SwiftData
+import SwiftUI
 import TipKit
-import WidgetKit
-import CoreData
+import OpaliteComposition
+import OpaliteCore
+import OpaliteData
+import OpaliteDesignSystem
+import os
+#if os(visionOS)
+import OpaliteFeatureImmersive
+#endif
 
 @main
-@MainActor
 struct OpaliteApp: App {
-    #if os(iOS)
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    #endif
-
+    @UIApplicationDelegateAdaptor(QuickActionAppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.openWindow) private var openWindow
 
-    @AppStorage(AppStorageKeys.userName) private var userName: String = "User"
-
-    let sharedModelContainer: ModelContainer
-    let colorManager: ColorManager
-    let canvasManager: CanvasManager
-    let communityManager = CommunityManager()
-    let toastManager = ToastManager()
-    let subscriptionManager = SubscriptionManager()
-    let reviewRequestManager = ReviewRequestManager()
-    let importCoordinator = ImportCoordinator()
-    let quickActionManager = QuickActionManager()
-    let hexCopyManager = HexCopyManager()
-    let immersiveColorManager = ImmersiveColorManager()
-
-    #if os(iOS)
-    let phoneSessionManager = PhoneSessionManager.shared
+    @State private var quickActions = QuickActionRelay.shared
+    private let session: SessionController
+    #if os(visionOS)
+    @State private var immersive = ImmersiveColorModel()
     #endif
+
+    /// True when the process is hosting a unit-test bundle. Under the test host the app
+    /// must avoid CloudKit (which traps on a simulator with no signed-in iCloud account).
+    static var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            || ProcessInfo.processInfo.environment["XCTestBundlePath"] != nil
+            || NSClassFromString("XCTestCase") != nil
+    }
+
+    /// One CloudKit-free container for the whole test-host process, backed by a unique
+    /// on-disk temp store (in-memory stores crash SwiftData on the first fetch in the
+    /// simulator, and SwiftUI may construct the `App` value more than once at launch).
+    private static let testContainer: ModelContainer = (try? OpaliteStore.makeTemporaryContainer()) ?? OpaliteStore.makeContainer(inMemory: true)
 
     init() {
-        let schema = Schema([
-            OpaliteColor.self,
-            OpalitePalette.self,
-            CanvasFile.self
-        ])
-
-        let cloudKitContainerID = "iCloud.com.molargiksoftware.Opalite"
-        let config = ModelConfiguration(
-            schema: schema,
-            cloudKitDatabase: .private(cloudKitContainerID)
+        let session = SessionController(
+            container: Self.isRunningTests ? Self.testContainer : nil,
+            indexer: Self.isRunningTests ? nil : SpotlightIndexer(),
+            reviewRequester: AppStoreReviewRequester(),
+            intentDonor: Self.isRunningTests ? nil : IntentDonor(),
+            activityAnnotator: EntityActivityAnnotator(),
+            vocabulary: Self.isRunningTests ? nil : ShortcutVocabularyUpdater()
         )
+        self.session = session
 
-        do {
-            sharedModelContainer = try ModelContainer(
-                for: schema,
-                configurations: [config]
-            )
-        } catch {
-            fatalError("[Opalite] Failed to initialize ModelContainer: \(error)")
+        // Expose the session to App Intents (Siri, Shortcuts, Spotlight).
+        AppDependencyManager.shared.add(dependency: session)
+
+        if !Self.isRunningTests {
+            try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
         }
-
-        colorManager = ColorManager(context: sharedModelContainer.mainContext)
-        canvasManager = CanvasManager(context: sharedModelContainer.mainContext)
-
-        // Listen for remote CloudKit changes so the in-memory cache stays current
-        NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSPersistentStoreRemoteChange,
-            object: nil,
-            queue: .main
-        ) { [colorManager, canvasManager] _ in
-            Task { @MainActor in
-                await colorManager.refreshAll()
-                await canvasManager.refreshAll()
-            }
-        }
-
-        #if os(iOS)
-        phoneSessionManager.colorManager = colorManager
-        #endif
-
-        try? Tips.configure([
-            .displayFrequency(.immediate),
-            .datastoreLocation(.applicationDefault)
-        ])
     }
 
     var body: some Scene {
         WindowGroup(id: "main") {
-            ContentView()
-                .toastContainer()
-                .onChange(of: scenePhase) { _, newPhase in
-                    handleScenePhaseChange(newPhase)
+            RootView(session: session)
+                .modelContainer(session.container)
+                .onOpenURL { url in session.handle(url: url) }
+                .onChange(of: scenePhase) { _, phase in
+                    guard phase == .active else { return }
+                    Task { await session.becameActive() }
+                    consumeQuickAction()
                 }
+                .onChange(of: quickActions.url) { _, _ in consumeQuickAction() }
                 .task {
-                    colorManager.author = userName
-                    communityManager.publisherName = userName
-                    syncColorsToWidgetStorage()
-                    #if os(iOS)
-                    phoneSessionManager.syncToWatch()
-                    #endif
+                    session.start()
+                    consumeQuickAction()
                 }
-                .onChange(of: userName) { _, newName in
-                    colorManager.author = newName
-                    communityManager.publisherName = newName
-                }
-                .onOpenURL { url in
-                    handleDeepLink(url)
-                }
-                .sheet(isPresented: Binding(
-                    get: { importCoordinator.isShowingColorImport },
-                    set: { importCoordinator.isShowingColorImport = $0 }
-                )) {
-                    if let preview = importCoordinator.pendingColorImport {
-                        ColorImportConfirmationSheet(preview: preview) {
-                            Task { await colorManager.refreshAll() }
-                        }
-                        .environment(colorManager)
-                    }
-                }
-                .sheet(isPresented: Binding(
-                    get: { importCoordinator.isShowingPaletteImport },
-                    set: { importCoordinator.isShowingPaletteImport = $0 }
-                )) {
-                    if let preview = importCoordinator.pendingPaletteImport {
-                        PaletteImportConfirmationSheet(preview: preview) {
-                            Task { await colorManager.refreshAll() }
-                        }
-                        .environment(colorManager)
-                    }
-                }
-                .alert("Import Error", isPresented: Binding(
-                    get: { importCoordinator.showingImportError },
-                    set: { importCoordinator.showingImportError = $0 }
-                )) {
-                    Button("OK", role: .cancel) {
-                        HapticsManager.shared.selection()
-                    }
-                } message: {
-                    Text(importCoordinator.importError?.errorDescription ?? "An unknown error occurred.")
-                }
-        }
-        .opaliteEnvironment(
-            modelContainer: sharedModelContainer,
-            colorManager: colorManager,
-            canvasManager: canvasManager,
-            communityManager: communityManager,
-            toastManager: toastManager,
-            subscriptionManager: subscriptionManager,
-            quickActionManager: quickActionManager,
-            hexCopyManager: hexCopyManager,
-            reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator,
-            immersiveColorManager: immersiveColorManager
-        )
-        .commands {
-            OpaliteCommands(
-                colorManager: colorManager,
-                canvasManager: canvasManager,
-                subscriptionManager: subscriptionManager,
-                toastManager: toastManager,
-                quickActionManager: quickActionManager,
-                hexCopyManager: hexCopyManager,
-                reviewRequestManager: reviewRequestManager
-            )
-        }
-
-#if os(macOS)
-        Window("SwatchBar", id: "swatchBar") {
-            SwatchBarView()
-                .toastContainer()
-                .task {
-                    await colorManager.refreshAll()
-                }
-        }
-        .opaliteEnvironment(
-            modelContainer: sharedModelContainer,
-            colorManager: colorManager,
-            canvasManager: canvasManager,
-            communityManager: communityManager,
-            toastManager: toastManager,
-            subscriptionManager: subscriptionManager,
-            quickActionManager: quickActionManager,
-            hexCopyManager: hexCopyManager,
-            reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator,
-            immersiveColorManager: immersiveColorManager
-        )
-        .windowResizability(.contentSize)
-        .defaultSize(width: 250, height: 1000)
-#elseif os(iOS) || os(visionOS)
-        WindowGroup(id: "swatchBar") {
-            SwatchBarView()
-                .toastContainer()
-                .task {
-                    await colorManager.refreshAll()
-                }
-                #if os(iOS)
-                .onAppear {
-                    colorManager.isSwatchBarOpen = true
-                    AppDelegate.registerSwatchBarSceneSession()
-                }
-                .onDisappear {
-                    colorManager.isSwatchBarOpen = false
-                    AppDelegate.swatchBarSceneSession = nil
-                }
+                #if os(visionOS)
+                .environment(immersive)
                 #endif
         }
-        .handlesExternalEvents(matching: Set(arrayLiteral: "swatchBar"))
-        .opaliteEnvironment(
-            modelContainer: sharedModelContainer,
-            colorManager: colorManager,
-            canvasManager: canvasManager,
-            communityManager: communityManager,
-            toastManager: toastManager,
-            subscriptionManager: subscriptionManager,
-            quickActionManager: quickActionManager,
-            hexCopyManager: hexCopyManager,
-            reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator,
-            immersiveColorManager: immersiveColorManager
-        )
-        .windowResizability(.contentSize)
-        .defaultSize(width: 250, height: 1000)
-#endif
+        .handlesExternalEvents(matching: ["main", "color", "palette", "canvas", "create", "sample", "shared", "community", "search", "settings", "onyx"])
+        .commands {
+            OpaliteCommands(session: session)
+        }
+        .windowResizability(.contentMinSize)
 
-#if os(visionOS)
+        WindowGroup(id: SwatchBarScene.windowID) {
+            SwatchBarRootView(session: session)
+                .modelContainer(session.container)
+                #if os(visionOS)
+                .environment(immersive)
+                #endif
+        }
+        .handlesExternalEvents(matching: ["swatchBar"])
+        .defaultSize(width: SwatchBarScene.defaultSize.width, height: SwatchBarScene.defaultSize.height)
+        .windowResizability(.contentMinSize)
+
+        #if os(visionOS)
         ImmersiveSpace(id: "colorConstellation") {
             ColorConstellationView()
+                .environment(immersive)
         }
         .immersionStyle(selection: .constant(.full), in: .full)
-        .opaliteEnvironment(
-            modelContainer: sharedModelContainer,
-            colorManager: colorManager,
-            canvasManager: canvasManager,
-            communityManager: communityManager,
-            toastManager: toastManager,
-            subscriptionManager: subscriptionManager,
-            quickActionManager: quickActionManager,
-            hexCopyManager: hexCopyManager,
-            reviewRequestManager: reviewRequestManager,
-            importCoordinator: importCoordinator,
-            immersiveColorManager: immersiveColorManager
-        )
-#endif
-    }
-
-    // MARK: - Scene Phase
-
-    private func handleScenePhaseChange(_ newPhase: ScenePhase) {
-        Task { @MainActor in
-            await colorManager.refreshAll()
-            await canvasManager.refreshAll()
-            if newPhase == .active {
-                await subscriptionManager.processUnfinishedTransactions()
-                await subscriptionManager.updatePurchasedProducts()
-            }
-            syncColorsToWidgetStorage()
-
-            #if os(iOS)
-            phoneSessionManager.syncToWatch()
-            #endif
-        }
-
-        #if os(iOS)
-        if newPhase == .active {
-            if let copiedHex = phoneSessionManager.processPendingHexCopy() {
-                toastManager.showSuccess("Copied \(copiedHex) from Watch")
-            }
-
-            if let shortcutType = AppDelegate.pendingShortcutType {
-                AppDelegate.pendingShortcutType = nil
-                if shortcutType == "OpenSwatchBarAction" {
-                    AppDelegate.openSwatchBarWindow()
-                } else if shortcutType == "CreateNewColorAction" {
-                    quickActionManager.requestCreateNewColor()
-                } else if shortcutType == "SamplePhotoAction" {
-                    quickActionManager.requestSamplePhoto()
-                }
-            }
-        }
         #endif
     }
 
-    // MARK: - Deep Linking
-
-    private func handleDeepLink(_ url: URL) {
-        if url.scheme == "opalite" && url.host == "swatchBar" {
-            #if os(iOS)
-            if AppDelegate.swatchBarSceneSession != nil {
-                AppDelegate.openSwatchBarWindow()
-            } else {
-                openWindow(id: "swatchBar")
-            }
-            #else
-            openWindow(id: "swatchBar")
-            #endif
-            return
-        }
-
-        if url.scheme == "opalite" && url.host == "sharedImage" {
-            return
-        }
-
-        if url.scheme == "opalite" && url.host == "color" {
-            let pathComponents = url.pathComponents
-            if pathComponents.count >= 2,
-               let colorID = UUID(uuidString: pathComponents[1]) {
-                IntentNavigationManager.shared.navigateToColor(id: colorID)
-            }
-            return
-        }
-
-        if url.scheme == "opalite" && url.host == "createColor" {
-            IntentNavigationManager.shared.showColorEditor()
-            return
-        }
-
-        importCoordinator.handleIncomingURL(url, colorManager: colorManager)
-    }
-
-    // MARK: - Widget Sync
-
-    private func syncColorsToWidgetStorage() {
-        let widgetColors = colorManager.colors.map { color in
-            WidgetColor(
-                id: color.id,
-                name: color.name,
-                red: color.red,
-                green: color.green,
-                blue: color.blue,
-                alpha: color.alpha
-            )
-        }
-        WidgetColorStorage.saveColors(widgetColors)
-        WidgetCenter.shared.reloadAllTimelines()
+    /// Routes a Home Screen quick action through the same deep-link path as URLs.
+    private func consumeQuickAction() {
+        guard let url = quickActions.url else { return }
+        quickActions.url = nil
+        session.handle(url: url)
     }
 }

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import OpaliteCore
+import OpaliteDesignSystem
 
 struct WatchSwatchView: View {
     let color: WatchColor

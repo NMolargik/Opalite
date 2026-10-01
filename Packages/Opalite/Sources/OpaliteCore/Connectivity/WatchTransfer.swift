@@ -252,3 +252,25 @@ nonisolated public struct WatchSnapshotCache: Sendable {
         return WatchPortfolioSnapshot(colors: colors, palettes: palettes, timestamp: timestamp)
     }
 }
+
+// MARK: - Watch widget store
+
+/// The recent-colors snapshot the watch app writes for its complication/widget.
+nonisolated public struct WatchWidgetStore: Sendable {
+    public static let colorsKey = "watchWidgetColors"
+    private let defaults: (any KeyValueStoring)?
+
+    public init(defaults: (any KeyValueStoring)? = AppGroup.watchDefaults) { self.defaults = defaults }
+
+    public func save(_ colors: [WatchColor]) {
+        guard let data = try? JSONEncoder().encode(colors) else { return }
+        defaults?.set(data, forKey: Self.colorsKey)
+    }
+
+    /// The most recently created colors, newest first.
+    public func recentColors(limit: Int = 3) -> [WatchColor] {
+        guard let data = defaults?.data(forKey: Self.colorsKey),
+              let colors = try? JSONDecoder().decode([WatchColor].self, from: data) else { return [] }
+        return Array(colors.sorted { $0.createdAt > $1.createdAt }.prefix(limit))
+    }
+}
