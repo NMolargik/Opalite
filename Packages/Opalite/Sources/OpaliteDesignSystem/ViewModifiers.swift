@@ -173,6 +173,42 @@ extension View {
 
 // MARK: - OS-gated navigation chrome
 
+/// Hands its content whether the tab-bar accessory is in its compact *inline* placement
+/// (the tab bar minimized, iOS 26+). Always `false` where accessories don't exist, so
+/// feature code never touches the iOS 26 environment key directly.
+public struct TabAccessoryPlacementReader<Content: View>: View {
+    private let content: (Bool) -> Content
+
+    public init(@ContentBuilder content: @escaping (Bool) -> Content) {
+        self.content = content
+    }
+
+    public var body: some View {
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+        if #available(iOS 26.0, *) {
+            InlinePlacementReader(content: content)
+        } else {
+            content(false)
+        }
+        #else
+        content(false)
+        #endif
+    }
+}
+
+#if os(iOS) && !targetEnvironment(macCatalyst)
+@available(iOS 26.0, *)
+private struct InlinePlacementReader<Content: View>: View {
+    let content: (Bool) -> Content
+    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
+
+    var body: some View {
+        content(placement == .inline)
+    }
+}
+#endif
+
+
 extension View {
     /// Attaches a tab-bar bottom accessory (iPhone/iPad, iOS 26+). The accessory is
     /// always present, so give it content worth the space. No-op elsewhere.

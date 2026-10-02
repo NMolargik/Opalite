@@ -300,6 +300,7 @@ public struct SwatchBarView: View {
 
     private var quickAddBar: some View {
         let state = model.quickAddState(in: portfolio)
+        let reduceMotion = reduceMotion
         return VStack(alignment: .leading, spacing: Brand.Space.xs) {
             HStack(spacing: Brand.Space.sm) {
                 quickAddPreview(state)

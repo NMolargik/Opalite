@@ -255,11 +255,13 @@ private struct PortfolioAccessory: View {
     let paletteCount: Int
     let onNewColor: () -> Void
 
-    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
-
-    private var isInline: Bool { placement == .inline }
-
     var body: some View {
+        TabAccessoryPlacementReader { isInline in
+            content(isInline: isInline)
+        }
+    }
+
+    private func content(isInline: Bool) -> some View {
         HStack(spacing: Brand.Space.sm) {
             Image(systemName: "paintpalette.fill")
                 .symbolRenderingMode(.hierarchical)

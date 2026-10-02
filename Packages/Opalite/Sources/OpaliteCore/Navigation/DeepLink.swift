@@ -38,7 +38,8 @@ nonisolated public enum DeepLink: Equatable, Sendable, Hashable {
         case "portfolio": self = .portfolio
         case "community": self = .community
         case "search": self = .search
-        case "canvases", "canvas" where idComponent == nil: self = .canvases
+        case "canvases": self = .canvases
+        case "canvas" where idComponent == nil: self = .canvases
         case "settings": self = .settings
         case "onyx": self = .onyx
         case "createcolor", "create-color": self = .createColor
