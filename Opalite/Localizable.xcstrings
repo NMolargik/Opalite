@@ -73,6 +73,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ %@, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ %@, %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ %@, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ %@、%@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ (%@)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -140,6 +164,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@前"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@ harmony wheel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rueda de armonía %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roue d'harmonie %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ハーモニーホイール"
           }
         }
       },
@@ -452,6 +500,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@、%lld色、%@による"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@, palette name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, nombre de la paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, nom de la palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@、パレット名"
           }
         }
       },
@@ -1249,6 +1321,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Aa" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aa"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aa"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "About" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1609,6 +1705,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Add a color, or drag swatches here from your Portfolio." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade un color o arrastra muestras aquí desde tu Portafolio."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une couleur ou glissez des échantillons ici depuis votre Portfolio."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーを追加するか、ポートフォリオからスウォッチをここにドラッグしてください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Add a hex, like 4A90E2" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1628,6 +1748,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "4A90E2のような16進コードを入力"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add a tag" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una etiqueta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグを追加"
           }
         }
       },
@@ -1796,6 +1940,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iPhone、iPad、またはMacでこのパレットにカラーを追加してください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add tag" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir etiqueta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter l'étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグを追加"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add to Palette…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a una paleta…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à une palette…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パレットに追加…"
           }
         }
       },
@@ -2012,6 +2204,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このカラーを読み込みリストに追加します"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Adds this color to your Portfolio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade este color a tu Portafolio"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute cette couleur à votre Portfolio"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このカラーをポートフォリオに追加します"
           }
         }
       },
@@ -2593,6 +2809,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Archive…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivar…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archiver…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アーカイブ…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Arrow" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2756,6 +2996,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "戻る"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Back to Portfolio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver al Portafolio"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour au Portfolio"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポートフォリオに戻る"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Background" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrière-plan"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背景"
           }
         }
       },
@@ -3721,6 +4009,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Choose a comparison color to check contrast" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un color de comparación para comprobar el contraste"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une couleur de comparaison pour vérifier le contraste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラストを確認する比較カラーを選択してください"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Choose a format to continue" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3985,6 +4297,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Clear comparison" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar comparación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer la comparaison"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比較をクリア"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Clear staged colors" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4196,6 +4532,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーの詳細"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Color Not Found" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color no encontrado"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couleur introuvable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーが見つかりません"
           }
         }
       },
@@ -4609,6 +4969,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Colors you add appear here." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los colores que añadas aparecerán aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les couleurs que vous ajoutez apparaissent ici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加したカラーはここに表示されます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Colors you create, sample, or import live here. Group them into palettes when you're ready." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4801,6 +5185,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Compare with a hex code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparar con un código hex"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparer avec un code hex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16進コードと比較"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Comparison hex code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código hex de comparación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code hex de comparaison"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比較用16進コード"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Complementary" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4988,6 +5420,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "紹介に進みます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Contrast" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraste"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト"
           }
         }
       },
@@ -5972,6 +6428,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーまたはパレットを作成するか、ファイルを読み込みます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Creates a new color in this palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un color nuevo en esta paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crée une nouvelle couleur dans cette palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパレットに新しいカラーを作成します"
           }
         }
       },
@@ -7465,6 +7945,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Duplicate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dupliquer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Duplicated %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8065,6 +8569,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Exit Full Screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de pantalla completa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter le plein écran"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全画面表示を終了"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Exit full screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de pantalla completa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter le plein écran"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全画面表示を終了"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Expand All" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8156,6 +8708,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "書き出しに失敗しました：%@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Export or share this color" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar o compartir este color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter ou partager cette couleur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このカラーを書き出すか共有します"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Export or share this palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar o compartir esta paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter ou partager cette palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパレットを書き出すか共有します"
           }
         }
       },
@@ -8324,6 +8924,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像を生成できませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Family" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familia"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Famille"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系統"
           }
         }
       },
@@ -8612,6 +9236,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "From your Portfolio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De tu Portafolio"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis votre Portfolio"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポートフォリオから"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Full Screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pantalla completa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plein écran"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全画面表示"
           }
         }
       },
@@ -9217,6 +9889,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Harmony" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Armonía"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harmonie"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハーモニー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Help keep the Community safe. Reports are anonymous, and content is hidden automatically once %lld people report it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9380,6 +10076,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーの16進コード"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Hex with Alpha" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex con alfa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex avec alpha"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルファ付き16進"
           }
         }
       },
@@ -10369,6 +11089,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Last edited on" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última edición en"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière modification sur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終編集デバイス"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Learn More" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10657,6 +11401,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Link a canvas to sketch with this palette's colors. The SwatchBar picks up its ink from here." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vincula un lienzo para dibujar con los colores de esta paleta. La SwatchBar toma su tinta de aquí."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liez un canevas pour dessiner avec les couleurs de cette palette. La SwatchBar y puise son encre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンバスをリンクすると、このパレットのカラーでスケッチできます。SwatchBarはここからインクを取得します。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Linked %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10892,6 +11660,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "報告を読み込み中…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Loose" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suelto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未分類"
           }
         }
       },
@@ -11545,6 +12337,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Move…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11900,6 +12716,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しいパレット名"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "New tag" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiqueta nueva"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいタグ"
           }
         }
       },
@@ -13513,6 +14353,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Open Canvas" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir lienzo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le canevas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンバスを開く"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Open Editor" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14473,6 +15337,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Palette Not Found" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paleta no encontrada"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette introuvable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パレットが見つかりません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Palette already saved" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15356,6 +16244,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレビュー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Preview background" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo de la vista previa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrière-plan de l'aperçu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビューの背景"
           }
         }
       },
@@ -18385,6 +19297,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Saving…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardando…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrement…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存中…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Screen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20713,6 +21649,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Tags help you find palettes in Search and are published with the palette." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las etiquetas te ayudan a encontrar paletas en Buscar y se publican junto con la paleta."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les étiquettes vous aident à retrouver vos palettes dans Rechercher et sont publiées avec la palette."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグは検索でパレットを見つけるのに役立ち、パレットと一緒に公開されます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Tags: \\(palette.tags.joined(separator: " : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21073,6 +22033,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Text on this color" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto sobre este color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texte sur cette couleur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このカラー上のテキスト"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Thank you to all of our amazing TestFlight testers!" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21284,6 +22268,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キャンバスは空です"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The canvas stays in your Canvases; it just won't be attached to this palette." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El lienzo permanece en tus Lienzos; solo dejará de estar vinculado a esta paleta."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le canevas reste dans vos Canevas; il ne sera simplement plus rattaché à cette palette."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンバスはキャンバス一覧に残ります。このパレットとのリンクだけが解除されます。"
           }
         }
       },
@@ -21553,6 +22561,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "This color as text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este color como texto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette couleur en texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このカラーをテキストに"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "This color may have been deleted on another device." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21620,6 +22652,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この書き出しはこのデバイスでは利用できません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "This is a loose color. Add it to a palette to keep related colors together." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este es un color suelto. Añádelo a una paleta para mantener juntos los colores relacionados."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette couleur est libre. Ajoutez-la à une palette pour regrouper les couleurs apparentées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これは未分類のカラーです。パレットに追加して、関連するカラーをまとめましょう。"
           }
         }
       },
@@ -21860,6 +22916,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ティント"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Tints, Shades & Tones" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tintes, sombras y tonos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teintes claires, teintes foncées et tons"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ティント・シェード・トーン"
           }
         }
       },
@@ -22561,6 +23641,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Unlink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desvincular"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dissocier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンク解除"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Unlink %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -22604,6 +23708,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パレットのリンクを解除"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Unlink the canvas?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Desvincular el lienzo?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dissocier le canevas?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンバスのリンクを解除しますか？"
           }
         }
       },
@@ -22921,6 +24049,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Use this hex code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar este código hex"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser ce code hex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この16進コードを使用"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "User" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23108,6 +24260,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "鮮やか"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "WCAG %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG %@"
           }
         }
       },
@@ -23329,6 +24505,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "What this palette is for, where it's used, what inspired it…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para qué sirve esta paleta, dónde se usa, qué la inspiró…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À quoi sert cette palette, où elle est utilisée, ce qui l'a inspirée…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパレットの用途、使用場所、インスピレーション…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "What will happen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23372,6 +24572,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "どんなストーリーがありますか？"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Where you found it, where it works, what it pairs with…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dónde lo encontraste, dónde funciona, con qué combina…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où vous l'avez trouvée, où elle fonctionne, avec quoi elle s'accorde…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見つけた場所、合う場面、相性のよい色…"
           }
         }
       },
@@ -24236,6 +25460,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "contrast ratio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "relación de contraste"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rapport de contraste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト比"
           }
         }
       },
