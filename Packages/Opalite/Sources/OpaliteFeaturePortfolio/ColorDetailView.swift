@@ -616,7 +616,7 @@ private struct ContrastCheckerCard: View {
                         Capsule(style: .continuous)
                             .fill(contrast.comparison == preset.rgba ? Color.accentColor.opacity(0.25) : Color.clear)
                     )
-                    .overlay(Capsule(style: .continuous).strokeBorder(contrast.comparison == preset.rgba ? Color.accentColor : .quaternary))
+                    .overlay(Capsule(style: .continuous).strokeBorder(contrast.comparison == preset.rgba ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.quaternary)))
                 }
                 .buttonStyle(.plain)
                 .hoverLift()
