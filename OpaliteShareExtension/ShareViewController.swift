@@ -31,18 +31,13 @@ final class ShareViewController: UIViewController {
         complete(success: true)
     }
 
+    /// Asks for the image's bytes directly, which covers file-backed and in-memory
+    /// providers alike without the deprecated `loadItem` path.
     private func loadImage(from provider: NSItemProvider) async -> UIImage? {
         await withCheckedContinuation { continuation in
-            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, error in
+            _ = provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                 if let error { Log.sharing.error("Share image load failed: \(error.localizedDescription)") }
-                let image: UIImage?
-                switch item {
-                case let url as URL: image = (try? Data(contentsOf: url)).flatMap(UIImage.init(data:))
-                case let data as Data: image = UIImage(data: data)
-                case let uiImage as UIImage: image = uiImage
-                default: image = nil
-                }
-                continuation.resume(returning: image)
+                continuation.resume(returning: data.flatMap(UIImage.init(data:)))
             }
         }
     }

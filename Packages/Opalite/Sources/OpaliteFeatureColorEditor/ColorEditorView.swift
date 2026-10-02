@@ -189,7 +189,8 @@ public struct ColorEditorView: View {
         ToolbarSpacerIfAvailable(.fixed, placement: .topBarTrailing)
 
         // Number pads have no return key and the notes field's return inserts a newline,
-        // so every field gets the same way out.
+        // so every field gets the same way out. visionOS has no keyboard toolbar placement.
+        #if !os(visionOS)
         ToolbarItemGroup(placement: .keyboard) {
             Spacer()
             Button("Done") {
@@ -198,6 +199,7 @@ public struct ColorEditorView: View {
             .fontWeight(.semibold)
             .accessibilityIdentifier("colorEditor.keyboardDone")
         }
+        #endif
 
         ToolbarItem(placement: .confirmationAction) {
             Button {
