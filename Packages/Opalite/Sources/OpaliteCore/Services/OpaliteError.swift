@@ -8,7 +8,7 @@
 
 import Foundation
 
-nonisolated public enum OpaliteError: LocalizedError, Equatable, Sendable {
+nonisolated public enum OpaliteError: LocalizedError, Equatable, Sendable, CustomLocalizedStringResourceConvertible {
     // Import / export
     case importFailed(reason: String)
     case exportFailed(reason: String)
@@ -84,5 +84,14 @@ nonisolated public enum OpaliteError: LocalizedError, Equatable, Sendable {
         case .communityRequiresOnyx, .paletteLimitReached, .canvasLimitReached: true
         default: false
         }
+    }
+}
+
+// MARK: - App Intents
+
+extension OpaliteError {
+    /// The same description Siri and Shortcuts read when an intent throws.
+    public var localizedStringResource: LocalizedStringResource {
+        LocalizedStringResource(stringLiteral: errorDescription ?? "Something went wrong.")
     }
 }

@@ -11,6 +11,7 @@ import AppIntents
 import Foundation
 import OpaliteComposition
 import OpaliteCore
+import OpaliteFeatureShared
 
 // MARK: - Navigation target
 
@@ -250,12 +251,6 @@ enum OpaliteIntentError: Error, CustomLocalizedStringResourceConvertible {
         switch self {
         case .notFound: "That item no longer exists."
         }
-    }
-}
-
-extension OpaliteError: CustomLocalizedStringResourceConvertible {
-    public var localizedStringResource: LocalizedStringResource {
-        LocalizedStringResource(stringLiteral: errorDescription ?? "Something went wrong.")
     }
 }
 
