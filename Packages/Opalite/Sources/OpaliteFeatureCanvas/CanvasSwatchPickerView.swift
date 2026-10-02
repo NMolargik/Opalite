@@ -93,6 +93,9 @@ private struct SwatchStrip: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollClipDisabled()
+                // A horizontal scroll view still takes every point of height it's offered;
+                // the strip is an overlay, so pin it to one row of swatches.
+                .frame(height: swatchSide + Brand.Space.xs * 2)
             }
         }
         .padding(.horizontal, Brand.Space.sm)

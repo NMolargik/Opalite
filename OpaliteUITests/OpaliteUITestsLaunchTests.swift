@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class OpaliteUITestsLaunchTests: XCTestCase {
+nonisolated final class OpaliteUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

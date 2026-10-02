@@ -82,6 +82,9 @@ struct CanvasEditorView: View {
             .navigationTitle(model.canvas.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarItems }
+            // The PencilKit tool picker docks at the bottom edge; the floating tab bar
+            // would sit on top of it.
+            .toolbar(.hidden, for: .tabBar)
             .toolbarRole(.editor)
             .task { attachAndLoad() }
             .onDisappear { model.flush() }
@@ -327,12 +330,19 @@ struct CanvasEditorView: View {
                     model.setInk(rgba)
                 }
                 .padding(.horizontal, Brand.Space.lg)
-                .padding(.bottom, Brand.Space.sm + model.obscuredBottomInset)
+                .padding(.bottom, Brand.Space.sm + swatchStripBottomInset)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: model.obscuredBottomInset)
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: model.isSwatchStripVisible)
+    }
+
+    /// The compact tool picker collapses to a floating pen at the bottom edge and reports
+    /// no obscured frame, so keep the strip clear of it by a fixed amount there.
+    private var swatchStripBottomInset: CGFloat {
+        let collapsedPickerHeight: CGFloat = sizeClass == .compact && model.isToolPickerVisible ? 72 : 0
+        return max(model.obscuredBottomInset, collapsedPickerHeight)
     }
 
     // MARK: - Menus
@@ -409,11 +419,13 @@ struct CanvasEditorView: View {
                     Label("Clear Canvas", systemImage: "eraser")
                 }
                 .disabled(model.isEmpty)
+                .destructiveMenuItem()
                 Button(role: .destructive) {
                     deleting = model.canvas
                 } label: {
                     Label("Delete Canvas", systemImage: "trash")
                 }
+                .destructiveMenuItem()
             } label: {
                 Label("More", systemImage: "ellipsis.circle")
             }

@@ -23,7 +23,6 @@ nonisolated public enum CommunityDestination: Hashable, Sendable {
 nonisolated public enum SettingsDestination: Hashable, Sendable, Codable {
     case appearance
     case accessibility
-    case hexCopying
     case onyx
     case watch
     case swatchBar

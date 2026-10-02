@@ -48,7 +48,8 @@ struct ColorBridgingTests {
     @Test func modelBridging() throws {
         let color = OpaliteColor(red: 0.2, green: 0.5, blue: 0.8)
         #expect(color.swiftUIColor.toHex() == "#3380CC")
-        #expect(color.idealTextColor() == .white)
+        #expect(color.idealTextColor() == .black)
+        #expect(OpaliteColor(red: 0.1, green: 0.1, blue: 0.3).idealTextColor() == .white)
         #expect(color.simulatedSwiftUIColor(.off) == color.swiftUIColor)
         #expect(color.simulatedSwiftUIColor(.protanopia) != color.swiftUIColor)
         let simulated = try #require(color.simulatedSwiftUIColor(.achromatopsia).rgba)

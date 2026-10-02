@@ -48,6 +48,7 @@ public struct RootView: View {
                     .id("splash")
                     .transition(stageTransition)
                     .zIndex(1)
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("splashView")
             case .onboarding:
                 OnboardingView(onFinished: {
@@ -57,6 +58,7 @@ public struct RootView: View {
                 .id("onboarding")
                 .transition(stageTransition)
                 .zIndex(1)
+                .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("onboardingView")
             case .main:
                 MainView(session: session)
@@ -64,6 +66,7 @@ public struct RootView: View {
                     .transition(stageTransition)
                     .zIndex(0)
                     .onAppear(perform: handleMainEntry)
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("mainView")
             }
         }

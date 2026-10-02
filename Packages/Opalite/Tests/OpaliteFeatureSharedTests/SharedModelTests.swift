@@ -471,8 +471,8 @@ struct CommunityModelTests {
         let env = PreviewEnvironment()
         await env.community.refreshIdentity()
         #expect(env.community.isUserSignedIn)
-        #expect(env.community.isMine(.sample))
-        #expect(!env.community.isMine(.sample2))
+        #expect(env.community.isMine(CommunityColor.sample))
+        #expect(!env.community.isMine(CommunityColor.sample2))
         #expect(env.community.isMine(CommunityPalette.sample))
     }
 

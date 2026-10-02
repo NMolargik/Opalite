@@ -3,8 +3,7 @@
 //  OpaliteComposition
 //
 //  The adaptive five-tab shell: a tab bar on iPhone and a sidebar on iPad/Mac/visionOS
-//  through `.sidebarAdaptable`, one NavigationStack per tab with typed destinations,
-//  the tab-bar bottom accessory (a quick "New Color" strip with a live count), the
+//  through `.sidebarAdaptable`, one NavigationStack per tab with typed destinations, the
 //  globally presented sheets (color editor, photo sampler, paywall, imports, hex-copy
 //  preference), and every deep link / presentation request routed through `AppRouter`.
 //
@@ -56,11 +55,6 @@ struct MainView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .minimizeTabBarOnScrollIfAvailable()
-        .tabViewBottomAccessoryIfAvailable {
-            PortfolioAccessory(colorCount: portfolio.colors.count, paletteCount: portfolio.activePalettes.count) {
-                router.present(.colorEditor)
-            }
-        }
         .tint(router.selectedTab.color)
         // MARK: Global presentations
         .sheet(item: $navigation.presentation) { presentation in
@@ -265,62 +259,6 @@ struct MainView: View {
 }
 
 // MARK: - Accessory
-
-/// The tab-bar bottom accessory (iOS 26+): a one-tap "New Color" with the live portfolio
-/// count. Shrinks to the essentials when the tab bar minimizes.
-private struct PortfolioAccessory: View {
-    let colorCount: Int
-    let paletteCount: Int
-    let onNewColor: () -> Void
-
-    var body: some View {
-        TabAccessoryPlacementReader { isInline in
-            content(isInline: isInline)
-        }
-    }
-
-    private func content(isInline: Bool) -> some View {
-        HStack(spacing: Brand.Space.sm) {
-            Image(systemName: "paintpalette.fill")
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(.opalitePurple)
-                .accessibilityHidden(true)
-            HStack(alignment: .firstTextBaseline, spacing: Brand.Space.xs) {
-                Text(colorCount, format: .number)
-                    .font(isInline ? .subheadline.weight(.bold) : .headline)
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-                Text(colorCount == 1 ? "color" : "colors")
-                    .font(.subheadline.weight(.semibold))
-                if !isInline {
-                    Text("·").foregroundStyle(.tertiary).accessibilityHidden(true)
-                    Text(paletteCount, format: .number)
-                        .font(.headline)
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                    Text(paletteCount == 1 ? "palette" : "palettes")
-                        .font(.subheadline.weight(.semibold))
-                }
-            }
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            Spacer(minLength: Brand.Space.sm)
-            Button(action: onNewColor) {
-                Label("New Color", systemImage: "plus")
-                    .font(.subheadline.weight(.semibold))
-                    .if(isInline) { $0.labelStyle(.iconOnly) }
-            }
-            .glassActionButton(tint: .opalitePurple)
-            .controlSize(.small)
-            .keyboardShortcut("n", modifiers: .command)
-            .hoverHighlight()
-            .accessibilityIdentifier("accessoryNewColorButton")
-            .accessibilityLabel(Text("Create a new color"))
-        }
-        .padding(.horizontal, isInline ? Brand.Space.sm : Brand.Space.lg)
-        .accessibilityElement(children: .contain)
-    }
-}
 
 // MARK: - Navigation model
 

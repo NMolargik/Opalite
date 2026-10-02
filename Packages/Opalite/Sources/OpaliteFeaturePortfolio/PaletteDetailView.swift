@@ -243,7 +243,7 @@ private struct PaletteDetailContent: View {
             HStack(spacing: Brand.Space.sm) {
                 TextField(String(localized: "Palette name"), text: $model.nameDraft)
                     .textFieldStyle(.plain)
-                    .font(.title2.weight(.semibold))
+                    .font(.headline)
                     .foregroundStyle(onDark ? .white : .black)
                     .textInputAutocapitalization(.words)
                     .submitLabel(.done)
@@ -283,9 +283,9 @@ private struct PaletteDetailContent: View {
             } label: {
                 HStack(spacing: Brand.Space.xs) {
                     Text(model.name)
-                        .font(.title2.weight(.semibold))
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
+                        .font(.headline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                     Image(systemName: "pencil")
                         .font(.caption.weight(.semibold))
                         .opacity(0.7)
@@ -543,7 +543,7 @@ private struct PaletteDetailContent: View {
                             Haptics.selection()
                             model.isConfirmingUnlink = true
                         } label: {
-                            Label("Unlink", systemImage: "link.badge.minus")
+                            Label("Unlink", systemImage: "personalhotspot.slash")
                                 .frame(maxWidth: .infinity)
                         }
                         .secondaryActionButton(tint: .opaliteTan)
@@ -661,6 +661,7 @@ private struct PaletteDetailContent: View {
                 } label: {
                     Label("Delete…", systemImage: "trash")
                 }
+                .destructiveMenuItem()
             } label: {
                 Label("More", systemImage: "ellipsis.circle")
             }

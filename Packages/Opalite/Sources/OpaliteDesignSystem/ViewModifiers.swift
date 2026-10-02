@@ -10,6 +10,9 @@
 
 import SwiftUI
 import OpaliteCore
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - Glass
 
@@ -141,15 +144,19 @@ extension View {
     /// The app's standard action-button treatment: native Liquid Glass button styles on
     /// 26+ (bordered fallback). Reserve `prominent` for the single primary action in a
     /// given context.
+    ///
+    /// Brand tints are remapped for legibility: a prominent button fills with the tint's
+    /// `fillVariant` (white text reads on it in either appearance) and a plain one labels
+    /// with its `inkVariant` (deep in light mode, the pale brand color in dark mode).
     @ContentBuilder
     public func glassActionButton(tint: Color = .opalitePurple, prominent: Bool = true) -> some View {
         #if os(visionOS) || os(watchOS)
-        if prominent { buttonStyle(.borderedProminent).tint(tint) } else { buttonStyle(.bordered).tint(tint) }
+        if prominent { buttonStyle(.borderedProminent).tint(tint.fillVariant) } else { buttonStyle(.bordered).tint(tint.inkVariant) }
         #else
         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, *) {
-            if prominent { buttonStyle(.glassProminent).tint(tint) } else { buttonStyle(.glass).tint(tint) }
+            if prominent { buttonStyle(.glassProminent).tint(tint.fillVariant) } else { buttonStyle(.glass).tint(tint.inkVariant) }
         } else {
-            if prominent { buttonStyle(.borderedProminent).tint(tint) } else { buttonStyle(.bordered).tint(tint) }
+            if prominent { buttonStyle(.borderedProminent).tint(tint.fillVariant) } else { buttonStyle(.bordered).tint(tint.inkVariant) }
         }
         #endif
     }
@@ -173,58 +180,7 @@ extension View {
 
 // MARK: - OS-gated navigation chrome
 
-/// Hands its content whether the tab-bar accessory is in its compact *inline* placement
-/// (the tab bar minimized, iOS 26+). Always `false` where accessories don't exist, so
-/// feature code never touches the iOS 26 environment key directly.
-public struct TabAccessoryPlacementReader<Content: View>: View {
-    private let content: (Bool) -> Content
-
-    public init(@ContentBuilder content: @escaping (Bool) -> Content) {
-        self.content = content
-    }
-
-    public var body: some View {
-        #if os(iOS) && !targetEnvironment(macCatalyst)
-        if #available(iOS 26.0, *) {
-            InlinePlacementReader(content: content)
-        } else {
-            content(false)
-        }
-        #else
-        content(false)
-        #endif
-    }
-}
-
-#if os(iOS) && !targetEnvironment(macCatalyst)
-@available(iOS 26.0, *)
-private struct InlinePlacementReader<Content: View>: View {
-    let content: (Bool) -> Content
-    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
-
-    var body: some View {
-        content(placement == .inline)
-    }
-}
-#endif
-
-
 extension View {
-    /// Attaches a tab-bar bottom accessory (iPhone/iPad, iOS 26+). The accessory is
-    /// always present, so give it content worth the space. No-op elsewhere.
-    @ContentBuilder
-    public func tabViewBottomAccessoryIfAvailable<Accessory: View>(@ContentBuilder _ accessory: () -> Accessory) -> some View {
-        #if os(iOS) && !targetEnvironment(macCatalyst)
-        if #available(iOS 26.0, *), !ProcessInfo.processInfo.isiOSAppOnMac {
-            tabViewBottomAccessory(content: accessory)
-        } else {
-            self
-        }
-        #else
-        self
-        #endif
-    }
-
     /// Lets the tab bar collapse while scrolling down (iOS 26+).
     @ContentBuilder
     public func minimizeTabBarOnScrollIfAvailable() -> some View {
@@ -295,6 +251,30 @@ extension View {
         #endif
     }
 
+}
+
+// MARK: - Menus
+
+extension View {
+    /// Keeps a destructive menu item's glyph red next to its red title. Menu glyphs pick
+    /// up the nearest `tint` (the tab color), which otherwise leaves a blue trash can
+    /// beside red text.
+    public func destructiveMenuItem() -> some View {
+        tint(.red)
+    }
+}
+
+// MARK: - Keyboard
+
+public enum Keyboard {
+    /// Resigns the software keyboard from whichever field holds focus — the keyboard
+    /// toolbar's Done button, and the escape hatch for number pads with no return key.
+    @MainActor
+    public static func dismiss() {
+        #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
+    }
 }
 
 // MARK: - Label styles

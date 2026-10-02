@@ -2,8 +2,8 @@
 //  AboutView.swift
 //  OpaliteFeatureSettings
 //
-//  Version and build, outbound links, credits, acknowledgments, and the App Store review
-//  prompt.
+//  The app name, outbound links, credits, acknowledgments, the App Store review prompt,
+//  and the version (shown once, in Build, where it can be copied).
 //
 
 #if os(iOS) || os(visionOS)
@@ -18,21 +18,17 @@ struct AboutView: View {
     @Environment(\.requestReview) private var requestReview
 
     private let version = AppVersionInfo()
-    private var bundleIdentifier: String { Bundle.main.bundleIdentifier ?? "—" }
 
     var body: some View {
         Form {
             Section {
-                ShowcaseHero(
-                    systemImage: "diamond.fill",
-                    gradient: LinearGradient.opalite,
-                    glow: .opalitePurple,
-                    title: String(localized: "Opalite"),
-                    subtitle: version.subtitle
-                )
-                .padding(.bottom, Brand.Space.sm)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
+                Text("Opalite")
+                    .font(.largeTitle.weight(.bold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Brand.Space.md)
+                    .accessibilityAddTraits(.isHeader)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
             }
 
             Section {
@@ -49,10 +45,6 @@ struct AboutView: View {
                 Link(destination: SettingsLinks.website) {
                     Label("Website", systemImage: "safari.fill")
                         .labelStyle(.settingsIcon(.blue))
-                }
-                Link(destination: SettingsLinks.support) {
-                    Label("Support", systemImage: "questionmark.circle.fill")
-                        .labelStyle(.settingsIcon(.green))
                 }
                 Link(destination: SettingsLinks.privacy) {
                     Label("Privacy Policy", systemImage: "hand.raised.fill")
@@ -91,13 +83,11 @@ struct AboutView: View {
                 DetailRow(String(localized: "Version"), value: version.formatted, monospaced: true) {
                     hexCopy.copy(text: version.formatted, label: String(localized: "version"))
                 }
-                DetailRow(String(localized: "Bundle"), value: bundleIdentifier, monospaced: true)
             } header: {
                 Text("Build")
             }
         }
         .navigationTitle("About")
-        .navigationSubtitleIfAvailable(version.subtitle)
     }
 }
 

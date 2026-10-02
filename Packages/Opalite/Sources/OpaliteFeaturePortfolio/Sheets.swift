@@ -227,6 +227,7 @@ struct ArchivedPalettesSheet: View {
                                 .contextMenu {
                                     Button { restore(palette) } label: { Label("Restore", systemImage: "arrow.uturn.backward") }
                                     Button(role: .destructive) { paletteToDelete = palette } label: { Label("Delete…", systemImage: "trash") }
+                                        .destructiveMenuItem()
                                 }
                             }
                         } footer: {

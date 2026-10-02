@@ -34,16 +34,14 @@ struct AppearanceSettingsView: View {
         Form {
             #if !os(visionOS)
             Section {
-                Picker(selection: theme) {
+                Picker("Theme", selection: theme) {
                     ForEach(AppThemeOption.allCases) { option in
                         Label(option.title, systemImage: Self.symbol(for: option))
                             .tag(option)
                     }
-                } label: {
-                    Label("Theme", systemImage: "circle.lefthalf.filled")
-                        .labelStyle(.settingsIcon(.indigo))
                 }
                 .pickerStyle(.inline)
+                .labelsHidden()
                 .onChange(of: themeRaw) { Haptics.selection() }
                 .accessibilityIdentifier("appearance.theme")
             } header: {

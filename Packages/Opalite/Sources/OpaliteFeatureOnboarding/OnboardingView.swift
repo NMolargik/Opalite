@@ -41,7 +41,6 @@ public struct OnboardingView: View {
                 bottomBar
             }
         }
-        .accessibilityIdentifier("onboardingView")
         .onAppear(perform: configure)
         .onChange(of: model.step) { _, _ in
             Haptics.selection()
@@ -52,12 +51,9 @@ public struct OnboardingView: View {
     // MARK: Background
 
     private var background: some View {
-        ZStack {
-            groupedBackground
-            LinearGradient.opaliteWash.opacity(0.6)
-        }
-        .ignoresSafeArea()
-        .accessibilityHidden(true)
+        groupedBackground
+            .ignoresSafeArea()
+            .accessibilityHidden(true)
     }
 
     // MARK: Top bar
@@ -102,7 +98,7 @@ public struct OnboardingView: View {
         HStack(spacing: Brand.Space.xs + 2) {
             ForEach(OnboardingStep.allCases) { step in
                 Capsule(style: .continuous)
-                    .fill(step == model.step ? AnyShapeStyle(LinearGradient.opaliteHorizontal) : AnyShapeStyle(.tertiary))
+                    .fill(step == model.step ? AnyShapeStyle(Color.opalitePurpleInk) : AnyShapeStyle(.tertiary))
                     .frame(width: step == model.step ? 24 : 8, height: 8)
                     .overlay(Capsule(style: .continuous).strokeBorder(.quaternary))
             }

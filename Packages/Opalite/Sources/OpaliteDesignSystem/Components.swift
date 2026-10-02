@@ -88,7 +88,8 @@ public struct SectionCard<Content: View, Trailing: View>: View {
 
 // MARK: - DetailRow
 
-/// A labeled row with a copyable value and an optional icon.
+/// A labeled row — the caption above a full-width value that wraps instead of truncating —
+/// with an optional icon and copy button.
 public struct DetailRow: View {
     let title: String
     let value: String
@@ -105,20 +106,23 @@ public struct DetailRow: View {
     }
 
     public var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: Brand.Space.md) {
+        HStack(alignment: .center, spacing: Brand.Space.md) {
             if let systemImage {
                 Image(systemName: systemImage)
                     .foregroundStyle(.secondary)
                     .frame(width: 20)
                     .accessibilityHidden(true)
             }
-            Text(title)
-                .foregroundStyle(.secondary)
-            Spacer(minLength: Brand.Space.sm)
-            Text(value)
-                .font(monospaced ? .body.monospaced() : .body)
-                .multilineTextAlignment(.trailing)
-                .selectableText()
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(monospaced ? .body.monospaced() : .body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .selectableText()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             if let onCopy {
                 Button {
                     Haptics.lightImpact()

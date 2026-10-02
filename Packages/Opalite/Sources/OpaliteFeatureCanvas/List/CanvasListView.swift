@@ -30,16 +30,9 @@ private struct CanvasGridView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.onyxEntitlement) private var entitlement
 
-    @State private var searchText = ""
     @State private var renaming: CanvasFile?
     @State private var deleting: CanvasFile?
     @State private var newCanvasBounce = false
-
-    private var filtered: [CanvasFile] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return canvases.canvases }
-        return canvases.canvases.filter { $0.title.localizedCaseInsensitiveContains(query) }
-    }
 
     private let columns = [GridItem(.adaptive(minimum: 170, maximum: 280), spacing: Brand.Space.lg)]
 
@@ -47,8 +40,6 @@ private struct CanvasGridView: View {
         Group {
             if canvases.canvases.isEmpty {
                 emptyState
-            } else if filtered.isEmpty {
-                ContentUnavailableView.search(text: searchText)
             } else {
                 grid
             }
@@ -56,8 +47,6 @@ private struct CanvasGridView: View {
         .background(groupedBackground.ignoresSafeArea())
         .navigationTitle("Canvas")
         .navigationSubtitleIfAvailable(subtitle)
-        .searchable(text: $searchText, prompt: "Search canvases")
-        .minimizingSearchIfAvailable()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -86,7 +75,7 @@ private struct CanvasGridView: View {
     private var grid: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Brand.Space.lg) {
-                ForEach(filtered) { canvas in
+                ForEach(canvases.canvases) { canvas in
                     let locked = !canvases.canAccess(canvas)
                     Button {
                         Haptics.lightImpact()
@@ -103,7 +92,7 @@ private struct CanvasGridView: View {
             .padding(Brand.Space.lg)
             .frame(maxWidth: 1200)
             .frame(maxWidth: .infinity)
-            .animation(reduceMotion ? nil : .snappy, value: filtered.map(\.id))
+            .animation(reduceMotion ? nil : .snappy, value: canvases.canvases.map(\.id))
         }
         .softScrollEdgesIfAvailable()
     }
@@ -134,6 +123,7 @@ private struct CanvasGridView: View {
         } label: {
             Label("Delete", systemImage: "trash")
         }
+        .destructiveMenuItem()
     }
 
     // MARK: - Empty

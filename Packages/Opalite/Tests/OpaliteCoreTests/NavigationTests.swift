@@ -209,7 +209,7 @@ struct AppTabTests {
     }
 
     @Test func settingsDestinationsAreCodable() throws {
-        let all: [SettingsDestination] = [.appearance, .accessibility, .hexCopying, .onyx, .watch, .swatchBar, .communityAdmin, .about]
+        let all: [SettingsDestination] = [.appearance, .accessibility, .onyx, .watch, .swatchBar, .communityAdmin, .about]
         let data = try JSONEncoder().encode(all)
         #expect(try JSONDecoder().decode([SettingsDestination].self, from: data) == all)
     }

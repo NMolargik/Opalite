@@ -188,6 +188,17 @@ public struct ColorEditorView: View {
 
         ToolbarSpacerIfAvailable(.fixed, placement: .topBarTrailing)
 
+        // Number pads have no return key and the notes field's return inserts a newline,
+        // so every field gets the same way out.
+        ToolbarItemGroup(placement: .keyboard) {
+            Spacer()
+            Button("Done") {
+                Keyboard.dismiss()
+            }
+            .fontWeight(.semibold)
+            .accessibilityIdentifier("colorEditor.keyboardDone")
+        }
+
         ToolbarItem(placement: .confirmationAction) {
             Button {
                 Haptics.success()

@@ -30,32 +30,38 @@ struct CanvasPlacedImagesLayer: View {
     private static let spaceName = "canvasViewport"
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            if isEditing {
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture { onSelect(nil) }
-                    .accessibilityHidden(true)
-            }
+        // The GeometryReader takes exactly the viewport the editor proposes, so the
+        // canvas-sized layer inside it overflows and gets clipped instead of growing the
+        // whole editor to the canvas (4096 pt square and up — the layers that backs
+        // would be hundreds of megabytes each).
+        GeometryReader { _ in
             ZStack(alignment: .topLeading) {
-                ForEach(images.sorted { $0.zIndex < $1.zIndex }) { image in
-                    CanvasPlacedImageView(
-                        image: image,
-                        isSelected: isEditing && selectedImageID == image.id,
-                        isInteractive: isEditing,
-                        zoomScale: zoomScale,
-                        coordinateSpace: .named(Self.spaceName),
-                        onSelect: { onSelect(image.id) },
-                        onBeginEdit: onBeginEdit,
-                        onChange: onChange,
-                        onEndEdit: onEndEdit,
-                        onDelete: { onDelete(image.id) }
-                    )
+                if isEditing {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture { onSelect(nil) }
+                        .accessibilityHidden(true)
                 }
+                ZStack(alignment: .topLeading) {
+                    ForEach(images.sorted { $0.zIndex < $1.zIndex }) { image in
+                        CanvasPlacedImageView(
+                            image: image,
+                            isSelected: isEditing && selectedImageID == image.id,
+                            isInteractive: isEditing,
+                            zoomScale: zoomScale,
+                            coordinateSpace: .named(Self.spaceName),
+                            onSelect: { onSelect(image.id) },
+                            onBeginEdit: onBeginEdit,
+                            onChange: onChange,
+                            onEndEdit: onEndEdit,
+                            onDelete: { onDelete(image.id) }
+                        )
+                    }
+                }
+                .frame(width: canvasSize.width, height: canvasSize.height, alignment: .topLeading)
+                .scaleEffect(zoomScale, anchor: .topLeading)
+                .offset(x: -contentOffset.x, y: -contentOffset.y)
             }
-            .frame(width: canvasSize.width, height: canvasSize.height, alignment: .topLeading)
-            .scaleEffect(zoomScale, anchor: .topLeading)
-            .offset(x: -contentOffset.x, y: -contentOffset.y)
         }
         .coordinateSpace(name: Self.spaceName)
         .clipped()

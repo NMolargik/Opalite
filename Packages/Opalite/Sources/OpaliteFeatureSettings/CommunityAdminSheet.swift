@@ -148,6 +148,7 @@ struct CommunityAdminView: View {
                             } label: {
                                 Label("Remove \(item.kindTitle)", systemImage: "trash")
                             }
+                            .destructiveMenuItem()
                         }
                 }
             } header: {

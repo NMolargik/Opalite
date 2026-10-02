@@ -245,6 +245,7 @@ public final class CommunityModel {
 
     @discardableResult
     public func report(id: CommunityRecordID, type: CommunityItemType, reason: ReportReason, details: String?) async -> Bool {
+        if currentUserRecordID == nil { await refreshIdentity() }
         guard isUserSignedIn else { toastManager.show(error: OpaliteError.communityNotSignedIn); return false }
         do {
             let count = try await service.report(id: id, type: type, reason: reason, details: details)

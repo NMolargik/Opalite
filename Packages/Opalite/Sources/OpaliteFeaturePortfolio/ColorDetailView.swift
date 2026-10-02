@@ -3,8 +3,8 @@
 //  OpaliteFeaturePortfolio
 //
 //  A saved color: the hero swatch (tap the badge to rename, with Apple Intelligence
-//  suggestions), info tiles, then collapsible cards — codes, details, notes, palette
-//  membership, the harmony wheel, tints/shades/tones, and the WCAG contrast checker.
+//  suggestions), info tiles, then collapsible cards — palette membership, codes, details,
+//  notes, the harmony wheel, tints/shades/tones, and the WCAG contrast checker.
 //  Edit is the single primary action; share, move, publish, full screen, and delete live
 //  in the toolbar and More menu. Menu-bar commands reach it through `PortfolioModel`.
 //
@@ -83,10 +83,10 @@ private struct ColorDetailContent: View {
                     .padding(.horizontal, Brand.Space.lg)
                     .padding(.top, Brand.Space.md)
                 VStack(spacing: Brand.Space.lg) {
+                    paletteCard(for: color)
                     codesCard(for: color)
                     detailsCard(for: color)
                     notesCard
-                    paletteCard(for: color)
                     harmonyCard
                     tonesCard
                     contrastCard
@@ -165,11 +165,6 @@ private struct ColorDetailContent: View {
 
     private func tiles(for color: OpaliteColor) -> some View {
         HStack(spacing: Brand.Space.sm) {
-            InfoTile(
-                title: String(localized: "Palette"),
-                value: color.palette?.name ?? String(localized: "Loose"),
-                systemImage: color.palette == nil ? "square.dashed" : "swatchpalette.fill"
-            )
             InfoTile(
                 title: String(localized: "Created On"),
                 value: DetailFormatting.shortDeviceName(color.createdOnDeviceName),
@@ -503,6 +498,7 @@ private struct ColorDetailContent: View {
                 } label: {
                     Label("Delete…", systemImage: "trash")
                 }
+                .destructiveMenuItem()
             } label: {
                 Label("More", systemImage: "ellipsis.circle")
             }

@@ -1537,30 +1537,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Create a new color" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crear un color nuevo"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Créer une nouvelle couleur"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しいカラーを作成"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Create colors on your iPhone, iPad, or Mac and they'll sync here with iCloud — or add one by hex code now." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3164,30 +3140,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ネイビー"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "New Color" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo color"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nouvelle couleur"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規カラー"
           }
         }
       },
@@ -6188,30 +6140,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "/年"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "·" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "·"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "·"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "·"
           }
         }
       },

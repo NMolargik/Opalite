@@ -197,7 +197,7 @@ struct PaletteSection: View {
                 Haptics.selection()
                 portfolio.link(nil, to: palette)
             } label: {
-                Label("Unlink \(canvas.title)", systemImage: "link.badge.minus")
+                Label("Unlink \(canvas.title)", systemImage: "personalhotspot.slash")
             }
         } else {
             Button {
@@ -223,6 +223,7 @@ struct PaletteSection: View {
         } label: {
             Label("Delete…", systemImage: "trash")
         }
+        .destructiveMenuItem()
     }
 }
 #endif

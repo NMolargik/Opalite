@@ -3,14 +3,14 @@
 //  OpaliteUITests
 //
 //  Smoke tests over the shell: launch, the splash → onboarding → main flow, tab
-//  navigation, and the global "New Color" entry point. They use the accessibility
+//  navigation, and the Portfolio's "New Color" entry point. They use the accessibility
 //  identifiers the feature modules publish (`splashView`, `continueButton`, `skipButton`,
-//  `onboardingView`, `mainView`, `accessoryNewColorButton`).
+//  `onboardingView`, `mainView`, `portfolio.createMenu`, `colorEditor.cancel`).
 //
 
 import XCTest
 
-final class OpaliteUITests: XCTestCase {
+nonisolated final class OpaliteUITests: XCTestCase {
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -21,6 +21,20 @@ final class OpaliteUITests: XCTestCase {
 
     override func tearDownWithError() throws {
         app = nil
+    }
+
+    /// Glass-styled buttons are not always exposed as `.button` elements, so look the
+    /// identifier up across every element type; the splash button also animates in.
+    @MainActor
+    private func element(_ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    @MainActor
+    private func tapContinue(file: StaticString = #filePath, line: UInt = #line) {
+        let button = element("continueButton")
+        XCTAssertTrue(button.waitForExistence(timeout: 5), "continueButton never appeared", file: file, line: line)
+        button.tap()
     }
 
     // MARK: - Launch
@@ -39,7 +53,7 @@ final class OpaliteUITests: XCTestCase {
         app.launch()
         let splash = app.otherElements["splashView"]
         XCTAssertTrue(splash.waitForExistence(timeout: 5))
-        app.buttons["continueButton"].firstMatch.tap()
+        tapContinue()
         XCTAssertTrue(app.otherElements["onboardingView"].waitForExistence(timeout: 5))
     }
 
@@ -48,8 +62,8 @@ final class OpaliteUITests: XCTestCase {
         app.launchArguments.append("--reset-onboarding")
         app.launch()
         XCTAssertTrue(app.otherElements["splashView"].waitForExistence(timeout: 5))
-        app.buttons["continueButton"].firstMatch.tap()
-        let skip = app.buttons["skipButton"].firstMatch
+        tapContinue()
+        let skip = element("skipButton")
         XCTAssertTrue(skip.waitForExistence(timeout: 5))
         skip.tap()
         XCTAssertTrue(app.otherElements["mainView"].waitForExistence(timeout: 5))
@@ -60,8 +74,8 @@ final class OpaliteUITests: XCTestCase {
         app.launchArguments.append("--reset-onboarding")
         app.launch()
         XCTAssertTrue(app.otherElements["splashView"].waitForExistence(timeout: 5))
-        app.buttons["continueButton"].firstMatch.tap()
-        let next = app.buttons["continueButton"].firstMatch
+        tapContinue()
+        let next = element("continueButton")
         XCTAssertTrue(next.waitForExistence(timeout: 5))
         for _ in 0..<6 where !app.otherElements["mainView"].exists {
             next.tap()
@@ -95,13 +109,15 @@ final class OpaliteUITests: XCTestCase {
         app.launchArguments.append("--skip-onboarding")
         app.launch()
         XCTAssertTrue(app.otherElements["mainView"].waitForExistence(timeout: 10))
-        let accessory = app.buttons["accessoryNewColorButton"].firstMatch
-        if accessory.waitForExistence(timeout: 3) {
-            accessory.tap()
-            XCTAssertTrue(app.navigationBars.element.waitForExistence(timeout: 5))
-            let cancel = app.buttons["Cancel"].firstMatch
-            if cancel.exists { cancel.tap() }
-        }
+        let createMenu = element("portfolio.createMenu")
+        XCTAssertTrue(createMenu.waitForExistence(timeout: 5))
+        createMenu.tap()
+        let newColor = app.buttons["New Color"].firstMatch
+        XCTAssertTrue(newColor.waitForExistence(timeout: 5))
+        newColor.tap()
+        let cancel = element("colorEditor.cancel")
+        XCTAssertTrue(cancel.waitForExistence(timeout: 5))
+        cancel.tap()
         XCTAssertEqual(app.state, .runningForeground)
     }
 

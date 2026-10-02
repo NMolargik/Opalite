@@ -52,15 +52,13 @@ struct AccessibilitySettingsView: View {
             }
 
             Section {
-                Picker(selection: mode) {
+                Picker("Simulation", selection: mode) {
                     ForEach(ColorBlindnessMode.allCases) { option in
                         Text(option.title).tag(option)
                     }
-                } label: {
-                    Label("Simulation", systemImage: "eye")
-                        .labelStyle(.settingsIcon(.orange))
                 }
                 .pickerStyle(.inline)
+                .labelsHidden()
                 .onChange(of: modeRaw) { Haptics.selection() }
                 .accessibilityIdentifier("accessibility.colorVision")
             } header: {

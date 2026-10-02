@@ -3,7 +3,7 @@
 //  OpaliteFeatureSettings
 //
 //  The Onyx page: status card, the one action that applies (get / manage), restore,
-//  the "about" sheet, what Onyx unlocks, and the legal links.
+//  and what Onyx unlocks. The legal links live on the paywall.
 //
 
 #if os(iOS) || os(visionOS)
@@ -21,7 +21,6 @@ struct OnyxSettingsView: View {
 
     @State private var isRestoring = false
     @State private var isShowingManageSubscriptions = false
-    @State private var isShowingInfo = false
 
     private var status: OnyxStatus {
         OnyxStatus(hasOnyx: subscription.hasOnyx, subscription: subscription.currentSubscription)
@@ -74,14 +73,6 @@ struct OnyxSettingsView: View {
                 .disabled(isRestoring || subscription.isLoading)
                 .accessibilityHint(Text("Checks the App Store for a previous Onyx purchase"))
                 .accessibilityIdentifier("onyx.restore")
-
-                Button {
-                    Haptics.selection()
-                    isShowingInfo = true
-                } label: {
-                    Label("About Onyx", systemImage: "info.circle.fill")
-                        .labelStyle(.settingsIcon(.gray))
-                }
             } footer: {
                 if status.showsUpgrade {
                     Text("Already bought Onyx on another device? Restore Purchases brings it to this one.")
@@ -108,22 +99,10 @@ struct OnyxSettingsView: View {
             } header: {
                 Text("What Onyx Unlocks")
             }
-
-            Section {
-                Link(destination: SettingsLinks.terms) {
-                    Label("Terms of Use", systemImage: "doc.text")
-                        .labelStyle(.settingsIcon(.secondary))
-                }
-                Link(destination: SettingsLinks.privacy) {
-                    Label("Privacy Policy", systemImage: "hand.raised.fill")
-                        .labelStyle(.settingsIcon(.secondary))
-                }
-            }
         }
         .navigationTitle("Onyx")
         .navigationSubtitleIfAvailable(status.title)
         .manageSubscriptionsSheet(isPresented: $isShowingManageSubscriptions)
-        .sheet(isPresented: $isShowingInfo) { OnyxInfoSheet() }
     }
 
     private func restore() async {

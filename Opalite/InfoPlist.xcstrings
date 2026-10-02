@@ -1,333 +1,363 @@
 {
-  "sourceLanguage": "en",
-  "version": "1.0",
-  "strings": {
-    "CFBundleDisplayName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
-          }
-        }
-      },
-      "comment": "Bundle display name"
-    },
-    "CFBundleName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite"
-          }
-        }
-      },
-      "comment": "Bundle name"
-    },
-    "NSCameraUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite uses your camera to take photos you can sample colors from."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite usa la cámara para tomar fotos de las que puedes extraer colores."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite utilise votre appareil photo pour prendre des photos dont vous pouvez extraire des couleurs."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opaliteはカメラで撮影した写真から色を抽出するために使用します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         }
       }
     },
-    "NSPhotoLibraryUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite uses your photo library so you can sample colors from your images."
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite usa tu fototeca para que puedas extraer colores de tus imágenes."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite utilise votre photothèque pour vous permettre d’extraire des couleurs de vos images."
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opaliteは写真ライブラリの画像から色を抽出するために使用します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite"
           }
         }
       }
     },
-    "NSSiriUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siri can open colors and palettes and save new colors by voice."
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite uses your camera to take photos you can sample colors from."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siri puede abrir colores y paletas y guardar colores nuevos por voz."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite usa la cámara para tomar fotos de las que puedes extraer colores."
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siri peut ouvrir des couleurs et des palettes et enregistrer de nouvelles couleurs par la voix."
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite utilise votre appareil photo pour prendre des photos dont vous pouvez extraire des couleurs."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siriは音声で色やパレットを開いたり、新しい色を保存したりできます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteはカメラで撮影した写真から色を抽出するために使用します。"
           }
         }
       }
     },
-    "New Color": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Color"
+    "NSPhotoLibraryUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite uses your photo library so you can sample colors from your images."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nuevo color"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite usa tu fototeca para que puedas extraer colores de tus imágenes."
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nouvelle couleur"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite utilise votre photothèque pour vous permettre d’extraire des couleurs de vos images."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新しい色"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteは写真ライブラリの画像から色を抽出するために使用します。"
           }
         }
-      },
-      "comment": "Home Screen quick action"
+      }
     },
-    "Sample Photo": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sample Photo"
+    "NSSiriUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri can open colors and palettes and save new colors by voice."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extraer de foto"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri puede abrir colores y paletas y guardar colores nuevos por voz."
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Échantillonner une photo"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri peut ouvrir des couleurs et des palettes et enregistrer de nouvelles couleurs par la voix."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真から抽出"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siriは音声で色やパレットを開いたり、新しい色を保存したりできます。"
           }
         }
-      },
-      "comment": "Home Screen quick action"
+      }
     },
-    "New Palette": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Palette"
+    "New Color" : {
+      "comment" : "Home Screen quick action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Color"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nueva paleta"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo color"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nouvelle palette"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle couleur"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新しいパレット"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい色"
           }
         }
-      },
-      "comment": "Home Screen quick action"
+      }
     },
-    "SwatchBar": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SwatchBar"
+    "New Palette" : {
+      "comment" : "Home Screen quick action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Palette"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SwatchBar"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva paleta"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SwatchBar"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle palette"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SwatchBar"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいパレット"
           }
         }
-      },
-      "comment": "Home Screen quick action"
+      }
     },
-    "Opalite Color": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite Color"
+    "Opalite Color" : {
+      "comment" : "Document type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite Color"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Color de Opalite"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color de Opalite"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couleur Opalite"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couleur Opalite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opaliteカラー"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteカラー"
           }
         }
-      },
-      "comment": "Document type"
+      }
     },
-    "Opalite Palette": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opalite Palette"
+    "Opalite Color Identifier" : {
+      "comment" : "Exported type (color drag identifier)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite Color Identifier"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paleta de Opalite"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identificador de color de Opalite"
           }
         },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Palette Opalite"
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiant de couleur Opalite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opaliteパレット"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteカラー識別子"
           }
         }
-      },
-      "comment": "Document type"
+      }
+    },
+    "Opalite Palette" : {
+      "comment" : "Document type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite Palette"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paleta de Opalite"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette Opalite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteパレット"
+          }
+        }
+      }
+    },
+    "Sample Photo" : {
+      "comment" : "Home Screen quick action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sample Photo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraer de foto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échantillonner une photo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真から抽出"
+          }
+        }
+      }
+    },
+    "SwatchBar" : {
+      "comment" : "Home Screen quick action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwatchBar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwatchBar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwatchBar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwatchBar"
+          }
+        }
+      }
     }
-  }
+  },
+  "version" : "1.0"
 }

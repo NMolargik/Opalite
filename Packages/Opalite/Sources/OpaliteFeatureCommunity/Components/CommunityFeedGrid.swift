@@ -154,6 +154,7 @@ struct CommunityColorMenuItems: View {
             Button(role: .destructive, action: onUnpublish) {
                 Label("Remove from Community", systemImage: "trash")
             }
+            .destructiveMenuItem()
         } else if !community.isMine(color) {
             Button(role: .destructive) {
                 Haptics.selection()
@@ -161,6 +162,7 @@ struct CommunityColorMenuItems: View {
             } label: {
                 Label("Report…", systemImage: "flag")
             }
+            .destructiveMenuItem()
         }
     }
 }
@@ -195,6 +197,7 @@ struct CommunityPaletteMenuItems: View {
             Button(role: .destructive, action: onUnpublish) {
                 Label("Remove from Community", systemImage: "trash")
             }
+            .destructiveMenuItem()
         } else if !community.isMine(palette) {
             Button(role: .destructive) {
                 Haptics.selection()
@@ -202,6 +205,7 @@ struct CommunityPaletteMenuItems: View {
             } label: {
                 Label("Report…", systemImage: "flag")
             }
+            .destructiveMenuItem()
         }
     }
 }

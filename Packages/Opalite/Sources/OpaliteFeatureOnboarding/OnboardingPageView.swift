@@ -44,35 +44,25 @@ struct OnboardingPageView: View {
 
 // MARK: - Header
 
-/// Hero symbol with a brand glow, then the title and subtitle.
+/// Hero symbol in the brand purple, then the title and subtitle.
 struct OnboardingPageHeader: View {
     let page: OnboardingPage
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var bounce = false
 
-    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize: CGFloat = 72
-    @ScaledMetric(relativeTo: .largeTitle) private var glowSize: CGFloat = 150
+    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize: CGFloat = 64
+    @ScaledMetric(relativeTo: .largeTitle) private var symbolBox: CGFloat = 120
 
     var body: some View {
         VStack(spacing: Brand.Space.lg) {
-            ZStack {
-                Circle()
-                    .fill(LinearGradient.opalite)
-                    .frame(width: glowSize, height: glowSize)
-                    .blur(radius: glowSize * 0.25)
-                    .opacity(0.65)
-                    .accessibilityHidden(true)
-
-                Image(systemName: page.systemImage)
-                    .font(.system(size: symbolSize, weight: .medium))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.opalitePurple)
-                    .symbolEffect(.bounce, options: .nonRepeating, value: bounce)
-                    .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
-                    .accessibilityHidden(true)
-            }
-            .frame(height: glowSize)
+            Image(systemName: page.systemImage)
+                .font(.system(size: symbolSize, weight: .medium))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(.opalitePurpleInk)
+                .symbolEffect(.bounce, options: .nonRepeating, value: bounce)
+                .frame(height: symbolBox)
+                .accessibilityHidden(true)
 
             VStack(spacing: Brand.Space.sm) {
                 Text(page.title)
@@ -110,11 +100,11 @@ struct OnboardingFeatureRow: View {
             Image(systemName: feature.systemImage)
                 .font(.body.weight(.semibold))
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(.primary)
+                .foregroundStyle(.opalitePurpleInk)
                 .frame(width: glyphBox, height: glyphBox)
                 .background(
                     RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
-                        .fill(Color.opalitePurple.opacity(0.22))
+                        .fill(Color.opalitePurpleInk.opacity(0.12))
                 )
                 .accessibilityHidden(true)
 

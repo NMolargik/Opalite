@@ -131,6 +131,7 @@ public struct SearchView: View {
                                     } label: {
                                         Label("Remove from Recents", systemImage: "trash")
                                     }
+                                    .destructiveMenuItem()
                                 }
                             }
                             .accessibilityHint(Text("Searches for \(chip.text)"))

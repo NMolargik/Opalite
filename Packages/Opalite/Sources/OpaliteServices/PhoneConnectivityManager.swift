@@ -53,9 +53,10 @@ public final class PhoneConnectivityManager: NSObject, WatchPortfolioPushing {
         guard WCSession.isSupported(), session == nil else { return }
         let session = WCSession.default
         session.delegate = self
-        session.activate()
         self.session = session
-        refreshState()
+        // `isPaired` & co. log "WCSession has not been activated" until the activation
+        // callback fires, so the first `refreshState()` happens there.
+        session.activate()
     }
 
     private func refreshState() {

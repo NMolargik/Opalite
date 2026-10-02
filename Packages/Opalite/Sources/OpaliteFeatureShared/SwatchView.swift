@@ -127,8 +127,10 @@ public struct SwatchView<MenuContent: View, ContextMenuContent: View>: View {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(displayColor)
             if showsBorder {
+                // Primary at low opacity: dark on light backgrounds, light on dark ones, so
+                // white and black swatches keep an edge against either grouped background.
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(.white.opacity(0.35), lineWidth: 1)
+                    .strokeBorder(.primary.opacity(0.2), lineWidth: 1)
             }
         }
     }

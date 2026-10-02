@@ -9,7 +9,6 @@
 
 #if os(iOS) || os(visionOS)
 import SwiftUI
-import StoreKit
 import OpaliteCore
 import OpaliteDesignSystem
 import OpaliteServices
@@ -29,13 +28,13 @@ public struct SettingsView: View {
     @Environment(PhoneConnectivityManager.self) private var connectivity
     #endif
 
+    @Environment(HexCopyModel.self) private var hexCopy
+
     @AppStorage(AppStorageKeys.appTheme) private var themeRaw = AppThemeOption.system.rawValue
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessRaw = ColorBlindnessMode.off.rawValue
-    @AppStorage(AppStorageKeys.includeHexPrefix) private var includeHexPrefix = true
 
     @State private var displayName = ""
     @State private var isSyncingNow = false
-    @State private var isShowingManageSubscriptions = false
     @State private var isConfirmingSampleData = false
     @State private var isShowingCommunityAdmin = false
     @FocusState private var isNameFocused: Bool
@@ -68,7 +67,6 @@ public struct SettingsView: View {
         .onChange(of: displayName) { _, newValue in
             ProfileName.commit(newValue, portfolio: portfolio, community: community)
         }
-        .manageSubscriptionsSheet(isPresented: $isShowingManageSubscriptions)
         .sheet(isPresented: $isShowingCommunityAdmin) { CommunityAdminSheet() }
         .confirmationDialog("Generate Sample Data?", isPresented: $isConfirmingSampleData, titleVisibility: .visible) {
             Button("Generate") {
@@ -128,6 +126,9 @@ public struct SettingsView: View {
 
     // MARK: - Onyx
 
+    /// The glossy card alone — it opens the Onyx page, which holds get/manage/restore.
+    /// Row insets and background are cleared so the grouped background doesn't peek out
+    /// around its corners.
     private var onyxSection: some View {
         Section {
             NavigationLink(value: SettingsDestination.onyx) {
@@ -136,27 +137,6 @@ public struct SettingsView: View {
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
             .accessibilityIdentifier("settings.onyx")
-
-            if onyxStatus.showsUpgrade {
-                Button {
-                    Haptics.selection()
-                    router.requestPaywall(context: String(localized: "Unlock everything Opalite has to offer"))
-                } label: {
-                    Label("Get Onyx", systemImage: "sparkles")
-                        .labelStyle(.settingsIcon(.onyx))
-                }
-                .accessibilityHint(Text("Shows Onyx plans and prices"))
-                .accessibilityIdentifier("settings.getOnyx")
-            } else if onyxStatus.canManageSubscription {
-                Button {
-                    Haptics.selection()
-                    isShowingManageSubscriptions = true
-                } label: {
-                    Label("Manage Subscription", systemImage: "creditcard.fill")
-                        .labelStyle(.settingsIcon(.onyx))
-                }
-                .accessibilityHint(Text("Opens your App Store subscription"))
-            }
         } header: {
             Text("Onyx")
         } footer: {
@@ -186,29 +166,24 @@ public struct SettingsView: View {
             .animation(.default, value: cloudSync.syncStatus)
             .accessibilityElement(children: .combine)
 
-            if let lastSync = cloudSync.lastSyncDate {
-                LabeledContent("Last Synced") {
-                    Text("\(Text(lastSync, style: .relative)) ago")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Button {
-                Haptics.selection()
-                Task { await syncNow() }
-            } label: {
-                HStack {
-                    Label("Sync Now", systemImage: "arrow.triangle.2.circlepath")
-                        .labelStyle(.settingsIcon(.blue))
-                    if isSyncingNow {
-                        Spacer()
-                        ProgressView()
+            if cloudSync.isCloudAvailable {
+                Button {
+                    Haptics.selection()
+                    Task { await syncNow() }
+                } label: {
+                    HStack {
+                        Label("Sync Now", systemImage: "arrow.triangle.2.circlepath")
+                            .labelStyle(.settingsIcon(.blue))
+                        if isSyncingNow {
+                            Spacer()
+                            ProgressView()
+                        }
                     }
                 }
+                .disabled(isSyncingNow || !CloudSyncPresentation.canSyncNow(cloudSync.syncStatus))
+                .accessibilityHint(Text("Saves pending changes and syncs with iCloud"))
+                .accessibilityIdentifier("settings.syncNow")
             }
-            .disabled(isSyncingNow || !CloudSyncPresentation.canSyncNow(cloudSync.syncStatus))
-            .accessibilityHint(Text("Saves pending changes and syncs with iCloud"))
-            .accessibilityIdentifier("settings.syncNow")
         } header: {
             Text("iCloud")
         } footer: {
@@ -257,18 +232,20 @@ public struct SettingsView: View {
             }
             .accessibilityIdentifier("settings.accessibility")
 
-            NavigationLink(value: SettingsDestination.hexCopying) {
-                LabeledContent {
-                    Text(includeHexPrefix ? "#3380CC" : "3380CC")
-                        .font(.body.monospaced())
-                } label: {
-                    Label("Hex Codes", systemImage: "number")
-                        .labelStyle(.settingsIcon(.green))
-                }
+            Toggle(isOn: Binding(get: { hexCopy.includesPrefix }, set: { newValue in
+                guard hexCopy.includesPrefix != newValue else { return }
+                Haptics.selection()
+                hexCopy.includesPrefix = newValue
+            })) {
+                Label("Include # Prefix", systemImage: "number")
+                    .labelStyle(.settingsIcon(.green))
             }
-            .accessibilityIdentifier("settings.hexCopying")
+            .tint(.green)
+            .accessibilityIdentifier("settings.includesPrefix")
         } header: {
             Text("Preferences")
+        } footer: {
+            Text("CSS and most design tools expect the # prefix. Turn it off when you paste into code that adds its own.")
         }
     }
 

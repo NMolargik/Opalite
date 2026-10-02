@@ -189,6 +189,7 @@ struct SessionControllerTests {
     }
 }
 
+#if os(iOS) || os(visionOS)
 @Suite("SwatchBar scene")
 struct SwatchBarSceneTests {
     @Test func windowIdentityIsStable() {
@@ -197,3 +198,4 @@ struct SwatchBarSceneTests {
         #expect(SwatchBarScene.defaultSize.height > SwatchBarScene.defaultSize.width)
     }
 }
+#endif

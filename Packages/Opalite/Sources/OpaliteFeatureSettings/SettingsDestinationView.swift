@@ -25,8 +25,6 @@ public struct SettingsDestinationView: View {
             AppearanceSettingsView()
         case .accessibility:
             AccessibilitySettingsView()
-        case .hexCopying:
-            HexCopySettingsView()
         case .onyx:
             OnyxSettingsView()
         case .watch:
@@ -63,7 +61,6 @@ struct WatchUnavailableView: View {
         List {
             NavigationLink("Appearance", value: SettingsDestination.appearance)
             NavigationLink("Accessibility", value: SettingsDestination.accessibility)
-            NavigationLink("Hex Codes", value: SettingsDestination.hexCopying)
             NavigationLink("Onyx", value: SettingsDestination.onyx)
             NavigationLink("Apple Watch", value: SettingsDestination.watch)
             NavigationLink("SwatchBar", value: SettingsDestination.swatchBar)

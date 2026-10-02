@@ -35,8 +35,9 @@ struct PaletteLinkMenuContent: View {
                 Haptics.selection()
                 portfolio.link(nil, to: linked)
             } label: {
-                Label("Unlink Palette", systemImage: "link.badge.minus")
+                Label("Unlink Palette", systemImage: "personalhotspot.slash")
             }
+            .destructiveMenuItem()
         }
     }
 }

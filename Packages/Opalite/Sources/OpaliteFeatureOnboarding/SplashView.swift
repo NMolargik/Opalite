@@ -2,10 +2,9 @@
 //  SplashView.swift
 //  OpaliteFeatureOnboarding
 //
-//  The first screen on a fresh install: a quick, cinematic welcome — the brand wash,
-//  a slowly turning hue ring around the gem motif, the app name in the brand gradient,
-//  one line of value, and a single "Get Started". The entrance is staged with springs;
-//  Reduce Motion shows the finished composition at once.
+//  The first screen on a fresh install: the app artwork, the name, one line of value,
+//  and a single "Get Started" — on the plain grouped background, in the system text
+//  colors. A short fade-and-settle entrance; Reduce Motion shows it at once.
 //
 
 #if os(iOS) || os(visionOS)
@@ -21,15 +20,10 @@ public struct SplashView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    @State private var showHero = false
-    @State private var showTitle = false
-    @State private var showButton = false
-    @State private var breathe = false
-    @State private var ringRotation: Double = 0
+    @State private var appeared = false
 
-    @ScaledMetric(relativeTo: .largeTitle) private var heroDiameter: CGFloat = 220
-    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 52
-    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize: CGFloat = 84
+    @ScaledMetric(relativeTo: .largeTitle) private var artworkSide: CGFloat = 148
+    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize: CGFloat = 96
 
     public init(onContinue: @escaping () -> Void) {
         self.onContinue = onContinue
@@ -37,18 +31,28 @@ public struct SplashView: View {
 
     public var body: some View {
         ZStack {
-            background
+            groupedBackground.ignoresSafeArea()
 
             VStack(spacing: Brand.Space.xxl) {
                 Spacer(minLength: 0)
 
-                hero
-                    .scaleEffect(showHero ? 1 : 0.6)
-                    .opacity(showHero ? 1 : 0)
+                artwork
+                    .frame(width: side, height: side)
+                    .scaleEffect(appeared ? 1 : 0.92)
+                    .accessibilityHidden(true)
 
-                titleBlock
-                    .offset(y: showTitle ? 0 : 16)
-                    .opacity(showTitle ? 1 : 0)
+                VStack(spacing: Brand.Space.md) {
+                    Text("Opalite")
+                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .accessibilityAddTraits(.isHeader)
+                    Text("Capture, organize, and share every color you love.")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, Brand.Space.lg)
+                .accessibilityElement(children: .combine)
 
                 Spacer(minLength: 0)
 
@@ -68,91 +72,27 @@ public struct SplashView: View {
                 .keyboardShortcut(.defaultAction)
                 .accessibilityIdentifier("continueButton")
                 .accessibilityHint("Continues to the introduction")
-                .scaleEffect(showButton ? 1 : 0.9)
-                .opacity(showButton ? 1 : 0)
                 .padding(.bottom, Brand.Space.lg)
             }
+            .opacity(appeared ? 1 : 0)
             .padding(.horizontal, Brand.Space.xl)
             .padding(.vertical, Brand.Space.xxl)
             .frame(maxWidth: Brand.readableWidth)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .accessibilityIdentifier("splashView")
         .onAppear(perform: runEntrance)
     }
 
-    // MARK: Background
+    // MARK: Artwork
 
-    private var background: some View {
-        ZStack {
-            groupedBackground
-            LinearGradient.opaliteWash
-
-            // Soft drifting blobs of the brand colors.
-            GeometryReader { proxy in
-                let size = proxy.size
-                let drift: CGFloat = breathe ? 24 : -24
-                Circle()
-                    .fill(Color.opaliteBlue)
-                    .frame(width: size.width * 0.9)
-                    .blur(radius: 90)
-                    .offset(x: -size.width * 0.35 + drift, y: -size.height * 0.25)
-                Circle()
-                    .fill(Color.opalitePurple)
-                    .frame(width: size.width * 0.8)
-                    .blur(radius: 100)
-                    .offset(x: size.width * 0.45 - drift, y: size.height * 0.15)
-                Circle()
-                    .fill(Color.opaliteTan)
-                    .frame(width: size.width * 0.9)
-                    .blur(radius: 100)
-                    .offset(x: size.width * 0.05, y: size.height * 0.6 + drift)
-            }
-            .opacity(0.55)
-        }
-        .ignoresSafeArea()
-        .accessibilityHidden(true)
-    }
-
-    // MARK: Hero
-
-    private var diameter: CGFloat {
-        horizontalSizeClass == .regular ? heroDiameter * 1.2 : heroDiameter
-    }
-
-    private var hero: some View {
-        let ringWidth = diameter * 0.055
-        return ZStack {
-            // Glow
-            Circle()
-                .fill(AngularGradient.hueWheel)
-                .blur(radius: diameter * 0.2)
-                .opacity(breathe ? 0.5 : 0.3)
-                .scaleEffect(breathe ? 1.08 : 0.96)
-
-            // Hue ring
-            Circle()
-                .strokeBorder(AngularGradient.hueWheel, lineWidth: ringWidth)
-                .rotationEffect(.degrees(ringRotation))
-
-            // Inner disc
-            Circle()
-                .fill(.ultraThinMaterial)
-                .overlay(Circle().strokeBorder(.white.opacity(0.35), lineWidth: 1))
-                .padding(ringWidth + Brand.Space.sm)
-
-            motif
-                .scaleEffect(breathe ? 1.04 : 0.98)
-        }
-        .frame(width: diameter, height: diameter)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Opalite gemstone")
+    private var side: CGFloat {
+        horizontalSizeClass == .regular ? artworkSide * 1.2 : artworkSide
     }
 
     /// The gem-and-squares artwork from the app's asset catalog when it is present (the
-    /// app target), otherwise an SF Symbol gem in the brand gradient (package previews).
+    /// app target), otherwise an SF Symbol gem in the brand purple (package previews).
     @ContentBuilder
-    private var motif: some View {
+    private var artwork: some View {
         if Self.hasBrandArtwork {
             ZStack {
                 Image("squares", bundle: .main)
@@ -162,13 +102,10 @@ public struct SplashView: View {
                     .resizable()
                     .scaledToFit()
             }
-            .padding(diameter * 0.2)
         } else {
             Image(systemName: "diamond.fill")
                 .font(.system(size: symbolSize, weight: .medium))
-                .foregroundStyle(LinearGradient.opalite)
-                .symbolEffect(.breathe, isActive: !reduceMotion)
-                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+                .foregroundStyle(.opalitePurpleInk)
         }
     }
 
@@ -181,40 +118,14 @@ public struct SplashView: View {
         #endif
     }()
 
-    // MARK: Title
-
-    private var titleBlock: some View {
-        VStack(spacing: Brand.Space.md) {
-            Text("Opalite")
-                .font(.system(size: titleSize, weight: .bold, design: .rounded))
-                .foregroundStyle(LinearGradient.opaliteHorizontal)
-                .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
-                .accessibilityAddTraits(.isHeader)
-
-            Text("Capture, organize, and share every color you love.")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.horizontal, Brand.Space.lg)
-        .accessibilityElement(children: .combine)
-    }
-
     // MARK: Entrance
 
     private func runEntrance() {
         guard !reduceMotion else {
-            showHero = true
-            showTitle = true
-            showButton = true
+            appeared = true
             return
         }
-        withAnimation(.spring(response: 0.7, dampingFraction: 0.8)) { showHero = true }
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.85).delay(0.25)) { showTitle = true }
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.5)) { showButton = true }
-        withAnimation(.linear(duration: 36).repeatForever(autoreverses: false)) { ringRotation = 360 }
-        withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) { breathe = true }
+        withAnimation(.easeOut(duration: 0.45)) { appeared = true }
     }
 }
 

@@ -86,6 +86,7 @@ struct ColorActionsMenu: View {
             } label: {
                 Label("Delete", systemImage: "trash")
             }
+            .destructiveMenuItem()
         }
     }
 }

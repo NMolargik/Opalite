@@ -57,8 +57,9 @@ public final class PortfolioStatusSync {
     public func start() {
         pushNow()
         guard observationTask == nil else { return }
+        // Subscribe synchronously so a change notified before the task first runs is not lost.
+        let stream = observeChanges()
         observationTask = Task { [weak self] in
-            guard let stream = self?.observeChanges() else { return }
             for await change in stream {
                 guard let self else { return }
                 if change.affectsPortfolio { self.schedulePush() }

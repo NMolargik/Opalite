@@ -25,9 +25,59 @@ extension Color {
     /// Black in light mode, white in dark mode (toolbar glyphs on pre-26 systems).
     public static var opaliteInverse: Color {
         #if canImport(UIKit) && !os(watchOS)
-        Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? .white : .black })
+        Color(uiColor: UIColor { @Sendable trait in trait.userInterfaceStyle == .dark ? .white : .black })
         #else
         Color.primary
+        #endif
+    }
+
+    // MARK: Text-safe variants
+
+    /// The brand blue deepened until it reads as text on white (5.1:1).
+    public static let opaliteBlueDeep = Color(.displayP3, red: 0x23 / 255, green: 0x75 / 255, blue: 0x9E / 255)
+    /// The brand purple deepened until white text reads on it (5.5:1).
+    public static let opalitePurpleDeep = Color(.displayP3, red: 0x6C / 255, green: 0x64 / 255, blue: 0x82 / 255)
+    /// The brand tan deepened until it reads as text on white (4.5:1).
+    public static let opaliteTanDeep = Color(.displayP3, red: 0x7E / 255, green: 0x75 / 255, blue: 0x69 / 255)
+
+    /// Blue for text and glyphs: deep in light mode, the pale brand blue in dark mode.
+    public static var opaliteBlueInk: Color { adaptive(light: .opaliteBlueDeep, dark: .opaliteBlue) }
+    /// Purple for text and glyphs: deep in light mode, the brand purple in dark mode.
+    public static var opalitePurpleInk: Color { adaptive(light: .opalitePurpleDeep, dark: .opalitePurple) }
+    /// Tan for text and glyphs: deep in light mode, the brand tan in dark mode.
+    public static var opaliteTanInk: Color { adaptive(light: .opaliteTanDeep, dark: .opaliteTan) }
+
+    /// The text-safe version of a brand tint (`opaliteBlue` → `opaliteBlueInk`); any other
+    /// color passes through. Button styles use it for tinted labels.
+    public var inkVariant: Color {
+        switch self {
+        case .opaliteBlue: .opaliteBlueInk
+        case .opalitePurple: .opalitePurpleInk
+        case .opaliteTan: .opaliteTanInk
+        default: self
+        }
+    }
+
+    /// The version of a brand tint that carries white text in either appearance
+    /// (prominent fills); any other color passes through.
+    public var fillVariant: Color {
+        switch self {
+        case .opaliteBlue: .opaliteBlueDeep
+        case .opalitePurple: .opalitePurpleDeep
+        case .opaliteTan: .opaliteTanDeep
+        default: self
+        }
+    }
+
+    /// UIKit resolves dynamic colors on SwiftUI's render thread, so the provider closure
+    /// must stay off the main actor: resolve both `UIColor`s up front and capture them.
+    private nonisolated static func adaptive(light: Color, dark: Color) -> Color {
+        #if canImport(UIKit) && !os(watchOS)
+        let lightColor = UIColor(light)
+        let darkColor = UIColor(dark)
+        return Color(uiColor: UIColor { @Sendable trait in trait.userInterfaceStyle == .dark ? darkColor : lightColor })
+        #else
+        return light
         #endif
     }
 }
@@ -37,6 +87,9 @@ extension ShapeStyle where Self == Color {
     public static var opalitePurple: Color { Color.opalitePurple }
     public static var opaliteTan: Color { Color.opaliteTan }
     public static var onyx: Color { Color.onyx }
+    public static var opaliteBlueInk: Color { Color.opaliteBlueInk }
+    public static var opalitePurpleInk: Color { Color.opalitePurpleInk }
+    public static var opaliteTanInk: Color { Color.opaliteTanInk }
 }
 
 @MainActor extension LinearGradient {

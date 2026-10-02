@@ -5,6 +5,7 @@
 //  Thin tvOS shell over the composition root. The TV UI lives in OpaliteFeatureTV.
 //
 
+import SwiftData
 import SwiftUI
 import OpaliteComposition
 
