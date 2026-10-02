@@ -45,7 +45,7 @@ public struct ColorExportSheet: View {
 #if DEBUG
 #Preview("Share Color") {
     Text("Host")
-        .sheet(isPresented: .constant(true)) {
+        .sharedSheet(isPresented: .constant(true)) {
             ColorExportSheet(color: .sample)
         }
         .previewEnvironment(hasOnyx: false)

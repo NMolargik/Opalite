@@ -250,7 +250,7 @@ public struct ColorEditorView: View {
         @State private var isPresented = true
         var body: some View {
             Button("Open Editor") { isPresented = true }
-                .sheet(isPresented: $isPresented) {
+                .sharedSheet(isPresented: $isPresented) {
                     ColorEditorView(mode: .create(initial: RGBA(red: 0.9, green: 0.4, blue: 0.3)), onCancel: { isPresented = false }, onSave: { _ in isPresented = false })
                 }
         }

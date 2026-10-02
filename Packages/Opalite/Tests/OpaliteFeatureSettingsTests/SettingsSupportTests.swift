@@ -132,30 +132,30 @@ struct WatchStatusPresentationTests {
 @Suite("Paywall catalog")
 struct PaywallCatalogTests {
     private let annual = PaywallPlan(subscription: .annual, displayPrice: "$4.99")
-    private let lifetime = PaywallPlan(subscription: .lifetime, displayPrice: "$19.99")
+    private let lifetime = PaywallPlan(subscription: .lifetime, displayPrice: "$9.99")
 
-    @Test func ordersAnnualBeforeLifetimeRegardlessOfInput() {
+    @Test func legacyAnnualIsNeverOffered() {
         let catalog = PaywallCatalog(plans: [lifetime, annual])
-        #expect(catalog.plans.map(\.subscription) == [.annual, .lifetime])
+        #expect(catalog.plans.map(\.subscription) == [.lifetime])
+        #expect(PaywallCatalog(plans: [annual]).isEmpty)
     }
 
     @Test func dropsDuplicates() {
-        let catalog = PaywallCatalog(plans: [annual, annual, lifetime])
-        #expect(catalog.plans.count == 2)
+        let catalog = PaywallCatalog(plans: [lifetime, lifetime])
+        #expect(catalog.plans.count == 1)
     }
 
-    @Test func defaultsToAnnual() {
-        #expect(PaywallCatalog(annual: annual, lifetime: lifetime).defaultSelectionID == annual.id)
-        #expect(PaywallCatalog(annual: nil, lifetime: lifetime).defaultSelectionID == lifetime.id)
-        #expect(PaywallCatalog(annual: nil, lifetime: nil).defaultSelectionID == nil)
-        #expect(PaywallCatalog(annual: nil, lifetime: nil).isEmpty)
+    @Test func defaultsToLifetime() {
+        #expect(PaywallCatalog(lifetime: lifetime).defaultSelectionID == lifetime.id)
+        #expect(PaywallCatalog(lifetime: nil).defaultSelectionID == nil)
+        #expect(PaywallCatalog(lifetime: nil).isEmpty)
     }
 
     @Test func keepsCurrentSelectionWhileOffered() {
-        let catalog = PaywallCatalog(annual: annual, lifetime: lifetime)
+        let catalog = PaywallCatalog(lifetime: lifetime)
         #expect(catalog.resolvedSelection(current: lifetime.id) == lifetime.id)
-        #expect(catalog.resolvedSelection(current: "gone") == annual.id)
-        #expect(catalog.resolvedSelection(current: nil) == annual.id)
+        #expect(catalog.resolvedSelection(current: "gone") == lifetime.id)
+        #expect(catalog.resolvedSelection(current: nil) == lifetime.id)
     }
 
     @Test func callToActionFollowsPlanKind() {
@@ -167,12 +167,10 @@ struct PaywallCatalogTests {
     @Test func legalTextDistinguishesOneTimePurchase() {
         #expect(PaywallCatalog.legalText(for: lifetime).contains("One-time"))
         #expect(PaywallCatalog.legalText(for: annual).contains("renew"))
-        #expect(PaywallCatalog.legalText(for: nil).contains("renew"))
+        #expect(PaywallCatalog.legalText(for: nil).contains("One-time"))
     }
 
     @Test func badgesAndIdentity() {
-        #expect(lifetime.isBestValue)
-        #expect(!annual.isBestValue)
         #expect(annual.id == OnyxSubscription.annual.rawValue)
         #expect(annual.isSubscription)
         #expect(!lifetime.isSubscription)

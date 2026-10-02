@@ -46,7 +46,7 @@ public struct SwatchBarView: View {
                 .safeAreaInset(edge: .bottom, spacing: 0) { quickAddBar }
         }
         .toastContainer()
-        .sheet(isPresented: $isPresentingEditor) {
+        .sharedSheet(isPresented: $isPresentingEditor) {
             ColorEditorView(mode: .create()) {
                 isPresentingEditor = false
             } onSave: { result in
@@ -57,7 +57,7 @@ public struct SwatchBarView: View {
                 }
             }
         }
-        .sheet(item: $editingColor) { color in
+        .sharedSheet(item: $editingColor) { color in
             ColorEditorView(mode: .edit(color)) {
                 editingColor = nil
             } onSave: { result in

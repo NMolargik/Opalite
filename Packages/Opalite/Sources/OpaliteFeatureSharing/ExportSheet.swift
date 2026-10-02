@@ -106,7 +106,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
             ) { result in
                 handleSaveResult(result)
             }
-            .sheet(isPresented: $isShowingPublish) { publishSheet() }
+            .sharedSheet(isPresented: $isShowingPublish) { publishSheet() }
         }
         .sharingSheet(detents: [.large])
         .onAppear {

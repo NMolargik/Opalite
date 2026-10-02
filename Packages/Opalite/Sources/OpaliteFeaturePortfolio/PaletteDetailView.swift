@@ -117,12 +117,12 @@ private struct PaletteDetailContent: View {
         .fullScreenCover(isPresented: $model.isShowingFullScreen) {
             FullScreenColorView(colors: model.members.map(\.rgba), title: palette.name, titles: model.members.map(\.displayName))
         }
-        .sheet(isPresented: $model.isShowingExport) { PaletteExportSheet(palette: palette) }
-        .sheet(isPresented: $model.isShowingPublish) { PublishPaletteSheet(palette: palette) }
-        .sheet(isPresented: $model.isShowingCanvasPicker) {
+        .sharedSheet(isPresented: $model.isShowingExport) { PaletteExportSheet(palette: palette) }
+        .sharedSheet(isPresented: $model.isShowingPublish) { PublishPaletteSheet(palette: palette) }
+        .sharedSheet(isPresented: $model.isShowingCanvasPicker) {
             CanvasPickerSheet { model.link($0) }
         }
-        .sheet(item: $movingColor) { color in
+        .sharedSheet(item: $movingColor) { color in
             PaletteSelectionSheet(colors: [color])
         }
         .confirmationDialog("Delete \(palette.name)?", isPresented: $model.isConfirmingDelete, titleVisibility: .visible) {

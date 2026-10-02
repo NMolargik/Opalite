@@ -49,7 +49,6 @@ struct PortfolioScreen: View {
     @State private var model: PortfolioViewModel
     @State private var containerWidth: CGFloat = 0
     @State private var droppedImage: DroppedImage?
-    @Namespace private var swatchNamespace
 
     private let createContentTip = CreateContentTip()
     private let colorDetailsTip = ColorDetailsTip()
@@ -99,7 +98,7 @@ struct PortfolioScreen: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Brand.Space.xl) {
                 tips
-                LooseColorsSection(model: model, swatchSize: swatchSize, namespace: swatchNamespace)
+                LooseColorsSection(model: model, swatchSize: swatchSize)
                 palettes
             }
             .padding(.vertical, Brand.Space.lg)
@@ -141,13 +140,13 @@ struct PortfolioScreen: View {
                     spacing: Brand.Space.lg
                 ) {
                     ForEach(Array(ordered.enumerated()), id: \.element.id) { index, palette in
-                        PaletteSection(palette: palette, model: model, swatchSize: swatchSize, namespace: swatchNamespace, showsTip: index == 0, asCard: true)
+                        PaletteSection(palette: palette, model: model, swatchSize: swatchSize, showsTip: index == 0, asCard: true)
                     }
                 }
                 .padding(.horizontal, Brand.Space.lg)
             } else {
                 ForEach(Array(ordered.enumerated()), id: \.element.id) { index, palette in
-                    PaletteSection(palette: palette, model: model, swatchSize: swatchSize, namespace: swatchNamespace, showsTip: index == 0, asCard: false)
+                    PaletteSection(palette: palette, model: model, swatchSize: swatchSize, showsTip: index == 0, asCard: false)
                 }
             }
         }
@@ -353,7 +352,7 @@ private struct PortfolioPresentations: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .sheet(item: $model.activeSheet) { sheet in
+            .sharedSheet(item: $model.activeSheet) { sheet in
                 switch sheet {
                 case .quickAddHex:
                     QuickAddHexSheet { model.saveQuickAdd($0) }

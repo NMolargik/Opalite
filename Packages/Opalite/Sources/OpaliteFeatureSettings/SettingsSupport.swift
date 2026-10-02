@@ -170,40 +170,26 @@ nonisolated public struct PaywallPlan: Identifiable, Equatable, Sendable {
 
     public var id: String { subscription.rawValue }
     public var isSubscription: Bool { subscription.isSubscription }
-    /// The lifetime plan carries the "Best Value" badge.
-    public var isBestValue: Bool { subscription == .lifetime }
 }
 
-/// The plans the paywall shows, in a fixed order with a sensible default selection.
+/// The plans the paywall shows — only plans still sold — with a default selection.
 nonisolated public struct PaywallCatalog: Equatable, Sendable {
     public let plans: [PaywallPlan]
 
-    /// Orders annual before lifetime regardless of the order products arrive in, and
-    /// drops duplicates.
+    /// Keeps purchasable plans only (legacy subscriptions never show), dropping duplicates.
     public init(plans: [PaywallPlan]) {
         var seen: Set<String> = []
-        self.plans = plans
-            .filter { seen.insert($0.id).inserted }
-            .sorted { Self.rank($0.subscription) < Self.rank($1.subscription) }
+        self.plans = plans.filter { $0.subscription.isPurchasable && seen.insert($0.id).inserted }
     }
 
-    public init(annual: PaywallPlan?, lifetime: PaywallPlan?) {
-        self.init(plans: [annual, lifetime].compactMap { $0 })
-    }
-
-    public static func rank(_ subscription: OnyxSubscription) -> Int {
-        switch subscription {
-        case .annual: 0
-        case .lifetime: 1
-        }
+    public init(lifetime: PaywallPlan?) {
+        self.init(plans: [lifetime].compactMap { $0 })
     }
 
     public var isEmpty: Bool { plans.isEmpty }
 
-    /// Annual when available, else the first plan.
-    public var defaultSelectionID: String? {
-        plans.first { $0.subscription == .annual }?.id ?? plans.first?.id
-    }
+    /// The first plan offered.
+    public var defaultSelectionID: String? { plans.first?.id }
 
     public func plan(withID id: String?) -> PaywallPlan? {
         guard let id else { return nil }
@@ -222,12 +208,13 @@ nonisolated public struct PaywallCatalog: Equatable, Sendable {
         return plan.isSubscription ? String(localized: "Subscribe") : String(localized: "Purchase")
     }
 
-    /// The App Store's required disclosure for the selected plan.
+    /// The App Store's required disclosure for the selected plan (one-time wording when
+    /// nothing is selected yet, since only one-time purchases are sold).
     public static func legalText(for plan: PaywallPlan?) -> String {
-        if let plan, !plan.isSubscription {
-            return String(localized: "One-time purchase. Payment is charged to your Apple Account at confirmation.")
+        if let plan, plan.isSubscription {
+            return String(localized: "Payment is charged to your Apple Account at confirmation. Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel in Settings.")
         }
-        return String(localized: "Payment is charged to your Apple Account at confirmation. Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel in Settings.")
+        return String(localized: "One-time purchase. Payment is charged to your Apple Account at confirmation.")
     }
 }
 

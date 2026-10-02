@@ -14057,6 +14057,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "One purchase unlocks Onyx on every device signed in with your Apple Account." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una sola compra desbloquea Onyx en todos los dispositivos con sesión iniciada en tu cuenta de Apple."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un seul achat débloque Onyx sur tous les appareils connectés à votre compte Apple."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一度の購入で、同じApple AccountでサインインしたすべてのデバイスでOnyxが使えるようになります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "One-time purchase. Payment is charged to your Apple Account at confirmation." : {
       "extractionState" : "manual",
       "localizations" : {

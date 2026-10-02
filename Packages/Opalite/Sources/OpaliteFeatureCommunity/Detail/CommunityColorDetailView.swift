@@ -70,7 +70,7 @@ public struct CommunityColorDetailView: View {
                 moreMenu
             }
         }
-        .sheet(isPresented: $isShowingReportSheet) {
+        .sharedSheet(isPresented: $isShowingReportSheet) {
             ReportItemSheet(id: color.id, type: .color)
         }
         .confirmationDialog("Remove this color from the Community?", isPresented: $isConfirmingRemoval, titleVisibility: .visible) {

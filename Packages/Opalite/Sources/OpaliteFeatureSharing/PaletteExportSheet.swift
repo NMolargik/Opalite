@@ -61,7 +61,7 @@ public struct PaletteExportSheet: View {
 #if DEBUG
 #Preview("Share Palette") {
     Text("Host")
-        .sheet(isPresented: .constant(true)) {
+        .sharedSheet(isPresented: .constant(true)) {
             PaletteExportSheet(palette: .sample)
         }
         .previewEnvironment(hasOnyx: false)

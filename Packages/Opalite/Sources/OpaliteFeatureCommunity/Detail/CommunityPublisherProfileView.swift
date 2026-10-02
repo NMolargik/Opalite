@@ -62,7 +62,7 @@ public struct CommunityPublisherProfileView: View {
         .navigationTitle(displayName)
         .toolbarTitleDisplayMode(.inline)
         .task(id: id) { await load() }
-        .sheet(item: $reportTarget) { target in
+        .sharedSheet(item: $reportTarget) { target in
             ReportItemSheet(id: target.id, type: target.type)
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: status)

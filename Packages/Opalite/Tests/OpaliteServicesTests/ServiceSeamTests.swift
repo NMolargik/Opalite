@@ -45,7 +45,7 @@ struct SystemSeamTests {
         let manager = SubscriptionManager()
         #expect(!manager.hasOnyx)
         #expect(manager.currentSubscription == nil)
-        #expect(manager.annualProduct == nil && manager.lifetimeProduct == nil)
+        #expect(manager.lifetimeProduct == nil)
         let entitlement: any EntitlementProviding = manager
         #expect(!entitlement.hasOnyx)
     }

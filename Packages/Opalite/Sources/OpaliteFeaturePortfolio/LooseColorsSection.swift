@@ -20,7 +20,6 @@ struct LooseColorsSection: View {
 
     @Bindable var model: PortfolioViewModel
     let swatchSize: SwatchSize
-    let namespace: Namespace.ID
 
     private var colors: [OpaliteColor] { portfolio.looseColors }
 
@@ -33,7 +32,6 @@ struct LooseColorsSection: View {
                 palette: nil,
                 swatchSize: swatchSize,
                 selectedIDs: model.selection.selectedIDs,
-                matchedNamespace: namespace,
                 onSelect: { color in
                     if !model.handleTap(on: color) { router.open(.color(color.id)) }
                 },

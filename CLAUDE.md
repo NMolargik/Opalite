@@ -29,7 +29,7 @@ xcodebuild -workspace Opalite.xcworkspace -scheme OpaliteTV -destination 'generi
 ```
 Package products only resolve through **scheme** builds (`-workspace … -scheme`); `xcodebuild -project … -target X` cannot see them.
 
-**Requirements:** iCloud container `iCloud.com.molargiksoftware.Opalite` (private DB for sync, public DB for Community); App Group `group.com.molargiksoftware.Opalite` (widgets, iMessage, Share Extension hand-off, intent hand-off); watch App Group `group.com.molargiksoftware.OpaliteWatch`; StoreKit products `onyx_1yr_4.99` and `onyx_lifetime_20` (`Opalite/Configuration.storekit` for local testing).
+**Requirements:** iCloud container `iCloud.com.molargiksoftware.Opalite` (private DB for sync, public DB for Community); App Group `group.com.molargiksoftware.Opalite` (widgets, iMessage, Share Extension hand-off, intent hand-off); watch App Group `group.com.molargiksoftware.OpaliteWatch`; StoreKit products `onyx_lifetime_20` (the only plan sold, a one-time purchase) and the legacy `onyx_1yr_4.99` annual subscription (still honored as an entitlement, never offered or displayed; `OnyxSubscription.purchasable`) — `Opalite/Configuration.storekit` for local testing.
 
 ## Architecture — `Packages/Opalite`
 
@@ -141,6 +141,8 @@ Brand colors **in code** (`Color.opaliteBlue/.opalitePurple/.opaliteTan/.onyx/.o
 - `@ContentBuilder` (SwiftUI's name for `ViewBuilder`) is the house spelling in package code; `@ToolbarContentBuilder` is unchanged. OS-gated modifiers are wrapped once in `OpaliteDesignSystem` as `…IfAvailable` helpers — don't sprinkle `#available` through feature views.
 - Adaptive layout is driven by `horizontalSizeClass` and `onGeometryChange`, never `UIDevice.userInterfaceIdiom` — iPad windows are freely resizable.
 - Drag & drop uses `DraggedColor` (`Transferable`) with the legacy `UTType.opaliteColor`/`.opaliteColorID` providers for cross-device drops; `SwatchRow` is the drop target.
+- **Sheets use `.sharedSheet(isPresented:|item:)`** (OpaliteFeatureShared), never `.sheet`, in every iOS/visionOS view. Mac Catalyst evaluates a sheet's root before the presenter's environment reaches it, so a root that reads a required Observable (`@Environment(PortfolioModel.self)` etc.) traps; the helper reads the shared models in the presenter and re-applies them inside the content.
+- Mac Catalyst canvas: PencilKit only draws with the pointer while the `PKCanvasView` is first responder, so `PencilCanvasRepresentable` keeps it first responder even with the system tool picker hidden and re-asserts on key-window changes.
 - Swift 6 concurrency: non-Sendable values crossing isolation use `UncheckedSendableBox`; system-framework delegate callbacks are `nonisolated` and extract Sendable values before hopping to `@MainActor`; `NSItemProvider` loads go through `ColorDragDrop`'s main-actor helper.
 - Default-argument isolation: a MainActor-protocol conformer used as a default argument needs a `nonisolated init() {}` (see `WidgetCenterReloader`).
 - Shipping identifiers (`com.molargiksoftware.Opalite`, the App Groups, the CloudKit container, the UTIs, the StoreKit product IDs, the `AppStorageKeys` strings) must not change.

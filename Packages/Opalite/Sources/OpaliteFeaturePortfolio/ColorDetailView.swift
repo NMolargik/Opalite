@@ -111,11 +111,11 @@ private struct ColorDetailContent: View {
         .fullScreenCover(isPresented: $model.isShowingFullScreen) {
             FullScreenColorView(colors: [color.rgba], title: color.displayName)
         }
-        .sheet(isPresented: $model.isShowingPaletteSheet) {
+        .sharedSheet(isPresented: $model.isShowingPaletteSheet) {
             PaletteSelectionSheet(colors: [color])
         }
-        .sheet(isPresented: $model.isShowingExport) { ColorExportSheet(color: color) }
-        .sheet(isPresented: $model.isShowingPublish) { PublishColorSheet(color: color) }
+        .sharedSheet(isPresented: $model.isShowingExport) { ColorExportSheet(color: color) }
+        .sharedSheet(isPresented: $model.isShowingPublish) { PublishColorSheet(color: color) }
         .confirmationDialog("Delete \(color.displayName)?", isPresented: $model.isConfirmingDelete, titleVisibility: .visible) {
             Button("Delete Color", role: .destructive) {
                 Haptics.selection()

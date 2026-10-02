@@ -42,6 +42,8 @@ struct OnyxGateTests {
         #expect(OnyxSubscription.lifetime.rawValue == "onyx_lifetime_20")
         #expect(OnyxSubscription.annual.isSubscription && !OnyxSubscription.lifetime.isSubscription)
         #expect(OnyxSubscription.productIDs == ["onyx_1yr_4.99", "onyx_lifetime_20"])
+        #expect(OnyxSubscription.purchasable == [.lifetime])
+        #expect(OnyxSubscription.purchasableProductIDs == ["onyx_lifetime_20"])
         #expect(OnyxSubscription.allCases.allSatisfy { $0.id == $0.rawValue })
     }
 }

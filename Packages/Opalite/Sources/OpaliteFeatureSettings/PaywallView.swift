@@ -3,8 +3,9 @@
 //  OpaliteFeatureSettings
 //
 //  The Onyx purchase screen the shell presents for `.paywall(context:)`: a dark hero,
-//  the reason it was shown, what Onyx unlocks, the two plans from the StoreKit catalog,
-//  one prominent purchase button, restore, and the App Store disclosures. Purchases go
+//  the reason it was shown, what Onyx unlocks, the lifetime plan from the StoreKit
+//  catalog (the annual subscription is legacy and never shown), one prominent purchase
+//  button, restore, and the App Store disclosures. Purchases go
 //  through `SubscriptionManager`; `Product` is only read for display.
 //
 
@@ -37,7 +38,6 @@ public struct PaywallView: View {
 
     private var catalog: PaywallCatalog {
         PaywallCatalog(
-            annual: subscription.annualProduct.map { PaywallPlan(subscription: .annual, displayPrice: $0.displayPrice) },
             lifetime: subscription.lifetimeProduct.map { PaywallPlan(subscription: .lifetime, displayPrice: $0.displayPrice) }
         )
     }
@@ -328,18 +328,8 @@ private struct PlanCard: View {
         Button(action: onSelect) {
             HStack(spacing: Brand.Space.md) {
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: Brand.Space.sm) {
-                        Text(plan.subscription.displayName)
-                            .font(.headline)
-                        if plan.isBestValue {
-                            Text("Best Value")
-                                .font(.caption2.weight(.bold))
-                                .padding(.horizontal, 7)
-                                .padding(.vertical, 3)
-                                .background(Capsule(style: .continuous).fill(LinearGradient.opaliteHorizontal))
-                                .foregroundStyle(Color.onyx)
-                        }
-                    }
+                    Text(plan.subscription.displayName)
+                        .font(.headline)
                     Text("\(plan.displayPrice) \(plan.subscription.priceDescription)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)

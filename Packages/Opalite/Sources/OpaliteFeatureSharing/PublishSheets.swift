@@ -368,7 +368,7 @@ private struct PublishActionBar: View {
 
 #Preview("Publish Palette") {
     Text("Host")
-        .sheet(isPresented: .constant(true)) {
+        .sharedSheet(isPresented: .constant(true)) {
             PublishPaletteSheet(palette: .sample)
         }
         .previewEnvironment()

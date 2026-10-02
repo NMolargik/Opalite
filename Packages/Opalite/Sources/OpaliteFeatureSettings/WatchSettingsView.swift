@@ -109,7 +109,7 @@ struct WatchSettingsView: View {
         }
         .navigationTitle("Apple Watch")
         .navigationSubtitleIfAvailable(status.summary)
-        .sheet(isPresented: $isShowingInfo) { WatchAppInfoSheet() }
+        .sharedSheet(isPresented: $isShowingInfo) { WatchAppInfoSheet() }
     }
 }
 

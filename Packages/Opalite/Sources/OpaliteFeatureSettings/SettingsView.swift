@@ -67,7 +67,7 @@ public struct SettingsView: View {
         .onChange(of: displayName) { _, newValue in
             ProfileName.commit(newValue, portfolio: portfolio, community: community)
         }
-        .sheet(isPresented: $isShowingCommunityAdmin) { CommunityAdminSheet() }
+        .sharedSheet(isPresented: $isShowingCommunityAdmin) { CommunityAdminSheet() }
         .confirmationDialog("Generate Sample Data?", isPresented: $isConfirmingSampleData, titleVisibility: .visible) {
             Button("Generate") {
                 Haptics.selection()
@@ -141,7 +141,7 @@ public struct SettingsView: View {
             Text("Onyx")
         } footer: {
             if onyxStatus.showsUpgrade {
-                Text("One purchase or subscription unlocks Onyx on every device signed in with your Apple Account.")
+                Text("One purchase unlocks Onyx on every device signed in with your Apple Account.")
             }
         }
     }

@@ -57,13 +57,13 @@ struct MainView: View {
         .minimizeTabBarOnScrollIfAvailable()
         .tint(router.selectedTab.color)
         // MARK: Global presentations
-        .sheet(item: $navigation.presentation) { presentation in
+        .sharedSheet(item: $navigation.presentation) { presentation in
             presentationSheet(presentation)
         }
-        .sheet(isPresented: $importer.isShowingColorImport) {
+        .sharedSheet(isPresented: $importer.isShowingColorImport) {
             if let preview = importer.pendingColorImport { ColorImportConfirmationSheet(preview: preview) }
         }
-        .sheet(isPresented: $importer.isShowingPaletteImport) {
+        .sharedSheet(isPresented: $importer.isShowingPaletteImport) {
             if let preview = importer.pendingPaletteImport { PaletteImportConfirmationSheet(preview: preview) }
         }
         .alert("Couldn't Import", isPresented: $importer.isShowingError, presenting: importer.importError) { _ in
@@ -184,7 +184,7 @@ struct MainView: View {
             }
             .interactiveDismissDisabled()
         case .swatchBarInfo:
-            SwatchBarInfoSheet()
+            SwatchBarInfoSheet(onOpen: supportsMultipleWindows ? { openWindow(id: SwatchBarScene.windowID) } : nil)
         }
     }
 

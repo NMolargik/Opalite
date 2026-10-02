@@ -86,7 +86,7 @@ public struct CommunityPaletteDetailView: View {
             guard !palette.hasLoadedColors else { return }
             loadedColors = await community.paletteColors(initialPalette)
         }
-        .sheet(isPresented: $isShowingReportSheet) {
+        .sharedSheet(isPresented: $isShowingReportSheet) {
             ReportItemSheet(id: palette.id, type: .palette)
         }
         .confirmationDialog("Remove this palette from the Community?", isPresented: $isConfirmingRemoval, titleVisibility: .visible) {

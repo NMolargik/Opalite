@@ -24,7 +24,6 @@ struct PaletteSection: View {
     let palette: OpalitePalette
     @Bindable var model: PortfolioViewModel
     let swatchSize: SwatchSize
-    let namespace: Namespace.ID
     let showsTip: Bool
     let asCard: Bool
 
@@ -52,7 +51,6 @@ struct PaletteSection: View {
                 colors: colors,
                 palette: palette,
                 swatchSize: swatchSize,
-                matchedNamespace: namespace,
                 onSelect: { router.open(.color($0.id)) },
                 onCreate: { model.requestEditor(for: palette) },
                 menu: { color in
@@ -101,9 +99,9 @@ struct PaletteSection: View {
         } message: {
             Text("Archived palettes leave the Portfolio but stay in Archived Palettes, where you can restore them.")
         }
-        .sheet(isPresented: $isShowingExport) { PaletteExportSheet(palette: palette) }
-        .sheet(isPresented: $isShowingPublish) { PublishPaletteSheet(palette: palette) }
-        .sheet(isPresented: $isShowingCanvasPicker) {
+        .sharedSheet(isPresented: $isShowingExport) { PaletteExportSheet(palette: palette) }
+        .sharedSheet(isPresented: $isShowingPublish) { PublishPaletteSheet(palette: palette) }
+        .sharedSheet(isPresented: $isShowingCanvasPicker) {
             CanvasPickerSheet { canvas in
                 portfolio.link(canvas, to: palette)
                 toasts.showSuccess(String(localized: "Linked \(canvas.title)"), systemImage: "link")

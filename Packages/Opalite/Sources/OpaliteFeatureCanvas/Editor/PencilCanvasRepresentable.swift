@@ -54,6 +54,11 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
         coordinator.canvasView = view
         coordinator.storedCanvasSize = canvasSize
         view.onMovedToWindow = { [weak coordinator] in coordinator?.windowDidAppear() }
+        #if targetEnvironment(macCatalyst)
+        // Clicking any SwiftUI control in the window can move first responder away from the
+        // canvas, after which PencilKit ignores pointer drags. Take it back on touch-down.
+        view.addGestureRecognizer(FirstResponderReclaimingRecognizer())
+        #endif
         return view
     }
 
@@ -107,6 +112,21 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
     @MainActor
     final class Coordinator: NSObject, PKCanvasViewDelegate, PKToolPickerObserver {
         weak var canvasView: OpaliteCanvasView?
+        #if targetEnvironment(macCatalyst)
+        nonisolated(unsafe) private var keyWindowObserver: (any NSObjectProtocol)?
+
+        override init() {
+            super.init()
+            keyWindowObserver = NotificationCenter.default.addObserver(forName: UIWindow.didBecomeKeyNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.windowDidBecomeKey() }
+            }
+        }
+
+        deinit {
+            if let keyWindowObserver { NotificationCenter.default.removeObserver(keyWindowObserver) }
+        }
+        #endif
+
         var toolPicker: PKToolPicker?
         var storedCanvasSize: CGSize = .zero
         var lastInkStamp: UUID?
@@ -144,8 +164,21 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
                 _ = canvasView.becomeFirstResponder()
             } else {
                 onObscuredInsetChanged?(0)
+                #if targetEnvironment(macCatalyst)
+                // On Mac Catalyst PencilKit only draws with the pointer while the canvas is
+                // first responder, whether or not the system picker is showing.
+                _ = canvasView.becomeFirstResponder()
+                #endif
             }
         }
+
+        #if targetEnvironment(macCatalyst)
+        /// Catalyst drops first responder when the window loses key; take it back.
+        func windowDidBecomeKey() {
+            guard let canvasView, canvasView.window?.isKeyWindow == true, !canvasView.isFirstResponder else { return }
+            _ = canvasView.becomeFirstResponder()
+        }
+        #endif
 
         // MARK: Tools
 
@@ -245,6 +278,25 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
 
     }
 }
+
+#if targetEnvironment(macCatalyst)
+/// A passive recognizer that makes its view first responder when a touch begins, then
+/// fails so PencilKit's own recognizers see every event untouched.
+private final class FirstResponderReclaimingRecognizer: UIGestureRecognizer {
+    init() {
+        super.init(target: nil, action: nil)
+        cancelsTouchesInView = false
+        delaysTouchesBegan = false
+        delaysTouchesEnded = false
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesBegan(touches, with: event)
+        if let view, !view.isFirstResponder { _ = view.becomeFirstResponder() }
+        state = .failed
+    }
+}
+#endif
 
 /// Reports when it joins a window so the tool picker attaches at the right moment.
 final class OpaliteCanvasView: PKCanvasView {

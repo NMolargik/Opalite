@@ -5,7 +5,9 @@
 //  Explains the SwatchBar the first time the user reaches for it (from Settings or the
 //  menu bar) and offers to open it. "Don't show again" writes
 //  `AppStorageKeys.skipSwatchBarConfirmation`, so the shell can open the window straight
-//  away next time. The shell presents this for `PendingPresentation.swatchBarInfo`.
+//  away next time. The shell presents this for `PendingPresentation.swatchBarInfo` and
+//  hands in `onOpen` (nil where the platform has no second window), which opens the
+//  window directly — routing back through the shell would only re-present this sheet.
 //
 
 #if os(iOS) || os(visionOS)
@@ -15,13 +17,18 @@ import OpaliteDesignSystem
 import OpaliteFeatureShared
 
 public struct SwatchBarInfoSheet: View {
-    @Environment(AppRouter.self) private var router
+    private let onOpen: (() -> Void)?
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipConfirmation = false
     @State private var hasAppeared = false
 
-    public init() {}
+    /// - Parameter onOpen: Opens the SwatchBar window; pass nil where multiple windows
+    ///   are unsupported and the sheet is purely informational.
+    public init(onOpen: (() -> Void)? = nil) {
+        self.onOpen = onOpen
+    }
 
     private struct Feature: Identifiable {
         let id: String
@@ -90,18 +97,20 @@ public struct SwatchBarInfoSheet: View {
                 .ignoresSafeArea()
             }
             .safeAreaInset(edge: .bottom) {
-                Button {
-                    Haptics.mediumImpact()
-                    router.open(.swatchBar)
-                    dismiss()
-                } label: {
-                    Label("Open SwatchBar", systemImage: "arrow.up.forward.square")
-                        .frame(maxWidth: .infinity)
+                if let onOpen {
+                    Button {
+                        Haptics.mediumImpact()
+                        onOpen()
+                        dismiss()
+                    } label: {
+                        Label("Open SwatchBar", systemImage: "arrow.up.forward.square")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .primaryActionButton()
+                    .padding(.horizontal, Brand.Space.lg)
+                    .padding(.bottom, Brand.Space.md)
+                    .accessibilityIdentifier("swatchBarInfo.open")
                 }
-                .primaryActionButton()
-                .padding(.horizontal, Brand.Space.lg)
-                .padding(.bottom, Brand.Space.md)
-                .accessibilityIdentifier("swatchBarInfo.open")
             }
             .navigationTitle("SwatchBar")
             .toolbarTitleDisplayMode(.inline)
@@ -198,8 +207,8 @@ public struct SwatchBarInfoSheet: View {
 #if DEBUG
 #Preview("SwatchBar info") {
     Color.clear
-        .sheet(isPresented: .constant(true)) {
-            SwatchBarInfoSheet()
+        .sharedSheet(isPresented: .constant(true)) {
+            SwatchBarInfoSheet(onOpen: {})
                 .previewEnvironment()
         }
 }

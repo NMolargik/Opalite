@@ -25,14 +25,13 @@ public final class SubscriptionManager: EntitlementProviding {
 
     @ObservationIgnored private var transactionListener: Task<Void, Never>?
 
-    /// Whether the user has Onyx (annual subscription or lifetime purchase).
+    /// Whether the user has Onyx (the lifetime purchase, or a legacy annual subscription).
     public var hasOnyx: Bool { !purchasedProductIDs.intersection(OnyxSubscription.productIDs).isEmpty }
 
     public var currentSubscription: OnyxSubscription? {
         purchasedProductIDs.lazy.compactMap(OnyxSubscription.init(rawValue:)).first
     }
 
-    public var annualProduct: Product? { products.first { $0.id == OnyxSubscription.annual.rawValue } }
     public var lifetimeProduct: Product? { products.first { $0.id == OnyxSubscription.lifetime.rawValue } }
 
     public init() {
@@ -52,7 +51,7 @@ public final class SubscriptionManager: EntitlementProviding {
         isLoading = true
         defer { isLoading = false }
         do {
-            products = try await Product.products(for: OnyxSubscription.productIDs).sorted { $0.price < $1.price }
+            products = try await Product.products(for: OnyxSubscription.purchasableProductIDs).sorted { $0.price < $1.price }
             error = nil
         } catch {
             Log.subscription.error("Product load failed: \(error.localizedDescription)")

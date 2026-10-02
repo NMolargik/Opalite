@@ -57,13 +57,13 @@ public struct CommunityView: View {
                 model.isShowingNamePrompt = true
             }
         }
-        .sheet(isPresented: $model.isShowingInfo) {
+        .sharedSheet(isPresented: $model.isShowingInfo) {
             CommunityInfoSheet()
         }
-        .sheet(isPresented: $model.isShowingNamePrompt, onDismiss: { hasPromptedForCommunityName = true }) {
+        .sharedSheet(isPresented: $model.isShowingNamePrompt, onDismiss: { hasPromptedForCommunityName = true }) {
             CommunityNamePromptSheet()
         }
-        .sheet(item: $model.reportTarget) { target in
+        .sharedSheet(item: $model.reportTarget) { target in
             ReportItemSheet(id: target.id, type: target.type)
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: status)
