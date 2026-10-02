@@ -268,7 +268,8 @@ public final class CommunityModel {
 
     // MARK: - Save to portfolio (Onyx)
 
-    /// Saves a Community color into the portfolio. Requires Onyx and no existing copy.
+    /// Saves a Community color into the portfolio under its original id, so a second save
+    /// is recognized as a duplicate. Requires Onyx.
     @discardableResult
     public func save(_ community: CommunityColor, into portfolio: PortfolioModel, router: AppRouter) -> Bool {
         guard entitlements.hasOnyx else {
@@ -281,7 +282,7 @@ public final class CommunityModel {
             toastManager.show(error: OpaliteError.communityColorAlreadyExists)
             return false
         }
-        let color = OpaliteColor(name: community.name, notes: community.notes, createdByDisplayName: community.publisherName, red: community.red, green: community.green, blue: community.blue, alpha: community.alpha)
+        let color = OpaliteColor(id: community.originalColorID, name: community.name, notes: community.notes, createdByDisplayName: community.publisherName, red: community.red, green: community.green, blue: community.blue, alpha: community.alpha)
         guard portfolio.insert(color) != nil else { return false }
         toastManager.showSuccess(String(localized: "Saved to your Portfolio"))
         return true
@@ -302,7 +303,7 @@ public final class CommunityModel {
         let colors = await paletteColors(community).map { c in
             OpaliteColor(name: c.name, notes: c.notes, createdByDisplayName: c.publisherName, red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)
         }
-        let palette = OpalitePalette(name: community.name, createdByDisplayName: community.publisherName, notes: community.notes, tags: community.tags, colors: colors)
+        let palette = OpalitePalette(id: community.originalPaletteID, name: community.name, createdByDisplayName: community.publisherName, notes: community.notes, tags: community.tags, colors: colors)
         guard portfolio.insert(palette) != nil else { return false }
         toastManager.showSuccess(String(localized: "Saved to your Portfolio"))
         return true

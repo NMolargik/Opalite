@@ -11,7 +11,8 @@ package gets flagged "stale" and is one careless click away from deletion.
 
 This script pins every catalog entry whose literal appears anywhere in
 `Packages/Opalite/Sources` to `extractionState: "manual"` (rescuing already-stale ones),
-and reports package string literals that are missing from the catalog entirely.
+and reports package string keys (as `extract_package_strings.py` derives them) that are
+missing from the catalog entirely.
 
     python3 Scripts/pin_package_strings.py            # pin + report
     python3 Scripts/pin_package_strings.py --missing  # only print missing literals (one per line)
@@ -139,9 +140,11 @@ def main() -> int:
         for key in rescued:
             print(f"  rescued: {key!r}")
 
-    keys = list(strings.keys())
-    all_literals = literals(source_blob([PACKAGE_SOURCES] + EXTRA_SOURCES))
-    missing = sorted(l for l in all_literals if not catalog_covers(l, keys))
+    # The runtime looks keys up with Foundation specifiers in place of interpolations;
+    # extract_package_strings produces exactly those keys.
+    from extract_package_strings import collect
+
+    missing = sorted(key for key in collect() if key not in strings)
     if missing_only:
         for literal in missing:
             print(literal)

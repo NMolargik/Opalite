@@ -17,3 +17,9 @@ Packages/*/.swiftpm/
 
 # Scratch
 build/
+
+# Swift module cache that Xcode drops next to the project
+*.xcodeproj/-Xcc/
+
+# Python
+__pycache__/

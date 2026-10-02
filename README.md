@@ -65,7 +65,7 @@ Dependencies point inward; features never touch persistence directly. See `CLAUD
 
 ## Localization
 
-English, Spanish, Canadian French, and Japanese via string catalogs in the app target (`Localizable.xcstrings`, `InfoPlist.xcstrings`, `AppShortcuts.xcstrings`). Package strings are pinned with `Scripts/pin_package_strings.py`.
+English, Spanish, Canadian French, and Japanese via string catalogs. The app target's `Localizable.xcstrings` is the master (plus `InfoPlist.xcstrings` and `AppShortcuts.xcstrings`); `Scripts/extract_package_strings.py` lists package strings as catalog keys, `Scripts/merge_translations.py` merges translations, `Scripts/pin_package_strings.py` pins them, and `Scripts/sync_target_catalogs.py` derives the TV, watch, widget, and extension catalogs from the master.
 
 ## Privacy
 
