@@ -4273,6 +4273,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Clear Recents" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar recientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les recherches récentes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近の検索を消去"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Clear Reports" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12457,6 +12481,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Name, hex code, notes, or tag" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre, código hex, notas o etiqueta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom, code hex, notes ou étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前、16進コード、メモ、タグ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Name, hex code, or tag" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13532,6 +13580,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "まだサンプリングされていません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Nothing to Search Yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay nada que buscar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à rechercher pour l'instant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ検索するものがありません"
           }
         }
       },
@@ -17449,6 +17521,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Recently Updated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizados recientemente"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récemment mis à jour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近更新したカラー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Rectangle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17708,6 +17804,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パレットから取り除く"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Remove from Recents" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar de recientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer des recherches récentes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近の検索から削除"
           }
         }
       },
@@ -18961,6 +19081,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Save a few colors and palettes in your Portfolio, then find them here by name, hex code, notes, tag, or color family." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda algunos colores y paletas en tu Portafolio y luego encuéntralos aquí por nombre, código hex, notas, etiqueta o familia de color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez quelques couleurs et palettes dans votre Portfolio, puis retrouvez-les ici par nom, code hex, notes, étiquette ou famille de couleurs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポートフォリオにカラーやパレットを保存すると、名前、16進コード、メモ、タグ、色の系統でここから検索できます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Save as Image" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19436,6 +19580,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "検索結果"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Searches for %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@を検索します"
           }
         }
       },
@@ -21164,6 +21332,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登録"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Suggestions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "候補"
           }
         }
       },

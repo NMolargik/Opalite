@@ -48,40 +48,11 @@ struct MainView: View {
         @Bindable var hexCopy = hexCopy
 
         TabView(selection: $router.selectedTab) {
-            Tab(AppTab.portfolio.title, systemImage: AppTab.portfolio.systemImage, value: .portfolio) {
-                NavigationStack(path: $navigation.portfolioPath) {
-                    PortfolioView()
-                        .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
-                }
-            }
-
-            Tab(AppTab.community.title, systemImage: AppTab.community.systemImage, value: .community) {
-                NavigationStack(path: $navigation.communityPath) {
-                    CommunityView()
-                        .navigationDestination(for: CommunityDestination.self) { CommunityDestinationView(destination: $0) }
-                }
-            }
-
-            Tab(AppTab.canvas.title, systemImage: AppTab.canvas.systemImage, value: .canvas) {
-                NavigationStack(path: $navigation.canvasPath) {
-                    CanvasListView()
-                        .navigationDestination(for: CanvasDestination.self) { CanvasDestinationView(destination: $0) }
-                }
-            }
-
-            Tab(AppTab.settings.title, systemImage: settingsSymbol, value: .settings) {
-                NavigationStack(path: $navigation.settingsPath) {
-                    SettingsView()
-                        .navigationDestination(for: SettingsDestination.self) { SettingsDestinationView(destination: $0) }
-                }
-            }
-
-            Tab(AppTab.search.title, systemImage: AppTab.search.systemImage, value: .search, role: .search) {
-                NavigationStack(path: $navigation.searchPath) {
-                    SearchView()
-                        .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
-                }
-            }
+            portfolioTab
+            communityTab
+            canvasTab
+            settingsTab
+            searchTab
         }
         .tabViewStyle(.sidebarAdaptable)
         .minimizeTabBarOnScrollIfAvailable()
@@ -121,6 +92,53 @@ struct MainView: View {
             handleDeepLink(router.pendingDeepLink)
             handlePresentation(router.pendingPresentation)
             openCanvas(canvases.pendingCanvasID)
+        }
+    }
+
+    // MARK: - Tabs
+
+    private var portfolioTab: some TabContent<AppTab> {
+        Tab(AppTab.portfolio.title, systemImage: AppTab.portfolio.systemImage, value: .portfolio) {
+            NavigationStack(path: $navigation.portfolioPath) {
+                PortfolioView()
+                    .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
+            }
+        }
+    }
+
+    private var communityTab: some TabContent<AppTab> {
+        Tab(AppTab.community.title, systemImage: AppTab.community.systemImage, value: .community) {
+            NavigationStack(path: $navigation.communityPath) {
+                CommunityView()
+                    .navigationDestination(for: CommunityDestination.self) { CommunityDestinationView(destination: $0) }
+            }
+        }
+    }
+
+    private var canvasTab: some TabContent<AppTab> {
+        Tab(AppTab.canvas.title, systemImage: AppTab.canvas.systemImage, value: .canvas) {
+            NavigationStack(path: $navigation.canvasPath) {
+                CanvasListView()
+                    .navigationDestination(for: CanvasDestination.self) { CanvasDestinationView(destination: $0) }
+            }
+        }
+    }
+
+    private var settingsTab: some TabContent<AppTab> {
+        Tab(AppTab.settings.title, systemImage: settingsSymbol, value: .settings) {
+            NavigationStack(path: $navigation.settingsPath) {
+                SettingsView()
+                    .navigationDestination(for: SettingsDestination.self) { SettingsDestinationView(destination: $0) }
+            }
+        }
+    }
+
+    private var searchTab: some TabContent<AppTab> {
+        Tab(AppTab.search.title, systemImage: AppTab.search.systemImage, value: .search, role: .search) {
+            NavigationStack(path: $navigation.searchPath) {
+                SearchView()
+                    .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
+            }
         }
     }
 
@@ -290,7 +308,7 @@ private struct PortfolioAccessory: View {
             Button(action: onNewColor) {
                 Label("New Color", systemImage: "plus")
                     .font(.subheadline.weight(.semibold))
-                    .labelStyle(isInline ? .iconOnly : .titleAndIcon)
+                    .if(isInline) { $0.labelStyle(.iconOnly) }
             }
             .glassActionButton(tint: .opalitePurple)
             .controlSize(.small)
