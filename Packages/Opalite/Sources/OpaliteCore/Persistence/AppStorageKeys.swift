@@ -12,6 +12,8 @@ nonisolated public enum AppStorageKeys {
     // MARK: - Lifecycle
     public static let isOnboardingComplete = "isOnboardingComplete"
     public static let lastReviewRequestVersion = "lastReviewRequestVersion"
+    /// The version that already asked for a review after a Procreate/ASE export.
+    public static let lastExportReviewRequestVersion = "lastExportReviewRequestVersion"
     public static let hasPromptedForCommunityName = "hasPromptedForCommunityName"
 
     // MARK: - Identity & appearance

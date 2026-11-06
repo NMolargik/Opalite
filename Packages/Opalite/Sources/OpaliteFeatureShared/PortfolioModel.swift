@@ -333,6 +333,19 @@ public final class PortfolioModel {
         reviewRequester.requestReview()
     }
 
+    /// Asks for a review once per version after the first export to a pro tool (Procreate
+    /// swatches or Adobe ASE). Call it after the export sheet has gone away.
+    /// - Returns: Whether a review was requested.
+    @discardableResult
+    public func requestReviewAfterExport(fileExtension: String) -> Bool {
+        guard let reviewRequester else { return false }
+        let last = defaults.string(forKey: AppStorageKeys.lastExportReviewRequestVersion) ?? ""
+        guard ReviewMilestone.shouldPromptAfterExport(fileExtension: fileExtension, currentVersion: appVersion, lastPromptedVersion: last) else { return false }
+        defaults.set(appVersion, forKey: AppStorageKeys.lastExportReviewRequestVersion)
+        reviewRequester.requestReview()
+        return true
+    }
+
     // MARK: - Error surfacing
 
     private func surfacing<T>(fallback: T, _ operation: () throws -> T) -> T {

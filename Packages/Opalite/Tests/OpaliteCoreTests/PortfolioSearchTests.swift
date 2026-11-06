@@ -143,4 +143,17 @@ struct ReviewMilestoneTests {
         #expect(!ReviewMilestone.shouldPrompt(colorCount: 2, paletteCount: 3, currentVersion: "1.2", lastPromptedVersion: ""))
         #expect(!ReviewMilestone.shouldPrompt(colorCount: 0, paletteCount: 1, currentVersion: "1.2", lastPromptedVersion: ""))
     }
+
+    @Test func promptsAfterTheFirstProcreateOrASEExport() {
+        #expect(ReviewMilestone.shouldPromptAfterExport(fileExtension: "swatches", currentVersion: "1.7.0", lastPromptedVersion: ""))
+        #expect(ReviewMilestone.shouldPromptAfterExport(fileExtension: "ASE", currentVersion: "1.7.0", lastPromptedVersion: "1.6.0"))
+    }
+
+    @Test func exportPromptIsOncePerVersionAndProOnly() {
+        #expect(!ReviewMilestone.shouldPromptAfterExport(fileExtension: "ase", currentVersion: "1.7.0", lastPromptedVersion: "1.7.0"))
+        #expect(!ReviewMilestone.shouldPromptAfterExport(fileExtension: "ase", currentVersion: "", lastPromptedVersion: ""))
+        for ext in ["png", "pdf", "opalitepalette", "gpl", "css", "swift"] {
+            #expect(!ReviewMilestone.shouldPromptAfterExport(fileExtension: ext, currentVersion: "1.7.0", lastPromptedVersion: ""))
+        }
+    }
 }

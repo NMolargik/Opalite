@@ -309,7 +309,8 @@ public final class PreviewEnvironment {
     /// - Parameters:
     ///   - hasOnyx: The entitlement to simulate.
     ///   - seeded: Whether to start with sample palettes, loose colors, and canvases.
-    public init(hasOnyx: Bool = true, seeded: Bool = true) {
+    ///   - reviewRequester: A review seam for tests (nil: never asks).
+    public init(hasOnyx: Bool = true, seeded: Bool = true, reviewRequester: (any ReviewRequesting)? = nil) {
         entitlements = FixedEntitlement(hasOnyx: hasOnyx)
         colorRepository = InMemoryColorRepository(changeCenter: changeCenter)
         paletteRepository = InMemoryPaletteRepository(changeCenter: changeCenter, colors: colorRepository)
@@ -344,6 +345,7 @@ public final class PreviewEnvironment {
             deletePalette: DeletePaletteUseCase(repository: paletteRepository),
             linkCanvas: LinkCanvasToPaletteUseCase(repository: paletteRepository),
             observeChanges: observe,
+            reviewRequester: reviewRequester,
             device: GenericDevice(deviceName: "Preview Device"),
             defaults: defaults,
             toastManager: toastManager,

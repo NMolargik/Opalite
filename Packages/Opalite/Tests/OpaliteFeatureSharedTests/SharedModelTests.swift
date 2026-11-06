@@ -634,3 +634,33 @@ struct CommunityModelTests {
         #expect(!env.communityService.colors.contains { $0.id == id })
     }
 }
+
+
+// MARK: - Review after export
+
+@Suite("PortfolioModel review prompts")
+struct PortfolioModelReviewTests {
+    @MainActor
+    final class CountingReviewRequester: ReviewRequesting {
+        var count = 0
+        func requestReview() { count += 1 }
+    }
+
+    @Test func asksOnceAfterTheFirstProExport() {
+        let requester = CountingReviewRequester()
+        let env = PreviewEnvironment(seeded: false, reviewRequester: requester)
+        #expect(!env.portfolio.requestReviewAfterExport(fileExtension: "png"))
+        #expect(requester.count == 0)
+        #expect(env.portfolio.requestReviewAfterExport(fileExtension: "swatches"))
+        #expect(requester.count == 1)
+        #expect(env.defaults.string(forKey: AppStorageKeys.lastExportReviewRequestVersion) == "1.0")
+        #expect(!env.portfolio.requestReviewAfterExport(fileExtension: "ase"), "once per version")
+        #expect(requester.count == 1)
+    }
+
+    @Test func doesNothingWithoutARequester() {
+        let env = PreviewEnvironment(seeded: false)
+        #expect(!env.portfolio.requestReviewAfterExport(fileExtension: "ase"))
+        #expect(env.defaults.string(forKey: AppStorageKeys.lastExportReviewRequestVersion) == nil)
+    }
+}

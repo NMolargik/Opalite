@@ -33,6 +33,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
     @Environment(AppRouter.self) private var router
     @Environment(ToastManager.self) private var toastManager
     @Environment(CommunityModel.self) private var community
+    @Environment(PortfolioModel.self) private var portfolio
 
     @State private var selectedFormat: Format?
     @State private var exported: ExportedFile?
@@ -41,6 +42,8 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
     @State private var isSavingToFiles = false
     @State private var isShowingPublish = false
     @State private var sharePreviewImage: Image?
+    /// The extension of the last pro-format file written, for the review prompt on dismiss.
+    @State private var exportedProExtension: String?
 
     private var hasOnyx: Bool { entitlement.hasOnyx }
 
@@ -114,7 +117,16 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
                 selectedFormat = ExportAccess.defaultFormat(in: formats, hasOnyx: hasOnyx)
             }
         }
-        .onDisappear { exported?.removeFromDisk() }
+        .onDisappear {
+            exported?.removeFromDisk()
+            if let exportedProExtension {
+                // The sheet is gone; give its animation a beat before the system alert.
+                Task {
+                    try? await Task.sleep(for: .milliseconds(600))
+                    portfolio.requestReviewAfterExport(fileExtension: exportedProExtension)
+                }
+            }
+        }
     }
 
     // MARK: - Rows
@@ -265,6 +277,9 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
             let file = try ExportedFile.load(url, contentType: format.contentType)
             if previous?.url != file.url { previous?.removeFromDisk() }
             exported = file
+            if ReviewMilestone.proExportExtensions.contains(format.fileExtension) {
+                exportedProExtension = format.fileExtension
+            }
             if sharePreviewImage == nil, let png = previewPNG(), let image = UIImage(data: png) {
                 sharePreviewImage = Image(uiImage: image)
             }
