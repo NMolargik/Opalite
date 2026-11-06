@@ -42,7 +42,7 @@ let package = Package(
         .library(name: "OpaliteComposition", targets: ["OpaliteComposition"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/devicekit/DeviceKit.git", from: "5.7.0"),
+        .package(url: "https://github.com/devicekit/DeviceKit.git", exact: "5.9.0"),
     ],
     targets: [
         .target(name: "OpaliteCore", swiftSettings: isolation),
