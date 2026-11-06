@@ -185,17 +185,11 @@ extension ReportReason {
 }
 
 extension OnyxSubscription {
+    /// The legacy annual plan is honored but never named in the UI: it reads as plain "Onyx".
     public var displayName: String {
         switch self {
-        case .annual: String(localized: "Onyx Annual")
+        case .annual: String(localized: "Onyx")
         case .lifetime: String(localized: "Onyx Lifetime")
-        }
-    }
-
-    public var priceDescription: String {
-        switch self {
-        case .annual: String(localized: "per year")
-        case .lifetime: String(localized: "one-time purchase")
         }
     }
 }

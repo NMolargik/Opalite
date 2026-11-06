@@ -43,7 +43,7 @@ struct OnyxSettingsView: View {
                         Label("Get Onyx", systemImage: "sparkles")
                             .labelStyle(.settingsIcon(.onyx))
                     }
-                    .accessibilityHint(Text("Shows Onyx plans and prices"))
+                    .accessibilityHint(Text("Shows what Onyx unlocks and its one-time price"))
                     .accessibilityIdentifier("onyx.get")
                 } else if status.canManageSubscription {
                     Button {

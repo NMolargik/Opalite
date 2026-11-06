@@ -26,11 +26,14 @@ struct OnyxStatusTests {
         #expect(status.systemImage == "diamond")
     }
 
-    @Test func annual() {
+    @Test func legacyAnnualReadsAsPlainOnyx() {
         let status = OnyxStatus(hasOnyx: true, subscription: .annual)
-        #expect(status.title == "Onyx Annual")
+        #expect(status.title == "Onyx")
+        #expect(!status.title.localizedCaseInsensitiveContains("annual"))
+        #expect(!status.detail.localizedCaseInsensitiveContains("renew"))
+        #expect(status.detail == OnyxStatus(hasOnyx: true, subscription: nil).detail)
         #expect(!status.showsUpgrade)
-        #expect(status.canManageSubscription)
+        #expect(status.canManageSubscription, "legacy subscribers keep a way to manage what they pay for")
         #expect(status.systemImage == "diamond.fill")
     }
 
@@ -158,22 +161,23 @@ struct PaywallCatalogTests {
         #expect(catalog.resolvedSelection(current: nil) == lifetime.id)
     }
 
-    @Test func callToActionFollowsPlanKind() {
-        #expect(PaywallCatalog.callToAction(for: annual) == "Subscribe")
-        #expect(PaywallCatalog.callToAction(for: lifetime) == "Purchase")
-        #expect(PaywallCatalog.callToAction(for: nil) == "Choose a Plan")
+    @Test func callToActionNeverSaysSubscribe() {
+        for plan in [annual, lifetime, nil] {
+            #expect(PaywallCatalog.callToAction(for: plan) == "Purchase")
+        }
     }
 
-    @Test func legalTextDistinguishesOneTimePurchase() {
-        #expect(PaywallCatalog.legalText(for: lifetime).contains("One-time"))
-        #expect(PaywallCatalog.legalText(for: annual).contains("renew"))
-        #expect(PaywallCatalog.legalText(for: nil).contains("One-time"))
+    @Test func legalTextIsAlwaysOneTime() {
+        for plan in [annual, lifetime, nil] {
+            let text = PaywallCatalog.legalText(for: plan)
+            #expect(text.contains("One-time"))
+            #expect(!text.localizedCaseInsensitiveContains("renew"))
+        }
     }
 
-    @Test func badgesAndIdentity() {
-        #expect(annual.id == OnyxSubscription.annual.rawValue)
-        #expect(annual.isSubscription)
-        #expect(!lifetime.isSubscription)
+    @Test func priceLineReadsOneTimeNoSubscription() {
+        #expect(lifetime.priceLine == "One-time $9.99. No subscription.")
+        #expect(lifetime.id == OnyxSubscription.lifetime.rawValue)
     }
 
     @Test func featuresAreUniqueAndNonEmpty() {

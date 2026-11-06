@@ -3,10 +3,10 @@
 //  OpaliteFeatureSettings
 //
 //  The Onyx purchase screen the shell presents for `.paywall(context:)`: a dark hero,
-//  the reason it was shown, what Onyx unlocks, the lifetime plan from the StoreKit
-//  catalog (the annual subscription is legacy and never shown), one prominent purchase
-//  button, restore, and the App Store disclosures. Purchases go
-//  through `SubscriptionManager`; `Product` is only read for display.
+//  the reason it was shown, what Onyx unlocks, the one-time lifetime purchase from the
+//  StoreKit catalog ("Onyx. One-time $9.99. No subscription." — the legacy annual plan is
+//  never shown), one prominent purchase button, restore, and the App Store disclosures.
+//  Purchases go through `SubscriptionManager`; `Product` is only read for display.
 //
 
 #if os(iOS) || os(visionOS)
@@ -55,8 +55,8 @@ public struct PaywallView: View {
                         systemImage: "diamond.fill",
                         gradient: LinearGradient.opalite,
                         glow: .opalitePurple,
-                        title: String(localized: "Opalite Onyx"),
-                        subtitle: String(localized: "Everything Opalite has to offer, unlocked.")
+                        title: String(localized: "Onyx"),
+                        subtitle: String(localized: "One-time purchase. No subscription.")
                     )
 
                     contextPill
@@ -186,12 +186,12 @@ public struct PaywallView: View {
     @ContentBuilder
     private var plans: some View {
         if subscription.isLoading && catalog.isEmpty {
-            ProgressView("Loading plans…")
+            ProgressView("Loading price…")
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Brand.Space.xl)
         } else if catalog.isEmpty {
             VStack(spacing: Brand.Space.md) {
-                Label("Plans Unavailable", systemImage: "exclamationmark.triangle.fill")
+                Label("Onyx Unavailable", systemImage: "exclamationmark.triangle.fill")
                     .font(.headline)
                     .symbolRenderingMode(.hierarchical)
                 Text(subscription.error?.errorDescription ?? String(localized: "Check your connection and try again."))
@@ -255,7 +255,7 @@ public struct PaywallView: View {
             .primaryActionButton(tint: .opalitePurple)
             .disabled(selectedPlan == nil || isBusy)
             .accessibilityLabel(Text(isPurchasing ? "Processing" : PaywallCatalog.callToAction(for: selectedPlan)))
-            .accessibilityHint(Text(selectedPlan == nil ? "Choose a plan first" : "Buys \(selectedPlan?.subscription.displayName ?? "")"))
+            .accessibilityHint(Text(selectedPlan.map { String(localized: "Buys Onyx for \($0.displayPrice)") } ?? String(localized: "Available once the price has loaded")))
             .accessibilityIdentifier("paywall.purchase")
 
             Button {
@@ -328,9 +328,9 @@ private struct PlanCard: View {
         Button(action: onSelect) {
             HStack(spacing: Brand.Space.md) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.subscription.displayName)
+                    Text("Onyx")
                         .font(.headline)
-                    Text("\(plan.displayPrice) \(plan.subscription.priceDescription)")
+                    Text(plan.priceLine)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -354,7 +354,7 @@ private struct PlanCard: View {
         )
         .hoverLift()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(plan.subscription.displayName), \(plan.displayPrice) \(plan.subscription.priceDescription)"))
+        .accessibilityLabel(Text("Onyx, \(plan.priceLine)"))
         .accessibilityValue(Text(isSelected ? "Selected" : "Not selected"))
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
         .accessibilityIdentifier("paywall.plan.\(plan.subscription.rawValue)")

@@ -3601,30 +3601,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Onyx Annual" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx anual"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx annuel"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx 年間"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Onyx Lifetime" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6092,54 +6068,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーとパレットはiCloudから同期されます。作成や編集はiPhone、iPad、Macで行えます。"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "one-time purchase" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "compra única"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "achat unique"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "買い切り"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "per year" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "al año"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "par année"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/年"
           }
         }
       },

@@ -162,7 +162,10 @@ struct LocalizedTitleTests {
     func reportReason(reason: ReportReason) { #expect(!reason.title.isEmpty) }
 
     @Test("OnyxSubscription", arguments: OnyxSubscription.allCases)
-    func onyx(product: OnyxSubscription) { #expect(!product.displayName.isEmpty && !product.priceDescription.isEmpty) }
+    func onyx(product: OnyxSubscription) {
+        #expect(!product.displayName.isEmpty)
+        #expect(!product.displayName.localizedCaseInsensitiveContains("annual"))
+    }
 
     @Test("ColorExportFormat", arguments: ColorExportFormat.allCases)
     func colorExport(format: ColorExportFormat) {

@@ -26,7 +26,7 @@ public struct OnyxStatus: Equatable {
         self.subscription = hasOnyx ? subscription : nil
     }
 
-    /// "Free", "Onyx Annual", or "Onyx Lifetime" (or "Onyx" for an unrecognized product).
+    /// "Free" or "Onyx Lifetime" ("Onyx" for a legacy or unrecognized product).
     public var title: String {
         guard hasOnyx else { return String(localized: "Free") }
         return subscription?.displayName ?? String(localized: "Onyx")
@@ -38,9 +38,8 @@ public struct OnyxStatus: Equatable {
             return String(localized: "Unlimited palettes and canvases, Community saves, and pro export formats.")
         }
         switch subscription {
-        case .annual: return String(localized: "Renews yearly. Manage or cancel anytime.")
         case .lifetime: return String(localized: "Yours forever. Thank you for supporting Opalite.")
-        case nil: return String(localized: "Active on this Apple Account.")
+        case .annual, nil: return String(localized: "Active on this Apple Account.")
         }
     }
 
@@ -49,7 +48,8 @@ public struct OnyxStatus: Equatable {
     /// Whether to offer the paywall.
     public var showsUpgrade: Bool { !hasOnyx }
 
-    /// Whether the App Store's manage-subscriptions sheet applies.
+    /// Whether the App Store's manage-subscriptions sheet applies — only for the legacy
+    /// annual subscribers, who still need a way to manage what they already pay for.
     public var canManageSubscription: Bool { hasOnyx && subscription == .annual }
 }
 
@@ -169,7 +169,9 @@ nonisolated public struct PaywallPlan: Identifiable, Equatable, Sendable {
     }
 
     public var id: String { subscription.rawValue }
-    public var isSubscription: Bool { subscription.isSubscription }
+
+    /// "One-time $9.99. No subscription."
+    public var priceLine: String { String(localized: "One-time \(displayPrice). No subscription.") }
 }
 
 /// The plans the paywall shows — only plans still sold — with a default selection.
@@ -202,19 +204,14 @@ nonisolated public struct PaywallCatalog: Equatable, Sendable {
         return defaultSelectionID
     }
 
-    /// The purchase button's title for the selected plan.
+    /// The purchase button's title. Only one-time purchases are sold, so it never says "Subscribe".
     public static func callToAction(for plan: PaywallPlan?) -> String {
-        guard let plan else { return String(localized: "Choose a Plan") }
-        return plan.isSubscription ? String(localized: "Subscribe") : String(localized: "Purchase")
+        String(localized: "Purchase")
     }
 
-    /// The App Store's required disclosure for the selected plan (one-time wording when
-    /// nothing is selected yet, since only one-time purchases are sold).
+    /// The App Store's required disclosure. Only one-time purchases are sold.
     public static func legalText(for plan: PaywallPlan?) -> String {
-        if let plan, plan.isSubscription {
-            return String(localized: "Payment is charged to your Apple Account at confirmation. Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel in Settings.")
-        }
-        return String(localized: "One-time purchase. Payment is charged to your Apple Account at confirmation.")
+        String(localized: "One-time purchase. Payment is charged to your Apple Account at confirmation.")
     }
 }
 

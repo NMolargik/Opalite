@@ -3013,6 +3013,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Available once the price has loaded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible cuando se cargue el precio"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offert une fois le prix chargé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "価格が読み込まれると利用できます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "A–Z" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3464,6 +3488,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バーガンディ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Buys Onyx for %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra Onyx por %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achète Onyx pour %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx を %@ で購入します"
           }
         }
       },
@@ -4090,30 +4138,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真を選択"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "Choose a Plan" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige un plan"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisissez un forfait"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プランを選択"
           }
         }
       },
@@ -8583,30 +8607,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Everything Opalite has to offer, unlocked." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todo lo que Opalite ofrece, desbloqueado."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tout ce qu'Opalite a à offrir, débloqué."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opaliteのすべての機能を、解放。"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Everything Still to Come" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11777,25 +11777,25 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Loading plans…" : {
+    "Loading price…" : {
       "extractionState" : "manual",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cargando planes…"
+            "value" : "Cargando precio…"
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chargement des forfaits…"
+            "value" : "Chargement du prix…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プランを読み込み中…"
+            "value" : "価格を読み込み中…"
           }
         }
       },
@@ -14081,6 +14081,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "One-time %@. No subscription." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago único de %@. Sin suscripción."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement unique de %@. Aucun abonnement."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ の買い切り。サブスクリプションなし。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "One-time purchase. No subscription." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra única. Sin suscripción."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat unique. Aucun abonnement."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切り購入。サブスクリプションなし。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "One-time purchase. Payment is charged to your Apple Account at confirmation." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14153,30 +14201,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Onyx Annual" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx anual"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx annuel"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyx 年間"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Onyx Lifetime" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14196,6 +14220,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Onyx 買い切り"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Onyx Unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx no disponible"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx non offert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx は利用できません"
           }
         }
       },
@@ -14268,6 +14316,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Onyxを復元しました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Onyx, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx, %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx、%@"
           }
         }
       },
@@ -15859,30 +15931,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Payment is charged to your Apple Account at confirmation. Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel in Settings." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El pago se carga a tu cuenta de Apple al confirmar. Las suscripciones se renuevan automáticamente a menos que se cancelen al menos 24 horas antes del final del período actual. Gestiona o cancela en Ajustes."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le paiement est débité de votre compte Apple à la confirmation. Les abonnements se renouvellent automatiquement, sauf s'ils sont annulés au moins 24 heures avant la fin de la période en cours. Gérez ou annulez dans Réglages."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お支払いは確認時にAppleアカウントに請求されます。サブスクリプションは、現在の期間が終了する24時間以上前にキャンセルしない限り、自動的に更新されます。管理やキャンセルは「設定」から行えます。"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Pen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -16286,30 +16334,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "配置エリア"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "Plans Unavailable" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Planes no disponibles"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Forfaits non disponibles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プランを利用できません"
           }
         }
       },
@@ -18278,30 +18302,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名称変更…"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "Renews yearly. Manage or cancel anytime." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se renueva cada año. Gestiona o cancela cuando quieras."
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renouvelé chaque année. Gérez ou annulez à tout moment."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "毎年自動更新されます。いつでも管理・解約できます。"
           }
         }
       },
@@ -20563,30 +20563,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Shows Onyx plans and prices" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muestra los planes y precios de Onyx"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Affiche les forfaits et les prix d'Onyx"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onyxのプランと価格を表示します"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "Shows each color edge to edge. Swipe to move between them." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20606,6 +20582,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "各カラーを画面いっぱいに表示します。スワイプして切り替えます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Shows what Onyx unlocks and its one-time price" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra lo que desbloquea Onyx y su precio único"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiche ce qu'Onyx débloque et son prix unique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyx で解除される機能と買い切り価格を表示します"
           }
         }
       },
@@ -21494,30 +21494,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "送信中…"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "Subscribe" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscribirse"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'abonner"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "登録"
           }
         }
       },
@@ -26085,30 +26061,6 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "one-time purchase" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "compra única"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "achat unique"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "買い切り"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
     "palette" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26128,30 +26080,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パレット"
-          }
-        }
-      },
-      "shouldGenerateSymbol" : false
-    },
-    "per year" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "al año"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "par année"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/年"
           }
         }
       },
