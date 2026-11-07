@@ -665,6 +665,7 @@ private struct ContrastCheckerCard: View {
                 Label(String(localized: "Suggest a fix"), systemImage: "wand.and.stars")
             }
             .buttonStyle(.bordered)
+            .padding(.top, Brand.Space.md)
             .accessibilityIdentifier("contrast.suggestFix")
             if showsFix {
                 HStack(spacing: Brand.Space.md) {
