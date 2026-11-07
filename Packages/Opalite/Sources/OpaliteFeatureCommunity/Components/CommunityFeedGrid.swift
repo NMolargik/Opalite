@@ -23,9 +23,10 @@ struct CommunityColorGrid: View {
     @Environment(CommunityModel.self) private var community
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var pendingRemoval: CommunityColor?
+    @State private var layout = LayoutProbe()
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: CommunityGridMetrics.columnMinimum(for: .colors, isRegularWidth: horizontalSizeClass == .regular), maximum: 320), spacing: Brand.Space.lg)]
+        CommunityGridMetrics.columns(for: .colors, width: layout.width, isRegularWidth: horizontalSizeClass == .regular, preferEven: layout.hasFold)
     }
 
     var body: some View {
@@ -49,6 +50,7 @@ struct CommunityColorGrid: View {
                 footer()
             }
         }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { layout = $0 }
         .communityRemovalDialog(item: $pendingRemoval, title: Text("Remove this color from the Community?")) { color in
             await community.unpublish(color)
         }
@@ -63,9 +65,10 @@ struct CommunityPaletteGrid: View {
     @Environment(CommunityModel.self) private var community
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var pendingRemoval: CommunityPalette?
+    @State private var layout = LayoutProbe()
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: CommunityGridMetrics.columnMinimum(for: .palettes, isRegularWidth: horizontalSizeClass == .regular), maximum: 520), spacing: Brand.Space.lg)]
+        CommunityGridMetrics.columns(for: .palettes, width: layout.width, isRegularWidth: horizontalSizeClass == .regular, preferEven: layout.hasFold)
     }
 
     var body: some View {
@@ -88,6 +91,7 @@ struct CommunityPaletteGrid: View {
                 footer()
             }
         }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { layout = $0 }
         .communityRemovalDialog(item: $pendingRemoval, title: Text("Remove this palette from the Community?")) { palette in
             await community.unpublish(palette)
         }
@@ -99,8 +103,10 @@ struct CommunitySkeletonGrid: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
+    @State private var layout = LayoutProbe()
+
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: CommunityGridMetrics.columnMinimum(for: segment, isRegularWidth: horizontalSizeClass == .regular), maximum: segment == .colors ? 320 : 520), spacing: Brand.Space.lg)]
+        CommunityGridMetrics.columns(for: segment, width: layout.width, isRegularWidth: horizontalSizeClass == .regular, preferEven: layout.hasFold)
     }
 
     var body: some View {
@@ -109,6 +115,7 @@ struct CommunitySkeletonGrid: View {
                 CommunitySkeletonCard(segment: segment)
             }
         }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { layout = $0 }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Loading"))
     }

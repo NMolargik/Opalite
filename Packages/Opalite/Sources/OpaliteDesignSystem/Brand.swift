@@ -156,6 +156,9 @@ nonisolated public enum Brand {
 
     /// The widest a detail column should grow on iPad/Mac before centering.
     public static let detailMaxWidth: CGFloat = 760
+
+    /// The widest a two-column detail layout should grow before centering.
+    public static let wideDetailMaxWidth: CGFloat = 1320
 }
 
 // MARK: - Hex colors

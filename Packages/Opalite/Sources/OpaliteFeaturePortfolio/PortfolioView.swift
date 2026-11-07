@@ -47,7 +47,7 @@ struct PortfolioScreen: View {
     @AppStorage(AppStorageKeys.swatchSize) private var swatchSizeRaw: String = SwatchSize.medium.rawValue
 
     @State private var model: PortfolioViewModel
-    @State private var containerWidth: CGFloat = 0
+    @State private var layout = LayoutProbe()
     @State private var droppedImage: DroppedImage?
 
     private let createContentTip = CreateContentTip()
@@ -65,7 +65,7 @@ struct PortfolioScreen: View {
     private var swatchSize: SwatchSize { SwatchSize(rawValue: swatchSizeRaw) ?? .medium }
 
     private var paletteColumns: Int {
-        PortfolioLayout.paletteColumns(width: containerWidth, isRegularWidth: !isCompact, paletteCount: portfolio.orderedPalettes.count)
+        PortfolioLayout.paletteColumns(width: layout.width, isRegularWidth: !isCompact, paletteCount: portfolio.orderedPalettes.count)
     }
 
     var body: some View {
@@ -76,7 +76,7 @@ struct PortfolioScreen: View {
                 content
             }
         }
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { containerWidth = $0 }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { layout = $0 }
         .navigationTitle("Opalite")
         .navigationSubtitleIfAvailable(model.subtitle ?? "")
         .toolbar { toolbar }
@@ -134,8 +134,11 @@ struct PortfolioScreen: View {
                 .padding(.horizontal, Brand.Space.lg)
 
             if paletteColumns > 1 {
+                // Explicit columns (not adaptive) so the count stays even, and a wider gap
+                // while iPhone Duo is partially folded so the hinge falls between the cards.
+                let gap = layout.isFoldActive ? Brand.Space.xxl * 2 : Brand.Space.lg
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: PortfolioLayout.paletteCardMinimumWidth), spacing: Brand.Space.lg, alignment: .top)],
+                    columns: Array(repeating: GridItem(.flexible(minimum: PortfolioLayout.paletteCardMinimumWidth), spacing: gap, alignment: .top), count: paletteColumns),
                     alignment: .leading,
                     spacing: Brand.Space.lg
                 ) {

@@ -48,6 +48,20 @@ struct PortfolioLayoutTests {
         #expect(PortfolioLayout.paletteColumns(width: 1200, isRegularWidth: false, paletteCount: 3) == 1)
     }
 
+    @Test func duoInnerDisplayGetsTwoPaletteColumns() {
+        // iPhone Duo open: 951 points minus the vertical bar leaves roughly 890.
+        #expect(PortfolioLayout.paletteColumns(width: 890, isRegularWidth: true, paletteCount: 2) == 2)
+        // iPad mini portrait stays one column.
+        #expect(PortfolioLayout.paletteColumns(width: 744, isRegularWidth: true, paletteCount: 2) == 1)
+    }
+
+    @Test func detailColumnsNeedRegularWidthAndRoom() {
+        #expect(PortfolioLayout.detailColumns(width: 890, isRegularWidth: true) == 2)
+        #expect(PortfolioLayout.detailColumns(width: 1200, isRegularWidth: true) == 2)
+        #expect(PortfolioLayout.detailColumns(width: 760, isRegularWidth: true) == 1)
+        #expect(PortfolioLayout.detailColumns(width: 1200, isRegularWidth: false) == 1)
+    }
+
     @Test func batchDeleteTitleInflects() {
         #expect(PortfolioLayout.batchDeleteTitle(count: 1) == "Delete 1 Color?")
         #expect(PortfolioLayout.batchDeleteTitle(count: 4) == "Delete 4 Colors?")

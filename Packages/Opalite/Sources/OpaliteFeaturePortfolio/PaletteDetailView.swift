@@ -46,6 +46,7 @@ private struct PaletteDetailContent: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var model: PaletteDetailViewModel
+    @State private var board = LayoutProbe()
     @State private var colorToDelete: OpaliteColor?
     @State private var movingColor: OpaliteColor?
     @Namespace private var namespace
@@ -209,7 +210,7 @@ private struct PaletteDetailContent: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Brand.Space.xl)
             } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: boardSwatchSide, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm)], spacing: Brand.Space.sm) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: boardSwatchSide * 0.8, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm), count: boardColumns), spacing: Brand.Space.sm) {
                     ForEach(members) { color in
                         NavigationLink(value: PortfolioDestination.color(color.id)) {
                             SwatchView(color: color, height: boardSwatchSide, cornerRadius: Brand.Radius.control, matchedNamespace: namespace, matchedID: color.id)
@@ -222,6 +223,7 @@ private struct PaletteDetailContent: View {
                 }
             }
         }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { board = $0 }
         .padding(Brand.Space.lg)
         .background(
             RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous)
@@ -236,6 +238,11 @@ private struct PaletteDetailContent: View {
     }
 
     private var boardSwatchSide: CGFloat { horizontalSizeClass == .compact ? 96 : 120 }
+
+    /// As many swatch columns as fit, kept even on a device with a fold.
+    private var boardColumns: Int {
+        GridColumns.count(fitting: board.width, minimum: boardSwatchSide, spacing: Brand.Space.sm, preferEven: board.hasFold)
+    }
 
     @ContentBuilder
     private func nameField(onDark: Bool) -> some View {

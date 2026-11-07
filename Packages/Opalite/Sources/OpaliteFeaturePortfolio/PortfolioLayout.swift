@@ -57,10 +57,16 @@ nonisolated public struct PortfolioSection: Identifiable, Hashable, Sendable {
 
 nonisolated public enum PortfolioLayout {
     /// Windows at least this wide (in a regular size class) show palettes in two columns.
-    public static let wideWindowThreshold: CGFloat = 900
+    /// Two 380-point cards, the gap and the edge padding need about 810 points; 840 keeps
+    /// slack and still lets iPhone Duo's open display (about 890 usable) get two columns.
+    public static let wideWindowThreshold: CGFloat = 840
 
     /// The minimum width of a palette card in the two-column grid.
-    public static let paletteCardMinimumWidth: CGFloat = 420
+    public static let paletteCardMinimumWidth: CGFloat = 380
+
+    /// A color detail at least this wide (in a regular size class) lays its cards out in
+    /// two columns instead of one stack.
+    public static let wideDetailThreshold: CGFloat = 820
 
     /// The sections in display order: loose colors first, then the palettes in the
     /// user's order. The loose section is always present so the drop target exists.
@@ -93,6 +99,12 @@ nonisolated public enum PortfolioLayout {
     public static func paletteColumns(width: CGFloat, isRegularWidth: Bool, paletteCount: Int) -> Int {
         guard isRegularWidth, width >= wideWindowThreshold, paletteCount > 1 else { return 1 }
         return 2
+    }
+
+    /// One stacked column, or two side by side when a regular-width window is wide enough
+    /// (iPad landscape, Mac, iPhone Duo's inner display).
+    public static func detailColumns(width: CGFloat, isRegularWidth: Bool) -> Int {
+        isRegularWidth && width >= wideDetailThreshold ? 2 : 1
     }
 
     /// A short "Delete n colors?" style title for batch confirmation.

@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import SwiftUI
 import OpaliteCore
 
 // MARK: - Feed status
@@ -85,6 +86,22 @@ nonisolated public enum CommunityGridMetrics {
         case (.palettes, false): 300
         case (.palettes, true): 340
         }
+    }
+
+    /// The widest a card grows: colors are square tiles, palettes are wide strips.
+    public static func columnMaximum(for segment: CommunitySegment) -> CGFloat {
+        switch segment {
+        case .colors: 320
+        case .palettes: 520
+        }
+    }
+
+    /// Explicit grid columns for a measured width: as many as fit at the segment's
+    /// minimum, kept even on a device with a fold, and one column until measured.
+    public static func columns(for segment: CommunitySegment, width: CGFloat, isRegularWidth: Bool, preferEven: Bool, spacing: CGFloat = 16) -> [GridItem] {
+        let minimum = columnMinimum(for: segment, isRegularWidth: isRegularWidth)
+        let count = GridColumns.count(fitting: width, minimum: minimum, spacing: spacing, preferEven: preferEven)
+        return Array(repeating: GridItem(.flexible(minimum: 0, maximum: columnMaximum(for: segment)), spacing: spacing), count: count)
     }
 
     /// How many skeleton cards to show while the first page loads.

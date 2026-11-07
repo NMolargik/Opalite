@@ -45,6 +45,7 @@ private struct ColorDetailContent: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var model: ColorDetailViewModel
+    @State private var layout = LayoutProbe()
     @Namespace private var heroNamespace
     @ScaledMetric(relativeTo: .largeTitle) private var heroHeight: CGFloat = 240
 
@@ -73,31 +74,23 @@ private struct ColorDetailContent: View {
 
     // MARK: - Content
 
+    private var isWideDetail: Bool {
+        PortfolioLayout.detailColumns(width: layout.width, isRegularWidth: horizontalSizeClass == .regular) == 2
+    }
+
     private func content(for color: OpaliteColor) -> some View {
         ScrollView {
-            VStack(spacing: 0) {
-                hero(for: color)
-                    .padding(.horizontal, Brand.Space.lg)
-                    .padding(.top, Brand.Space.sm)
-                tiles(for: color)
-                    .padding(.horizontal, Brand.Space.lg)
-                    .padding(.top, Brand.Space.md)
-                VStack(spacing: Brand.Space.lg) {
-                    paletteCard(for: color)
-                    codesCard(for: color)
-                    detailsCard(for: color)
-                    notesCard
-                    harmonyCard
-                    tonesCard
-                    contrastCard
+            Group {
+                if isWideDetail {
+                    wideContent(for: color)
+                } else {
+                    stackedContent(for: color)
                 }
-                .padding(.horizontal, Brand.Space.lg)
-                .padding(.top, Brand.Space.lg)
-                .padding(.bottom, Brand.Space.xxl)
             }
-            .frame(maxWidth: Brand.detailMaxWidth)
+            .frame(maxWidth: isWideDetail ? Brand.wideDetailMaxWidth : Brand.detailMaxWidth)
             .frame(maxWidth: .infinity)
         }
+        .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { layout = $0 }
         .background(groupedBackground)
         .softScrollEdgesIfAvailable()
         .navigationTitle(color.displayName)
@@ -127,6 +120,56 @@ private struct ColorDetailContent: View {
             Text("This can't be undone.")
         }
         .accessibilityIdentifier("colorDetailView")
+    }
+
+    /// The phone layout: one column, hero first.
+    private func stackedContent(for color: OpaliteColor) -> some View {
+        VStack(spacing: 0) {
+            hero(for: color)
+                .padding(.horizontal, Brand.Space.lg)
+                .padding(.top, Brand.Space.sm)
+            tiles(for: color)
+                .padding(.horizontal, Brand.Space.lg)
+                .padding(.top, Brand.Space.md)
+            VStack(spacing: Brand.Space.lg) {
+                paletteCard(for: color)
+                codesCard(for: color)
+                detailsCard(for: color)
+                notesCard
+                harmonyCard
+                tonesCard
+                contrastCard
+            }
+            .padding(.horizontal, Brand.Space.lg)
+            .padding(.top, Brand.Space.lg)
+            .padding(.bottom, Brand.Space.xxl)
+        }
+    }
+
+    /// The wide layout (iPad landscape, Mac, iPhone Duo open): the color and its facts on
+    /// the left, the tools on the right. While a fold is active the gap widens so the
+    /// hinge sits between the columns rather than through a card.
+    private func wideContent(for color: OpaliteColor) -> some View {
+        HStack(alignment: .top, spacing: layout.isFoldActive ? Brand.Space.xxl * 2 : Brand.Space.xl) {
+            VStack(spacing: Brand.Space.lg) {
+                hero(for: color)
+                tiles(for: color)
+                paletteCard(for: color)
+                codesCard(for: color)
+                detailsCard(for: color)
+                notesCard
+            }
+            .frame(maxWidth: .infinity, alignment: .top)
+            VStack(spacing: Brand.Space.lg) {
+                harmonyCard
+                tonesCard
+                contrastCard
+            }
+            .frame(maxWidth: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, Brand.Space.lg)
+        .padding(.top, Brand.Space.sm)
+        .padding(.bottom, Brand.Space.xxl)
     }
 
     // MARK: - Hero
