@@ -824,21 +824,22 @@ struct FullScreenColorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var index = 0
 
+    private var current: RGBA { colors[safe: index] ?? colors[0] }
+
     var body: some View {
-        TabView(selection: $index) {
-            ForEach(Array(colors.enumerated()), id: \.offset) { offset, rgba in
+        pages
+            // The paged TabView is a UIKit page controller underneath and stops at the
+            // window's reserved regions (iPhone Duo's camera strip, the vertical bars), which
+            // left a white band on the trailing edge. Painting the current color behind it,
+            // past every safe area, covers whatever the pager leaves.
+            .background {
                 ZStack {
-                    if rgba.alpha < 1 { Checkerboard(squareSize: 14) }
-                    rgba.color
+                    if current.alpha < 1 { Checkerboard(squareSize: 14) }
+                    current.color
                 }
                 .ignoresSafeArea()
-                .tag(offset)
-                .accessibilityLabel(Text(titles?[safe: offset] ?? rgba.hexString))
             }
-        }
-        .tabViewStyle(.page(indexDisplayMode: colors.count > 1 ? .automatic : .never))
-        .ignoresSafeArea()
-        .overlay(alignment: .top) {
+            .overlay(alignment: .top) {
             HStack(spacing: Brand.Space.sm) {
                 Text(titles?[safe: index] ?? title)
                     .font(.headline)
@@ -869,6 +870,30 @@ struct FullScreenColorView: View {
         }
         .onTapGesture { dismiss() }
         .accessibilityIdentifier("fullScreenColorView")
+    }
+
+    /// One color fills the screen directly; several page through a TabView.
+    @ContentBuilder
+    private var pages: some View {
+        if colors.count == 1 {
+            Color.clear
+                .ignoresSafeArea()
+                .accessibilityLabel(Text(titles?.first ?? title))
+        } else {
+            TabView(selection: $index) {
+                ForEach(Array(colors.enumerated()), id: \.offset) { offset, rgba in
+                    ZStack {
+                        if rgba.alpha < 1 { Checkerboard(squareSize: 14) }
+                        rgba.color
+                    }
+                    .ignoresSafeArea()
+                    .tag(offset)
+                    .accessibilityLabel(Text(titles?[safe: offset] ?? rgba.hexString))
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .automatic))
+            .ignoresSafeArea()
+        }
     }
 }
 
