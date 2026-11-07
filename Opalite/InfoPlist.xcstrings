@@ -327,36 +327,6 @@
           }
         }
       }
-    },
-    "SwatchBar" : {
-      "comment" : "Home Screen quick action",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SwatchBar"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SwatchBar"
-          }
-        },
-        "fr-CA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SwatchBar"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SwatchBar"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"

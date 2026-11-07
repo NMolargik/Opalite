@@ -4,7 +4,8 @@
 //
 //  Home Screen quick actions (long-press the app icon / Dock menu on Mac). Static items
 //  are declared in Info.plist with their `type` set to an `opalite://` URL, so they route
-//  through the same DeepLink path as widgets, Siri, iMessage, and the menu bar.
+//  through the same DeepLink path as widgets, Siri, iMessage, and the menu bar. The
+//  SwatchBar item is dynamic, added at launch only where the SwatchBar exists.
 //
 //  UIKit delivers quick actions only through app/scene delegates, so this file bridges
 //  them into SwiftUI via a small observable relay. The scene delegate also configures the
@@ -15,6 +16,7 @@ import SwiftUI
 import UIKit
 import OpaliteComposition
 import OpaliteCore
+import OpaliteDesignSystem
 import os
 
 /// Bridge between the UIKit delegate world and SwiftUI. The `shared` instance exists only
@@ -28,6 +30,23 @@ final class QuickActionRelay {
 }
 
 final class QuickActionAppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        // Static items (Info.plist) show on every device; the SwatchBar one is dynamic so
+        // iPhone, including iPhone Duo, never offers a window it cannot open.
+        application.shortcutItems = SwatchBarSupport.isAvailable ? [
+            UIApplicationShortcutItem(
+                type: DeepLink.swatchBar.url.absoluteString,
+                localizedTitle: String(localized: "SwatchBar"),
+                localizedSubtitle: nil,
+                icon: UIApplicationShortcutIcon(systemImageName: "square.stack.fill")
+            )
+        ] : []
+        return true
+    }
+
     func application(
         _ application: UIApplication,
         configurationForConnecting session: UISceneSession,

@@ -91,13 +91,7 @@ public struct SettingsView: View {
     private var theme: AppThemeOption { AppThemeOption(rawValue: themeRaw) ?? .system }
     private var colorBlindnessMode: ColorBlindnessMode { ColorBlindnessMode(rawValue: colorBlindnessRaw) ?? .off }
 
-    private var supportsSwatchBar: Bool {
-        #if canImport(UIKit)
-        UIApplication.shared.supportsMultipleScenes
-        #else
-        false
-        #endif
-    }
+    private var supportsSwatchBar: Bool { SwatchBarSupport.isAvailable }
 
     // MARK: - Profile
 

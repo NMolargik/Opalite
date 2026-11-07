@@ -40,9 +40,11 @@ struct OpaliteCommands: Commands {
 
         CommandGroup(after: .toolbar) {
             Divider()
-            Button("Show SwatchBar") { openWindow(id: SwatchBarScene.windowID) }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
-            Divider()
+            if SwatchBarSupport.isAvailable {
+                Button("Show SwatchBar") { openWindow(id: SwatchBarScene.windowID) }
+                    .keyboardShortcut("s", modifiers: [.command, .shift])
+                Divider()
+            }
             Button("Refresh") {
                 portfolio.refresh()
                 canvases.refresh()

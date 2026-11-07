@@ -129,14 +129,6 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>opalite://createPalette</string>
 		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>square.stack.fill</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>SwatchBar</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>opalite://swatchBar</string>
-		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

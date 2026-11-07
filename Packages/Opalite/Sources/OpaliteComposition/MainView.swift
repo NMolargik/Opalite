@@ -184,7 +184,7 @@ struct MainView: View {
             }
             .interactiveDismissDisabled()
         case .swatchBarInfo:
-            SwatchBarInfoSheet(onOpen: supportsMultipleWindows ? { openWindow(id: SwatchBarScene.windowID) } : nil)
+            SwatchBarInfoSheet(onOpen: SwatchBarSupport.isAvailable && supportsMultipleWindows ? { openWindow(id: SwatchBarScene.windowID) } : nil)
         }
     }
 
@@ -246,7 +246,7 @@ struct MainView: View {
     }
 
     private func openSwatchBar() {
-        guard supportsMultipleWindows else {
+        guard SwatchBarSupport.isAvailable, supportsMultipleWindows else {
             navigation.presentation = PresentationItem(kind: .swatchBarInfo)
             return
         }

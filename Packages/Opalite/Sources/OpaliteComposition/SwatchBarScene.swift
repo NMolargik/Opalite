@@ -11,6 +11,9 @@ import SwiftUI
 import OpaliteCore
 import OpaliteDesignSystem
 import OpaliteFeatureSwatchBar
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public enum SwatchBarScene {
     public static let windowID = "swatchBar"
@@ -25,9 +28,40 @@ public struct SwatchBarRootView: View {
     }
 
     public var body: some View {
-        SwatchBarView()
-            .sessionEnvironment(session)
-            .onAppear { session.portfolio.refresh() }
+        if SwatchBarSupport.isAvailable {
+            SwatchBarView()
+                .sessionEnvironment(session)
+                .onAppear { session.portfolio.refresh() }
+        } else {
+            // iPhone, including iPhone Duo: nothing in the app opens this window, but state
+            // restoration can bring back a SwatchBar session that was opened before the
+            // device lost the feature. Show the normal app in it and, when the main session
+            // is also open, tear this one down so it does not come back again.
+            RootView(session: session)
+                #if os(iOS)
+                .background(RestoredSceneCloser())
+                #endif
+        }
     }
 }
+
+#if os(iOS)
+/// Destroys the scene session this view lands in, as long as another session stays open.
+/// `dismissWindow` is a no-op where the system reports no multiple-window support (the
+/// closed iPhone Duo), so this goes through UIKit's session API instead.
+private struct RestoredSceneCloser: UIViewRepresentable {
+    func makeUIView(context: Context) -> CloserView { CloserView() }
+    func updateUIView(_ uiView: CloserView, context: Context) {}
+
+    final class CloserView: UIView {
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            guard let session = window?.windowScene?.session else { return }
+            let application = UIApplication.shared
+            guard application.openSessions.count > 1 else { return }
+            application.requestSceneSessionDestruction(session, options: nil)
+        }
+    }
+}
+#endif
 #endif

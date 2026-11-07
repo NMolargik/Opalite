@@ -241,7 +241,7 @@ struct PortfolioScreen: View {
                 }
                 .disabled(portfolio.archivedPalettes.isEmpty)
 
-                if !isCompact {
+                if SwatchBarSupport.isAvailable {
                     Divider()
                     Button {
                         Haptics.selection()

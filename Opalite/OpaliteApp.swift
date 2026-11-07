@@ -90,6 +90,10 @@ struct OpaliteApp: App {
         }
         .windowResizability(.contentMinSize)
 
+        // iPad, Mac, and visionOS only. The scene has to be declared unconditionally, so on
+        // iPhone (including iPhone Duo) it matches no external event; every `openWindow`
+        // caller checks `SwatchBarSupport.isAvailable` first, so nothing opens it there and
+        // an `opalite://swatchBar` URL falls through to the main window's deep-link path.
         WindowGroup(id: SwatchBarScene.windowID) {
             SwatchBarRootView(session: session)
                 .modelContainer(session.container)
@@ -97,7 +101,7 @@ struct OpaliteApp: App {
                 .environment(immersive)
                 #endif
         }
-        .handlesExternalEvents(matching: ["swatchBar"])
+        .handlesExternalEvents(matching: SwatchBarSupport.isAvailable ? ["swatchBar"] : [])
         .defaultSize(width: SwatchBarScene.defaultSize.width, height: SwatchBarScene.defaultSize.height)
         .windowResizability(.contentMinSize)
 
