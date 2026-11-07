@@ -254,6 +254,21 @@ private struct ColorDetailContent: View {
                     hexCopy.copy(text: hsvString(color.hsv), label: String(localized: "HSV"))
                 }
                 Divider()
+                DetailRow(String(localized: "OKLCH"), value: color.rgba.oklchString, systemImage: "paintpalette", monospaced: true) {
+                    hexCopy.copy(text: color.rgba.oklchString, label: String(localized: "OKLCH"))
+                }
+                Divider()
+                DetailRow(String(localized: "Display P3"), value: color.rgba.displayP3String, systemImage: "display", monospaced: true) {
+                    hexCopy.copy(text: color.rgba.displayP3String, label: String(localized: "Display P3"))
+                }
+                if !color.rgba.isInSRGBGamut {
+                    Divider()
+                    Label(String(localized: "Outside sRGB: this color is only displayable on wide-gamut screens. Hex and RGB values are approximations."), systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .padding(.vertical, Brand.Space.xs)
+                }
+                Divider()
                 DetailRow(String(localized: "CMYK"), value: DetailFormatting.cmykString(color.cmyk), systemImage: "printer", monospaced: true) {
                     hexCopy.copy(text: DetailFormatting.cmykString(color.cmyk), label: String(localized: "CMYK"))
                 }
@@ -565,6 +580,7 @@ private struct ContrastCheckerCard: View {
     let candidates: [ContrastCandidate]
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(HexCopyModel.self) private var hexCopy
     @FocusState private var isHexFocused: Bool
 
     private var contrast: ContrastCheck { model.contrast }
@@ -577,6 +593,109 @@ private struct ContrastCheckerCard: View {
             hexField
             if !candidates.isEmpty { candidateRow }
             criteria
+            apca
+        }
+    }
+
+    // MARK: APCA (supplemental)
+
+    @State private var showsFix = false
+
+    private var apca: some View {
+        VStack(alignment: .leading, spacing: Brand.Space.xs) {
+            Divider().padding(.vertical, Brand.Space.xs)
+            Text("APCA (supplemental)")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .accessibilityAddTraits(.isHeader)
+            if let asText = contrast.apcaSourceAsText, let onSource = contrast.apcaTextOnSource {
+                apcaRow(String(localized: "This color as text"), lc: asText)
+                Divider()
+                apcaRow(String(localized: "Text on this color"), lc: onSource)
+                Text("APCA measures perceived lightness contrast and depends on which color is the text. It is a guide beside WCAG, not a replacement.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, Brand.Space.xs)
+                fixSection
+            } else {
+                Text("Choose a comparison color to see APCA contrast.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func apcaRow(_ title: String, lc: Double) -> some View {
+        HStack(spacing: Brand.Space.md) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title).font(.subheadline.weight(.medium))
+                Text(apcaGuidance(APCA.Band(lc: lc))).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            Text(APCA.lcText(lc))
+                .font(.subheadline.monospacedDigit().weight(.semibold))
+        }
+        .padding(.vertical, Brand.Space.xs)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func apcaGuidance(_ band: APCA.Band) -> String {
+        switch band {
+        case .fail: String(localized: "Too low for text")
+        case .spot: String(localized: "Incidental text only")
+        case .large: String(localized: "Large headlines")
+        case .content: String(localized: "Content and large body text")
+        case .body: String(localized: "Body text")
+        case .fluent: String(localized: "Fluent reading")
+        }
+    }
+
+    @ContentBuilder
+    private var fixSection: some View {
+        if contrast.passes(.aaNormal) {
+            Label(String(localized: "This pair already passes WCAG AA."), systemImage: "checkmark.seal")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        } else if let fix = contrast.suggestedFix {
+            Button {
+                showsFix = true
+                Haptics.selection()
+            } label: {
+                Label(String(localized: "Suggest a fix"), systemImage: "wand.and.stars")
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("contrast.suggestFix")
+            if showsFix {
+                HStack(spacing: Brand.Space.md) {
+                    RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
+                        .fill(fix.color)
+                        .frame(width: 44, height: 44)
+                        .overlay(RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous).strokeBorder(.quaternary))
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(fix.hexString).font(.subheadline.monospaced().weight(.medium))
+                        Text("\(fix.contrastRatio(against: contrast.comparison ?? .white).formatted(.number.precision(.fractionLength(2)))):1 · \(APCA.lcText(APCA.contrast(text: fix, background: contrast.comparison ?? .white)))")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                        Text("Same hue, lightness nudged to reach AA")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                    Button {
+                        hexCopy.copy(text: fix.hexString, label: String(localized: "Hex"))
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel(Text("Copy suggested color"))
+                }
+            }
+        } else {
+            Label(String(localized: "No lightness change on this color can reach AA against the comparison."), systemImage: "exclamationmark.triangle")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
