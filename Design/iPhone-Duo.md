@@ -70,6 +70,8 @@ The inner display ignores the app's supported orientations; the outer display fo
 
 Done on branch `duo-1.7.2`: two palette columns on the open display (explicit, even, wider gap while a fold is active), the two-column color detail, measured even-column counts for palette boards and the Community grids, iPhone landscape, and the first Duo screenshot set in `Screenshots/iPhone Duo/`. Verified in the simulator: closed portrait, closed landscape (bar on the left), open landscape (hinge lands between the two detail columns), open portrait. All 407 package tests pass; the Catalyst build is clean.
 
+Full-screen color view: Nick spotted a white band on the trailing edge of the open display (the pager's page insets left the window background showing). Fixed by painting the current color behind the pager edge to edge and skipping the pager for a single color; verified in the simulator on the open display (landscape) and the closed display (portrait).
+
 Two things the simulator could not confirm. The "fold active" widening of the column gap never visibly engaged in the partially-open pose, so either the simulator does not report the division region as active or the probe is attached too high in the hierarchy; the layout still splits cleanly around the hinge either way. And after rotating the closed device to landscape, Device Hub's rotate control cycled between the two landscape orientations without returning to portrait until the app relaunched; the same build on the iPhone 17 Pro simulator rotates back normally, so this looks like a Device Hub quirk, but it is worth one check on hardware.
 
 ## Verification
