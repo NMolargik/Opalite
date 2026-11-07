@@ -675,7 +675,7 @@ private struct ContrastCheckerCard: View {
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(fix.hexString).font(.subheadline.monospaced().weight(.medium))
-                        Text("\(fix.contrastRatio(against: contrast.comparison ?? .white).formatted(.number.precision(.fractionLength(2)))):1 · \(APCA.lcText(APCA.contrast(text: fix, background: contrast.comparison ?? .white)))")
+                        Text(verbatim: "\(String(format: "%.2f", fix.contrastRatio(against: contrast.comparison ?? .white))):1 · \(APCA.lcText(APCA.contrast(text: fix, background: contrast.comparison ?? .white)))")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
                         Text("Same hue, lightness nudged to reach AA")
