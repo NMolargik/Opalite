@@ -33,6 +33,10 @@ struct MainView: View {
     let session: SessionController
 
     @State private var navigation = NavigationModel()
+    #if targetEnvironment(macCatalyst)
+    @State private var eyedropper: EyedropperModel?
+    @AppStorage(AppStorageKeys.eyedropperHotkey) private var eyedropperHotkeyRaw = EyedropperHotkey.default.rawValue
+    #endif
     @AppStorage(AppStorageKeys.colorBlindnessMode) private var colorBlindnessModeRaw = ColorBlindnessMode.off.rawValue
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipSwatchBarConfirmation = false
 
@@ -54,6 +58,10 @@ struct MainView: View {
             searchTab
         }
         .tabViewStyle(.sidebarAdaptable)
+        #if targetEnvironment(macCatalyst)
+        .task { startEyedropper() }
+        .onChange(of: eyedropperHotkeyRaw) { eyedropper?.refreshHotkey() }
+        #endif
         .minimizeTabBarOnScrollIfAvailable()
         .tint(router.selectedTab.color)
         // MARK: Global presentations
@@ -244,6 +252,20 @@ struct MainView: View {
         router.select(.canvas)
         navigation.canvasPath = NavigationPath([CanvasDestination.canvas(id)])
     }
+
+    #if targetEnvironment(macCatalyst)
+    /// Wires the global-hotkey eyedropper; a pick surfaces the SwatchBar unless the user keeps it hidden.
+    private func startEyedropper() {
+        guard eyedropper == nil else { return }
+        let model = EyedropperModel(portfolio: portfolio, hexCopy: hexCopy)
+        model.onPicked = { [weak model] _ in
+            guard let model, !model.keepsSwatchBarHidden, SwatchBarSupport.isAvailable, supportsMultipleWindows else { return }
+            openWindow(id: SwatchBarScene.windowID)
+        }
+        model.refreshHotkey()
+        eyedropper = model
+    }
+    #endif
 
     private func openSwatchBar() {
         guard SwatchBarSupport.isAvailable, supportsMultipleWindows else {

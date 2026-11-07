@@ -16,6 +16,13 @@ struct SwatchBarSettingsView: View {
     @Environment(AppRouter.self) private var router
     @AppStorage(AppStorageKeys.skipSwatchBarConfirmation) private var skipsConfirmation = false
 
+    #if targetEnvironment(macCatalyst)
+    @AppStorage(AppStorageKeys.eyedropperHotkey) private var hotkeyRaw = EyedropperHotkey.default.rawValue
+    @AppStorage(AppStorageKeys.eyedropperCopyFormat) private var copyFormatRaw = EyedropperCopyFormat.hex.rawValue
+    @AppStorage(AppStorageKeys.eyedropperAutoCopy) private var autoCopy = true
+    @AppStorage(AppStorageKeys.eyedropperKeepSwatchBarHidden) private var keepHidden = false
+    #endif
+
     private var highlights: [(systemImage: String, title: String, detail: String)] {
         var items: [(systemImage: String, title: String, detail: String)] = [
             ("rectangle.on.rectangle", String(localized: "Minimal Footprint"), String(localized: "A compact window for quick reference. Resize it as narrow as you need.")),
@@ -65,6 +72,43 @@ struct SwatchBarSettingsView: View {
                 Text("Highlights")
             }
 
+            #if targetEnvironment(macCatalyst)
+            Section {
+                Picker(selection: $hotkeyRaw) {
+                    ForEach(EyedropperHotkey.allCases) { hotkey in
+                        Text(hotkey == .off ? String(localized: "Off") : hotkey.symbols).tag(hotkey.rawValue)
+                    }
+                } label: {
+                    Label("Shortcut", systemImage: "keyboard")
+                        .labelStyle(.settingsIcon(.purple))
+                }
+                Toggle(isOn: $autoCopy) {
+                    Label("Copy Picked Color", systemImage: "doc.on.clipboard")
+                        .labelStyle(.settingsIcon(.purple))
+                }
+                .tint(.purple)
+                if autoCopy {
+                    Picker(selection: $copyFormatRaw) {
+                        ForEach(EyedropperCopyFormat.allCases) { format in
+                            Text(format.title).tag(format.rawValue)
+                        }
+                    } label: {
+                        Label("Copy As", systemImage: "textformat")
+                            .labelStyle(.settingsIcon(.purple))
+                    }
+                }
+                Toggle(isOn: $keepHidden) {
+                    Label("Keep SwatchBar Hidden", systemImage: "eye.slash")
+                        .labelStyle(.settingsIcon(.purple))
+                }
+                .tint(.purple)
+            } header: {
+                Text("Eyedropper")
+            } footer: {
+                Text("Press the shortcut in any app to sample a color with the magnifier. The pick is saved to your portfolio, and the SwatchBar opens to show it unless you keep it hidden.")
+            }
+            #endif
+
             Section {
                 Toggle(isOn: $skipsConfirmation) {
                     Label("Open Without Asking", systemImage: "bolt.fill")
@@ -101,6 +145,20 @@ struct SwatchBarSettingsView: View {
         .navigationTitle("SwatchBar")
     }
 }
+
+#if targetEnvironment(macCatalyst)
+extension EyedropperCopyFormat {
+    var title: String {
+        switch self {
+        case .hex: String(localized: "Hex")
+        case .rgb: String(localized: "RGB")
+        case .hsl: String(localized: "HSL")
+        case .oklch: String(localized: "OKLCH")
+        case .displayP3: String(localized: "Display P3")
+        }
+    }
+}
+#endif
 
 #if DEBUG
 #Preview("SwatchBar") {
