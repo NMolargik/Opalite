@@ -827,20 +827,42 @@ struct FullScreenColorView: View {
     private var current: RGBA { colors[safe: index] ?? colors[0] }
 
     var body: some View {
-        pages
-            // The paged TabView is a UIKit page controller underneath and stops at the
-            // window's reserved regions (iPhone Duo's camera strip, the vertical bars), which
-            // left a white band on the trailing edge. Painting the current color behind it,
-            // past every safe area, covers whatever the pager leaves.
-            .background {
-                ZStack {
-                    if current.alpha < 1 { Checkerboard(squareSize: 14) }
-                    current.color
+        // A NavigationStack so the exit control is a real bar item: the system keeps it clear
+        // of the camera strip, moves it into the vertical strip on iPhone Duo, and gives it
+        // its own glass. The name stays a small capsule in the top-left corner, outside the
+        // bar, because a text item in the vertical strip gets squeezed into a circle.
+        NavigationStack {
+            pages
+                // The paged TabView is a UIKit page controller underneath. Kept inside the safe
+                // area (not edge to edge) so a page is exactly as wide as the pager and the next
+                // page never peeks into the status strip; the current color painted behind it,
+                // past every safe area, fills the edges.
+                .background {
+                    ZStack {
+                        if current.alpha < 1 { Checkerboard(squareSize: 14) }
+                        current.color
+                    }
+                    .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
-            }
-            .overlay(alignment: .top) {
-            HStack(spacing: Brand.Space.sm) {
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            Haptics.selection()
+                            dismiss()
+                        } label: {
+                            Label("Exit Full Screen", systemImage: "arrow.down.right.and.arrow.up.left")
+                        }
+                        .accessibilityLabel(Text("Exit full screen"))
+                        .accessibilityIdentifier("fullScreen.exit")
+                    }
+                }
+                .onTapGesture { dismiss() }
+                .accessibilityIdentifier("fullScreenColorView")
+        }
+        .overlay(alignment: .topLeading) {
+            HStack(spacing: Brand.Space.xs) {
                 Text(titles?[safe: index] ?? title)
                     .font(.headline)
                     .lineLimit(1)
@@ -849,27 +871,15 @@ struct FullScreenColorView: View {
                         .font(.subheadline.monospacedDigit())
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
-                Button {
-                    Haptics.selection()
-                    dismiss()
-                } label: {
-                    Label("Exit Full Screen", systemImage: "arrow.down.right.and.arrow.up.left")
-                        .labelStyle(.iconOnly)
-                        .font(.title3)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Exit full screen"))
-                .accessibilityIdentifier("fullScreen.exit")
             }
-            .padding(.horizontal, Brand.Space.lg)
-            .padding(.vertical, Brand.Space.md)
+            .padding(.horizontal, Brand.Space.md)
+            .padding(.vertical, Brand.Space.sm)
             .adaptiveGlassCapsule()
-            .padding(.horizontal, Brand.Space.lg)
+            .padding(.leading, Brand.Space.lg)
             .padding(.top, Brand.Space.sm)
+            .accessibilityElement(children: .combine)
+            .allowsHitTesting(false)
         }
-        .onTapGesture { dismiss() }
-        .accessibilityIdentifier("fullScreenColorView")
     }
 
     /// One color fills the screen directly; several page through a TabView.
@@ -886,13 +896,11 @@ struct FullScreenColorView: View {
                         if rgba.alpha < 1 { Checkerboard(squareSize: 14) }
                         rgba.color
                     }
-                    .ignoresSafeArea()
                     .tag(offset)
                     .accessibilityLabel(Text(titles?[safe: offset] ?? rgba.hexString))
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .automatic))
-            .ignoresSafeArea()
         }
     }
 }
