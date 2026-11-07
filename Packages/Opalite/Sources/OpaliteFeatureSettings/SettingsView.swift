@@ -326,6 +326,14 @@ public struct SettingsView: View {
                     .labelStyle(.settingsIcon(.red))
             }
             .accessibilityHint(Text("Reviews reported Community content"))
+
+            @Bindable var subscription = subscription
+            Toggle(isOn: $subscription.isSimulatingOnyx) {
+                Label("Simulate Onyx", systemImage: "diamond")
+                    .labelStyle(.settingsIcon(.indigo))
+            }
+            .onChange(of: subscription.isSimulatingOnyx) { Haptics.selection() }
+            .accessibilityHint(Text("Unlocks Onyx features in this debug build without a purchase"))
         } header: {
             Text("Debug")
         } footer: {

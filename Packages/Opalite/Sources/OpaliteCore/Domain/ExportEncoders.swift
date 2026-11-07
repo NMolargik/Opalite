@@ -119,21 +119,41 @@ nonisolated public enum ExportEncoders {
 
     // MARK: - CSS
 
-    public static func css(title: String, prefix: String?, swatches: [ExportSwatch]) -> Data {
+    /// CSS custom properties on `:root`. With `darkSwatches`, the same properties are
+    /// overridden inside `@media (prefers-color-scheme: dark)`, paired with the light
+    /// swatches by position; extra dark swatches are ignored and missing ones keep the
+    /// light value.
+    public static func css(title: String, prefix: String?, swatches: [ExportSwatch], darkSwatches: [ExportSwatch]? = nil) -> Data {
         var lines = ["/* \(title) - Exported from Opalite */", ":root {"]
         let prefixSlug = prefix.map(cssSlug)
-        for swatch in swatches {
+        func slug(for swatch: ExportSwatch) -> String {
             var slug = cssSlug(swatch.resolvedName)
             if let prefixSlug, !prefixSlug.isEmpty { slug = "\(prefixSlug)-\(slug)" }
-            let c = swatch.rgba
-            if c.alpha < 1 {
-                lines.append("  --\(slug): rgba(\(c.red.byte), \(c.green.byte), \(c.blue.byte), \(String(format: "%.2f", c.alpha)));")
-            } else {
-                lines.append("  --\(slug): rgb(\(c.red.byte), \(c.green.byte), \(c.blue.byte));")
-            }
-            lines.append("  --\(slug)-hex: \(c.hexString);")
+            return slug
+        }
+        func declarations(_ slug: String, _ c: RGBA, indent: String) -> [String] {
+            let value = c.alpha < 1
+                ? "rgba(\(c.red.byte), \(c.green.byte), \(c.blue.byte), \(String(format: "%.2f", c.alpha)))"
+                : "rgb(\(c.red.byte), \(c.green.byte), \(c.blue.byte))"
+            return ["\(indent)--\(slug): \(value);", "\(indent)--\(slug)-hex: \(c.hexString);"]
+        }
+        for swatch in swatches {
+            lines += declarations(slug(for: swatch), swatch.rgba, indent: "  ")
         }
         lines.append("}")
+        if let darkSwatches {
+            let pairs = Array(zip(swatches, darkSwatches))
+            if !pairs.isEmpty {
+                lines.append("")
+                lines.append("@media (prefers-color-scheme: dark) {")
+                lines.append("  :root {")
+                for (light, dark) in pairs {
+                    lines += declarations(slug(for: light), dark.rgba, indent: "    ")
+                }
+                lines.append("  }")
+                lines.append("}")
+            }
+        }
         return Data(lines.joined(separator: "\n").utf8)
     }
 
@@ -147,25 +167,71 @@ nonisolated public enum ExportEncoders {
 
     // MARK: - SwiftUI
 
-    public static func swiftUI(title: String, prefix: String?, swatches: [ExportSwatch]) -> Data {
+    /// A `Color` extension with one static constant per swatch. With `darkSwatches`,
+    /// each paired constant becomes an adaptive color that resolves per appearance
+    /// through a small `Color(light:dark:)` helper appended to the file; swatches past
+    /// the end of the dark palette stay fixed.
+    public static func swiftUI(title: String, prefix: String?, swatches: [ExportSwatch], darkSwatches: [ExportSwatch]? = nil) -> Data {
         var lines = ["// \(title) - Exported from Opalite", "import SwiftUI", "", "extension Color {"]
         let typePrefix = prefix.map(upperCamel) ?? ""
-        for swatch in swatches {
+        func literal(_ c: RGBA, indent: String) -> [String] {
+            [
+                "\(indent)Color(",
+                "\(indent)    red: \(String(format: "%.3f", c.red)),",
+                "\(indent)    green: \(String(format: "%.3f", c.green)),",
+                "\(indent)    blue: \(String(format: "%.3f", c.blue)),",
+                "\(indent)    opacity: \(String(format: "%.2f", c.alpha))",
+                "\(indent))",
+            ]
+        }
+        var usedAdaptive = false
+        for (index, swatch) in swatches.enumerated() {
             var property = lowerCamel(swatch.resolvedName)
             if !typePrefix.isEmpty {
                 property = lowerCamel(typePrefix) + property.prefix(1).uppercased() + property.dropFirst()
             }
-            let c = swatch.rgba
-            lines.append("    static let \(property) = Color(")
-            lines.append("        red: \(String(format: "%.3f", c.red)),")
-            lines.append("        green: \(String(format: "%.3f", c.green)),")
-            lines.append("        blue: \(String(format: "%.3f", c.blue)),")
-            lines.append("        opacity: \(String(format: "%.2f", c.alpha))")
-            lines.append("    )")
+            if let darkSwatches, index < darkSwatches.count {
+                usedAdaptive = true
+                lines.append("    static let \(property) = Color(")
+                let light = literal(swatch.rgba, indent: "        ")
+                let dark = literal(darkSwatches[index].rgba, indent: "        ")
+                lines.append("        light: " + light[0].trimmingCharacters(in: .whitespaces))
+                lines += light.dropFirst().dropLast()
+                lines.append("        ),")
+                lines.append("        dark: " + dark[0].trimmingCharacters(in: .whitespaces))
+                lines += dark.dropFirst().dropLast()
+                lines.append("        )")
+                lines.append("    )")
+            } else {
+                let body = literal(swatch.rgba, indent: "    ")
+                lines.append("    static let \(property) = " + body[0].trimmingCharacters(in: .whitespaces))
+                lines += body.dropFirst()
+            }
             lines.append("")
         }
         if lines.last == "" { lines.removeLast() }
         lines.append("}")
+        if usedAdaptive {
+            lines += [
+                "",
+                "extension Color {",
+                "    /// Resolves to `light` or `dark` with the current appearance.",
+                "    init(light: Color, dark: Color) {",
+                "        #if canImport(UIKit)",
+                "        self.init(uiColor: UIColor { traits in",
+                "            traits.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)",
+                "        })",
+                "        #elseif canImport(AppKit)",
+                "        self.init(nsColor: NSColor(name: nil) { appearance in",
+                "            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor(dark) : NSColor(light)",
+                "        })",
+                "        #else",
+                "        self = light",
+                "        #endif",
+                "    }",
+                "}",
+            ]
+        }
         if swatches.count == 1, let only = swatches.first {
             lines.append("")
             lines.append("// Usage: Color.\(lowerCamel(only.resolvedName))")

@@ -18,14 +18,41 @@ import OpaliteFeatureShared
 import OpaliteServices
 import os
 
-struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: View>: View {
+struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, PublishSheet: View>: View {
     let title: String
     let subject: String
     let formats: [Format]
+    /// Changes whenever an option that affects the written file changes, so the file is
+    /// prepared again. Sheets without options leave it at its default.
+    let optionsRevision: AnyHashable
     let prepare: @MainActor (Format) throws -> URL
     let previewPNG: @MainActor () -> Data?
     @ContentBuilder let hero: () -> Hero
+    /// Extra controls for the chosen format, shown as their own section when non-empty.
+    @ContentBuilder let options: (Format?) -> Options
     @ContentBuilder let publishSheet: () -> PublishSheet
+
+    init(
+        title: String,
+        subject: String,
+        formats: [Format],
+        optionsRevision: AnyHashable = 0,
+        prepare: @escaping @MainActor (Format) throws -> URL,
+        previewPNG: @escaping @MainActor () -> Data?,
+        @ContentBuilder hero: @escaping () -> Hero,
+        @ContentBuilder options: @escaping (Format?) -> Options,
+        @ContentBuilder publishSheet: @escaping () -> PublishSheet
+    ) {
+        self.title = title
+        self.subject = subject
+        self.formats = formats
+        self.optionsRevision = optionsRevision
+        self.prepare = prepare
+        self.previewPNG = previewPNG
+        self.hero = hero
+        self.options = options
+        self.publishSheet = publishSheet
+    }
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.onyxEntitlement) private var entitlement
@@ -75,6 +102,8 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
                     }
                 }
 
+                options(selectedFormat)
+
                 Section {
                     publishRow
                 } header: {
@@ -100,7 +129,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
-            .task(id: selectedFormat) { await prepareSelected() }
+            .task(id: PrepareKey(format: selectedFormat, revision: optionsRevision)) { await prepareSelected() }
             .fileExporter(
                 isPresented: $isSavingToFiles,
                 document: exported.map(ExportFileDocument.init),
@@ -304,6 +333,36 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, PublishSheet: Vi
             toastManager.show(error: OpaliteError.exportFailed(reason: error.localizedDescription))
         }
     }
+}
+
+extension ExportSheet where Options == EmptyView {
+    /// A sheet with no per-format options.
+    init(
+        title: String,
+        subject: String,
+        formats: [Format],
+        prepare: @escaping @MainActor (Format) throws -> URL,
+        previewPNG: @escaping @MainActor () -> Data?,
+        @ContentBuilder hero: @escaping () -> Hero,
+        @ContentBuilder publishSheet: @escaping () -> PublishSheet
+    ) {
+        self.init(
+            title: title,
+            subject: subject,
+            formats: formats,
+            prepare: prepare,
+            previewPNG: previewPNG,
+            hero: hero,
+            options: { _ in EmptyView() },
+            publishSheet: publishSheet
+        )
+    }
+}
+
+/// What a prepared file depends on: the format and the options revision.
+private struct PrepareKey<Format: Hashable>: Hashable {
+    let format: Format?
+    let revision: AnyHashable
 }
 
 // MARK: - Format row

@@ -26228,6 +26228,270 @@
         }
       },
       "shouldGenerateSymbol" : false
+    },
+    "UI Components" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Componentes de interfaz"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Composants d’interface"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UI コンポーネント"
+          }
+        }
+      }
+    },
+    "Icons, controls and focus rings, 3:1" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iconos, controles y anillos de foco, 3:1"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icônes, contrôles et anneaux de focus, 3:1"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイコン、コントロール、フォーカスリング、3:1"
+          }
+        }
+      }
+    },
+    "Text" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト"
+          }
+        }
+      }
+    },
+    "Non-text" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No textual"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non textuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト以外"
+          }
+        }
+      }
+    },
+    "Tip: hover, pressed and focused shades need to pass too. Run them against the same background." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: los tonos al pasar el cursor, al pulsar y al enfocar también deben aprobar. Compruébalos sobre el mismo fondo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : les teintes au survol, à l’appui et au focus doivent aussi réussir. Vérifiez-les sur le même arrière-plan."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: ホバー、押下、フォーカス時の色も合格する必要があります。同じ背景で確認してください。"
+          }
+        }
+      }
+    },
+    "Dark variant" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variante oscura"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variante sombre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダークバリアント"
+          }
+        }
+      }
+    },
+    "Pair a palette for dark appearance" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empareja una paleta para el aspecto oscuro"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Associer une palette pour l’apparence sombre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダーク外観用のパレットをペアにする"
+          }
+        }
+      }
+    },
+    "Options" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オプション"
+          }
+        }
+      }
+    },
+    "None" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "なし"
+          }
+        }
+      }
+    },
+    "Colors pair by position with the palette you choose; without one, the file has a single value per color." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los colores se emparejan por posición con la paleta que elijas; sin ella, el archivo tiene un solo valor por color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les couleurs s’associent par position avec la palette choisie; sans palette, le fichier n’a qu’une valeur par couleur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選んだパレットと位置順に色をペアにします。パレットを選ばない場合、ファイルには色ごとに1つの値だけが含まれます。"
+          }
+        }
+      }
+    },
+    "%@ fills a prefers-color-scheme: dark block. ^[%lld color](inflect: true) pair by position." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ rellena un bloque prefers-color-scheme: dark. ^[%lld color](inflect: true) se emparejan por posición."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ remplit un bloc prefers-color-scheme: dark. ^[%lld color](inflect: true) s’associent par position."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ が prefers-color-scheme: dark ブロックを埋めます。^[%lld color](inflect: true) が位置順にペアになります。"
+          }
+        }
+      }
+    },
+    "%@ becomes the dark value of each adaptive Color. ^[%lld color](inflect: true) pair by position." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pasa a ser el valor oscuro de cada Color adaptativo. ^[%lld color](inflect: true) se emparejan por posición."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ devient la valeur sombre de chaque Color adaptative. ^[%lld color](inflect: true) s’associent par position."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ が各アダプティブ Color のダーク値になります。^[%lld color](inflect: true) が位置順にペアになります。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

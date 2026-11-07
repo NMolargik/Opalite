@@ -63,6 +63,21 @@ struct ContrastCheckTests {
         #expect(!check.passes(.aaaNormal))
     }
 
+    @Test func uiComponentsIsItsOwnNonTextCriterionAtThreeToOne() {
+        // Mid gray on white is about 3.95:1: enough for icons and controls, not body text.
+        var check = ContrastCheck(source: .white)
+        check.select(.gray)
+        #expect(check.passes(.uiComponents))
+        #expect(ContrastCheck.Criterion.uiComponents.kind == .nonText)
+        #expect(ContrastCheck.Criterion.cases(of: .nonText) == [.uiComponents])
+        #expect(ContrastCheck.Criterion.cases(of: .text).count == 4)
+
+        // Light gray on white is well under 3:1 and fails everything.
+        check.select(hex: "#BBBBBB")
+        #expect(!check.passes(.uiComponents))
+        #expect(check.passingCriteria.isEmpty)
+    }
+
     @Test func hexSelectionRejectsIncompleteCodes() {
         var check = ContrastCheck(source: .black)
         let rejected = check.select(hex: "FF")

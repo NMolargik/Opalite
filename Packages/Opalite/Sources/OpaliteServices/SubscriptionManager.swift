@@ -26,7 +26,20 @@ public final class SubscriptionManager: EntitlementProviding {
     @ObservationIgnored private var transactionListener: Task<Void, Never>?
 
     /// Whether the user has Onyx (the lifetime purchase, or a legacy annual subscription).
-    public var hasOnyx: Bool { !purchasedProductIDs.intersection(OnyxSubscription.productIDs).isEmpty }
+    public var hasOnyx: Bool {
+        #if DEBUG
+        if isSimulatingOnyx { return true }
+        #endif
+        return !purchasedProductIDs.intersection(OnyxSubscription.productIDs).isEmpty
+    }
+
+    #if DEBUG
+    /// Debug builds only: pretend Onyx is owned so gated features can be exercised in the
+    /// simulator without a StoreKit purchase. Persisted so it survives relaunches.
+    public var isSimulatingOnyx: Bool = UserDefaults.standard.bool(forKey: "debug.simulateOnyx") {
+        didSet { UserDefaults.standard.set(isSimulatingOnyx, forKey: "debug.simulateOnyx") }
+    }
+    #endif
 
     public var currentSubscription: OnyxSubscription? {
         purchasedProductIDs.lazy.compactMap(OnyxSubscription.init(rawValue:)).first

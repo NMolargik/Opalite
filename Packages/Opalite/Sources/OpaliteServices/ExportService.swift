@@ -53,9 +53,12 @@ public enum ExportService {
     }
 
     /// Exports a palette; `imagePNG` is required for `.image`, `userName` labels the PDF.
-    public static func exportPalette(_ palette: OpalitePalette, format: PaletteExportFormat, imagePNG: Data? = nil, userName: String = "User") throws -> URL {
+    /// `darkPalette` pairs a second palette as the dark-appearance variant in the CSS and
+    /// SwiftUI formats (colors pair by position); the other formats ignore it.
+    public static func exportPalette(_ palette: OpalitePalette, format: PaletteExportFormat, imagePNG: Data? = nil, userName: String = "User", darkPalette: OpalitePalette? = nil) throws -> URL {
         let baseName = ExportEncoders.sanitizedFilename(palette.name)
         let swatches = palette.sortedColors.map { ExportSwatch(name: $0.name, rgba: $0.rgba) }
+        let darkSwatches = darkPalette?.sortedColors.map { ExportSwatch(name: $0.name, rgba: $0.rgba) }
         let data: Data
         switch format {
         case .image:
@@ -76,9 +79,9 @@ public enum ExportService {
         case .gpl:
             data = ExportEncoders.gpl(name: palette.name, swatches: swatches)
         case .css:
-            data = ExportEncoders.css(title: palette.name, prefix: palette.name, swatches: swatches)
+            data = ExportEncoders.css(title: palette.name, prefix: palette.name, swatches: swatches, darkSwatches: darkSwatches)
         case .swiftui:
-            data = ExportEncoders.swiftUI(title: palette.name, prefix: palette.name, swatches: swatches)
+            data = ExportEncoders.swiftUI(title: palette.name, prefix: palette.name, swatches: swatches, darkSwatches: darkSwatches)
         }
         return try write(data, filename: "\(baseName).\(format.fileExtension)")
     }

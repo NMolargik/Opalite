@@ -192,6 +192,46 @@ struct TextEncoderTests {
         #expect(!text.contains("\n\n}"), "no blank line before the closing brace")
     }
 
+    @Test func cssDarkVariantsOverrideInsideAMediaBlockPairedByPosition() {
+        let dark = [ExportSwatch(name: "Night Rose", rgba: RGBA(red: 0.5, green: 0, blue: 0))]
+        let text = String(decoding: ExportEncoders.css(title: "Sunset", prefix: nil, swatches: swatches, darkSwatches: dark), as: UTF8.self)
+        let lines = text.components(separatedBy: "\n")
+        #expect(lines[2] == "  --dusty-rose: rgb(255, 0, 0);")
+        #expect(lines[6] == "}")
+        #expect(lines[7] == "")
+        #expect(lines[8] == "@media (prefers-color-scheme: dark) {")
+        #expect(lines[9] == "  :root {")
+        #expect(lines[10] == "    --dusty-rose: rgb(128, 0, 0);", "the dark value is written under the light swatch's name")
+        #expect(lines[11] == "    --dusty-rose-hex: #800000;")
+        #expect(lines[12] == "  }")
+        #expect(lines[13] == "}")
+        #expect(!text.contains("night-rose"), "dark swatch names never appear")
+        #expect(text.components(separatedBy: "--0000ff:").count == 2, "a swatch past the end of the dark palette keeps its single light value")
+    }
+
+    @Test func cssWithEmptyDarkPaletteIsPlain() {
+        let plain = ExportEncoders.css(title: "Sunset", prefix: nil, swatches: swatches)
+        let empty = ExportEncoders.css(title: "Sunset", prefix: nil, swatches: swatches, darkSwatches: [])
+        #expect(plain == empty)
+    }
+
+    @Test func swiftUIDarkVariantsBecomeAdaptiveColorsWithAHelper() {
+        let dark = [ExportSwatch(name: nil, rgba: RGBA(red: 0.5, green: 0, blue: 0))]
+        let text = String(decoding: ExportEncoders.swiftUI(title: "Sunset", prefix: nil, swatches: swatches, darkSwatches: dark), as: UTF8.self)
+        #expect(text.contains("    static let dustyRose = Color(\n        light: Color(\n            red: 1.000,"))
+        #expect(text.contains("        dark: Color(\n            red: 0.500,"))
+        #expect(text.contains("    static let color0000ff = Color(\n        red: 0.000,"), "unpaired swatches stay fixed")
+        #expect(text.contains("init(light: Color, dark: Color)"))
+        #expect(text.contains("#if canImport(UIKit)") && text.contains("#elseif canImport(AppKit)"))
+        #expect(text.components(separatedBy: "extension Color {").count == 3, "the helper is its own extension")
+    }
+
+    @Test func swiftUIWithoutDarkVariantsHasNoHelper() {
+        let text = String(decoding: ExportEncoders.swiftUI(title: "Sunset", prefix: nil, swatches: swatches), as: UTF8.self)
+        #expect(!text.contains("init(light:"))
+        #expect(text.components(separatedBy: "extension Color {").count == 2)
+    }
+
     @Test("lowerCamel", arguments: [
         ("Dusty Rose", "dustyRose"), ("#FF5733", "ff5733"), ("123 Go", "color123Go"), ("", "customColor"), ("!!!", "customColor"),
         ("ocean   MIST blue", "oceanMistBlue"), ("Red", "red"),

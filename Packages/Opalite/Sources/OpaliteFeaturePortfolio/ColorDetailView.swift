@@ -681,8 +681,29 @@ private struct ContrastCheckerCard: View {
     }
 
     private var criteria: some View {
-        VStack(spacing: Brand.Space.xs) {
-            ForEach(ContrastCheck.Criterion.allCases) { criterion in
+        VStack(alignment: .leading, spacing: Brand.Space.xs) {
+            criteriaGroup(String(localized: "Text"), ContrastCheck.Criterion.cases(of: .text))
+            Divider()
+                .padding(.vertical, Brand.Space.xs)
+            criteriaGroup(String(localized: "Non-text"), ContrastCheck.Criterion.cases(of: .nonText))
+            if contrast.hasComparison {
+                Text("Tip: hover, pressed and focused shades need to pass too. Run them against the same background.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, Brand.Space.xs)
+            }
+        }
+    }
+
+    /// One labeled run of criteria rows: the WCAG text levels, or the non-text threshold.
+    private func criteriaGroup(_ label: String, _ group: [ContrastCheck.Criterion]) -> some View {
+        VStack(alignment: .leading, spacing: Brand.Space.xs) {
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .accessibilityAddTraits(.isHeader)
+            ForEach(group) { criterion in
                 let passes = contrast.passes(criterion)
                 HStack(spacing: Brand.Space.md) {
                     Image(systemName: passes ? "checkmark.circle.fill" : "xmark.circle")
@@ -701,7 +722,7 @@ private struct ContrastCheckerCard: View {
                 .padding(.vertical, Brand.Space.xs)
                 .accessibilityElement(children: .combine)
                 .accessibilityValue(Text(contrast.hasComparison ? (passes ? "Passes" : "Fails") : "Not checked"))
-                if criterion != ContrastCheck.Criterion.allCases.last { Divider() }
+                if criterion != group.last { Divider() }
             }
         }
     }

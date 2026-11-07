@@ -28,14 +28,27 @@ nonisolated public struct ContrastCandidate: Identifiable, Hashable, Sendable {
 nonisolated public struct ContrastCheck: Equatable, Sendable {
     // MARK: - Criteria
 
-    /// WCAG 2.x success criteria for text, in the order they're displayed.
+    /// WCAG 2.x success criteria, in the order they're displayed: the four text levels
+    /// (1.4.3 and 1.4.6), then the non-text threshold for icons, controls and focus
+    /// indicators (1.4.11), which shares AA Large's 3:1 but is its own pass or fail.
     public enum Criterion: String, CaseIterable, Identifiable, Sendable {
         case aaNormal
         case aaLarge
         case aaaNormal
         case aaaLarge
+        case uiComponents
 
         public var id: String { rawValue }
+
+        /// Text criteria apply to glyphs; non-text to everything else that has to be seen.
+        public enum Kind: Sendable { case text, nonText }
+
+        public var kind: Kind {
+            switch self {
+            case .aaNormal, .aaLarge, .aaaNormal, .aaaLarge: .text
+            case .uiComponents: .nonText
+            }
+        }
 
         public var threshold: Double {
             switch self {
@@ -43,6 +56,7 @@ nonisolated public struct ContrastCheck: Equatable, Sendable {
             case .aaLarge: 3.0
             case .aaaNormal: 7.0
             case .aaaLarge: 4.5
+            case .uiComponents: 3.0
             }
         }
 
@@ -52,6 +66,7 @@ nonisolated public struct ContrastCheck: Equatable, Sendable {
             case .aaLarge: String(localized: "AA Large")
             case .aaaNormal: String(localized: "AAA Normal")
             case .aaaLarge: String(localized: "AAA Large")
+            case .uiComponents: String(localized: "UI Components")
             }
         }
 
@@ -61,7 +76,13 @@ nonisolated public struct ContrastCheck: Equatable, Sendable {
             case .aaLarge: String(localized: "Large text, 3:1")
             case .aaaNormal: String(localized: "Enhanced body text, 7:1")
             case .aaaLarge: String(localized: "Enhanced large text, 4.5:1")
+            case .uiComponents: String(localized: "Icons, controls and focus rings, 3:1")
             }
+        }
+
+        /// The criteria of one kind, in display order.
+        public static func cases(of kind: Kind) -> [Criterion] {
+            allCases.filter { $0.kind == kind }
         }
     }
 
