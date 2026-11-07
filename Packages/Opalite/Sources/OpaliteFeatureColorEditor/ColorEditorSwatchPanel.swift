@@ -163,6 +163,12 @@ struct ColorEditorSwatchPanel: View {
             DetailRow(String(localized: "HSL"), value: viewModel.rgba.hslString, systemImage: "circle.lefthalf.filled", monospaced: true) {
                 hexCopy.copy(text: viewModel.rgba.hslString, label: String(localized: "HSL"))
             }
+            DetailRow(String(localized: "OKLCH"), value: viewModel.rgba.oklchString, systemImage: "paintpalette", monospaced: true) {
+                hexCopy.copy(text: viewModel.rgba.oklchString, label: String(localized: "OKLCH"))
+            }
+            DetailRow(String(localized: "Display P3"), value: viewModel.rgba.displayP3String, systemImage: "display", monospaced: true) {
+                hexCopy.copy(text: viewModel.rgba.displayP3String, label: String(localized: "Display P3"))
+            }
         }
         .padding(.horizontal, Brand.Space.lg)
         .padding(.vertical, Brand.Space.sm)

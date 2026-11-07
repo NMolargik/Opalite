@@ -134,6 +134,23 @@ nonisolated public struct ContrastCheck: Equatable, Sendable {
         ratio.map(WCAGConformance.init(ratio:))
     }
 
+    /// APCA Lc of the source color used as text on the comparison (supplemental to WCAG).
+    public var apcaSourceAsText: Double? {
+        comparison.map { APCA.contrast(text: source, background: $0) }
+    }
+
+    /// APCA Lc of the comparison used as text on the source color.
+    public var apcaTextOnSource: Double? {
+        comparison.map { APCA.contrast(text: $0, background: source) }
+    }
+
+    /// The source color nudged in OKLCH lightness until it passes WCAG AA for normal text
+    /// against the comparison; nil without a comparison, when already passing, or unreachable.
+    public var suggestedFix: RGBA? {
+        guard let comparison else { return nil }
+        return ColorMath.suggestForeground(source, on: comparison, targetRatio: Criterion.aaNormal.threshold)
+    }
+
     /// "4.52:1", or an em dash placeholder before a comparison is chosen.
     public var ratioText: String {
         conformance?.ratioText ?? "—:1"

@@ -126,6 +126,19 @@ struct HexFieldTests {
         #expect(viewModel.rgba.alpha == 0.25)
         #expect(viewModel.applyAlphaPercent(101) == false)
     }
+
+    @Test func oklchEntryAndGamutClipping() {
+        let viewModel = ColorEditorViewModel(rgba: seedColor)
+        #expect(viewModel.applyOKLCH(lightnessPercent: 60, chroma: 0.1, hueDegrees: 250))
+        #expect(viewModel.rgba.oklch.hue > 245 && viewModel.rgba.oklch.hue < 255)
+        #expect(!viewModel.oklchEntryWasClipped)
+        #expect(viewModel.applyOKLCH(lightnessPercent: 70, chroma: 0.4, hueDegrees: 150))
+        #expect(viewModel.oklchEntryWasClipped, "vivid green is outside sRGB")
+        #expect(viewModel.rgba.isInSRGBGamut)
+        #expect(viewModel.applyRGBBytes(red: 1, green: 2, blue: 3))
+        #expect(!viewModel.oklchEntryWasClipped, "warning clears once the color changes")
+        #expect(viewModel.applyOKLCH(lightnessPercent: 120, chroma: 0.1, hueDegrees: 0) == false)
+    }
 }
 
 // MARK: - Channels

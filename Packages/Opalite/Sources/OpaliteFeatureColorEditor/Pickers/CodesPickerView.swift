@@ -27,18 +27,22 @@ struct CodesPickerView: View {
     @State private var saturation = ""
     @State private var lightness = ""
     @State private var opacity = ""
+    @State private var okL = ""
+    @State private var okC = ""
+    @State private var okH = ""
 
     private enum Field: Hashable {
-        case hex, red, green, blue, hue, saturation, lightness, opacity
+        case hex, red, green, blue, hue, saturation, lightness, opacity, okL, okC, okH
         var group: Group {
             switch self {
             case .hex: .hex
             case .red, .green, .blue: .rgb
             case .hue, .saturation, .lightness: .hsl
             case .opacity: .opacity
+            case .okL, .okC, .okH: .oklch
             }
         }
-        enum Group { case hex, rgb, hsl, opacity }
+        enum Group { case hex, rgb, hsl, opacity, oklch }
     }
 
     var body: some View {
@@ -60,6 +64,21 @@ struct CodesPickerView: View {
                     numberField(String(localized: "S"), text: $saturation, field: .saturation)
                     numberField(String(localized: "L"), text: $lightness, field: .lightness)
                     copyButton(label: String(localized: "HSL"), text: viewModel.rgba.hslString)
+                }
+            }
+            section(String(localized: "OKLCH"), subtitle: String(localized: "Perceptual lightness in percent, chroma, hue in degrees")) {
+                VStack(alignment: .leading, spacing: Brand.Space.sm) {
+                    HStack(spacing: Brand.Space.sm) {
+                        decimalField(String(localized: "L"), text: $okL, field: .okL, maxLength: 5)
+                        decimalField(String(localized: "C"), text: $okC, field: .okC, maxLength: 5)
+                        decimalField(String(localized: "H"), text: $okH, field: .okH, maxLength: 6)
+                        copyButton(label: String(localized: "OKLCH"), text: viewModel.rgba.oklchString)
+                    }
+                    if viewModel.oklchEntryWasClipped {
+                        Label(String(localized: "Outside sRGB: chroma was reduced to the nearest displayable color."), systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
                 }
             }
             section(String(localized: "Opacity"), subtitle: String(localized: "0–100%")) {
@@ -169,6 +188,34 @@ struct CodesPickerView: View {
         .accessibilityIdentifier("colorEditor.codes.\(label.lowercased())")
     }
 
+    private func decimalField(_ label: String, text: Binding<String>, field: Field, maxLength: Int) -> some View {
+        VStack(spacing: 3) {
+            Text(label)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            TextField(label, text: text)
+                .font(.body.monospacedDigit())
+                .multilineTextAlignment(.center)
+                .keyboardType(.decimalPad)
+                .focused($focus, equals: field)
+                .onChange(of: text.wrappedValue) { _, value in
+                    let filtered = String(value.filter { $0.isNumber || $0 == "." }.prefix(maxLength))
+                    if filtered != value { text.wrappedValue = filtered }
+                }
+                .padding(.vertical, Brand.Space.sm)
+                .frame(maxWidth: .infinity)
+                .background(secondaryGroupedBackground, in: RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
+                        .strokeBorder(focus == field ? Color.opalitePurple.opacity(0.7) : Color.clear, lineWidth: 1.5)
+                )
+        }
+        .frame(minWidth: 56)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(label) value"))
+        .accessibilityIdentifier("colorEditor.codes.oklch.\(label.lowercased())")
+    }
+
     private func copyButton(label: String, text: String?) -> some View {
         Button {
             if let text {
@@ -211,6 +258,10 @@ struct CodesPickerView: View {
         saturation = "\(Int((hsl.saturation * 100).rounded()))"
         lightness = "\(Int((hsl.lightness * 100).rounded()))"
         opacity = "\(Int((rgba.alpha * 100).rounded()))"
+        let lch = rgba.oklch
+        okL = String(format: "%.1f", lch.lightness * 100)
+        okC = String(format: "%.3f", lch.chroma)
+        okH = String(format: "%.1f", lch.hue)
     }
 
     private func commit(_ group: Field.Group) {
@@ -227,6 +278,12 @@ struct CodesPickerView: View {
         case .hsl:
             if let h = Double(hue), let s = Double(saturation), let l = Double(lightness) {
                 accepted = viewModel.applyHSL(hueDegrees: h, saturationPercent: s, lightnessPercent: l)
+            } else {
+                accepted = false
+            }
+        case .oklch:
+            if let l = Double(okL), let c = Double(okC), let h = Double(okH) {
+                accepted = viewModel.applyOKLCH(lightnessPercent: l, chroma: c, hueDegrees: h)
             } else {
                 accepted = false
             }

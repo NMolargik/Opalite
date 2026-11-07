@@ -135,7 +135,9 @@ nonisolated public enum ExportEncoders {
             let value = c.alpha < 1
                 ? "rgba(\(c.red.byte), \(c.green.byte), \(c.blue.byte), \(String(format: "%.2f", c.alpha)))"
                 : "rgb(\(c.red.byte), \(c.green.byte), \(c.blue.byte))"
-            return ["\(indent)--\(slug): \(value);", "\(indent)--\(slug)-hex: \(c.hexString);"]
+            var lines = ["\(indent)--\(slug): \(value);", "\(indent)--\(slug)-hex: \(c.hexString);", "\(indent)--\(slug)-oklch: \(c.oklchString);"]
+            if !c.isInSRGBGamut { lines.append("\(indent)--\(slug)-p3: \(c.displayP3String);") }
+            return lines
         }
         for swatch in swatches {
             lines += declarations(slug(for: swatch), swatch.rgba, indent: "  ")
@@ -175,14 +177,18 @@ nonisolated public enum ExportEncoders {
         var lines = ["// \(title) - Exported from Opalite", "import SwiftUI", "", "extension Color {"]
         let typePrefix = prefix.map(upperCamel) ?? ""
         func literal(_ c: RGBA, indent: String) -> [String] {
-            [
+            // Colors outside sRGB (wide-gamut samples) are emitted in Display P3 so they survive.
+            let wide = !c.isInSRGBGamut
+            let p3 = c.displayP3
+            return [
                 "\(indent)Color(",
-                "\(indent)    red: \(String(format: "%.3f", c.red)),",
-                "\(indent)    green: \(String(format: "%.3f", c.green)),",
-                "\(indent)    blue: \(String(format: "%.3f", c.blue)),",
+                wide ? "\(indent)    .displayP3," : nil,
+                "\(indent)    red: \(String(format: "%.3f", wide ? p3.red : c.red)),",
+                "\(indent)    green: \(String(format: "%.3f", wide ? p3.green : c.green)),",
+                "\(indent)    blue: \(String(format: "%.3f", wide ? p3.blue : c.blue)),",
                 "\(indent)    opacity: \(String(format: "%.2f", c.alpha))",
                 "\(indent))",
-            ]
+            ].compactMap { $0 }
         }
         var usedAdaptive = false
         for (index, swatch) in swatches.enumerated() {

@@ -348,6 +348,26 @@ public final class ColorEditorViewModel {
         return true
     }
 
+    /// The last OKLCH entry typed into the codes fields; used to warn when it was outside sRGB.
+    public private(set) var lastOKLCHEntry: OKLCH?
+
+    /// True while the current color is a gamut-mapped stand-in for an out-of-sRGB OKLCH entry.
+    public var oklchEntryWasClipped: Bool {
+        guard let entry = lastOKLCHEntry, !entry.isInSRGBGamut else { return false }
+        return entry.gamutMappedRGBA.hexString == rgba.hexString
+    }
+
+    /// Applies OKLCH values (lightness in percent, chroma ≈ 0–0.4, hue in degrees). Colors outside
+    /// sRGB keep their lightness and hue and have chroma reduced to the nearest displayable value.
+    @discardableResult
+    public func applyOKLCH(lightnessPercent: Double, chroma: Double, hueDegrees: Double) -> Bool {
+        guard (0...100).contains(lightnessPercent), (0...0.5).contains(chroma), (0...360).contains(hueDegrees) else { return false }
+        let entry = OKLCH(lightness: lightnessPercent / 100, chroma: chroma, hue: hueDegrees)
+        lastOKLCHEntry = entry
+        pick(withAlpha(entry.gamutMappedRGBA))
+        return true
+    }
+
     /// Applies opacity in percent.
     @discardableResult
     public func applyAlphaPercent(_ percent: Int) -> Bool {

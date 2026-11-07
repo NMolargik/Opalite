@@ -36,6 +36,12 @@ nonisolated public enum AppStorageKeys {
     public static let skipSwatchBarConfirmation = "skipSwatchBarConfirmation"
     public static let swatchBarSwatchSize = "swatchBarSwatchSize"
 
+    // MARK: - Mac eyedropper
+    public static let eyedropperHotkey = "eyedropperHotkey"
+    public static let eyedropperCopyFormat = "eyedropperCopyFormat"
+    public static let eyedropperAutoCopy = "eyedropperAutoCopy"
+    public static let eyedropperKeepSwatchBarHidden = "eyedropperKeepSwatchBarHidden"
+
     // MARK: - Watch relay
     public static let lastWatchSyncTimestamp = "lastWatchSyncTimestamp"
     public static let lastWatchSyncColorCount = "lastWatchSyncColorCount"
