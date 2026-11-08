@@ -19,6 +19,9 @@ import os
 /// The collapsible cards of the palette detail, in display order.
 nonisolated public enum PaletteDetailSection: String, CaseIterable, Identifiable, Sendable {
     case colors
+    case contrastMatrix
+    case lightnessScale
+    case colorVision
     case notes
     case tags
     case canvas
@@ -53,6 +56,15 @@ final class PaletteDetailViewModel {
     var isConfirmingDelete = false
     var isConfirmingArchive = false
     var isConfirmingUnlink = false
+
+    // Accessibility tools
+    var contrastMode: ContrastMatrixMode = .wcag
+    var contrastPair: ContrastPair?
+    var scaleBaseID: UUID?
+    var scaleCustom: RGBA?
+    var scaleHexDraft = ""
+    var selectedScaleStop: Int?
+    var visionMode: ColorBlindnessMode = .protanopia
 
     @ObservationIgnored var notesAutosaveDelay: Duration = .milliseconds(650)
     @ObservationIgnored private var notesSaveTask: Task<Void, Never>?
@@ -100,6 +112,95 @@ final class PaletteDetailViewModel {
     func setExpanded(_ section: PaletteDetailSection, _ expanded: Bool) {
         if expanded { expandedSections.insert(section) } else { expandedSections.remove(section) }
     }
+
+    // MARK: - Contrast matrix
+
+    /// The matrix stays readable and cheap: the first `maxMatrixColors` members.
+    static let maxMatrixColors = 16
+
+    var matrixMembers: [OpaliteColor] { Array(members.prefix(Self.maxMatrixColors)) }
+    var isMatrixTruncated: Bool { memberCount > Self.maxMatrixColors }
+    var contrastMatrix: ContrastMatrix { ContrastMatrix(colors: matrixMembers.map(\.rgba)) }
+
+    /// Opens the contrast checker for `row` as text on `column`.
+    func openContrast(row: Int, column: Int) {
+        let colors = matrixMembers
+        guard colors.indices.contains(row), colors.indices.contains(column), row != column else { return }
+        contrastPair = ContrastPair(textID: colors[row].id, backgroundID: colors[column].id)
+    }
+
+    // MARK: - Lightness scale
+
+    /// The member the scale starts from: the chosen one, else the first.
+    var scaleBaseColor: OpaliteColor? {
+        if let id = scaleBaseID, let chosen = members.first(where: { $0.id == id }) { return chosen }
+        return members.first
+    }
+
+    /// The color the scale is built from: a typed hex wins over a member.
+    var scaleBase: RGBA? { scaleCustom ?? scaleBaseColor?.rgba }
+    var scaleSteps: [LightnessScale.Step] { scaleBase.map(LightnessScale.generate(from:)) ?? [] }
+
+    /// The step shown in detail: the chosen one, else the nearest to the base lightness.
+    var shownScaleStep: LightnessScale.Step? {
+        let steps = scaleSteps
+        guard !steps.isEmpty else { return nil }
+        if let stop = selectedScaleStop, let match = steps.first(where: { $0.stop == stop }) { return match }
+        return nearestScaleStep
+    }
+
+    var nearestScaleStep: LightnessScale.Step? {
+        guard let base = scaleBase else { return nil }
+        let steps = scaleSteps
+        return steps.indices.contains(LightnessScale.closestIndex(to: base)) ? steps[LightnessScale.closestIndex(to: base)] : nil
+    }
+
+    func selectScaleBase(_ color: OpaliteColor) {
+        scaleBaseID = color.id
+        scaleCustom = nil
+        selectedScaleStop = nil
+    }
+
+    /// Applies the typed hex as the scale's base; returns whether it parsed.
+    @discardableResult
+    func applyScaleHex() -> Bool {
+        guard let parsed = RGBA(hex: scaleHexDraft) else { return false }
+        scaleCustom = parsed
+        scaleHexDraft = ""
+        selectedScaleStop = nil
+        return true
+    }
+
+    var scaleBaseName: String {
+        if scaleCustom != nil { return scaleCustom?.hexString ?? "" }
+        return scaleBaseColor?.displayName ?? ""
+    }
+
+    /// Saves the scale as a new palette named "<base> Scale" with colors "<base> 50" ... "<base> 950".
+    /// Nil when the free tier's palette limit was hit (the paywall toast is already shown).
+    @discardableResult
+    func addScaleAsPalette(open: @escaping @MainActor (UUID) -> Void = { _ in }) -> OpalitePalette? {
+        let steps = scaleSteps
+        guard !steps.isEmpty else { return nil }
+        let base = scaleBaseName
+        guard let created = portfolio.createPalette(name: String(localized: "\(base) Scale")) else { return nil }
+        // Newest-updated sorts first, so create 950 first to leave 50 on top.
+        for step in steps.reversed() {
+            _ = portfolio.createColor(step.srgb, name: "\(base) \(step.stop)", in: created)
+        }
+        toasts.show(ToastItem(
+            message: String(localized: "Created \(created.name)"),
+            style: .success,
+            systemImage: "swatchpalette.fill",
+            actionTitle: String(localized: "Open"),
+            action: { open(created.id) }
+        ))
+        return created
+    }
+
+    // MARK: - Color vision
+
+    var colorVision: ColorVisionAnalysis { ColorVisionAnalysis(colors: members.map(\.rgba)) }
 
     // MARK: - Naming
 
@@ -257,4 +358,23 @@ final class PaletteDetailViewModel {
         if portfolio.activePaletteID == paletteID { portfolio.activePaletteID = nil }
         saveNotesNow()
     }
+}
+
+
+// MARK: - Accessibility tool types
+
+/// The matrix shows WCAG ratios and levels, or APCA Lc.
+nonisolated enum ContrastMatrixMode: String, CaseIterable, Identifiable, Sendable {
+    case wcag
+    case apca
+
+    var id: String { rawValue }
+}
+
+/// A tapped matrix cell: `textID` as text on `backgroundID`.
+nonisolated struct ContrastPair: Identifiable, Hashable, Sendable {
+    let textID: UUID
+    let backgroundID: UUID
+
+    var id: String { "\(textID.uuidString)-\(backgroundID.uuidString)" }
 }

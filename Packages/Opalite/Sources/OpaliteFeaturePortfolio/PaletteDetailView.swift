@@ -97,6 +97,9 @@ private struct PaletteDetailContent: View {
                     .padding(.top, Brand.Space.md)
                 VStack(spacing: Brand.Space.lg) {
                     colorsCard(for: palette)
+                    contrastMatrixCard
+                    lightnessScaleCard
+                    colorVisionCard
                     notesCard
                     tagsCard
                     canvasCard(for: palette)
@@ -131,6 +134,7 @@ private struct PaletteDetailContent: View {
         .sharedSheet(isPresented: $model.isShowingCanvasPicker) {
             CanvasPickerSheet { model.link($0) }
         }
+        .sharedSheet(item: $model.contrastPair) { pair in ContrastPairSheet(pair: pair) }
         .sharedSheet(item: $movingColor) { color in
             PaletteSelectionSheet(colors: [color])
         }
@@ -437,6 +441,29 @@ private struct PaletteDetailContent: View {
             onRemoveFromPalette: { withAnimation(reduceMotion ? nil : .snappy) { model.remove(color) } },
             onDelete: { colorToDelete = color }
         )
+    }
+
+    private var contrastMatrixCard: some View {
+        SectionCard(String(localized: "Contrast Matrix"), systemImage: "square.grid.3x3", tint: .opaliteBlue, isExpanded: expansion(.contrastMatrix)) {
+            ContrastMatrixCard(model: model)
+        }
+        .accessibilityIdentifier("paletteDetail.contrastMatrix")
+    }
+
+    private var lightnessScaleCard: some View {
+        SectionCard(String(localized: "Lightness Scale"), systemImage: "slider.horizontal.3", tint: .opalitePurple, isExpanded: expansion(.lightnessScale)) {
+            LightnessScaleCard(model: model) {
+                model.addScaleAsPalette(open: { router.open(.palette($0)) })
+            }
+        }
+        .accessibilityIdentifier("paletteDetail.lightnessScale")
+    }
+
+    private var colorVisionCard: some View {
+        SectionCard(String(localized: "Color Vision"), systemImage: "eye", tint: .opaliteTan, isExpanded: expansion(.colorVision)) {
+            ColorVisionCard(model: model)
+        }
+        .accessibilityIdentifier("paletteDetail.colorVision")
     }
 
     private var notesCard: some View {

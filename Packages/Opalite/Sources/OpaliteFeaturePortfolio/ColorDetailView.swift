@@ -577,7 +577,7 @@ private struct ColorDetailContent: View {
 
 // MARK: - Contrast checker
 
-private struct ContrastCheckerCard: View {
+struct ContrastCheckerCard: View {
     @Bindable var model: ColorDetailViewModel
     let candidates: [ContrastCandidate]
 
@@ -632,7 +632,7 @@ private struct ContrastCheckerCard: View {
         HStack(spacing: Brand.Space.md) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title).font(.subheadline.weight(.medium))
-                Text(apcaGuidance(APCA.Band(lc: lc))).font(.caption).foregroundStyle(.secondary)
+                Text(APCA.Band(lc: lc).guidance).font(.caption).foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
             Text(APCA.lcText(lc))
@@ -640,17 +640,6 @@ private struct ContrastCheckerCard: View {
         }
         .padding(.vertical, Brand.Space.xs)
         .accessibilityElement(children: .combine)
-    }
-
-    private func apcaGuidance(_ band: APCA.Band) -> String {
-        switch band {
-        case .fail: String(localized: "Too low for text")
-        case .spot: String(localized: "Incidental text only")
-        case .large: String(localized: "Large headlines")
-        case .content: String(localized: "Content and large body text")
-        case .body: String(localized: "Body text")
-        case .fluent: String(localized: "Fluent reading")
-        }
     }
 
     @ContentBuilder
