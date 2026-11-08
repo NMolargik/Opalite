@@ -211,6 +211,7 @@ public struct ColorEditorView: View {
             }
             .disabled(!viewModel.canSave)
             .keyboardShortcut("s", modifiers: .command)
+            .toolbarButtonTint(prominent: true)
             .accessibilityHint(viewModel.canSave ? Text("Saves the color") : Text("Make a change first"))
             .accessibilityIdentifier("colorEditor.save")
         }

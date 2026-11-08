@@ -122,17 +122,26 @@ extension View {
             .overlay(Capsule(style: .continuous).strokeBorder(.quaternary))
     }
 
-    /// Tints toolbar glyphs with the inverse-theme color on systems before 26, where
-    /// toolbar buttons otherwise pick up the accent color.
+    /// The one toolbar-button treatment. Every toolbar button and menu applies it.
+    ///
+    /// Default (`prominent: false`): the plain system glass style with the standard tint, so
+    /// sibling items read as one family instead of the system picking fills per item type.
+    /// `prominent: true` fills the item and is reserved for the screen's single primary
+    /// action (Add, Edit-that-opens-the-editor, Save). Share, menus, filters, info and
+    /// navigation are never prominent, and destructive actions live in menus or
+    /// confirmations, never as a filled toolbar button.
+    ///
+    /// Before 26 the glyphs take the inverse-theme color (toolbar buttons otherwise pick up
+    /// the accent color) and a prominent item uses the bordered-prominent style.
     @ContentBuilder
-    public func toolbarButtonTint() -> some View {
+    public func toolbarButtonTint(prominent: Bool = false) -> some View {
         #if os(visionOS) || os(watchOS)
         self
         #else
         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, *) {
-            self
+            if prominent { buttonStyle(.glassProminent) } else { buttonStyle(.glass) }
         } else {
-            tint(.opaliteInverse)
+            if prominent { buttonStyle(.borderedProminent) } else { tint(.opaliteInverse) }
         }
         #endif
     }

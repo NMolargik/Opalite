@@ -605,6 +605,7 @@ private struct PaletteDetailContent: View {
             } label: {
                 Label("Add Color", systemImage: "plus")
             }
+            .toolbarButtonTint(prominent: true)
             .accessibilityHint(Text("Creates a new color in this palette"))
             .accessibilityIdentifier("paletteDetail.add")
         }
@@ -615,6 +616,7 @@ private struct PaletteDetailContent: View {
             } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
+            .toolbarButtonTint()
             .disabled(model.memberCount == 0)
             .accessibilityHint(Text("Export or share this palette"))
         }

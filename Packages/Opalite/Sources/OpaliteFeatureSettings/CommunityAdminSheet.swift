@@ -98,6 +98,7 @@ struct CommunityAdminView: View {
                     Haptics.selection()
                     Task { await load() }
                 }
+                .toolbarButtonTint()
                 .disabled(isLoading)
             }
         }

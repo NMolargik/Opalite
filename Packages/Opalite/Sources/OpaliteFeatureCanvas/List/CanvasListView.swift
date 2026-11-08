@@ -55,6 +55,7 @@ private struct CanvasGridView: View {
                     Label("New Canvas", systemImage: "plus")
                         .symbolEffect(.bounce, value: newCanvasBounce)
                 }
+                .toolbarButtonTint(prominent: true)
                 .accessibilityIdentifier("canvas.new")
                 .accessibilityHint(canvases.canCreateCanvas ? Text("Creates a new drawing canvas") : Text("Unlimited canvases require Onyx"))
                 .keyboardShortcut("n", modifiers: .command)

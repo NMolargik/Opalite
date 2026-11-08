@@ -261,6 +261,7 @@ struct PortfolioScreen: View {
 
         ToolbarItem(placement: .primaryAction) {
             createMenu
+                .toolbarButtonTint(prominent: true)
         }
     }
 

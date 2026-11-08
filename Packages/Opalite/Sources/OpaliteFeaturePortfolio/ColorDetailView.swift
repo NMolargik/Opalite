@@ -502,6 +502,7 @@ private struct ColorDetailContent: View {
             } label: {
                 Label("Edit", systemImage: "slider.horizontal.3")
             }
+            .toolbarButtonTint(prominent: true)
             .accessibilityHint(Text("Opens the color editor"))
             .accessibilityIdentifier("colorDetail.edit")
         }
@@ -512,6 +513,7 @@ private struct ColorDetailContent: View {
             } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
+            .toolbarButtonTint()
             .accessibilityHint(Text("Export or share this color"))
         }
         ToolbarItem(placement: .topBarTrailing) {
@@ -974,6 +976,7 @@ struct FullScreenColorView: View {
                         } label: {
                             Label("Exit Full Screen", systemImage: "arrow.down.right.and.arrow.up.left")
                         }
+                        .toolbarButtonTint()
                         .accessibilityLabel(Text("Exit full screen"))
                         .accessibilityIdentifier("fullScreen.exit")
                     }

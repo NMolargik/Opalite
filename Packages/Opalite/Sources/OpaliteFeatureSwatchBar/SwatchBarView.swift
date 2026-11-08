@@ -404,7 +404,7 @@ public struct SwatchBarView: View {
                 Label("New Color", systemImage: "plus")
             }
             .keyboardShortcut("n", modifiers: .command)
-            .toolbarButtonTint()
+            .toolbarButtonTint(prominent: true)
             .accessibilityIdentifier("swatchBar.newColor")
         }
 
