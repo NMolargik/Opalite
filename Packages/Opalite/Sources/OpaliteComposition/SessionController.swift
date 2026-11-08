@@ -185,7 +185,7 @@ public final class SessionController {
         portfolio.beforeDestructiveChange = { [weak backupManager] in backupManager?.backUpBeforeDelete() }
 
         community = CommunityModel(
-            service: communityService ?? CloudKitCommunityService(),
+            service: communityService ?? Self.defaultCommunityService(),
             entitlements: subscriptions,
             toastManager: toastManager,
             publisherName: portfolio.authorName,
@@ -220,6 +220,15 @@ public final class SessionController {
         #if os(iOS) && canImport(WatchConnectivity)
         phone.configure(snapshotProvider: { [statusSync] in statusSync.currentSnapshot() }, pasteboard: pasteboard)
         #endif
+    }
+
+    /// The CloudKit Community service. Debug builds run with `--no-cloudkit` use an offline
+    /// fake instead, so an unsigned simulator build (no iCloud entitlement) can launch.
+    private static func defaultCommunityService() -> any CommunityService {
+        #if DEBUG
+        if CommandLine.arguments.contains("--no-cloudkit") { return FakeCommunityService() }
+        #endif
+        return CloudKitCommunityService()
     }
 
     private static func makeThumbnailRenderer() -> (@MainActor (CanvasFile) -> Data?)? {

@@ -35,6 +35,8 @@ struct SyncHealthPresentationTests {
     @Test func backupWording() {
         let header = BackupHeader(formatVersion: 1, createdAt: Date(), reason: .automatic, appVersion: "", deviceName: "", colorCount: 1, paletteCount: 2)
         #expect(BackupPresentation.counts(header).contains("1") && BackupPresentation.counts(header).contains("2"))
+        #expect(!BackupPresentation.counts(header).contains("^["), "inflection markup is resolved")
+        #expect(BackupPresentation.counts(BackupHeader(formatVersion: 1, createdAt: Date(), reason: .manual, appVersion: "", deviceName: "", colorCount: 1, paletteCount: 1)) == "1 color, 1 palette")
         #expect(Set(BackupReason.allCases.map(BackupPresentation.reason)).count == BackupReason.allCases.count)
         #expect(BackupPresentation.restoreResult(RestoreSummary(colorsKept: 3)).hasPrefix("Nothing to restore"))
         #expect(BackupPresentation.restoreResult(RestoreSummary(colorsAdded: 3, palettesAdded: 1)).contains("3"))

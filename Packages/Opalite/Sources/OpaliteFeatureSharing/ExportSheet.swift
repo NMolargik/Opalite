@@ -76,6 +76,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { proxy in
             List {
                 Section {
                     hero()
@@ -102,6 +103,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                     } footer: {
                         Text("Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation.")
                     }
+                    .id("designTokens")
                 }
 
                 options(selectedFormat)
@@ -119,6 +121,15 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                 }
             }
             .listStyle(.insetGrouped)
+            #if DEBUG
+            .task {
+                // Simulator verification: `--scroll-to-tokens` brings the Design Tokens section into view.
+                guard CommandLine.arguments.contains("--scroll-to-tokens") else { return }
+                try? await Task.sleep(for: .seconds(1))
+                proxy.scrollTo("designTokens", anchor: UnitPoint(x: 0.5, y: 0.18))
+            }
+            #endif
+            }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -360,8 +360,12 @@ public enum SyncHealthPresentation {
 // MARK: - Backups
 
 public enum BackupPresentation {
+    /// `String(localized:)` leaves `^[…](inflect: true)` markup in the text; an attributed
+    /// string applies the grammar agreement, so plain strings go through one.
+    private static func resolved(_ text: AttributedString) -> String { String(text.characters) }
+
     public static func counts(_ header: BackupHeader) -> String {
-        String(localized: "^[\(header.colorCount) color](inflect: true), ^[\(header.paletteCount) palette](inflect: true)")
+        resolved(AttributedString(localized: "^[\(header.colorCount) color](inflect: true), ^[\(header.paletteCount) palette](inflect: true)"))
     }
 
     public static func reason(_ reason: BackupReason) -> String {
@@ -375,6 +379,6 @@ public enum BackupPresentation {
 
     public static func restoreResult(_ summary: RestoreSummary) -> String {
         if !summary.addedAnything { return String(localized: "Nothing to restore. Everything in this backup is already in your library.") }
-        return String(localized: "Restored ^[\(summary.colorsAdded) color](inflect: true) and ^[\(summary.palettesAdded) palette](inflect: true)")
+        return resolved(AttributedString(localized: "Restored ^[\(summary.colorsAdded) color](inflect: true) and ^[\(summary.palettesAdded) palette](inflect: true)"))
     }
 }

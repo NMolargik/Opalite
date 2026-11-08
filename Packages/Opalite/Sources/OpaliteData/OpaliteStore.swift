@@ -41,7 +41,14 @@ public enum OpaliteStore {
             }
         }
 
+        #if DEBUG
+        // Unsigned simulator builds have no iCloud entitlement; CloudKit setup traps there.
+        let skipCloudKit = CommandLine.arguments.contains("--no-cloudkit")
+        #else
+        let skipCloudKit = false
+        #endif
         do {
+            if skipCloudKit { throw CocoaError(.featureUnsupported) }
             let cloud = ModelConfiguration(schema: schema, cloudKitDatabase: .private(AppGroup.cloudKitContainerID))
             let container = try ModelContainer(for: schema, configurations: cloud)
             lastMode = .cloudKit

@@ -68,6 +68,14 @@ private struct PaletteDetailContent: View {
             }
         }
         .onAppear(perform: model.didAppear)
+        #if DEBUG
+        .task {
+            // Simulator verification: `--show-export-sheet` opens the export sheet.
+            guard CommandLine.arguments.contains("--show-export-sheet") else { return }
+            try? await Task.sleep(for: .seconds(1))
+            model.isShowingExport = true
+        }
+        #endif
         .onDisappear(perform: model.willDisappear)
         .onChange(of: portfolio.pendingCommand) { _, command in
             guard let command, portfolio.activePaletteID == model.paletteID, model.handle(command) else { return }
