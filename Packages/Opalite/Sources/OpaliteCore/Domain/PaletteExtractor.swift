@@ -76,6 +76,15 @@ nonisolated public struct PaletteSamples: Sendable {
         self.init(out)
     }
 
+    /// Samples with no real hue (greys, white, black) scaled by `factor`, so large neutral
+    /// backgrounds do not crowd out the colors a person would call the palette.
+    public func discountingNeutrals(to factor: Double, chromaThreshold: Double = 0.03) -> PaletteSamples {
+        PaletteSamples(samples.map { sample in
+            let chroma = ColorSpaces.oklch(from: ColorSpaces.oklab(from: sample.rgba)).chroma
+            return chroma < chromaThreshold ? WeightedColor(sample.rgba, weight: sample.weight * factor) : sample
+        })
+    }
+
     /// This source scaled so its weights sum to `total`, ready to blend with another.
     public func normalized(to total: Double = 1) -> PaletteSamples {
         let sum = totalWeight

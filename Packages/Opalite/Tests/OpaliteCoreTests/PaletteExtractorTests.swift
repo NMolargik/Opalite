@@ -177,3 +177,15 @@ private extension OKLab {
         #expect(palette.count == 3)
     }
 }
+
+@Suite struct PaletteSamplesTests {
+    @Test func discountingNeutralsShrinksOnlyGreys() {
+        let samples = PaletteSamples([
+            WeightedColor(RGBA(hex: "#FFFFFF")!, weight: 10),
+            WeightedColor(RGBA(hex: "#E63946")!, weight: 10),
+        ]).discountingNeutrals(to: 0.1)
+        let byHex = Dictionary(uniqueKeysWithValues: samples.samples.map { ($0.rgba.hexString, $0.weight) })
+        #expect(abs((byHex["#FFFFFF"] ?? 0) - 1) < 1e-9)
+        #expect(byHex["#E63946"] == 10)
+    }
+}
