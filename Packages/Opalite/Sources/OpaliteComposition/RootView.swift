@@ -82,8 +82,9 @@ public struct RootView: View {
     }
 
     #if DEBUG
-    /// Verification helpers for simulator runs: `--seed-sample-data`, `--simulate-onyx`,
-    /// `--seed-confusable-palette`, `--open-first-palette` (with `--palette-index=N`), `--open-settings`, and `--open-backups`. Debug builds only.
+    /// Verification helpers for simulator runs: `--seed-sample-data`, `--simulate-onyx`, `--simulate-no-onyx`,
+    /// `--seed-confusable-palette`, `--open-first-palette` (with `--palette-index=N`), `--open-settings`,
+    /// `--open-backups`, and `--simulate-icloud=<state>`. Debug builds only.
     private func applyDebugLaunchArguments() async {
         let arguments = CommandLine.arguments
         if arguments.contains("--seed-sample-data"), session.portfolio.colors.isEmpty { session.portfolio.generateSampleData() }
@@ -94,6 +95,10 @@ public struct RootView: View {
             }
         }
         if arguments.contains("--simulate-onyx") { session.subscriptions.isSimulatingOnyx = true }
+        if arguments.contains("--simulate-no-onyx") { session.subscriptions.isSimulatingOnyx = false }
+        if let argument = arguments.first(where: { $0.hasPrefix("--simulate-icloud=") }) {
+            session.cloudSync.simulate(String(argument.dropFirst("--simulate-icloud=".count)))
+        }
         if arguments.contains("--open-first-palette") {
             try? await Task.sleep(for: .seconds(1.5))
             let palettes = session.portfolio.orderedPalettes

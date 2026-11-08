@@ -36,6 +36,7 @@ public struct SettingsView: View {
 
     @State private var displayName = ""
     @State private var isSyncingNow = false
+    @State private var isShowingSyncDetails = false
     @State private var isConfirmingSampleData = false
     @State private var isShowingCommunityAdmin = false
     @FocusState private var isNameFocused: Bool
@@ -144,53 +145,36 @@ public struct SettingsView: View {
 
     // MARK: - iCloud
 
+    private var iCloudState: ICloudState {
+        ICloudState.resolve(status: cloudSync.syncStatus, storeMode: cloudSync.storeMode)
+    }
+
     private var cloudSection: some View {
         Section {
             LabeledContent {
-                Text(CloudSyncPresentation.title(for: cloudSync.syncStatus))
-                    .foregroundStyle(cloudSync.syncStatus.isError ? .orange : .secondary)
+                Text(iCloudState.title)
+                    .foregroundStyle(iCloudState.needsAttention ? Color.orange : Color.secondary)
                     .contentTransition(.opacity)
             } label: {
                 Label {
-                    Text("iCloud Sync")
+                    Text("iCloud")
                 } icon: {
-                    Image(systemName: cloudSync.syncStatus.systemImage)
-                        .symbolEffect(.rotate, isActive: cloudSync.syncStatus == .syncing)
+                    Image(systemName: iCloudState.systemImage)
+                        .symbolEffect(.rotate, isActive: iCloudState == .syncing)
                 }
                 .labelStyle(.settingsIcon(.blue))
             }
-            .animation(.default, value: cloudSync.syncStatus)
+            .animation(.default, value: iCloudState)
             .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("settings.sync.status")
 
-            syncHealthRows
-
-            if cloudSync.isCloudAvailable {
-                Button {
-                    Haptics.selection()
-                    Task { await syncNow() }
-                } label: {
-                    HStack {
-                        Label("Sync Now", systemImage: "arrow.triangle.2.circlepath")
-                            .labelStyle(.settingsIcon(.blue))
-                        if isSyncingNow {
-                            Spacer()
-                            ProgressView()
-                        }
-                    }
-                }
-                .disabled(isSyncingNow || !CloudSyncPresentation.canSyncNow(cloudSync.syncStatus))
-                .accessibilityHint(Text("Saves pending changes and syncs with iCloud"))
-                .accessibilityIdentifier("settings.syncNow")
+            DisclosureGroup("Sync Details", isExpanded: $isShowingSyncDetails) {
+                syncDetailRows
             }
-        } header: {
-            Text("iCloud")
+            .accessibilityIdentifier("settings.sync.details")
         } footer: {
-            VStack(alignment: .leading, spacing: Brand.Space.sm) {
-                Text(CloudSyncPresentation.guidance(for: cloudSync.syncStatus))
-                if let note = SyncHealthPresentation.storageExplanation(cloudSync.storeMode) {
-                    Text(note)
-                }
-                Text("Last Synced is the last time iCloud reported a finished sync since Opalite opened. iOS doesn't tell apps about earlier syncs.")
+            if let footer = iCloudState.footer {
+                Text(footer)
             }
         }
     }
@@ -213,16 +197,10 @@ public struct SettingsView: View {
         }
     }
 
-    /// What iCloud actually reported: account, where the library is stored, the last
-    /// finished sync, and the last error. Nothing here is estimated.
+    /// What iCloud actually reported: where the library is stored, the last finished sync,
+    /// and the last error. Nothing here is estimated.
     @ContentBuilder
-    private var syncHealthRows: some View {
-        LabeledContent("iCloud Account") {
-            Text(SyncHealthPresentation.account(isAvailable: cloudSync.isCloudAvailable))
-                .foregroundStyle(cloudSync.isCloudAvailable ? Color.secondary : Color.orange)
-        }
-        .accessibilityIdentifier("settings.sync.account")
-
+    private var syncDetailRows: some View {
         LabeledContent("Library Storage") {
             Text(SyncHealthPresentation.storage(cloudSync.storeMode))
                 .foregroundStyle(cloudSync.storeMode == .cloudKit ? Color.secondary : Color.orange)
@@ -236,12 +214,30 @@ public struct SettingsView: View {
         .accessibilityIdentifier("settings.sync.lastSynced")
 
         if let problem = cloudSync.lastSyncError {
-            LabeledContent("Last Problem") {
+            LabeledContent("Last Error") {
                 Text(SyncHealthPresentation.lastProblem(problem, lastSuccess: cloudSync.lastSuccessfulSyncDate))
                     .foregroundStyle(.orange)
                     .multilineTextAlignment(.trailing)
             }
             .accessibilityIdentifier("settings.sync.lastProblem")
+        }
+
+        if cloudSync.isCloudAvailable {
+            Button {
+                Haptics.selection()
+                Task { await syncNow() }
+            } label: {
+                HStack {
+                    Label("Sync Now", systemImage: "arrow.triangle.2.circlepath")
+                    if isSyncingNow {
+                        Spacer()
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(isSyncingNow || !CloudSyncPresentation.canSyncNow(cloudSync.syncStatus))
+            .accessibilityHint(Text("Saves pending changes and syncs with iCloud"))
+            .accessibilityIdentifier("settings.syncNow")
         }
     }
 

@@ -33,6 +33,11 @@ struct MainView: View {
     let session: SessionController
 
     @State private var navigation = NavigationModel()
+    #if DEBUG
+    /// `--show-export-sheet` (palette) or `--show-export-sheet=color` presents the export sheet at launch.
+    @State private var isShowingDebugPaletteExport = false
+    @State private var isShowingDebugColorExport = false
+    #endif
     #if targetEnvironment(macCatalyst)
     @State private var eyedropper: EyedropperModel?
     @AppStorage(AppStorageKeys.eyedropperHotkey) private var eyedropperHotkeyRaw = EyedropperHotkey.default.rawValue
@@ -77,6 +82,19 @@ struct MainView: View {
         .sharedSheet(isPresented: $importer.isShowingPaletteImport) {
             if let preview = importer.pendingPaletteImport { PaletteImportConfirmationSheet(preview: preview) }
         }
+        #if DEBUG
+        .sharedSheet(isPresented: $isShowingDebugPaletteExport) {
+            if let palette = portfolio.orderedPalettes.first { PaletteExportSheet(palette: palette) }
+        }
+        .sharedSheet(isPresented: $isShowingDebugColorExport) {
+            if let color = portfolio.colors.first { ColorExportSheet(color: color) }
+        }
+        .task {
+            guard let argument = CommandLine.arguments.first(where: { $0.hasPrefix("--show-export-sheet") }) else { return }
+            try? await Task.sleep(for: .seconds(2))
+            if argument.hasSuffix("=color") { isShowingDebugColorExport = true } else { isShowingDebugPaletteExport = true }
+        }
+        #endif
         .alert("Couldn't Import", isPresented: $importer.isShowingError, presenting: importer.importError) { _ in
             Button("OK", role: .cancel) {}
         } message: { error in

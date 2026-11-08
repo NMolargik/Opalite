@@ -83,13 +83,27 @@ struct AppVersionInfoTests {
 
 @Suite("iCloud wording")
 struct CloudSyncPresentationTests {
-    @Test func titles() {
-        #expect(CloudSyncPresentation.title(for: .idle) == "Ready")
-        #expect(CloudSyncPresentation.title(for: .syncing) == "Syncing…")
-        #expect(CloudSyncPresentation.title(for: .synced(.now)) == "Up to Date")
-        #expect(CloudSyncPresentation.title(for: .error("x")) == "Needs Attention")
-        #expect(CloudSyncPresentation.title(for: .offline) == "Offline")
-        #expect(CloudSyncPresentation.title(for: .unavailable) == "Not Signed In")
+    @Test func statesFoldTheManagerStatus() {
+        typealias S = CloudSyncManager.SyncStatus
+        #expect(ICloudState.resolve(status: S.synced(.now), storeMode: .cloudKit) == .upToDate)
+        #expect(ICloudState.resolve(status: S.syncing, storeMode: .cloudKit) == .syncing)
+        #expect(ICloudState.resolve(status: S.idle, storeMode: .cloudKit) == .ready)
+        #expect(ICloudState.resolve(status: S.error("x"), storeMode: .cloudKit) == .error)
+        #expect(ICloudState.resolve(status: S.offline, storeMode: .cloudKit) == .offline)
+        #expect(ICloudState.resolve(status: S.unavailable, storeMode: .cloudKit) == .notSignedIn)
+        #expect(ICloudState.resolve(status: S.synced(.now), storeMode: .localOnly) == .thisDeviceOnly)
+        #expect(ICloudState.resolve(status: S.idle, storeMode: .inMemory) == .thisDeviceOnly)
+        // No account explains a local-only store, so it wins.
+        #expect(ICloudState.resolve(status: S.unavailable, storeMode: .localOnly) == .notSignedIn)
+    }
+
+    @Test func titlesAreDistinctAndFootersOnlyWhenActionIsNeeded() {
+        let states: [ICloudState] = [.syncing, .upToDate, .ready, .notSignedIn, .thisDeviceOnly, .offline, .error]
+        #expect(Set(states.map(\.title)).count == states.count)
+        for state in states {
+            #expect((state.footer != nil) == state.needsAttention)
+            #expect(!(state.footer ?? "").contains("\u{2014}"))
+        }
     }
 
     @Test func syncNowOnlyWhenItCanDoSomething() {
@@ -99,11 +113,6 @@ struct CloudSyncPresentationTests {
         #expect(!CloudSyncPresentation.canSyncNow(.syncing))
         #expect(!CloudSyncPresentation.canSyncNow(.offline))
         #expect(!CloudSyncPresentation.canSyncNow(.unavailable))
-    }
-
-    @Test func errorGuidanceCarriesTheMessage() {
-        #expect(CloudSyncPresentation.guidance(for: .error("Quota exceeded")).contains("Quota exceeded"))
-        #expect(CloudSyncPresentation.guidance(for: .unavailable).contains("Sign in"))
     }
 }
 

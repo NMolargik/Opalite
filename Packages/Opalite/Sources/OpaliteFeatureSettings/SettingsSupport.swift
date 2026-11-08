@@ -83,38 +83,85 @@ nonisolated public struct AppVersionInfo: Equatable, Sendable {
 
 // MARK: - iCloud
 
-/// Wording for the iCloud section from the sync manager's status.
+/// Whether the iCloud section can act on the sync manager's status.
 public enum CloudSyncPresentation {
-    public static func title(for status: CloudSyncManager.SyncStatus) -> String {
-        switch status {
-        case .idle: String(localized: "Ready")
-        case .syncing: String(localized: "Syncing…")
-        case .synced: String(localized: "Up to Date")
-        case .error: String(localized: "Needs Attention")
-        case .offline: String(localized: "Offline")
-        case .unavailable: String(localized: "Not Signed In")
-        }
-    }
-
-    /// The section footer: what the status means and what, if anything, to do.
-    public static func guidance(for status: CloudSyncManager.SyncStatus) -> String {
-        switch status {
-        case .idle, .synced, .syncing:
-            String(localized: "Colors, palettes, and canvases sync through iCloud to every device signed in with your Apple Account. Free iCloud space must be available.")
-        case .error(let message):
-            String(localized: "iCloud reported a problem: \(message). Opalite keeps working on this device and retries automatically.")
-        case .offline:
-            String(localized: "You're offline. Changes are saved on this device and sync when a connection returns.")
-        case .unavailable:
-            String(localized: "Sign in to iCloud in the Settings app to sync your work between devices.")
-        }
-    }
-
     /// Whether "Sync Now" can do anything right now.
     public static func canSyncNow(_ status: CloudSyncManager.SyncStatus) -> Bool {
         switch status {
         case .idle, .synced, .error: true
         case .syncing, .offline, .unavailable: false
+        }
+    }
+}
+
+// MARK: - iCloud state
+
+/// The single plain state the iCloud row shows, folded from what the sync manager reports.
+/// Account, storage mode, reachability and the event stream all feed it; nothing is guessed.
+public enum ICloudState: Equatable, Sendable {
+    case syncing
+    case upToDate
+    /// Signed in with nothing reported yet this launch.
+    case ready
+    case notSignedIn
+    case thisDeviceOnly
+    case offline
+    case error
+
+    /// Precedence: no account explains everything else, then a store that can't sync, then
+    /// connectivity, then the event stream's own state.
+    public static func resolve(status: CloudSyncManager.SyncStatus, storeMode: CloudSyncManager.StoreMode) -> ICloudState {
+        if status == .unavailable { return .notSignedIn }
+        if storeMode != .cloudKit { return .thisDeviceOnly }
+        switch status {
+        case .offline: return .offline
+        case .error: return .error
+        case .syncing: return .syncing
+        case .synced: return .upToDate
+        case .idle: return .ready
+        case .unavailable: return .notSignedIn
+        }
+    }
+
+    public var title: String {
+        switch self {
+        case .syncing: String(localized: "Syncing…")
+        case .upToDate: String(localized: "Up to Date")
+        case .ready: String(localized: "Ready")
+        case .notSignedIn: String(localized: "Not Signed In")
+        case .thisDeviceOnly: String(localized: "This Device Only")
+        case .offline: String(localized: "Offline")
+        case .error: String(localized: "Error")
+        }
+    }
+
+    public var systemImage: String {
+        switch self {
+        case .syncing: "arrow.triangle.2.circlepath.icloud"
+        case .upToDate: "checkmark.icloud"
+        case .ready: "icloud"
+        case .notSignedIn: "person.icloud"
+        case .thisDeviceOnly: "icloud.slash"
+        case .offline: "icloud.slash"
+        case .error: "exclamationmark.icloud"
+        }
+    }
+
+    /// Whether the value is drawn as a warning.
+    public var needsAttention: Bool {
+        switch self {
+        case .notSignedIn, .thisDeviceOnly, .error: true
+        case .syncing, .upToDate, .ready, .offline: false
+        }
+    }
+
+    /// The one short footer line, only when the user has something to do.
+    public var footer: String? {
+        switch self {
+        case .notSignedIn: String(localized: "Sign in to iCloud in the Settings app to sync between devices.")
+        case .thisDeviceOnly: String(localized: "Your library is saved on this device only. Restart Opalite after signing in to iCloud.")
+        case .error: String(localized: "iCloud hit a problem. Open Sync Details to see it.")
+        case .syncing, .upToDate, .ready, .offline: nil
         }
     }
 }
@@ -320,24 +367,11 @@ nonisolated public enum SettingsLinks {
 /// Plain-language wording for the iCloud sync-health rows. Each value says only what the
 /// system reported: nothing is estimated, and "not yet" is shown instead of a guess.
 public enum SyncHealthPresentation {
-    public static func account(isAvailable: Bool) -> String {
-        isAvailable ? String(localized: "Signed In") : String(localized: "Not Signed In")
-    }
-
     public static func storage(_ mode: CloudSyncManager.StoreMode) -> String {
         switch mode {
         case .cloudKit: String(localized: "Syncing with iCloud")
         case .localOnly: String(localized: "This Device Only")
         case .inMemory: String(localized: "Temporary")
-        }
-    }
-
-    /// What the storage row means, when it isn't the normal case.
-    public static func storageExplanation(_ mode: CloudSyncManager.StoreMode) -> String? {
-        switch mode {
-        case .cloudKit: nil
-        case .localOnly: String(localized: "iCloud couldn't be set up when Opalite opened, so your library is saved on this device only. Restart Opalite after signing in to iCloud.")
-        case .inMemory: String(localized: "Opalite couldn't open its storage, so changes made now won't be kept after you quit.")
         }
     }
 

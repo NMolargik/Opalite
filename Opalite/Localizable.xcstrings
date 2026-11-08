@@ -3181,6 +3181,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Adobe ASE" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adobe ASE"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adobe ASE"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adobe ASE"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Adobe Swatch Exchange" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3392,6 +3416,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "類似色"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Android" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
           }
         }
       },
@@ -4285,6 +4333,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Best for sharing and inspiration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ideal para compartir e inspirarse"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idéal pour partager et s'inspirer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有やインスピレーションに最適"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Black" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4760,6 +4832,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CMYK：シアン%lldパーセント、マゼンタ%lldパーセント、イエロー%lldパーセント、キー%lldパーセント"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "CSS" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
           }
         }
       },
@@ -5799,6 +5895,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コード"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Codes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6058,6 +6178,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーコード"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Color details for print and clients" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalles de color para imprimir y para clientes"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails des couleurs pour l'impression et les clients"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "印刷やクライアント向けのカラー詳細"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Color extension" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extensión de Color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extension de Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color の拡張"
           }
         }
       },
@@ -8319,6 +8487,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Custom properties" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Propiedades personalizadas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Propriétés personnalisées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタムプロパティ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Cyan" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8482,6 +8674,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダークバリアント"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Dart color constants" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Constantes de color de Dart"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Constantes de couleur Dart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dart のカラー定数"
           }
         }
       },
@@ -8962,6 +9178,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Design Apps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps de diseño"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps de design"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デザインアプリ"
           }
         }
       },
@@ -10239,6 +10479,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Every color and palette, right on your wrist." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10695,6 +10959,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Exporting files and code requires Onyx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar archivos y código requiere Onyx"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exportation de fichiers et de code nécessite Onyx"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルとコードの書き出しにはOnyxが必要です"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Export…" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11055,6 +11343,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Files and code need Onyx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los archivos y el código requieren Onyx"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fichiers et le code nécessitent Onyx"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルとコードにはOnyxが必要です"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Fills the screen with this color" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11151,6 +11463,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Flattened to sRGB" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convertido a sRGB"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplati en sRGB"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sRGBに変換"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Fluent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11194,6 +11530,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "長文の快適な読み取り"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Flutter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter"
           }
         }
       },
@@ -11506,6 +11866,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GIMPパレット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "GIMP, Inkscape, Krita" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIMP, Inkscape, Krita"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIMP, Inkscape, Krita"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIMP、Inkscape、Krita"
           }
         }
       },
@@ -12351,6 +12735,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Hex, RGB, OKLCH, Display P3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex, RGB, OKLCH, Display P3"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex, RVB, OKLCH, Display P3"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex、RGB、OKLCH、Display P3"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Hide Tools" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12783,6 +13191,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Import it back into Opalite" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impórtalo de nuevo en Opalite"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réimportez-le dans Opalite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteに読み込み直せます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Imported" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13167,6 +13599,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "JSON" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "JSON with hex, RGB, OKLCH, and Display P3 values for each color." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13474,6 +13930,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大きいテキスト、3:1"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Last Error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último error"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière erreur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直近のエラー"
           }
         }
       },
@@ -16769,6 +17249,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "One color set per color" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un conjunto de colores por color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jeu de couleurs par couleur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1色につき1つのカラーセット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "One purchase or subscription unlocks Onyx on every device signed in with your Apple Account." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17148,6 +17652,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opaliteカラー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opalite File" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo de Opalite"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier Opalite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opaliteファイル"
           }
         }
       },
@@ -17827,6 +18355,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Opens Onyx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Onyx"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Onyx"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onyxを開きます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Opens Opalite to a specific screen." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -18470,6 +19022,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "sRGB外：この色は広色域ディスプレイでのみ表示できます。16進数とRGBの値は近似値です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "PDF" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
           }
         }
       },
@@ -19142,6 +19718,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Photoshop, Illustrator, InDesign" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photoshop, Illustrator, InDesign"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photoshop, Illustrator, InDesign"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photoshop、Illustrator、InDesign"
           }
         }
       },
@@ -19886,6 +20486,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プロ向け書き出し形式"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Procreate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procreate"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procreate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procreate"
           }
         }
       },
@@ -22267,6 +22891,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "SCSS variables" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables SCSS"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables SCSS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SCSS変数"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "SCSS variables ready to import into your stylesheets." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -22622,6 +23270,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@を%@からサンプリングしました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Sass" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sass"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sass"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sass"
           }
         }
       },
@@ -24403,6 +25075,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Sign in to iCloud in the Settings app to sync between devices." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión en iCloud en Ajustes para sincronizar entre dispositivos."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous à iCloud dans Réglages pour synchroniser entre vos appareils."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「設定」アプリでiCloudにサインインすると、デバイス間で同期できます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Sign in to iCloud in the Settings app to sync your work between devices." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -25603,6 +26299,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Swatches for Procreate on iPad" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestras para Procreate en iPad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échantillons pour Procreate sur iPad"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPad版Procreate用のスウォッチ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "SwiftUI" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftUI"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftUI"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftUI"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "SwiftUI Code" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -25670,6 +26414,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同期"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Sync Details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalles de sincronización"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails de la synchronisation"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同期の詳細"
           }
         }
       },
@@ -25987,6 +26755,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Tailwind" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Tailwind CSS" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26006,6 +26798,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tailwind CSS"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Tailwind v4 theme, OKLCH" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema de Tailwind v4, OKLCH"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème Tailwind v4, OKLCH"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind v4テーマ、OKLCH"
           }
         }
       },
@@ -29109,6 +29925,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "W3C Tokens" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tokens W3C"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetons W3C"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W3Cトークン"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "WCAG" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -30093,6 +30933,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Your library is saved on this device only. Restart Opalite after signing in to iCloud." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu biblioteca se guarda solo en este dispositivo. Reinicia Opalite después de iniciar sesión en iCloud."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre bibliothèque est enregistrée sur cet appareil seulement. Redémarrez Opalite après vous être connecté à iCloud."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライブラリはこのデバイスにのみ保存されています。iCloudにサインインしたあと、Opaliteを再起動してください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Your most recently created colors." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -30357,6 +31221,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "^[%lld format](inflect: true)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld formato](inflect: true)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld format](inflect: true)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld個の形式](inflect: true)"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "^[%lld palette](inflect: true)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -30448,6 +31336,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "colors.xml resources" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recursos colors.xml"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ressources colors.xml"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "colors.xmlリソース"
           }
         }
       },
@@ -30645,6 +31557,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "iCloud hit a problem. Open Sync Details to see it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud tuvo un problema. Abre Detalles de sincronización para verlo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud a rencontré un problème. Ouvrez Détails de la synchronisation pour le voir."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudで問題が発生しました。「同期の詳細」で確認できます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "iCloud reported a problem: %@. Opalite keeps working on this device and retries automatically." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -30808,6 +31744,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画面"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "tokens.json" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tokens.json"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tokens.json"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tokens.json"
           }
         }
       },

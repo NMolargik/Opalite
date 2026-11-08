@@ -11,11 +11,7 @@ import OpaliteServices
 
 @Suite("Sync health wording")
 struct SyncHealthPresentationTests {
-    @Test func accountAndStorage() {
-        #expect(SyncHealthPresentation.account(isAvailable: true) != SyncHealthPresentation.account(isAvailable: false))
-        #expect(SyncHealthPresentation.storageExplanation(.cloudKit) == nil)
-        #expect(SyncHealthPresentation.storageExplanation(.localOnly) != nil)
-        #expect(SyncHealthPresentation.storageExplanation(.inMemory) != nil)
+    @Test func storage() {
         #expect(Set([CloudSyncManager.StoreMode.cloudKit, .localOnly, .inMemory].map(SyncHealthPresentation.storage)).count == 3)
     }
 
