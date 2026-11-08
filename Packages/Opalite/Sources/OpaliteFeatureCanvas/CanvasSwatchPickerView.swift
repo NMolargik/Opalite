@@ -92,7 +92,10 @@ private struct SwatchStrip: View {
                     .padding(.vertical, Brand.Space.xs)
                 }
                 .scrollIndicators(.hidden)
-                .scrollClipDisabled()
+                // Clipped to the strip: with clipping disabled the swatches ran past the
+                // capsule's trailing edge and off the window on Mac. The vertical padding above
+                // leaves room for the selection ring and hover lift inside the clip.
+                .clipShape(Rectangle())
                 // A horizontal scroll view still takes every point of height it's offered;
                 // the strip is an overlay, so pin it to one row of swatches.
                 .frame(height: swatchSide + Brand.Space.xs * 2)
