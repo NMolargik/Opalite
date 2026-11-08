@@ -139,7 +139,18 @@ extension View {
         self
         #else
         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, *) {
-            if prominent { buttonStyle(.glassProminent) } else { buttonStyle(.glass) }
+            #if targetEnvironment(macCatalyst)
+            // Mac idiom: a toolbar Button hands the environment tint to its bar item, which
+            // fills the whole glass bubble with it, while menus stay unfilled and menus cannot
+            // take the prominent style at all. Every Mac toolbar item is therefore plain (tint
+            // cleared for the bubble) so buttons and menus match on every tab. Sheet
+            // confirmations (`.confirmationAction`) keep the system style.
+            tint(.clear)
+            #else
+            // Plain items take no button style: the toolbar already draws them as system
+            // glass, exactly like menus. An explicit `.glass` style adds a second bubble.
+            if prominent { buttonStyle(.glassProminent) } else { self }
+            #endif
         } else {
             if prominent { buttonStyle(.borderedProminent) } else { tint(.opaliteInverse) }
         }
@@ -357,3 +368,4 @@ public var secondaryBackground: Color {
     Color.gray.opacity(0.15)
     #endif
 }
+

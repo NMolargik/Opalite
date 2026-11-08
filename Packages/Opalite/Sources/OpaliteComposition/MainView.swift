@@ -63,6 +63,9 @@ struct MainView: View {
         .onChange(of: eyedropperHotkeyRaw) { eyedropper?.refreshHotkey() }
         #endif
         .minimizeTabBarOnScrollIfAvailable()
+        // Drives the tab bar / sidebar selection color only. Each tab's stack carries its
+        // own fixed tint below: tinting the content from `selectedTab` made Mac Catalyst's
+        // window toolbar keep the previous tab's color after a switch.
         .tint(router.selectedTab.color)
         // MARK: Global presentations
         .sharedSheet(item: $navigation.presentation) { presentation in
@@ -105,6 +108,7 @@ struct MainView: View {
                 PortfolioView()
                     .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
             }
+            .tint(AppTab.portfolio.color)
         }
     }
 
@@ -114,6 +118,7 @@ struct MainView: View {
                 CommunityView()
                     .navigationDestination(for: CommunityDestination.self) { CommunityDestinationView(destination: $0) }
             }
+            .tint(AppTab.community.color)
         }
     }
 
@@ -123,6 +128,7 @@ struct MainView: View {
                 CanvasListView()
                     .navigationDestination(for: CanvasDestination.self) { CanvasDestinationView(destination: $0) }
             }
+            .tint(AppTab.canvas.color)
         }
     }
 
@@ -132,6 +138,7 @@ struct MainView: View {
                 SettingsView()
                     .navigationDestination(for: SettingsDestination.self) { SettingsDestinationView(destination: $0) }
             }
+            .tint(AppTab.settings.color)
         }
     }
 
@@ -141,6 +148,7 @@ struct MainView: View {
                 SearchView()
                     .navigationDestination(for: PortfolioDestination.self, destination: portfolioDestination)
             }
+            .tint(AppTab.search.color)
         }
     }
 
