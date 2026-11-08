@@ -120,14 +120,14 @@ struct ContrastMatrixCard: View {
     }
 
     private func summary(_ matrix: ContrastMatrix) -> some View {
-        let passing = matrix.passingPairCount
-        let total = matrix.pairCount
+        let passingCount: Int = matrix.passingPairCount
+        let totalCount: Int = matrix.pairCount
         return Label {
-            Text("\(passing) of \(total) pairs pass AA for normal text")
+            Text("\(passingCount) of \(totalCount) pairs pass AA for normal text")
                 .font(.subheadline.weight(.medium))
         } icon: {
-            Image(systemName: passing == total ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(passing == total ? Color.green : Color.orange)
+            Image(systemName: passingCount == totalCount ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                .foregroundStyle(passingCount == totalCount ? Color.green : Color.orange)
         }
         .accessibilityElement(children: .combine)
     }
@@ -552,6 +552,7 @@ struct ColorVisionCard: View {
 
     var body: some View {
         let analysis = model.colorVision
+        let threshold = String(format: "%.2f", ColorVisionAnalysis.confusionThreshold)
         VStack(alignment: .leading, spacing: Brand.Space.md) {
             if model.memberCount < 2 {
                 Text("Add at least two colors to see how well they hold apart for people with color-vision deficiency.")
@@ -564,7 +565,7 @@ struct ColorVisionCard: View {
                 if let report = analysis.report(for: model.visionMode) {
                     problems(report, analysis: analysis)
                 }
-                Text("Each pair is measured in OKLab after simulating the deficiency. Colors closer than \(String(format: "%.2f", ColorVisionAnalysis.confusionThreshold)) are hard to tell apart. The score is the share of pairs that are clearly different in normal vision and stay that way.")
+                Text("Each pair is measured in OKLab after simulating the deficiency. Colors closer than \(threshold) are hard to tell apart. The score is the share of pairs that are clearly different in normal vision and stay that way.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                 if analysis.similarForEveryonePairCount > 0 {
@@ -675,7 +676,9 @@ struct ColorVisionCard: View {
     }
 
     private func pairRow(_ pair: ColorVisionAnalysis.Pair, first: OpaliteColor, second: OpaliteColor) -> some View {
-        HStack(alignment: .center, spacing: Brand.Space.md) {
+        let simulated = String(format: "%.3f", pair.simulatedDistance)
+        let normal = String(format: "%.3f", pair.normalDistance)
+        return HStack(alignment: .center, spacing: Brand.Space.md) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("As designed")
                     .font(.caption2)
@@ -704,7 +707,7 @@ struct ColorVisionCard: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(first.displayName) and \(second.displayName)"))
-        .accessibilityValue(Text("Hard to tell apart. Distance \(String(format: "%.3f", pair.simulatedDistance)) after simulation, \(String(format: "%.3f", pair.normalDistance)) in normal vision."))
+        .accessibilityValue(Text("Hard to tell apart. Distance \(simulated) after simulation, \(normal) in normal vision."))
     }
 
     /// Two colors side by side in one rounded tile, so how close they look is obvious.
