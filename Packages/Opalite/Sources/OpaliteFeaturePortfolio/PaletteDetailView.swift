@@ -131,6 +131,14 @@ private struct PaletteDetailContent: View {
         .navigationSubtitleIfAvailable(DetailFormatting.paletteSubtitle(colorCount: model.memberCount, author: palette.createdByDisplayName, updatedAt: palette.updatedAt))
         .toolbarTitleDisplayMode(.inline)
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
+        .toolbarTitleMenu {
+            Button {
+                Haptics.selection()
+                withAnimation(reduceMotion ? nil : .bouncy) { model.beginRenaming() }
+            } label: {
+                Label("Rename…", systemImage: "character.cursor.ibeam")
+            }
+        }
         .toolbar { toolbar(for: palette) }
         .fullScreenCover(isPresented: $model.isShowingEditor) {
             ColorEditorView(mode: .create(palette: palette), onCancel: { model.isShowingEditor = false }) { result in
@@ -217,12 +225,14 @@ private struct PaletteDetailContent: View {
         let members = model.members
         let onDark = !background.prefersDarkText
         return VStack(alignment: .leading, spacing: Brand.Space.md) {
-            HStack(alignment: .center, spacing: Brand.Space.sm) {
-                // The name lives in the nav title; the field only appears while renaming
-                // (More > Rename…).
-                if model.isEditingName { nameField(onDark: onDark) }
-                Spacer(minLength: Brand.Space.sm)
-                backgroundMenu(onDark: onDark)
+            // The name lives in the nav title; the field only appears while renaming
+            // (title menu or More > Rename…). The background button floats over the corner.
+            if model.isEditingName {
+                HStack(alignment: .center, spacing: Brand.Space.sm) {
+                    nameField(onDark: onDark)
+                    Spacer(minLength: Brand.Space.sm)
+                }
+                .padding(.trailing, boardBackgroundButtonSize)
             }
 
             if members.isEmpty {
@@ -253,6 +263,8 @@ private struct PaletteDetailContent: View {
                 }
                 addTile(onDark: onDark)
             }
+            // Keeps the first row's name badges clear of the floating button.
+            .padding(.top, model.isEditingName ? 0 : boardBackgroundButtonClearance)
         }
         .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { board = $0 }
         .padding(Brand.Space.lg)
@@ -261,12 +273,20 @@ private struct PaletteDetailContent: View {
                 .fill(background.rgba.color)
         )
         .overlay(RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous).strokeBorder(.white.opacity(0.25)))
+        .overlay(alignment: .topTrailing) {
+            backgroundMenu(onDark: onDark)
+                .padding(Brand.Space.xs)
+        }
         .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
         .animation(reduceMotion ? nil : .snappy, value: background)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Palette preview, \(palette.name), \(members.count) colors"))
         .accessibilityIdentifier("paletteDetail.board")
     }
+
+    private let boardBackgroundButtonSize: CGFloat = 30
+    /// Extra top inset so a long name badge in the trailing swatch never sits under the button.
+    private let boardBackgroundButtonClearance: CGFloat = 10
 
     private var boardSwatchSide: CGFloat { horizontalSizeClass == .compact ? 96 : 120 }
 
@@ -326,9 +346,9 @@ private struct PaletteDetailContent: View {
             }
         } label: {
             Image(systemName: "paintbrush.pointed")
-                .font(.body.weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(onDark ? .white : .black)
-                .frame(width: 36, height: 36)
+                .frame(width: boardBackgroundButtonSize, height: boardBackgroundButtonSize)
                 .background(Circle().fill((onDark ? Color.black : Color.white).opacity(0.28)))
                 .contentShape(Circle())
         }
