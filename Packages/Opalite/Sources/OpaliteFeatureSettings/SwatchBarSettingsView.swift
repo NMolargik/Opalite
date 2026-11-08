@@ -86,6 +86,7 @@ struct SwatchBarSettingsView: View {
                     Label("Copy Picked Color", systemImage: "doc.on.clipboard")
                         .labelStyle(.settingsIcon(.purple))
                 }
+                .toggleStyle(.settingsRow)
                 .tint(.purple)
                 if autoCopy {
                     Picker(selection: $copyFormatRaw) {
@@ -101,6 +102,7 @@ struct SwatchBarSettingsView: View {
                     Label("Keep SwatchBar Hidden", systemImage: "eye.slash")
                         .labelStyle(.settingsIcon(.purple))
                 }
+                .toggleStyle(.settingsRow)
                 .tint(.purple)
             } header: {
                 Text("Eyedropper")
@@ -114,6 +116,7 @@ struct SwatchBarSettingsView: View {
                     Label("Open Without Asking", systemImage: "bolt.fill")
                         .labelStyle(.settingsIcon(.purple))
                 }
+                .toggleStyle(.settingsRow)
                 .tint(.purple)
             } footer: {
                 Text("Skips the confirmation when a swatch opens the SwatchBar.")

@@ -234,6 +234,7 @@ public struct SettingsView: View {
                 Label("Include # Prefix", systemImage: "number")
                     .labelStyle(.settingsIcon(.green))
             }
+            .toggleStyle(.settingsRow)
             .tint(.green)
             .accessibilityIdentifier("settings.includesPrefix")
         } header: {
@@ -326,6 +327,7 @@ public struct SettingsView: View {
                 Label("Simulate Onyx", systemImage: "diamond")
                     .labelStyle(.settingsIcon(.indigo))
             }
+            .toggleStyle(.settingsRow)
             .onChange(of: subscription.isSimulatingOnyx) { Haptics.selection() }
             .accessibilityHint(Text("Unlocks Onyx features in this debug build without a purchase"))
         } header: {

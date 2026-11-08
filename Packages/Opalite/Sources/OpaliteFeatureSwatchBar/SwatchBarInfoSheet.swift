@@ -76,6 +76,7 @@ public struct SwatchBarInfoSheet: View {
                         Label("Don't show this again", systemImage: "eye.slash")
                             .labelStyle(.alignedIcon)
                     }
+                    .toggleStyle(.settingsRow)
                     .tint(.opalitePurple)
                     .padding(.horizontal, Brand.Space.lg)
                     .padding(.vertical, Brand.Space.md)

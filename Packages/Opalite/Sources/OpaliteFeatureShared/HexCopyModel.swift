@@ -31,9 +31,17 @@ public final class HexCopyModel {
         self.donor = donor
     }
 
+    /// Backed by defaults, so observation is wired by hand: without `access`/`withMutation`
+    /// SwiftUI never learns the value changed and a bound toggle only redraws when its view
+    /// is rebuilt (for example after leaving and returning to Settings).
     public var format: HexFormat {
-        get { HexFormat.stored(in: defaults) }
-        set { newValue.save(to: defaults) }
+        get {
+            access(keyPath: \.format)
+            return HexFormat.stored(in: defaults)
+        }
+        set {
+            withMutation(keyPath: \.format) { newValue.save(to: defaults) }
+        }
     }
 
     public var includesPrefix: Bool {
