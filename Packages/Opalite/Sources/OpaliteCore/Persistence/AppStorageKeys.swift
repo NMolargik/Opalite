@@ -26,6 +26,8 @@ nonisolated public enum AppStorageKeys {
     public static let swatchSize = "swatchSize"
     /// JSON-encoded `[UUID]` giving the user's palette order in the Portfolio.
     public static let paletteOrder = "paletteOrder"
+    /// `PaletteColorsLayout` raw value: how a palette detail shows its colors (board or list).
+    public static let paletteColorsLayout = "paletteColorsLayout"
 
     // MARK: - Hex copying
     public static let includeHexPrefix = "includeHexPrefix"

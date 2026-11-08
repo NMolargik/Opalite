@@ -30,7 +30,7 @@ public struct ColorExportSheet: View {
             },
             previewPNG: { Self.renderPNG(color, size: CGSize(width: 256, height: 256), scale: 2) },
             hero: {
-                ColorHero(rgba: color.rgba, title: color.displayName)
+                AdaptiveColorHero(rgba: color.rgba, title: color.displayName)
                     .padding(.vertical, Brand.Space.sm)
             },
             publishSheet: { PublishColorSheet(color: color) }

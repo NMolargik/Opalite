@@ -267,6 +267,116 @@ struct PaletteHero: View {
     }
 }
 
+// MARK: - Compact heroes (iPhone sheets)
+
+/// The compact palette preview: name and color count on one line over a single strip of
+/// swatches that compresses as colors are added. About 74 points tall, so the format rows
+/// below it stay above the fold on iPhone.
+struct CompactPaletteHero: View {
+    let name: String
+    let colors: [RGBA]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Brand.Space.sm) {
+            HStack(alignment: .firstTextBaseline, spacing: Brand.Space.sm) {
+                Text(name)
+                    .font(.headline)
+                    .lineLimit(1)
+                Spacer(minLength: Brand.Space.sm)
+                Text("^[\(colors.count) color](inflect: true)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+                    .contentTransition(.numericText())
+            }
+            strip
+        }
+        .padding(.horizontal, Brand.Space.xs)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(name), \(colors.count) colors"))
+    }
+
+    @ContentBuilder
+    private var strip: some View {
+        let shape = RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
+        if colors.isEmpty {
+            shape.fill(.quaternary).frame(height: 44)
+        } else {
+            HStack(spacing: colors.count > 12 ? 0 : 2) {
+                ForEach(Array(colors.enumerated()), id: \.offset) { _, rgba in
+                    Rectangle()
+                        .fill(rgba.color)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(height: 44)
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(.quaternary))
+        }
+    }
+}
+
+/// The compact color preview: a swatch beside its name and hex, on one row.
+struct CompactColorHero: View {
+    let rgba: RGBA
+    let title: String
+
+    var body: some View {
+        HStack(spacing: Brand.Space.md) {
+            ColorChip(rgba, size: 56)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                    .lineLimit(1)
+                Text(rgba.hexString)
+                    .font(.subheadline.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, Brand.Space.xs)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(title), \(rgba.hexString)"))
+    }
+}
+
+/// Picks the compact palette preview on compact width and the large card elsewhere.
+struct AdaptivePaletteHero: View {
+    let name: String
+    let colors: [RGBA]
+    let background: PreviewBackground?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    var body: some View {
+        if horizontalSizeClass == .compact {
+            CompactPaletteHero(name: name, colors: colors)
+        } else {
+            VStack(spacing: Brand.Space.sm) {
+                PaletteHero(name: name, colors: colors, background: background)
+                Text("^[\(colors.count) color](inflect: true)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .contentTransition(.numericText())
+            }
+        }
+    }
+}
+
+/// Picks the compact color preview on compact width and the large card elsewhere.
+struct AdaptiveColorHero: View {
+    let rgba: RGBA
+    let title: String
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    var body: some View {
+        if horizontalSizeClass == .compact {
+            CompactColorHero(rgba: rgba, title: title)
+        } else {
+            ColorHero(rgba: rgba, title: title)
+        }
+    }
+}
+
 // MARK: - Previews
 
 #if DEBUG
