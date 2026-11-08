@@ -112,7 +112,31 @@ public final class CloudSyncManager {
         observers.removeAll()
     }
 
-    public var isCloudAvailable: Bool { cloudAvailability() }
+    public var isCloudAvailable: Bool {
+        #if DEBUG
+        if let debugCloudAvailable { return debugCloudAvailable }
+        #endif
+        return cloudAvailability()
+    }
+
+    #if DEBUG
+    /// Debug builds only: pins the account check for `--simulate-icloud`.
+    @ObservationIgnored private var debugCloudAvailable: Bool?
+
+    /// Debug builds only: puts the manager in a state for screenshots and UI checks
+    /// (`--simulate-icloud=synced|syncing|error|signedout|offline|local`).
+    public func simulate(_ name: String) {
+        debugCloudAvailable = name != "signedout"
+        isOnline = name != "offline"
+        isSyncing = name == "syncing"
+        storeMode = name == "local" ? .localOnly : .cloudKit
+        lastErrorMessage = name == "error" ? "iCloud storage is full" : nil
+        lastSyncError = name == "error" ? SyncErrorRecord(message: "iCloud storage is full", date: Date()) : nil
+        lastSuccessfulSyncDate = ["synced", "offline"].contains(name) ? Date().addingTimeInterval(-300) : nil
+        lastSyncDate = lastSuccessfulSyncDate
+        updateSyncStatus()
+    }
+    #endif
 
     // MARK: - Monitoring
 
