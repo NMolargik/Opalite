@@ -1045,6 +1045,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%lld of %lld pairs pass AA" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld de %2$lld pares cumplen AA"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld paires sur %2$lld respectent AA"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld組中%1$lld組がAAに適合"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%lld of %lld pairs pass AA for normal text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2917,6 +2941,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Add two colors to check contrast" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega dos colores para comprobar el contraste"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez deux couleurs pour vérifier le contraste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラストを確認するには色を2つ追加してください"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Added %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3416,6 +3464,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "類似色"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Analyze" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analizar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分析"
           }
         }
       },
@@ -4400,6 +4472,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "青"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Board" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tablero"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planche"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ボード"
           }
         }
       },
@@ -14489,6 +14585,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "List" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Lives beside your work" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -18926,6 +19046,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オレンジ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Organize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organizar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organiser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "整理"
           }
         }
       },
@@ -24710,6 +24854,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーを表示"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Show Colors As" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar colores como"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les couleurs en"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色の表示方法"
           }
         }
       },
@@ -31312,6 +31480,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "^[すでにあるカラーを%lld色](inflect: true)このパレットに移動します"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "by %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "por %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "par %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 作成"
           }
         }
       },

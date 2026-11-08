@@ -60,13 +60,7 @@ public struct PaletteExportSheet: View {
             },
             previewPNG: { Self.renderPNG(palette, size: CGSize(width: 400, height: 200), scale: 2) },
             hero: {
-                VStack(spacing: Brand.Space.sm) {
-                    PaletteHero(name: palette.name, colors: palette.colorValues, background: palette.previewBackground)
-                    Text("^[\(palette.colorCount) color](inflect: true)")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .contentTransition(.numericText())
-                }
+                AdaptivePaletteHero(name: palette.name, colors: palette.colorValues, background: palette.previewBackground)
                 .padding(.vertical, Brand.Space.sm)
             },
             options: { format in

@@ -147,6 +147,31 @@ struct PaletteDetailViewModelTests {
         return (env, model, palette)
     }
 
+    @Test func contrastSummaryCountsPassingPairs() {
+        let (_, model, _) = makeModel()
+        let matrix = model.contrastMatrix
+        if matrix.pairCount == 0 {
+            #expect(model.contrastSummary == String(localized: "Add two colors to check contrast"))
+        } else {
+            #expect(model.contrastSummary == String(localized: "\(matrix.passingPairCount) of \(matrix.pairCount) pairs pass AA"))
+        }
+    }
+
+    @Test func subtitleJoinsCountAuthorAndDate() {
+        let date = Date(timeIntervalSince1970: 1_731_000_000)
+        let full = DetailFormatting.paletteSubtitle(colorCount: 5, author: "Nick", updatedAt: date)
+        #expect(full.hasPrefix(String(localized: "\(5) colors") + " · "))
+        #expect(full.contains(String(localized: "by \("Nick")")))
+        #expect(full.hasSuffix(DetailFormatting.shortDate(date)))
+        let anonymous = DetailFormatting.paletteSubtitle(colorCount: 1, author: "  ", updatedAt: date)
+        #expect(anonymous == String(localized: "1 color") + " · " + DetailFormatting.shortDate(date))
+    }
+
+    @Test func colorsLayoutDefaultsToBoard() {
+        #expect(PaletteColorsLayout(rawValue: "list") == .list)
+        #expect(PaletteColorsLayout.allCases.first == .board)
+    }
+
     @Test func renameCommitsNonBlankDraftOnly() {
         let (_, model, palette) = makeModel()
         model.beginRenaming()

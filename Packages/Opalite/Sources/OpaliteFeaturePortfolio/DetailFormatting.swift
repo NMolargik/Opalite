@@ -35,6 +35,18 @@ nonisolated public enum DetailFormatting {
         date.formatted(date: .abbreviated, time: .shortened)
     }
 
+    /// The palette header subtitle: "5 colors · by Nick · Nov 8". The author is left out when
+    /// anonymous; the date follows the user's locale.
+    public static func paletteSubtitle(colorCount: Int, author: String?, updatedAt: Date) -> String {
+        let count = colorCount == 1 ? String(localized: "1 color") : String(localized: "\(colorCount) colors")
+        var parts = [count]
+        if let name = author?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
+            parts.append(String(localized: "by \(name)"))
+        }
+        parts.append(shortDate(updatedAt))
+        return parts.joined(separator: " · ")
+    }
+
     /// "C 10%  M 20%  Y 30%  K 40%".
     public static func cmykString(_ cmyk: CMYK) -> String {
         func pct(_ value: Double) -> Int { Int((ColorMath.clamp(value) * 100).rounded()) }

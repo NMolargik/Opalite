@@ -45,6 +45,7 @@ private struct PaletteDetailContent: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    @AppStorage(AppStorageKeys.paletteColorsLayout) private var layout: PaletteColorsLayout = .board
     @State private var model: PaletteDetailViewModel
     @State private var board = LayoutProbe()
     @State private var colorToDelete: OpaliteColor?
@@ -90,21 +91,26 @@ private struct PaletteDetailContent: View {
         ScrollView {
             ScrollViewReader { proxy in
             VStack(spacing: 0) {
-                board(for: palette)
-                    .padding(.horizontal, Brand.Space.lg)
-                    .padding(.top, Brand.Space.sm)
-                tiles(for: palette)
-                    .padding(.horizontal, Brand.Space.lg)
-                    .padding(.top, Brand.Space.md)
-                VStack(spacing: Brand.Space.lg) {
-                    colorsCard(for: palette)
-                    accessibilityRow
-                    notesCard
-                    tagsCard
-                    canvasCard(for: palette)
+                if layout == .board {
+                    board(for: palette)
+                        .padding(.horizontal, Brand.Space.lg)
+                        .padding(.top, Brand.Space.sm)
+                }
+                VStack(spacing: Brand.Space.xl) {
+                    if layout == .list {
+                        colorsCard(for: palette)
+                    }
+                    group(String(localized: "Analyze")) {
+                        accessibilityRow
+                    }
+                    group(String(localized: "Organize")) {
+                        notesCard
+                        tagsCard
+                        canvasCard(for: palette)
+                    }
                 }
                 .padding(.horizontal, Brand.Space.lg)
-                .padding(.top, Brand.Space.lg)
+                .padding(.top, layout == .board ? Brand.Space.xl : Brand.Space.sm)
                 .padding(.bottom, Brand.Space.xxl)
             }
             #if DEBUG
@@ -122,7 +128,7 @@ private struct PaletteDetailContent: View {
         .background(groupedBackground)
         .softScrollEdgesIfAvailable()
         .navigationTitle(palette.name)
-        .navigationSubtitleIfAvailable(countText(model.memberCount))
+        .navigationSubtitleIfAvailable(DetailFormatting.paletteSubtitle(colorCount: model.memberCount, author: palette.createdByDisplayName, updatedAt: palette.updatedAt))
         .toolbarTitleDisplayMode(.inline)
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
         .toolbar { toolbar(for: palette) }
@@ -218,10 +224,7 @@ private struct PaletteDetailContent: View {
             }
 
             if members.isEmpty {
-                VStack(spacing: Brand.Space.sm) {
-                    Image(systemName: "swatchpalette")
-                        .font(.largeTitle)
-                        .symbolRenderingMode(.hierarchical)
+                VStack(spacing: Brand.Space.xs) {
                     Text("No colors yet")
                         .font(.headline)
                     Text("Add a color, or drag swatches here from your Portfolio.")
@@ -230,19 +233,23 @@ private struct PaletteDetailContent: View {
                 }
                 .foregroundStyle(onDark ? Color.white.opacity(0.85) : Color.black.opacity(0.7))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, Brand.Space.xl)
-            } else {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: boardSwatchSide * 0.8, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm), count: boardColumns), spacing: Brand.Space.sm) {
-                    ForEach(members) { color in
-                        NavigationLink(value: PortfolioDestination.color(color.id)) {
-                            SwatchView(color: color, height: boardSwatchSide, cornerRadius: Brand.Radius.control, matchedNamespace: namespace, matchedID: color.id)
-                        }
-                        .buttonStyle(.plain)
-                        .hoverLift()
-                        .contextMenu { memberMenu(color) }
-                        .accessibilityHint(Text("Opens the color"))
+                .padding(.top, Brand.Space.sm)
+            }
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: boardSwatchSide * 0.8, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm), count: boardColumns), spacing: Brand.Space.sm) {
+                ForEach(members) { color in
+                    NavigationLink(value: PortfolioDestination.color(color.id)) {
+                        SwatchView(color: color, height: boardSwatchSide, cornerRadius: Brand.Radius.control, matchedNamespace: namespace, matchedID: color.id)
                     }
+                    .buttonStyle(.plain)
+                    .hoverLift()
+                    .contextMenu { memberMenu(color) }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(color.hasName ? "\(color.displayName), \(color.hexString)" : String(localized: "Unnamed color, \(color.hexString)")))
+                    .accessibilityHint(Text("Opens the color"))
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityActions { memberAccessibilityActions(color) }
                 }
+                addTile(onDark: onDark)
             }
         }
         .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { board = $0 }
@@ -354,14 +361,57 @@ private struct PaletteDetailContent: View {
         .accessibilityValue(Text(background.displayName))
     }
 
-    // MARK: - Tiles
+    // MARK: - Add tile and groups
 
-    private func tiles(for palette: OpalitePalette) -> some View {
-        HStack(spacing: Brand.Space.sm) {
-            InfoTile(title: String(localized: "Colors"), value: model.memberCount.formatted(), systemImage: "swatchpalette.fill")
-            InfoTile(title: String(localized: "Created by"), value: DetailFormatting.authorName(palette.createdByDisplayName), systemImage: "person.fill", tint: .opaliteBlue)
-            InfoTile(title: String(localized: "Updated"), value: DetailFormatting.shortDate(palette.updatedAt), systemImage: "clock.fill", tint: .opaliteTan)
+    /// The trailing "+" tile of the board: the same size as a swatch.
+    private func addTile(onDark: Bool) -> some View {
+        let ink = onDark ? Color.white : Color.black
+        return Button {
+            Haptics.selection()
+            model.isShowingEditor = true
+        } label: {
+            RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
+                .strokeBorder(ink.opacity(0.45), style: StrokeStyle(lineWidth: 1.5, dash: [6, 5]))
+                .background(RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous).fill(ink.opacity(0.06)))
+                .frame(height: boardSwatchSide)
+                .overlay {
+                    Image(systemName: "plus")
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(ink.opacity(0.75))
+                }
+                .contentShape(RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous))
         }
+        .buttonStyle(.plain)
+        .hoverLift()
+        .accessibilityLabel(Text("Add Color"))
+        .accessibilityHint(Text("Creates a new color in this palette"))
+        .accessibilityIdentifier("paletteDetail.addTile")
+    }
+
+    /// A captioned group of cards below the board.
+    private func group<Content: View>(_ title: String, @ContentBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: Brand.Space.sm) {
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .padding(.horizontal, Brand.Space.lg)
+                .accessibilityAddTraits(.isHeader)
+            VStack(spacing: Brand.Space.md) {
+                content()
+            }
+        }
+    }
+
+    /// VoiceOver equivalents of the swatch context menu.
+    @ContentBuilder
+    private func memberAccessibilityActions(_ color: OpaliteColor) -> some View {
+        Button("Copy Hex") { hexCopy.copyHex(for: color) }
+        Button(color.palette == nil ? "Add to Palette…" : "Move to Palette…") { movingColor = color }
+        if color.palette != nil {
+            Button("Remove from Palette") { withAnimation(reduceMotion ? nil : .snappy) { model.remove(color) } }
+        }
+        Button("Delete") { colorToDelete = color }
     }
 
     // MARK: - Cards
@@ -469,8 +519,9 @@ private struct PaletteDetailContent: View {
                     Text("Accessibility")
                         .font(.headline)
                         .foregroundStyle(.primary)
-                    Text("Contrast matrix, lightness scale and color vision")
+                    Text(model.contrastSummary)
                         .font(.caption)
+                        .contentTransition(.numericText())
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
@@ -487,6 +538,7 @@ private struct PaletteDetailContent: View {
         }
         .buttonStyle(.plain)
         .hoverLift()
+        .accessibilityValue(Text(model.contrastSummary))
         .accessibilityHint(Text("Opens contrast, lightness scale and color-vision tools for this palette"))
         .accessibilityIdentifier("paletteDetail.accessibility")
         .id("paletteDetail.accessibilityRow")
@@ -696,6 +748,10 @@ private struct PaletteDetailContent: View {
                     Label("Full Screen", systemImage: "arrow.up.left.and.arrow.down.right")
                 }
                 .disabled(model.memberCount == 0)
+                Picker("Show Colors As", selection: $layout) {
+                    Label("Board", systemImage: "square.grid.2x2").tag(PaletteColorsLayout.board)
+                    Label("List", systemImage: "list.bullet").tag(PaletteColorsLayout.list)
+                }
                 Divider()
                 Button {
                     Haptics.selection()
@@ -739,10 +795,6 @@ private struct PaletteDetailContent: View {
             .accessibilityLabel(Text("More actions"))
             .accessibilityIdentifier("paletteDetail.moreMenu")
         }
-    }
-
-    private func countText(_ count: Int) -> String {
-        count == 1 ? String(localized: "1 color") : String(localized: "\(count) colors")
     }
 }
 

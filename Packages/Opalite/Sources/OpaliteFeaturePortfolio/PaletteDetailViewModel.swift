@@ -28,6 +28,14 @@ nonisolated public enum PaletteDetailSection: String, CaseIterable, Identifiable
     public static let initiallyExpanded: Set<PaletteDetailSection> = [.colors, .canvas]
 }
 
+/// How the palette detail shows its colors. Board is the default; the choice persists per user.
+nonisolated public enum PaletteColorsLayout: String, CaseIterable, Identifiable, Sendable {
+    case board
+    case list
+
+    public var id: String { rawValue }
+}
+
 @Observable
 final class PaletteDetailViewModel {
     // MARK: - Dependencies
@@ -134,6 +142,13 @@ final class PaletteDetailViewModel {
         let colors = matrixMembers
         guard colors.indices.contains(row), colors.indices.contains(column), row != column else { return }
         contrastPair = ContrastPair(textID: colors[row].id, backgroundID: colors[column].id)
+    }
+
+    /// "0 of 10 pairs pass AA" for the Analyze row; a prompt while fewer than two colors exist.
+    var contrastSummary: String {
+        let matrix = contrastMatrix
+        guard matrix.pairCount > 0 else { return String(localized: "Add two colors to check contrast") }
+        return String(localized: "\(matrix.passingPairCount) of \(matrix.pairCount) pairs pass AA")
     }
 
     // MARK: - Lightness scale
