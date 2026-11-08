@@ -181,7 +181,7 @@ public struct ExtractPaletteSheet: View {
                     .overlay(RoundedRectangle(cornerRadius: Brand.Radius.swatch, style: .continuous).strokeBorder(.quaternary))
                     .accessibilityLabel(Text("Chosen image"))
             } else {
-                ImageDropPlaceholder(isTargeted: isDropTargeted)
+                ImageDropPlaceholder(isTargeted: isDropTargeted, buildsPalette: true)
             }
         }
         .accessibilityElement(children: .contain)

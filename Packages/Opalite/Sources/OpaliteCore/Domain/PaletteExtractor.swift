@@ -134,12 +134,23 @@ nonisolated public enum PaletteExtractor {
         let byWeight = clusters.sorted {
             $0.weight != $1.weight ? $0.weight > $1.weight : ($0.center.lightness, $0.center.a, $0.center.b) < ($1.center.lightness, $1.center.a, $1.center.b)
         }
+        // Most prominent first, then repeatedly the cluster that is both sizeable and far from
+        // what is already chosen (weighted farthest-point), so distinct hues beat a fourth shade
+        // of the dominant one.
         var chosen: [Cluster] = []
-        for cluster in byWeight where chosen.count < target {
-            guard cluster.weight / total >= minimumShare || chosen.count < countRange.lowerBound else { continue }
-            if chosen.allSatisfy({ distance($0.center, cluster.center) >= minimumSeparation }) {
-                chosen.append(cluster)
+        var remaining = byWeight.filter { $0.weight / total >= minimumShare }
+        if remaining.count < countRange.lowerBound { remaining = byWeight }
+        while chosen.count < target, !remaining.isEmpty {
+            var bestIndex: Int?
+            var bestScore = -1.0
+            for (index, cluster) in remaining.enumerated() {
+                let nearest = chosen.map { distance($0.center, cluster.center) }.min() ?? 1
+                guard nearest >= minimumSeparation else { continue }
+                let score = (cluster.weight / total).squareRoot() * nearest
+                if score > bestScore { bestScore = score; bestIndex = index }
             }
+            guard let index = bestIndex else { break }
+            chosen.append(remaining.remove(at: index))
         }
         // Fewer than the minimum survived the share cutoff: top up with the next most prominent distinct ones.
         if chosen.count < min(target, countRange.lowerBound) {

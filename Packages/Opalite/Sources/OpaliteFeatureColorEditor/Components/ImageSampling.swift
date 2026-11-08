@@ -397,6 +397,8 @@ struct CameraCaptureView: UIViewControllerRepresentable {
 /// The dashed placeholder shown before an image is chosen; also the drop target hint.
 struct ImageDropPlaceholder: View {
     var isTargeted = false
+    /// The extract-palette sheet reuses the zone but describes a different next step.
+    var buildsPalette = false
 
     var body: some View {
         VStack(spacing: Brand.Space.md) {
@@ -407,7 +409,13 @@ struct ImageDropPlaceholder: View {
                 .symbolEffect(.bounce, value: isTargeted)
             Text("Choose a Photo")
                 .font(.headline)
-            Text("Pick from Photos, take a picture, or drop an image here. Then tap or drag on it to sample a color.")
+            Group {
+                if buildsPalette {
+                    Text("Pick an image, or drop one here, and Opalite builds a palette from its colors.")
+                } else {
+                    Text("Pick from Photos, take a picture, or drop an image here. Then tap or drag on it to sample a color.")
+                }
+            }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

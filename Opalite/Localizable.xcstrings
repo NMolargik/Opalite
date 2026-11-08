@@ -17227,6 +17227,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Pick an image, or drop one here, and Opalite builds a palette from its colors." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una imagen, o suelta una aquí, y Opalite crea una paleta con sus colores."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une image, ou déposez-en une ici, et Opalite crée une palette à partir de ses couleurs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を選ぶか、ここにドロップすると、Opalite がその色からパレットを作成します。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Pick colors six ways" : {
       "extractionState" : "manual",
       "localizations" : {
