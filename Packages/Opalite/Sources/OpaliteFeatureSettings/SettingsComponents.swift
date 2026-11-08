@@ -137,7 +137,7 @@ struct ShowcaseFeatureRow: View {
             Image(systemName: systemImage)
                 .font(.title3.weight(.semibold))
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint)
+                .foregroundStyle(tint.inkVariant)
                 .frame(width: badgeSize, height: badgeSize)
                 .background(Circle().fill(tint.opacity(0.14)))
                 .accessibilityHidden(true)

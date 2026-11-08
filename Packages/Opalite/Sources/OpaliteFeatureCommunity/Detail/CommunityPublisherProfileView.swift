@@ -110,7 +110,7 @@ public struct CommunityPublisherProfileView: View {
         } icon: {
             Image(systemName: systemImage)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint.gradient)
+                .foregroundStyle(tint.inkVariant)
         }
         .padding(.horizontal, Brand.Space.md)
         .padding(.vertical, Brand.Space.sm)

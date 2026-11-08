@@ -172,7 +172,7 @@ public struct PhotoSamplerSheet: View {
                 } icon: {
                     Image(systemName: "tray.full")
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(Color.opalitePurple)
+                        .foregroundStyle(Color.opalitePurpleInk)
                 }
                 .font(.headline)
                 Text("\(staged.count)")

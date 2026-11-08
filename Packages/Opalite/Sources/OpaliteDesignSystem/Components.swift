@@ -50,7 +50,7 @@ public struct SectionCard<Content: View, Trailing: View>: View {
                     if let systemImage {
                         Image(systemName: systemImage)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(tint)
+                            .foregroundStyle(tint.inkVariant)
                             .frame(width: 22)
                             .accessibilityHidden(true)
                     }
@@ -164,7 +164,7 @@ public struct InfoTile: View {
                 Text(title)
             } icon: {
                 Image(systemName: systemImage)
-                    .foregroundStyle(tint.gradient)
+                    .foregroundStyle(tint.inkVariant)
                     .symbolEffect(.bounce, options: .repeat(1), value: bounce)
             }
             .font(.caption)

@@ -157,7 +157,7 @@ public struct SwatchBarView: View {
                 Image(systemName: section.systemImage)
                     .symbolRenderingMode(.hierarchical)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.opalitePurple)
+                    .foregroundStyle(.opalitePurpleInk)
                     .accessibilityHidden(true)
                 Text(section.title)
                     .font(.subheadline.weight(.semibold))

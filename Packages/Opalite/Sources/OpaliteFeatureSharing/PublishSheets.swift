@@ -290,7 +290,7 @@ private struct GuidelinesSection: View {
                     .foregroundStyle(.secondary)
             } icon: {
                 Image(systemName: "hand.raised.fill")
-                    .foregroundStyle(.opalitePurple)
+                    .foregroundStyle(.opalitePurpleInk)
             }
             .labelStyle(.alignedIcon)
             if includesPaletteNote {
@@ -300,7 +300,7 @@ private struct GuidelinesSection: View {
                         .foregroundStyle(.secondary)
                 } icon: {
                     Image(systemName: "paintpalette.fill")
-                        .foregroundStyle(.opalitePurple)
+                        .foregroundStyle(.opalitePurpleInk)
                 }
                 .labelStyle(.alignedIcon)
             }
@@ -310,7 +310,7 @@ private struct GuidelinesSection: View {
                     .foregroundStyle(.secondary)
             } icon: {
                 Image(systemName: "clock.fill")
-                    .foregroundStyle(.opalitePurple)
+                    .foregroundStyle(.opalitePurpleInk)
             }
             .labelStyle(.alignedIcon)
         } header: {

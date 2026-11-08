@@ -58,7 +58,7 @@ struct StatusCallout: View {
             Image(systemName: systemImage)
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint)
+                .foregroundStyle(tint.inkVariant)
                 .frame(width: 28)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: Brand.Space.xs) {
@@ -97,7 +97,7 @@ struct OutcomeRow: View {
         } icon: {
             Image(systemName: outcome.systemImage)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint)
+                .foregroundStyle(tint.inkVariant)
         }
         .labelStyle(.alignedIcon)
         .accessibilityElement(children: .combine)

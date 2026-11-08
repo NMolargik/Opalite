@@ -58,7 +58,7 @@ struct LooseColorsSection: View {
             Image(systemName: "paintpalette.fill")
                 .font(.title2)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(Color.opalitePurple)
+                .foregroundStyle(Color.opalitePurpleInk)
                 .accessibilityHidden(true)
             Text("Colors")
                 .font(.title2.weight(.semibold))

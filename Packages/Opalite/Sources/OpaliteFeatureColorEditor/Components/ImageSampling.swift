@@ -371,7 +371,7 @@ struct ImageDropPlaceholder: View {
             Image(systemName: "photo.badge.plus")
                 .font(.largeTitle)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(Color.opalitePurple)
+                .foregroundStyle(Color.opalitePurpleInk)
                 .symbolEffect(.bounce, value: isTargeted)
             Text("Choose a Photo")
                 .font(.headline)

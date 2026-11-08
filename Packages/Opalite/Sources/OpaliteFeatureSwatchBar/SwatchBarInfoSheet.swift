@@ -183,7 +183,7 @@ public struct SwatchBarInfoSheet: View {
             Image(systemName: feature.systemImage)
                 .symbolRenderingMode(.hierarchical)
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(.opalitePurple)
+                .foregroundStyle(.opalitePurpleInk)
                 .frame(width: 36, height: 36)
                 .background(Color.opalitePurple.opacity(0.14), in: RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous))
                 .accessibilityHidden(true)

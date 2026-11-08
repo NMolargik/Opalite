@@ -133,7 +133,7 @@ private struct AppIconChoice: View {
                 HStack(spacing: 4) {
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.opalitePurple)
+                            .foregroundStyle(.opalitePurpleInk)
                             .accessibilityHidden(true)
                     }
                     Text(option.title)

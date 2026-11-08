@@ -109,7 +109,7 @@ private struct CommunityInfoCard: View {
             Image(systemName: systemImage)
                 .font(.title2)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint.gradient)
+                .foregroundStyle(tint.inkVariant)
                 .frame(width: 36)
                 .accessibilityHidden(true)
 
