@@ -131,6 +131,14 @@ private struct PaletteDetailContent: View {
         .navigationSubtitleIfAvailable(DetailFormatting.paletteSubtitle(colorCount: model.memberCount, author: palette.createdByDisplayName, updatedAt: palette.updatedAt))
         .toolbarTitleDisplayMode(.inline)
         .toolbarRole(horizontalSizeClass == .compact ? .automatic : .editor)
+        .toolbarTitleMenu {
+            Button {
+                Haptics.selection()
+                withAnimation(reduceMotion ? nil : .bouncy) { model.beginRenaming() }
+            } label: {
+                Label("Rename…", systemImage: "character.cursor.ibeam")
+            }
+        }
         .toolbar { toolbar(for: palette) }
         .fullScreenCover(isPresented: $model.isShowingEditor) {
             ColorEditorView(mode: .create(palette: palette), onCancel: { model.isShowingEditor = false }) { result in
@@ -217,12 +225,13 @@ private struct PaletteDetailContent: View {
         let members = model.members
         let onDark = !background.prefersDarkText
         return VStack(alignment: .leading, spacing: Brand.Space.md) {
-            HStack(alignment: .center, spacing: Brand.Space.sm) {
-                // The name lives in the nav title; the field only appears while renaming
-                // (More > Rename…).
-                if model.isEditingName { nameField(onDark: onDark) }
-                Spacer(minLength: Brand.Space.sm)
-                backgroundMenu(onDark: onDark)
+            // The name lives in the nav title; the field only appears while renaming
+            // (title menu or More > Rename…). The preview background lives in the More menu.
+            if model.isEditingName {
+                HStack(alignment: .center, spacing: Brand.Space.sm) {
+                    nameField(onDark: onDark)
+                    Spacer(minLength: Brand.Space.sm)
+                }
             }
 
             if members.isEmpty {
@@ -267,6 +276,7 @@ private struct PaletteDetailContent: View {
         .accessibilityLabel(Text("Palette preview, \(palette.name), \(members.count) colors"))
         .accessibilityIdentifier("paletteDetail.board")
     }
+
 
     private var boardSwatchSide: CGFloat { horizontalSizeClass == .compact ? 96 : 120 }
 
@@ -317,7 +327,10 @@ private struct PaletteDetailContent: View {
         }
     }
 
-    private func backgroundMenu(onDark: Bool) -> some View {
+    /// The preview background, a rarely changed setting, as a More-menu submenu so the board
+    /// stays pure color (a floating corner button collided with the last swatch and was too
+    /// small to tap comfortably).
+    private var backgroundSubmenu: some View {
         Menu {
             Picker("Background", selection: Binding(get: { background }, set: { model.setBackground($0) })) {
                 ForEach(PreviewBackground.allCases) { option in
@@ -325,17 +338,9 @@ private struct PaletteDetailContent: View {
                 }
             }
         } label: {
-            Image(systemName: "paintbrush.pointed")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(onDark ? .white : .black)
-                .frame(width: 36, height: 36)
-                .background(Circle().fill((onDark ? Color.black : Color.white).opacity(0.28)))
-                .contentShape(Circle())
+            Label("Preview Background", systemImage: "paintbrush.pointed")
         }
-        .buttonStyle(.plain)
-        .hoverLift()
-        .accessibilityLabel(Text("Preview background"))
-        .accessibilityValue(Text(background.displayName))
+        .disabled(layout == .list)
     }
 
     // MARK: - Add tile and groups
@@ -729,6 +734,7 @@ private struct PaletteDetailContent: View {
                     Label("Board", systemImage: "square.grid.2x2").tag(PaletteColorsLayout.board)
                     Label("List", systemImage: "list.bullet").tag(PaletteColorsLayout.list)
                 }
+                backgroundSubmenu
                 Divider()
                 Button {
                     Haptics.selection()
