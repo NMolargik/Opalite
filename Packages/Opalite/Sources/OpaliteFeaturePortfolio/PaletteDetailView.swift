@@ -218,7 +218,9 @@ private struct PaletteDetailContent: View {
         let onDark = !background.prefersDarkText
         return VStack(alignment: .leading, spacing: Brand.Space.md) {
             HStack(alignment: .center, spacing: Brand.Space.sm) {
-                nameField(onDark: onDark)
+                // The name lives in the nav title; the field only appears while renaming
+                // (More > Rename…).
+                if model.isEditingName { nameField(onDark: onDark) }
                 Spacer(minLength: Brand.Space.sm)
                 backgroundMenu(onDark: onDark)
             }
@@ -235,7 +237,7 @@ private struct PaletteDetailContent: View {
                 .frame(maxWidth: .infinity)
                 .padding(.top, Brand.Space.sm)
             }
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: boardSwatchSide * 0.8, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm), count: boardColumns), spacing: Brand.Space.sm) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: boardSwatchSide * GridColumns.relaxedFactor, maximum: boardSwatchSide * 1.6), spacing: Brand.Space.sm), count: boardColumns), spacing: Brand.Space.sm) {
                 ForEach(members) { color in
                     NavigationLink(value: PortfolioDestination.color(color.id)) {
                         SwatchView(color: color, height: boardSwatchSide, cornerRadius: Brand.Radius.control, matchedNamespace: namespace, matchedID: color.id)
@@ -270,7 +272,7 @@ private struct PaletteDetailContent: View {
 
     /// As many swatch columns as fit, kept even on a device with a fold.
     private var boardColumns: Int {
-        GridColumns.count(fitting: board.width, minimum: boardSwatchSide, spacing: Brand.Space.sm, preferEven: board.hasFold)
+        GridColumns.count(fitting: board.width, minimum: boardSwatchSide, spacing: Brand.Space.sm, preferEven: board.hasFold, items: model.members.count + 1)
     }
 
     @ContentBuilder
@@ -312,31 +314,6 @@ private struct PaletteDetailContent: View {
             .padding(.vertical, Brand.Space.xs)
             .background(Capsule(style: .continuous).fill((onDark ? Color.black : Color.white).opacity(0.28)))
             .transition(.blurReplace)
-        } else {
-            Button {
-                Haptics.selection()
-                withAnimation(reduceMotion ? nil : .bouncy) { model.beginRenaming() }
-            } label: {
-                HStack(spacing: Brand.Space.xs) {
-                    Text(model.name)
-                        .font(.headline)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.85)
-                    Image(systemName: "pencil")
-                        .font(.caption.weight(.semibold))
-                        .opacity(0.7)
-                        .accessibilityHidden(true)
-                }
-                .foregroundStyle(onDark ? .white : .black)
-                .padding(.horizontal, Brand.Space.md)
-                .padding(.vertical, Brand.Space.sm)
-                .background(Capsule(style: .continuous).fill((onDark ? Color.black : Color.white).opacity(0.28)))
-            }
-            .buttonStyle(.plain)
-            .hoverLift()
-            .accessibilityLabel(Text("\(model.name), palette name"))
-            .accessibilityHint(Text("Double-tap to rename"))
-            .accessibilityIdentifier("paletteDetail.name")
         }
     }
 
