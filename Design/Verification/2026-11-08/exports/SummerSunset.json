@@ -1,0 +1,242 @@
+{
+  "name": "Summer Sunset",
+  "generator": "Opalite",
+  "colors": [
+    {
+      "key": "dusty-rose",
+      "name": "Dusty Rose",
+      "hex": "#CC808C",
+      "rgb": {
+        "red": 204,
+        "green": 128,
+        "blue": 140
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.6818,
+        "chroma": 0.0958,
+        "hue": 9.09
+      },
+      "displayP3": {
+        "red": 0.7577,
+        "green": 0.5137,
+        "blue": 0.5522
+      },
+      "inSRGBGamut": true,
+      "dark": {
+        "hex": "#663340",
+        "rgb": {
+          "red": 102,
+          "green": 51,
+          "blue": 64
+        },
+        "alpha": 1,
+        "oklch": {
+          "lightness": 0.3912,
+          "chroma": 0.0744,
+          "hue": 5.18
+        },
+        "displayP3": {
+          "red": 0.3737,
+          "green": 0.2103,
+          "blue": 0.2503
+        },
+        "inSRGBGamut": true
+      }
+    },
+    {
+      "key": "dusty-rose-2",
+      "name": "dusty-rose",
+      "hex": "#336699",
+      "rgb": {
+        "red": 51,
+        "green": 102,
+        "blue": 153
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.4993,
+        "chroma": 0.0987,
+        "hue": 250.43
+      },
+      "displayP3": {
+        "red": 0.2499,
+        "green": 0.3952,
+        "blue": 0.584
+      },
+      "inSRGBGamut": true,
+      "dark": {
+        "hex": "#1A334D",
+        "rgb": {
+          "red": 26,
+          "green": 51,
+          "blue": 77
+        },
+        "alpha": 1,
+        "oklch": {
+          "lightness": 0.3138,
+          "chroma": 0.0559,
+          "hue": 250.03
+        },
+        "displayP3": {
+          "red": 0.1238,
+          "green": 0.1975,
+          "blue": 0.2918
+        },
+        "inSRGBGamut": true
+      }
+    },
+    {
+      "key": "ff5733",
+      "name": "#FF5733",
+      "hex": "#FF5733",
+      "rgb": {
+        "red": 255,
+        "green": 87,
+        "blue": 51
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.68,
+        "chroma": 0.2103,
+        "hue": 33.62
+      },
+      "displayP3": {
+        "red": 0.9257,
+        "green": 0.3881,
+        "blue": 0.2579
+      },
+      "inSRGBGamut": true,
+      "dark": {
+        "hex": "#802B1A",
+        "rgb": {
+          "red": 128,
+          "green": 43,
+          "blue": 26
+        },
+        "alpha": 1,
+        "oklch": {
+          "lightness": 0.413,
+          "chroma": 0.1203,
+          "hue": 33.67
+        },
+        "displayP3": {
+          "red": 0.4618,
+          "green": 0.1925,
+          "blue": 0.1261
+        },
+        "inSRGBGamut": true
+      }
+    },
+    {
+      "key": "neon-lime",
+      "name": "Neon Lime",
+      "hex": "#00FE24",
+      "rgb": {
+        "red": 0,
+        "green": 254,
+        "blue": 36
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.8657,
+        "chroma": 0.293,
+        "hue": 143.16
+      },
+      "displayP3": {
+        "red": 0.4483,
+        "green": 0.9851,
+        "blue": 0.3159
+      },
+      "inSRGBGamut": false
+    },
+    {
+      "key": "default",
+      "name": "default",
+      "hex": "#1A1A1A",
+      "rgb": {
+        "red": 26,
+        "green": 26,
+        "blue": 26
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.2156,
+        "chroma": 0,
+        "hue": 0
+      },
+      "displayP3": {
+        "red": 0.1,
+        "green": 0.1,
+        "blue": 0.1
+      },
+      "inSRGBGamut": true
+    },
+    {
+      "key": "creme-brulee",
+      "name": "Crème Brûlée",
+      "hex": "#F2D999",
+      "rgb": {
+        "red": 242,
+        "green": 217,
+        "blue": 153
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.891,
+        "chroma": 0.086,
+        "hue": 88.67
+      },
+      "displayP3": {
+        "red": 0.9333,
+        "green": 0.8536,
+        "blue": 0.6305
+      },
+      "inSRGBGamut": true
+    },
+    {
+      "key": "e66633",
+      "name": "夕焼け",
+      "hex": "#E66633",
+      "rgb": {
+        "red": 230,
+        "green": 102,
+        "blue": 51
+      },
+      "alpha": 1,
+      "oklch": {
+        "lightness": 0.6598,
+        "chroma": 0.1712,
+        "hue": 40.78
+      },
+      "displayP3": {
+        "red": 0.8385,
+        "green": 0.4296,
+        "blue": 0.2558
+      },
+      "inSRGBGamut": true
+    },
+    {
+      "key": "glass",
+      "name": "Glass",
+      "hex": "#1A334D",
+      "rgb": {
+        "red": 26,
+        "green": 51,
+        "blue": 77
+      },
+      "alpha": 0.5,
+      "oklch": {
+        "lightness": 0.3138,
+        "chroma": 0.0559,
+        "hue": 250.03
+      },
+      "displayP3": {
+        "red": 0.1238,
+        "green": 0.1975,
+        "blue": 0.2918
+      },
+      "inSRGBGamut": true
+    }
+  ]
+}

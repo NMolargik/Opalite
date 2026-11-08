@@ -20,7 +20,18 @@ public enum OpaliteStore {
         CanvasFile.self,
     ])
 
+    /// How a container returned by `makeContainer` is actually stored.
+    public enum Mode: Sendable {
+        case cloudKit
+        case localOnly
+        case inMemory
+    }
+
+    /// The mode of the most recent `makeContainer` call (it can degrade from CloudKit).
+    public private(set) static var lastMode: Mode = .cloudKit
+
     public static func makeContainer(inMemory: Bool = false) -> ModelContainer {
+        lastMode = .inMemory
         if inMemory {
             do {
                 let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -30,16 +41,27 @@ public enum OpaliteStore {
             }
         }
 
+        #if DEBUG
+        // Unsigned simulator builds have no iCloud entitlement; CloudKit setup traps there.
+        let skipCloudKit = CommandLine.arguments.contains("--no-cloudkit")
+        #else
+        let skipCloudKit = false
+        #endif
         do {
+            if skipCloudKit { throw CocoaError(.featureUnsupported) }
             let cloud = ModelConfiguration(schema: schema, cloudKitDatabase: .private(AppGroup.cloudKitContainerID))
-            return try ModelContainer(for: schema, configurations: cloud)
+            let container = try ModelContainer(for: schema, configurations: cloud)
+            lastMode = .cloudKit
+            return container
         } catch {
             Log.app.error("CloudKit container unavailable, falling back to local store: \(error.localizedDescription)")
         }
 
         do {
             let local = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
-            return try ModelContainer(for: schema, configurations: local)
+            let container = try ModelContainer(for: schema, configurations: local)
+            lastMode = .localOnly
+            return container
         } catch {
             Log.app.fault("Local store unavailable, falling back to in-memory: \(error.localizedDescription)")
         }

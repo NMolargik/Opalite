@@ -12,7 +12,7 @@ import Testing
 @Suite("DeepLink")
 struct DeepLinkTests {
     nonisolated static let everyLink: [DeepLink] = [
-        .portfolio, .community, .search, .canvases, .settings, .onyx,
+        .portfolio, .community, .search, .canvases, .settings, .onyx, .backups,
         .createColor, .createPalette, .samplePhoto, .swatchBar, .sharedImage,
         .color(UUID()), .palette(UUID()), .canvas(UUID()),
     ]
@@ -31,6 +31,7 @@ struct DeepLinkTests {
         ("opalite://canvas", .canvases),
         ("opalite://settings", .settings),
         ("opalite://onyx", .onyx),
+        ("opalite://backups", .backups),
         ("opalite://createColor", .createColor),
         ("opalite://createcolor", .createColor),
         ("opalite://create-color", .createColor),
@@ -79,6 +80,7 @@ struct DeepLinkTests {
         #expect(DeepLink.canvas(UUID()).destinationTab == .canvas)
         #expect(DeepLink.settings.destinationTab == .settings)
         #expect(DeepLink.onyx.destinationTab == .settings)
+        #expect(DeepLink.backups.destinationTab == .settings)
         #expect(DeepLink.swatchBar.destinationTab == nil)
     }
 
@@ -209,7 +211,7 @@ struct AppTabTests {
     }
 
     @Test func settingsDestinationsAreCodable() throws {
-        let all: [SettingsDestination] = [.appearance, .accessibility, .onyx, .watch, .swatchBar, .communityAdmin, .about]
+        let all: [SettingsDestination] = [.appearance, .accessibility, .onyx, .watch, .swatchBar, .backups, .communityAdmin, .about]
         let data = try JSONEncoder().encode(all)
         #expect(try JSONDecoder().decode([SettingsDestination].self, from: data) == all)
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Summer Sunset - Exported from Opalite -->
+<resources>
+    <color name="summer_sunset_dusty_rose">#CC808C</color>
+    <color name="summer_sunset_dusty_rose_2">#336699</color>
+    <color name="summer_sunset_ff5733">#FF5733</color>
+    <color name="summer_sunset_neon_lime">#00FE24</color> <!-- sRGB approximation of a wide-gamut color -->
+    <color name="summer_sunset_default">#1A1A1A</color>
+    <color name="summer_sunset_creme_brulee">#F2D999</color>
+    <color name="summer_sunset_e66633">#E66633</color>
+    <color name="summer_sunset_glass">#801A334D</color>
+    <!-- Dark appearance: copy these into res/values-night/colors.xml and drop the _dark suffix. -->
+    <color name="summer_sunset_dusty_rose_dark">#663340</color>
+    <color name="summer_sunset_dusty_rose_2_dark">#1A334D</color>
+    <color name="summer_sunset_ff5733_dark">#802B1A</color>
+</resources>

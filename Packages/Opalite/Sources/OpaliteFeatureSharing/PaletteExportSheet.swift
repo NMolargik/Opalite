@@ -28,7 +28,9 @@ public struct PaletteExportSheet: View {
     private static let imageSize = CGSize(width: 1200, height: 600)
 
     /// Formats whose output can carry a light and a dark value per color.
-    private static let adaptiveFormats: Set<PaletteExportFormat> = [.css, .swiftui]
+    private static func isAdaptive(_ format: PaletteExportFormat) -> Bool {
+        format == .css || format == .swiftui || format.isDesignToken
+    }
 
     /// Every other palette in the Portfolio, offered as a dark counterpart.
     private var darkCandidates: [OpalitePalette] {
@@ -53,7 +55,7 @@ public struct PaletteExportSheet: View {
                     format: format,
                     imagePNG: format == .image ? Self.renderPNG(palette) : nil,
                     userName: userName.isEmpty ? String(localized: "User") : userName,
-                    darkPalette: Self.adaptiveFormats.contains(format) ? darkPalette : nil
+                    darkPalette: Self.isAdaptive(format) ? darkPalette : nil
                 )
             },
             previewPNG: { Self.renderPNG(palette, size: CGSize(width: 400, height: 200), scale: 2) },
@@ -68,7 +70,7 @@ public struct PaletteExportSheet: View {
                 .padding(.vertical, Brand.Space.sm)
             },
             options: { format in
-                if let format, Self.adaptiveFormats.contains(format), !darkCandidates.isEmpty {
+                if let format, Self.isAdaptive(format), !darkCandidates.isEmpty {
                     darkVariantSection(for: format)
                 }
             },
@@ -77,7 +79,7 @@ public struct PaletteExportSheet: View {
     }
 
     /// "Dark variant": pair another palette so CSS gets a `prefers-color-scheme: dark`
-    /// block and SwiftUI gets adaptive colors. Colors pair by position.
+    /// block, SwiftUI gets adaptive colors, and the token formats get dark values. Colors pair by position.
     private func darkVariantSection(for format: PaletteExportFormat) -> some View {
         Section {
             Picker(selection: $darkPaletteID) {
@@ -112,12 +114,25 @@ public struct PaletteExportSheet: View {
         } footer: {
             if let darkPalette {
                 let paired = min(palette.colorCount, darkPalette.colorCount)
-                Text(format == .css
-                    ? "\(darkPalette.name) fills a prefers-color-scheme: dark block. ^[\(paired) color](inflect: true) pair by position."
-                    : "\(darkPalette.name) becomes the dark value of each adaptive Color. ^[\(paired) color](inflect: true) pair by position.")
+                Text(darkFooter(for: format, paletteName: darkPalette.name, paired: paired))
             } else {
                 Text("Colors pair by position with the palette you choose; without one, the file has a single value per color.")
             }
+        }
+    }
+
+    private func darkFooter(for format: PaletteExportFormat, paletteName: String, paired: Int) -> LocalizedStringKey {
+        switch format {
+        case .css, .tailwind:
+            "\(paletteName) fills a prefers-color-scheme: dark block. ^[\(paired) color](inflect: true) pair by position."
+        case .swiftui:
+            "\(paletteName) becomes the dark value of each adaptive Color. ^[\(paired) color](inflect: true) pair by position."
+        case .xcassets:
+            "\(paletteName) becomes the dark appearance of each color set. ^[\(paired) color](inflect: true) pair by position."
+        case .android:
+            "\(paletteName) is added as _dark entries to copy into values-night. ^[\(paired) color](inflect: true) pair by position."
+        default:
+            "\(paletteName) is written as the dark value of each color. ^[\(paired) color](inflect: true) pair by position."
         }
     }
 

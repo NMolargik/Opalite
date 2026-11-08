@@ -128,7 +128,7 @@ let package = Package(
         ),
         .testTarget(name: "OpaliteCoreTests", dependencies: ["OpaliteCore"], swiftSettings: isolation),
         .testTarget(name: "OpaliteDataTests", dependencies: ["OpaliteData"], swiftSettings: isolation),
-        .testTarget(name: "OpaliteServicesTests", dependencies: ["OpaliteServices"], swiftSettings: isolation),
+        .testTarget(name: "OpaliteServicesTests", dependencies: ["OpaliteServices", "OpaliteData"], swiftSettings: isolation),
         .testTarget(name: "OpaliteDesignSystemTests", dependencies: ["OpaliteDesignSystem"], swiftSettings: isolation),
         .testTarget(name: "OpaliteFeatureSharedTests", dependencies: ["OpaliteFeatureShared"], swiftSettings: isolation),
         .testTarget(name: "OpaliteFeatureColorEditorTests", dependencies: ["OpaliteFeatureColorEditor"], swiftSettings: isolation),

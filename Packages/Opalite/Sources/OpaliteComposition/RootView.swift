@@ -75,8 +75,33 @@ public struct RootView: View {
             if CommandLine.arguments.contains("--skip-onboarding") { isOnboardingComplete = true }
             wasReturningUser = isOnboardingComplete
             appStage = isOnboardingComplete ? .main : .splash
+            #if DEBUG
+            await applyDebugLaunchArguments()
+            #endif
         }
     }
+
+    #if DEBUG
+    /// Verification helpers for simulator runs: `--seed-sample-data`, `--simulate-onyx`,
+    /// `--open-first-palette`, `--open-settings`, and `--open-backups`. Debug builds only.
+    private func applyDebugLaunchArguments() async {
+        let arguments = CommandLine.arguments
+        if arguments.contains("--seed-sample-data"), session.portfolio.colors.isEmpty { session.portfolio.generateSampleData() }
+        if arguments.contains("--simulate-onyx") { session.subscriptions.isSimulatingOnyx = true }
+        if arguments.contains("--open-first-palette") {
+            try? await Task.sleep(for: .seconds(1.5))
+            if let id = session.portfolio.orderedPalettes.first?.id { session.router.open(.palette(id)) }
+        }
+        if arguments.contains("--open-settings") {
+            try? await Task.sleep(for: .seconds(1.5))
+            session.router.open(.settings)
+        }
+        if arguments.contains("--open-backups") {
+            try? await Task.sleep(for: .seconds(1.5))
+            session.router.open(.backups)
+        }
+    }
+    #endif
 
     private var stageTransition: AnyTransition {
         reduceMotion ? .opacity : .asymmetric(
@@ -117,6 +142,7 @@ extension View {
             .environment(session.hexCopy)
             .environment(session.importer)
             .environment(session.cloudSync)
+            .environment(session.backups)
             .environment(session.subscriptions)
             .environment(session.colorNaming)
             .environment(\.onyxEntitlement, session.subscriptions)

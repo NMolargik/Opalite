@@ -234,6 +234,9 @@ struct MainView: View {
         case .onyx:
             router.select(.settings)
             navigation.settingsPath = NavigationPath([SettingsDestination.onyx])
+        case .backups:
+            router.select(.settings)
+            navigation.settingsPath = NavigationPath([SettingsDestination.backups])
         }
     }
 

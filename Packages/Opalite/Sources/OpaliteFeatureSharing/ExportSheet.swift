@@ -76,6 +76,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { proxy in
             List {
                 Section {
                     hero()
@@ -83,23 +84,26 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                         .listRowBackground(Color.clear)
                 }
 
+                let groups = ExportFormatCatalog.split(formats)
                 Section {
-                    ForEach(formats) { format in
-                        FormatRow(
-                            format: format,
-                            isSelected: selectedFormat == format,
-                            isLocked: ExportAccess.isLocked(format, hasOnyx: hasOnyx),
-                            isBusy: isPreparing && selectedFormat == format
-                        ) {
-                            choose(format)
-                        }
-                    }
+                    ForEach(groups.general) { format in formatRow(format) }
                 } header: {
                     Text("Format")
                 } footer: {
                     if ExportAccess.hasLockedFormats(in: formats, hasOnyx: hasOnyx) {
                         Text("Formats marked Onyx are part of the Onyx upgrade.")
                     }
+                }
+
+                if !groups.designTokens.isEmpty {
+                    Section {
+                        ForEach(groups.designTokens) { format in formatRow(format) }
+                    } header: {
+                        Text("Design Tokens")
+                    } footer: {
+                        Text("Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation.")
+                    }
+                    .id("designTokens")
                 }
 
                 options(selectedFormat)
@@ -117,6 +121,15 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                 }
             }
             .listStyle(.insetGrouped)
+            #if DEBUG
+            .task {
+                // Simulator verification: `--scroll-to-tokens` brings the Design Tokens section into view.
+                guard CommandLine.arguments.contains("--scroll-to-tokens") else { return }
+                try? await Task.sleep(for: .seconds(1))
+                proxy.scrollTo("designTokens", anchor: UnitPoint(x: 0.5, y: 0.18))
+            }
+            #endif
+            }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -159,6 +172,17 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     }
 
     // MARK: - Rows
+
+    private func formatRow(_ format: Format) -> some View {
+        FormatRow(
+            format: format,
+            isSelected: selectedFormat == format,
+            isLocked: ExportAccess.isLocked(format, hasOnyx: hasOnyx),
+            isBusy: isPreparing && selectedFormat == format
+        ) {
+            choose(format)
+        }
+    }
 
     private var publishRow: some View {
         Button {

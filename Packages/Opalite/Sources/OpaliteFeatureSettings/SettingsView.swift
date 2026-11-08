@@ -23,6 +23,7 @@ public struct SettingsView: View {
     @Environment(PortfolioModel.self) private var portfolio
     @Environment(CommunityModel.self) private var community
     @Environment(CloudSyncManager.self) private var cloudSync
+    @Environment(BackupManager.self) private var backups
     @Environment(SubscriptionManager.self) private var subscription
     #if os(iOS) && canImport(WatchConnectivity) && !targetEnvironment(macCatalyst)
     @Environment(PhoneConnectivityManager.self) private var connectivity
@@ -50,6 +51,7 @@ public struct SettingsView: View {
             profileSection
             onyxSection
             cloudSection
+            backupsSection
             preferencesSection
             #if os(iOS) && canImport(WatchConnectivity) && !targetEnvironment(macCatalyst)
             watchSection
@@ -160,6 +162,8 @@ public struct SettingsView: View {
             .animation(.default, value: cloudSync.syncStatus)
             .accessibilityElement(children: .combine)
 
+            syncHealthRows
+
             if cloudSync.isCloudAvailable {
                 Button {
                     Haptics.selection()
@@ -181,7 +185,63 @@ public struct SettingsView: View {
         } header: {
             Text("iCloud")
         } footer: {
-            Text(CloudSyncPresentation.guidance(for: cloudSync.syncStatus))
+            VStack(alignment: .leading, spacing: Brand.Space.sm) {
+                Text(CloudSyncPresentation.guidance(for: cloudSync.syncStatus))
+                if let note = SyncHealthPresentation.storageExplanation(cloudSync.storeMode) {
+                    Text(note)
+                }
+                Text("Last Synced is the last time iCloud reported a finished sync since Opalite opened. iOS doesn't tell apps about earlier syncs.")
+            }
+        }
+    }
+
+    // MARK: - Backups
+
+    private var backupsSection: some View {
+        Section {
+            NavigationLink(value: SettingsDestination.backups) {
+                LabeledContent {
+                    Text(backups.lastBackupDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? String(localized: "None Yet"))
+                } label: {
+                    Label("Backups", systemImage: "clock.arrow.circlepath")
+                        .labelStyle(.settingsIcon(.green))
+                }
+            }
+            .accessibilityIdentifier("settings.backups")
+        } footer: {
+            Text("A copy of your colors and palettes is saved on this device every day.")
+        }
+    }
+
+    /// What iCloud actually reported: account, where the library is stored, the last
+    /// finished sync, and the last error. Nothing here is estimated.
+    @ContentBuilder
+    private var syncHealthRows: some View {
+        LabeledContent("iCloud Account") {
+            Text(SyncHealthPresentation.account(isAvailable: cloudSync.isCloudAvailable))
+                .foregroundStyle(cloudSync.isCloudAvailable ? Color.secondary : Color.orange)
+        }
+        .accessibilityIdentifier("settings.sync.account")
+
+        LabeledContent("Library Storage") {
+            Text(SyncHealthPresentation.storage(cloudSync.storeMode))
+                .foregroundStyle(cloudSync.storeMode == .cloudKit ? Color.secondary : Color.orange)
+        }
+        .accessibilityIdentifier("settings.sync.storage")
+
+        LabeledContent("Last Synced") {
+            Text(SyncHealthPresentation.lastSynced(cloudSync.lastSuccessfulSyncDate))
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityIdentifier("settings.sync.lastSynced")
+
+        if let problem = cloudSync.lastSyncError {
+            LabeledContent("Last Problem") {
+                Text(SyncHealthPresentation.lastProblem(problem, lastSuccess: cloudSync.lastSuccessfulSyncDate))
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.trailing)
+            }
+            .accessibilityIdentifier("settings.sync.lastProblem")
         }
     }
 

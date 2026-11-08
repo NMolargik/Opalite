@@ -1,0 +1,136 @@
+{
+  "collection": "Summer Sunset",
+  "note": "Colors are sRGB. Figma variables do not support OKLCH or Display P3, so wide-gamut colors are gamut-mapped and keep their Display P3 value in the description.",
+  "modes": [
+    "Light",
+    "Dark"
+  ],
+  "variables": [
+    {
+      "name": "summer-sunset/dusty-rose",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#CC808C",
+          "r": 0.8,
+          "g": 0.5,
+          "b": 0.55,
+          "a": 1
+        },
+        "Dark": {
+          "hex": "#663340",
+          "r": 0.4,
+          "g": 0.2,
+          "b": 0.25,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/dusty-rose-2",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#336699",
+          "r": 0.2,
+          "g": 0.4,
+          "b": 0.6,
+          "a": 1
+        },
+        "Dark": {
+          "hex": "#1A334D",
+          "r": 0.1,
+          "g": 0.2,
+          "b": 0.3,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/ff5733",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#FF5733",
+          "r": 1,
+          "g": 0.34,
+          "b": 0.2,
+          "a": 1
+        },
+        "Dark": {
+          "hex": "#802B1A",
+          "r": 0.5,
+          "g": 0.17,
+          "b": 0.1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/neon-lime",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#00FE24",
+          "r": 0,
+          "g": 0.9977,
+          "b": 0.1427,
+          "a": 1
+        }
+      },
+      "description": "Display P3 original: color(display-p3 0.4483 0.9851 0.3159). Figma variables hold the sRGB approximation."
+    },
+    {
+      "name": "summer-sunset/default",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#1A1A1A",
+          "r": 0.1,
+          "g": 0.1,
+          "b": 0.1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/creme-brulee",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#F2D999",
+          "r": 0.95,
+          "g": 0.85,
+          "b": 0.6,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/e66633",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#E66633",
+          "r": 0.9,
+          "g": 0.4,
+          "b": 0.2,
+          "a": 1
+        }
+      }
+    },
+    {
+      "name": "summer-sunset/glass",
+      "type": "COLOR",
+      "values": {
+        "Light": {
+          "hex": "#1A334D",
+          "r": 0.1,
+          "g": 0.2,
+          "b": 0.3,
+          "a": 0.5
+        }
+      }
+    }
+  ]
+}

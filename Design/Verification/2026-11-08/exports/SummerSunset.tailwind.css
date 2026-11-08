@@ -1,0 +1,20 @@
+/* Summer Sunset - Tailwind CSS v4 theme, exported from Opalite */
+@theme {
+  --color-summer-sunset-dusty-rose: oklch(68.2% 0.096 9.09);
+  --color-summer-sunset-dusty-rose-2: oklch(49.9% 0.099 250.43);
+  --color-summer-sunset-ff5733: oklch(68.0% 0.210 33.62);
+  --color-summer-sunset-neon-lime: oklch(86.6% 0.293 143.16); /* outside sRGB, fallback #00FE24 */
+  --color-summer-sunset-default: oklch(21.6% 0.000 0.00);
+  --color-summer-sunset-creme-brulee: oklch(89.1% 0.086 88.67);
+  --color-summer-sunset-e66633: oklch(66.0% 0.171 40.78);
+  --color-summer-sunset-glass: oklch(31.4% 0.056 250.03 / 0.5);
+}
+
+/* Dark appearance: overrides the theme variables above. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-summer-sunset-dusty-rose: oklch(39.1% 0.074 5.18);
+    --color-summer-sunset-dusty-rose-2: oklch(31.4% 0.056 250.03);
+    --color-summer-sunset-ff5733: oklch(41.3% 0.120 33.67);
+  }
+}

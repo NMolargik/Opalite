@@ -48,13 +48,17 @@ public enum ExportService {
             data = ExportEncoders.css(title: swatch.resolvedName, prefix: nil, swatches: [swatch])
         case .swiftui:
             data = ExportEncoders.swiftUI(title: swatch.resolvedName, prefix: nil, swatches: [swatch])
+        default:
+            guard let kind = format.designTokenKind else { throw ExportError.renderFailed }
+            let set = TokenSet(title: swatch.resolvedName, prefix: nil, swatches: [swatch])
+            data = kind.encode(set, catalogName: baseName)
         }
-        return try write(data, filename: "\(baseName).\(format.fileExtension)")
+        return try write(data, filename: "\(baseName)\(format.filenameSuffix)")
     }
 
     /// Exports a palette; `imagePNG` is required for `.image`, `userName` labels the PDF.
-    /// `darkPalette` pairs a second palette as the dark-appearance variant in the CSS and
-    /// SwiftUI formats (colors pair by position); the other formats ignore it.
+    /// `darkPalette` pairs a second palette as the dark-appearance variant in the CSS,
+    /// SwiftUI, and design-token formats (colors pair by position); the other formats ignore it.
     public static func exportPalette(_ palette: OpalitePalette, format: PaletteExportFormat, imagePNG: Data? = nil, userName: String = "User", darkPalette: OpalitePalette? = nil) throws -> URL {
         let baseName = ExportEncoders.sanitizedFilename(palette.name)
         let swatches = palette.sortedColors.map { ExportSwatch(name: $0.name, rgba: $0.rgba) }
@@ -82,8 +86,12 @@ public enum ExportService {
             data = ExportEncoders.css(title: palette.name, prefix: palette.name, swatches: swatches, darkSwatches: darkSwatches)
         case .swiftui:
             data = ExportEncoders.swiftUI(title: palette.name, prefix: palette.name, swatches: swatches, darkSwatches: darkSwatches)
+        default:
+            guard let kind = format.designTokenKind else { throw ExportError.renderFailed }
+            let set = TokenSet(title: palette.name, prefix: palette.name, swatches: swatches, darkSwatches: darkSwatches)
+            data = kind.encode(set, catalogName: baseName)
         }
-        return try write(data, filename: "\(baseName).\(format.fileExtension)")
+        return try write(data, filename: "\(baseName)\(format.filenameSuffix)")
     }
 
     /// Exports the whole portfolio as a PDF.

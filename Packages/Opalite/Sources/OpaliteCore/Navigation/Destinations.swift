@@ -26,6 +26,7 @@ nonisolated public enum SettingsDestination: Hashable, Sendable, Codable {
     case onyx
     case watch
     case swatchBar
+    case backups
     case communityAdmin
     case about
 }

@@ -326,12 +326,12 @@ struct ProcreateEncoderTests {
 struct ExportFormatTests {
     @Test func colorFreeFormats() {
         #expect(Set(ColorExportFormat.allCases.filter(\.isFreeFormat)) == [.opalite, .image])
-        #expect(ColorExportFormat.allCases.count == 7)
+        #expect(ColorExportFormat.allCases.count == 15)
     }
 
     @Test func paletteFreeFormats() {
         #expect(Set(PaletteExportFormat.allCases.filter(\.isFreeFormat)) == [.opalite, .image, .pdf])
-        #expect(PaletteExportFormat.allCases.count == 8)
+        #expect(PaletteExportFormat.allCases.count == 16)
     }
 
     @Test func extensionsAndTypes() {
@@ -344,5 +344,16 @@ struct ExportFormatTests {
         #expect(PaletteExportFormat.allCases.allSatisfy { !$0.fileExtension.isEmpty && !$0.systemImage.isEmpty })
         #expect(PaletteExportFormat.pdf.fileExtension == "pdf")
         #expect(ColorExportFormat.swiftui.fileExtension == "swift")
+    }
+
+    @Test func designTokenFormatsAreOnyxAndHaveSuffixes() {
+        let tokens = ColorExportFormat.allCases.filter(\.isDesignToken)
+        #expect(tokens.count == 8 && tokens.allSatisfy { !$0.isFreeFormat })
+        #expect(PaletteExportFormat.allCases.filter(\.isDesignToken).count == 8)
+        #expect(ColorExportFormat.dtcg.filenameSuffix == ".tokens.json")
+        #expect(ColorExportFormat.xcassets.filenameSuffix == ".xcassets.zip")
+        #expect(ColorExportFormat.css.filenameSuffix == ".css")
+        #expect(PaletteExportFormat.android.filenameSuffix == ".colors.xml")
+        #expect(PaletteExportFormat.allCases.filter(\.isDesignToken).allSatisfy { $0.filenameSuffix.hasSuffix(".\($0.fileExtension)") })
     }
 }
