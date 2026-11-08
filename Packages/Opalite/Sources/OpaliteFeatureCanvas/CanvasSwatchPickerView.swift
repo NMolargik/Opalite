@@ -47,6 +47,8 @@ private struct SwatchStrip: View {
     @Environment(AppRouter.self) private var router
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .body) private var swatchSide: CGFloat = 36
+    private static let leadingFade: CGFloat = 8
+    private static let trailingFade: CGFloat = 20
 
     let preferredPaletteID: UUID?
     let selected: RGBA?
@@ -88,14 +90,25 @@ private struct SwatchStrip: View {
                             swatch(color)
                         }
                     }
-                    .padding(.horizontal, Brand.Space.xs)
+                    .padding(.leading, Self.leadingFade)
+                    .padding(.trailing, Self.trailingFade)
                     .padding(.vertical, Brand.Space.xs)
                 }
                 .scrollIndicators(.hidden)
                 // Clipped to the strip: with clipping disabled the swatches ran past the
                 // capsule's trailing edge and off the window on Mac. The vertical padding above
-                // leaves room for the selection ring and hover lift inside the clip.
-                .clipShape(Rectangle())
+                // leaves room for the selection ring and hover lift inside the clip. The ends
+                // fade instead of cutting a swatch in half; the content padding matches the
+                // fades, so the first and last swatches sit clear of them at rest.
+                .mask {
+                    HStack(spacing: 0) {
+                        LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
+                            .frame(width: Self.leadingFade)
+                        Rectangle()
+                        LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                            .frame(width: Self.trailingFade)
+                    }
+                }
                 // A horizontal scroll view still takes every point of height it's offered;
                 // the strip is an overlay, so pin it to one row of swatches.
                 .frame(height: swatchSide + Brand.Space.xs * 2)
@@ -103,6 +116,9 @@ private struct SwatchStrip: View {
         }
         .padding(.horizontal, Brand.Space.sm)
         .padding(.vertical, Brand.Space.xs)
+        // Clip to the same capsule the background draws, so a swatch scrolled to either end
+        // tucks under the rounded edge instead of poking past it.
+        .clipShape(Capsule())
         .adaptiveGlassCapsule()
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text("Ink colors"))

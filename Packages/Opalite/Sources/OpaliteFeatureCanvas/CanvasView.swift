@@ -57,11 +57,9 @@ struct CanvasEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.horizontalSizeClass) private var sizeClass
 
     @State private var model: CanvasEditorModel
     @State private var deleting: CanvasFile?
-    @State private var trailingSafeArea: CGFloat = 0
     #if canImport(PhotosUI)
     @State private var photoItem: PhotosPickerItem?
     #endif
@@ -80,7 +78,6 @@ struct CanvasEditorView: View {
         content
             .overlay(alignment: .top) { topChrome }
             .overlay(alignment: .bottom) { bottomChrome }
-            .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.trailing } action: { trailingSafeArea = $0 }
             .navigationTitle(model.canvas.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarItems }
@@ -175,7 +172,11 @@ struct CanvasEditorView: View {
                 .transition(.opacity)
             }
         }
-        .ignoresSafeArea(edges: .bottom)
+        // The drawing surface runs to the window's edges, so ink continues under the floating
+        // chrome instead of stopping at an invisible line. Horizontal matters on the iPhone
+        // Duo, whose vertical bar takes the trailing safe area, and on iPhone in landscape.
+        // The scroll view's automatic inset adjustment keeps the content's origin in place.
+        .ignoresSafeArea(edges: [.bottom, .horizontal])
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: model.isPlacing)
     }
 
@@ -203,6 +204,10 @@ struct CanvasEditorView: View {
                 imageEditingBar
             } else if !model.isPlacing {
                 floatingToolbar
+                if swatchStripPlacement == .top {
+                    swatchStrip
+                        .frame(maxWidth: Brand.readableWidth)
+                }
                 #if targetEnvironment(macCatalyst)
                 if !model.isToolPickerVisible {
                     CatalystToolPicker(inkColor: model.inkColor) { model.apply(externalTool: $0) }
@@ -327,34 +332,42 @@ struct CanvasEditorView: View {
 
     private var bottomChrome: some View {
         Group {
-            if model.isSwatchStripVisible, !model.isPlacing, !model.isEditingImages {
-                CanvasSwatchPickerView(preferredPaletteID: model.canvas.palette?.id, selected: model.inkColor) { rgba in
-                    model.setInk(rgba)
-                }
-                .padding(.trailing, swatchStripTrailingInset)
-                .padding(.horizontal, Brand.Space.lg)
-                .padding(.bottom, Brand.Space.sm + model.obscuredBottomInset)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+            if swatchStripPlacement == .bottom {
+                swatchStrip
+                    .padding(.horizontal, Brand.Space.lg)
+                    .padding(.bottom, Brand.Space.sm + model.obscuredBottomInset)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: model.obscuredBottomInset)
         .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: model.isSwatchStripVisible)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: swatchStripTrailingInset)
     }
 
-    /// In compact width the tool picker collapses to a floating pen in the bottom trailing
-    /// corner of the window and reports no obscured frame. Lifting the strip above it left
-    /// it hanging mid-screen (worst on the closed iPhone Duo), so the strip stays on the
-    /// bottom edge and gives up the pen's column instead. The pen hugs the window edge, not
-    /// the safe area, so where a vertical bar already insets the trailing side (iPhone Duo)
-    /// only the remainder is needed.
-    private var swatchStripTrailingInset: CGFloat {
-        guard sizeClass == .compact, model.isToolPickerVisible, model.obscuredBottomInset == 0 else { return 0 }
-        return max(0, collapsedPenClearance - trailingSafeArea)
+    @ViewBuilder
+    private var swatchStrip: some View {
+        if model.isSwatchStripVisible, !model.isPlacing, !model.isEditingImages {
+            CanvasSwatchPickerView(preferredPaletteID: model.canvas.palette?.id, selected: model.inkColor) { rgba in
+                model.setInk(rgba)
+            }
+        }
     }
 
-    /// The collapsed pen's width plus its margin from the window's trailing edge, plus a gap.
-    private let collapsedPenClearance: CGFloat = 108
+    private enum SwatchStripPlacement { case top, bottom }
+
+    /// Where the ink strip lives. On iPhone and iPad, PencilKit's tool picker floats over the
+    /// bottom of the screen (a collapsed pen in compact width, a floating palette on iPad) and
+    /// reports the frame it covers only some of the time. A strip at the bottom was either
+    /// hidden behind the palette or lifted by a stale report and left hanging mid-screen (the
+    /// closed iPhone Duo), so there the strip sits under the floating toolbar, clear of the
+    /// picker in every state. Mac Catalyst draws its own tool row and visionOS docks the
+    /// picker, so both keep the strip at the bottom, lifted by the reported inset.
+    private var swatchStripPlacement: SwatchStripPlacement {
+        #if targetEnvironment(macCatalyst) || os(visionOS)
+        .bottom
+        #else
+        .top
+        #endif
+    }
 
     // MARK: - Menus
 
