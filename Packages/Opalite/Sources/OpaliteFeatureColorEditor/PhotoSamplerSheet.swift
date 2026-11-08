@@ -12,6 +12,7 @@ import SwiftUI
 import OpaliteCore
 import OpaliteDesignSystem
 import UIKit
+import OpaliteFeatureShared
 
 public struct PhotoSamplerSheet: View {
     private let initialImage: PlatformImage?
@@ -27,6 +28,7 @@ public struct PhotoSamplerSheet: View {
     @State private var sampledColor: RGBA?
     @State private var staged: [Staged] = []
     @State private var isDropTargeted = false
+    @State private var isExtractingPalette = false
 
     private struct Staged: Identifiable, Hashable {
         let id = UUID()
@@ -62,6 +64,16 @@ public struct PhotoSamplerSheet: View {
                         )
                         .frame(maxHeight: 440)
                         .transition(.opacity.combined(with: .scale(scale: 0.96)))
+
+                        Button {
+                            Haptics.selection()
+                            isExtractingPalette = true
+                        } label: {
+                            Label("Extract Palette from Photo", systemImage: "wand.and.stars")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .secondaryActionButton(tint: .opaliteBlue)
+                        .accessibilityIdentifier("photoSampler.extractPalette")
 
                         if let sampledColor {
                             sampledCard(sampledColor)
@@ -116,6 +128,9 @@ public struct PhotoSamplerSheet: View {
                 setImage(dropped)
                 return true
             } isTargeted: { isDropTargeted = $0 }
+        }
+        .sharedSheet(isPresented: $isExtractingPalette) {
+            ExtractPaletteSheet(image: image)
         }
         .onAppear {
             if image == nil, let initialImage { setImage(initialImage) }

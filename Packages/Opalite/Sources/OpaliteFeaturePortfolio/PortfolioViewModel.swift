@@ -23,6 +23,7 @@ final class PortfolioViewModel {
     /// The one modal sheet the root can show at a time.
     nonisolated enum Sheet: Identifiable, Hashable, Sendable {
         case quickAddHex
+        case extractPalette
         case paletteOrder
         case archivedPalettes
         case moveColor(UUID)

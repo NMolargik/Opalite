@@ -3241,6 +3241,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "No colors could be found on that page." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron colores en esa página."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune couleur n'a été trouvée sur cette page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このページから色を見つけられませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "No colors in this palette yet" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3716,6 +3740,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opaliteはこの種類のファイルを開けません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opalite couldn't reach that website. Check the address and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite no pudo acceder a ese sitio web. Revisa la dirección e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite n'a pas pu joindre ce site Web. Vérifiez l'adresse et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite はそのウェブサイトに接続できませんでした。アドレスを確認してもう一度お試しください。"
           }
         }
       },
@@ -5305,6 +5353,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "That address didn't return a web page." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esa dirección no devolvió una página web."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette adresse n'a pas renvoyé de page Web."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "そのアドレスはウェブページを返しませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "That color is already in your Portfolio" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5324,6 +5396,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "そのカラーはすでにポートフォリオにあります"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "That doesn't look like a website address. Try something like example.com." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eso no parece una dirección web. Prueba con algo como example.com."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas une adresse de site Web. Essayez quelque chose comme example.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトのアドレスではないようです。example.com のように入力してください。"
           }
         }
       },
@@ -5396,6 +5492,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルに必要なデータがありません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The website returned an error (%@)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web devolvió un error (%@)."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site Web a renvoyé une erreur (%@)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトがエラーを返しました (%@)。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The website took too long to respond. Check the address and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web tardó demasiado en responder. Revisa la dirección e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site Web a mis trop de temps à répondre. Vérifiez l'adresse et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトの応答に時間がかかりすぎています。アドレスを確認してもう一度お試しください。"
           }
         }
       },
@@ -5996,6 +6140,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "黄"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "You appear to be offline. Connect to the internet and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece que no tienes conexión. Conéctate a internet e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous semblez être hors ligne. Connectez-vous à Internet et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインのようです。インターネットに接続してもう一度お試しください。"
           }
         }
       },
