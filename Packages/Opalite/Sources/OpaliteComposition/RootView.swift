@@ -117,6 +117,7 @@ extension View {
             .environment(session.hexCopy)
             .environment(session.importer)
             .environment(session.cloudSync)
+            .environment(session.backups)
             .environment(session.subscriptions)
             .environment(session.colorNaming)
             .environment(\.onyxEntitlement, session.subscriptions)

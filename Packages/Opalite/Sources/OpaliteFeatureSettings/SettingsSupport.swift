@@ -314,3 +314,67 @@ nonisolated public enum SettingsLinks {
     public static let support = website
     public static let deviceKit = URL(string: "https://github.com/devicekit/DeviceKit")!
 }
+
+// MARK: - Sync health
+
+/// Plain-language wording for the iCloud sync-health rows. Each value says only what the
+/// system reported: nothing is estimated, and "not yet" is shown instead of a guess.
+public enum SyncHealthPresentation {
+    public static func account(isAvailable: Bool) -> String {
+        isAvailable ? String(localized: "Signed In") : String(localized: "Not Signed In")
+    }
+
+    public static func storage(_ mode: CloudSyncManager.StoreMode) -> String {
+        switch mode {
+        case .cloudKit: String(localized: "Syncing with iCloud")
+        case .localOnly: String(localized: "This Device Only")
+        case .inMemory: String(localized: "Temporary")
+        }
+    }
+
+    /// What the storage row means, when it isn't the normal case.
+    public static func storageExplanation(_ mode: CloudSyncManager.StoreMode) -> String? {
+        switch mode {
+        case .cloudKit: nil
+        case .localOnly: String(localized: "iCloud couldn't be set up when Opalite opened, so your library is saved on this device only. Restart Opalite after signing in to iCloud.")
+        case .inMemory: String(localized: "Opalite couldn't open its storage, so changes made now won't be kept after you quit.")
+        }
+    }
+
+    /// "Today at 9:41 AM", or "Not yet" when iCloud hasn't reported a finished sync since Opalite opened.
+    public static func lastSynced(_ date: Date?) -> String {
+        guard let date else { return String(localized: "Not Yet This Session") }
+        return date.formatted(date: .abbreviated, time: .shortened)
+    }
+
+    /// The last error CloudKit reported, with when it happened and whether a later sync succeeded.
+    public static func lastProblem(_ error: CloudSyncManager.SyncErrorRecord, lastSuccess: Date?) -> String {
+        let when = error.date.formatted(date: .abbreviated, time: .shortened)
+        if let lastSuccess, lastSuccess > error.date {
+            return String(localized: "\(error.message) (\(when), since resolved)")
+        }
+        return String(localized: "\(error.message) (\(when))")
+    }
+}
+
+// MARK: - Backups
+
+public enum BackupPresentation {
+    public static func counts(_ header: BackupHeader) -> String {
+        String(localized: "^[\(header.colorCount) color](inflect: true), ^[\(header.paletteCount) palette](inflect: true)")
+    }
+
+    public static func reason(_ reason: BackupReason) -> String {
+        switch reason {
+        case .automatic: String(localized: "Automatic")
+        case .manual: String(localized: "Back Up Now")
+        case .beforeDelete: String(localized: "Before deleting")
+        case .imported: String(localized: "Imported")
+        }
+    }
+
+    public static func restoreResult(_ summary: RestoreSummary) -> String {
+        if !summary.addedAnything { return String(localized: "Nothing to restore. Everything in this backup is already in your library.") }
+        return String(localized: "Restored ^[\(summary.colorsAdded) color](inflect: true) and ^[\(summary.palettesAdded) palette](inflect: true)")
+    }
+}

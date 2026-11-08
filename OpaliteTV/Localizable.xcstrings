@@ -5713,6 +5713,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "The backup couldn't be saved: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar la copia: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde n’a pas pu être enregistrée : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存できませんでした: %@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "The file format is invalid or corrupted." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5785,6 +5809,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "This backup was made by a newer version of Opalite. Update Opalite to restore it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta copia la creó una versión más reciente de Opalite. Actualiza Opalite para restaurarla."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette sauvegarde a été créée par une version plus récente d’Opalite. Mettez Opalite à jour pour la restaurer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップは新しいバージョンの Opalite で作成されました。復元するには Opalite をアップデートしてください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "This color may have been deleted on another device." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5828,6 +5876,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この書き出しはこのデバイスでは利用できません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "This file isn't an Opalite backup, or it's damaged." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este archivo no es una copia de Opalite o está dañado."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier n’est pas une sauvegarde Opalite ou il est endommagé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは Opalite のバックアップではないか、破損しています。"
           }
         }
       },

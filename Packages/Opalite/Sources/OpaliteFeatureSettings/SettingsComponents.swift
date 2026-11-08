@@ -214,6 +214,7 @@ extension View {
         self
             .previewEnvironment(hasOnyx: hasOnyx)
             .environment(CloudSyncManager())
+            .environment(BackupManager.preview())
             .environment(SubscriptionManager())
             #if os(iOS) && canImport(WatchConnectivity)
             .environment(PhoneConnectivityManager())

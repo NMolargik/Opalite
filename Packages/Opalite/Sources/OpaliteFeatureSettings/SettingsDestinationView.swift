@@ -35,6 +35,8 @@ public struct SettingsDestinationView: View {
             #endif
         case .swatchBar:
             SwatchBarSettingsView()
+        case .backups:
+            BackupsView()
         case .communityAdmin:
             CommunityAdminView()
         case .about:
@@ -64,6 +66,7 @@ struct WatchUnavailableView: View {
             NavigationLink("Onyx", value: SettingsDestination.onyx)
             NavigationLink("Apple Watch", value: SettingsDestination.watch)
             NavigationLink("SwatchBar", value: SettingsDestination.swatchBar)
+            NavigationLink("Backups", value: SettingsDestination.backups)
             NavigationLink("Moderation", value: SettingsDestination.communityAdmin)
             NavigationLink("About", value: SettingsDestination.about)
         }

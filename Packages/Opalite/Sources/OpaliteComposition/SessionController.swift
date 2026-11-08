@@ -35,6 +35,7 @@ public final class SessionController {
     public let hexCopy: HexCopyModel
     public let importer: ImportModel
     public let cloudSync: CloudSyncManager
+    public let backups: BackupManager
     public let subscriptions: SubscriptionManager
     public let colorNaming: ColorNameSuggestionService
     public let statusSync: PortfolioStatusSync
@@ -79,7 +80,18 @@ public final class SessionController {
         widgetReloader: (any WidgetTimelineReloading)? = WidgetCenterReloader(),
         statusSyncDebounce: Duration = .milliseconds(750)
     ) {
+        let providedContainer = container
         let container = container ?? OpaliteStore.makeContainer()
+        let storeMode: CloudSyncManager.StoreMode
+        if providedContainer != nil {
+            storeMode = container.configurations.first?.isStoredInMemoryOnly == true ? .inMemory : .localOnly
+        } else {
+            switch OpaliteStore.lastMode {
+            case .cloudKit: storeMode = .cloudKit
+            case .localOnly: storeMode = .localOnly
+            case .inMemory: storeMode = .inMemory
+            }
+        }
         self.container = container
         self.activityAnnotator = activityAnnotator
         self.sharedDefaults = sharedDefaults
@@ -157,7 +169,20 @@ public final class SessionController {
 
         let cloud = CloudSyncManager(changeCenter: changeCenter)
         cloud.configure(with: container.mainContext)
+        cloud.configure(storeMode: storeMode)
         cloudSync = cloud
+
+        let portfolioModel = portfolio
+        let backupManager = BackupManager(
+            container: container,
+            changeCenter: changeCenter,
+            deviceName: device.deviceName,
+            paletteOrder: { [weak portfolioModel] in portfolioModel?.paletteOrder.ids ?? [] },
+            applyPaletteOrder: { [weak portfolioModel] in portfolioModel?.reorderPalettes($0) }
+        )
+        backups = backupManager
+        // Bulk deletes take a (throttled) backup first.
+        portfolio.beforeDestructiveChange = { [weak backupManager] in backupManager?.backUpBeforeDelete() }
 
         community = CommunityModel(
             service: communityService ?? CloudKitCommunityService(),
@@ -213,6 +238,7 @@ public final class SessionController {
         if !started {
             started = true
             statusSync.start()
+            backups.backUpIfDue()
             #if os(iOS) && canImport(WatchConnectivity)
             phoneConnectivity.activate()
             #endif
@@ -223,6 +249,7 @@ public final class SessionController {
 
     /// Foreground work: entitlements and the queued watch hex copy.
     public func becameActive() async {
+        backups.backUpIfDue()
         await subscriptions.processUnfinishedTransactions()
         await subscriptions.updatePurchasedProducts()
         consumePendingDeepLinkFromIntents()

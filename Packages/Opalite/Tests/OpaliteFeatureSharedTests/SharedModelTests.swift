@@ -664,3 +664,33 @@ struct PortfolioModelReviewTests {
         #expect(env.defaults.string(forKey: AppStorageKeys.lastExportReviewRequestVersion) == nil)
     }
 }
+
+// MARK: - Backups before bulk deletes
+
+@Suite("Pre-delete backup hook")
+struct PreDeleteHookTests {
+    @Test @MainActor func bulkDeletesAskForABackupFirst() {
+        let environment = PreviewEnvironment()
+        var calls = 0
+        environment.portfolio.beforeDestructiveChange = { calls += 1 }
+
+        // One color, or a palette deleted but keeping its colors: nothing destructive in bulk.
+        if let moss = environment.portfolio.looseColors.first { environment.portfolio.delete(moss) }
+        environment.portfolio.delete([])
+        #expect(calls == 0)
+        environment.portfolio.delete(environment.sample, deleteColors: false)
+        #expect(calls == 0)
+    }
+
+    @Test @MainActor func deletingAPaletteWithItsColorsAndMultiDeletesBackUp() {
+        let environment = PreviewEnvironment()
+        var calls = 0
+        environment.portfolio.beforeDestructiveChange = { calls += 1 }
+        let loose = Array(environment.portfolio.looseColors.prefix(2))
+        #expect(loose.count == 2)
+        environment.portfolio.delete(loose)
+        #expect(calls == 1)
+        environment.portfolio.delete(environment.sample, deleteColors: true)
+        #expect(calls == 2)
+    }
+}

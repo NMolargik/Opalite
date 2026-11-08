@@ -182,7 +182,7 @@ final class PortfolioViewModel {
     func deleteSelection() {
         let colors = selectedLooseColors
         isConfirmingBatchDelete = false
-        for color in colors { portfolio.delete(color) }
+        portfolio.delete(colors)
         selection.end()
         if !colors.isEmpty {
             let message = colors.count == 1 ? String(localized: "Deleted 1 color") : String(localized: "Deleted \(colors.count) colors")

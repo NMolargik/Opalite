@@ -45,11 +45,37 @@ public final class CloudSyncManager {
         }
     }
 
+    public struct SyncErrorRecord: Equatable, Sendable {
+        public let message: String
+        public let date: Date
+
+        public init(message: String, date: Date) {
+            self.message = message
+            self.date = date
+        }
+    }
+
+    /// Whether the SwiftData container is CloudKit-backed. `OpaliteStore` falls back to a
+    /// local or in-memory store when CloudKit can't be set up.
+    public enum StoreMode: Equatable, Sendable {
+        case cloudKit
+        case localOnly
+        case inMemory
+    }
+
     public private(set) var syncStatus: SyncStatus = .idle
     public private(set) var isSyncing = false
     public private(set) var lastSyncDate: Date?
     public private(set) var hasReceivedRemoteChange = false
     public private(set) var lastErrorMessage: String?
+    /// When CloudKit last reported a finished import or export that succeeded. Unlike
+    /// `lastSyncDate`, local saves and manual refreshes never set it. Nil until an event
+    /// arrives in this launch: the system does not report earlier syncs.
+    public private(set) var lastSuccessfulSyncDate: Date?
+    /// The most recent failure CloudKit reported this launch, kept after a later success.
+    public private(set) var lastSyncError: SyncErrorRecord?
+    /// How the library is stored on this device.
+    public private(set) var storeMode: StoreMode = .cloudKit
     /// Whether the network is reachable.
     public private(set) var isOnline = true
 
@@ -65,6 +91,12 @@ public final class CloudSyncManager {
     ) {
         self.changeCenter = changeCenter
         self.cloudAvailability = cloudAvailability
+    }
+
+    /// Records how the container was actually created (it can degrade from CloudKit).
+    public func configure(storeMode mode: StoreMode) {
+        storeMode = mode
+        updateSyncStatus()
     }
 
     public func configure(with context: ModelContext) {
@@ -136,10 +168,12 @@ public final class CloudSyncManager {
             isSyncing = false
             if event.succeeded {
                 lastSyncDate = Date()
+                lastSuccessfulSyncDate = lastSyncDate
                 lastErrorMessage = nil
                 if event.isImport { markRemoteChangeReceived() }
             } else if let message = event.errorDescription {
                 lastErrorMessage = message
+                lastSyncError = SyncErrorRecord(message: message, date: Date())
                 Log.sync.error("CloudKit sync event failed: \(message)")
             }
         }

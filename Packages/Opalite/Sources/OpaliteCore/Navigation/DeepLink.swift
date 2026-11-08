@@ -24,11 +24,12 @@ nonisolated public enum DeepLink: Equatable, Sendable, Hashable {
     case swatchBar
     case sharedImage
     case onyx
+    case backups
 
     public static let scheme = "opalite"
 
     /// Parses an `opalite://` URL. Supported forms:
-    /// - `opalite://portfolio`, `community`, `search`, `canvases`, `settings`, `onyx`
+    /// - `opalite://portfolio`, `community`, `search`, `canvases`, `settings`, `onyx`, `backups`
     /// - `opalite://color/<uuid>`, `palette/<uuid>`, `canvas/<uuid>`
     /// - `opalite://createColor`, `createPalette`, `samplePhoto`, `swatchBar`, `sharedImage`
     public init?(url: URL) {
@@ -42,6 +43,7 @@ nonisolated public enum DeepLink: Equatable, Sendable, Hashable {
         case "canvas" where idComponent == nil: self = .canvases
         case "settings": self = .settings
         case "onyx": self = .onyx
+        case "backups": self = .backups
         case "createcolor", "create-color": self = .createColor
         case "createpalette", "create-palette": self = .createPalette
         case "samplephoto", "sample-photo": self = .samplePhoto
@@ -71,6 +73,7 @@ nonisolated public enum DeepLink: Equatable, Sendable, Hashable {
         case .canvases: path = "canvases"
         case .settings: path = "settings"
         case .onyx: path = "onyx"
+        case .backups: path = "backups"
         case .createColor: path = "createColor"
         case .createPalette: path = "createPalette"
         case .samplePhoto: path = "samplePhoto"
@@ -90,7 +93,7 @@ nonisolated public enum DeepLink: Equatable, Sendable, Hashable {
         case .community: .community
         case .search: .search
         case .canvases, .canvas: .canvas
-        case .settings, .onyx: .settings
+        case .settings, .onyx, .backups: .settings
         case .swatchBar: nil
         }
     }

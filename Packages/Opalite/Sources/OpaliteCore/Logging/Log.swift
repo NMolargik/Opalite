@@ -17,6 +17,7 @@ nonisolated public enum Log {
     public static let canvas = Logger(subsystem: subsystem, category: "Canvas")
     public static let community = Logger(subsystem: subsystem, category: "Community")
     public static let sync = Logger(subsystem: subsystem, category: "CloudSync")
+    public static let backup = Logger(subsystem: subsystem, category: "Backup")
     public static let subscription = Logger(subsystem: subsystem, category: "Subscription")
     public static let watch = Logger(subsystem: subsystem, category: "Watch")
     public static let widgets = Logger(subsystem: subsystem, category: "Widgets")

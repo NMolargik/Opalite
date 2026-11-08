@@ -63,6 +63,10 @@ public final class PortfolioModel {
     /// Bumped after every refresh so views computing from the cache re-evaluate.
     public private(set) var changeStamp = 0
 
+    /// Called just before a bulk delete (several colors, or a palette with its colors) so the
+    /// composition root can take a backup first. Single-item deletes don't call it.
+    @ObservationIgnored public var beforeDestructiveChange: (@MainActor () -> Void)?
+
     /// The display name stamped on new colors/palettes (Settings › Profile).
     public var authorName: String
 
@@ -269,7 +273,14 @@ public final class PortfolioModel {
         update(palette) { $0.isArchived = archived }
     }
 
+    /// Deletes several colors; backs up first when more than one goes.
+    public func delete(_ colors: [OpaliteColor]) {
+        if colors.count > 1 { beforeDestructiveChange?() }
+        for color in colors { delete(color) }
+    }
+
     public func delete(_ palette: OpalitePalette, deleteColors: Bool) {
+        if deleteColors, palette.colorCount > 0 { beforeDestructiveChange?() }
         if activePaletteID == palette.id { activePaletteID = nil }
         paletteOrder.remove(palette.id)
         paletteOrder.save(to: defaults)

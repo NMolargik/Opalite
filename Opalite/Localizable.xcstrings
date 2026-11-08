@@ -147,6 +147,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ (%@, since resolved)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (%@, ya resuelto)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (%@, depuis résolu)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (%@、解決済み)"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ Copy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -584,6 +608,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@の値"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@ · %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · %@"
           }
         }
       },
@@ -1328,6 +1376,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ほかのアプリと並べて使える、カラーを集めたコンパクトなウインドウ。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A copy of your colors and palettes is saved on this device every day." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada día se guarda en este dispositivo una copia de tus colores y paletas."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une copie de vos couleurs et palettes est enregistrée chaque jour sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色とパレットのコピーが毎日このデバイスに保存されます。"
           }
         }
       },
@@ -2461,6 +2533,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Adds a backup file to the list. It isn't restored until you choose Restore." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega un archivo de copia a la lista. No se restaura hasta que elijas Restaurar."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute un fichier de sauvegarde à la liste. Il n’est restauré que si vous choisissez Restaurer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップファイルを一覧に追加します。「復元」を選ぶまで復元はされません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Adds a color by typing its hex code" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3325,6 +3421,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Automatic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automática"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Automatic Sync" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3445,6 +3565,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Back Up Now" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar ahora"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarder maintenant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐバックアップ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Back to Portfolio" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3488,6 +3632,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "背景"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Backup added to the list" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia agregada a la lista"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde ajoutée à la liste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを一覧に追加しました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Backup options" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de la copia"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options de la sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップのオプション"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Backup saved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia guardada"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde enregistrée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存しました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Backups" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copias de seguridad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegardes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Before deleting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes de eliminar"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avant la suppression"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除前"
           }
         }
       },
@@ -7671,6 +7935,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Delete Backup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar copia"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを削除"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Delete Canvas" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7786,6 +8074,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パレットとカラーを削除"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Delete This Backup?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar esta copia?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer cette sauvegarde?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップを削除しますか?"
           }
         }
       },
@@ -11271,6 +11583,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Import Backup File" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar archivo de copia"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer un fichier de sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップファイルを読み込む"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Import Color" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11386,6 +11722,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "読み込みに失敗しました：%@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Imported" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importada"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込み済み"
           }
         }
       },
@@ -12063,6 +12423,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Last Problem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último problema"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernier problème"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直近の問題"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Last Synced" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12082,6 +12466,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最終同期"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Last Synced is the last time iCloud reported a finished sync since Opalite opened. iOS doesn't tell apps about earlier syncs." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última sincronización es la última vez que iCloud informó de una sincronización completada desde que se abrió Opalite. iOS no avisa a las apps de sincronizaciones anteriores."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière synchronisation indique la dernière fois qu’iCloud a signalé une synchronisation terminée depuis l’ouverture d’Opalite. iOS ne communique pas aux apps les synchronisations antérieures."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「最終同期」は、Opalite を開いてから iCloud が同期の完了を最後に報告した時刻です。それ以前の同期は iOS からアプリに通知されません。"
           }
         }
       },
@@ -12202,6 +12610,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライブラリ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Library Storage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almacenamiento de la biblioteca"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stockage de la bibliothèque"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライブラリの保存先"
           }
         }
       },
@@ -14105,6 +14537,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "No backups yet. The first one is saved the next time Opalite opens, or tap Back Up Now." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay copias. La primera se guarda la próxima vez que se abra Opalite, o toca Copiar ahora."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune sauvegarde pour l’instant. La première est enregistrée à la prochaine ouverture d’Opalite, ou touchez Sauvegarder maintenant."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップはまだありません。次に Opalite を開いたときに最初のバックアップが保存されます。「今すぐバックアップ」をタップすることもできます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "No color yet" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14417,6 +14873,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "None Yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna todavía"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune pour l’instant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだありません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Normal Vision" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14484,6 +14964,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サインインしていません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Not Yet This Session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no en esta sesión"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore durant cette session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このセッションではまだありません"
           }
         }
       },
@@ -14724,6 +15228,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "公開するものはまだありません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Nothing to restore. Everything in this backup is already in your library." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay nada que restaurar. Todo lo de esta copia ya está en tu biblioteca."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à restaurer. Tout le contenu de cette sauvegarde est déjà dans votre bibliothèque."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元するものはありません。このバックアップの内容はすべてライブラリにあります。"
           }
         }
       },
@@ -15523,6 +16051,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Opalite couldn't open its storage, so changes made now won't be kept after you quit." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite no pudo abrir su almacenamiento, así que los cambios que hagas ahora no se conservarán al salir."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite n’a pas pu ouvrir son stockage; les changements faits maintenant ne seront pas conservés à la fermeture."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite が保存領域を開けなかったため、今行った変更は終了すると失われます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Opalite for Apple TV shows the colors and palettes you've made on your other devices, at the size they deserve." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15590,6 +16142,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opaliteの宝石"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opalite saves a backup of your colors and palettes on this device once a day and before you delete several items at once. The newest 10 are kept. Backups stay on this device and aren't synced to iCloud. Canvases aren't included." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite guarda en este dispositivo una copia de tus colores y paletas una vez al día y antes de eliminar varios elementos a la vez. Se conservan las 10 más recientes. Las copias se quedan en este dispositivo y no se sincronizan con iCloud. Los lienzos no se incluyen."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite enregistre sur cet appareil une sauvegarde de vos couleurs et palettes une fois par jour et avant que vous supprimiez plusieurs éléments à la fois. Les 10 plus récentes sont conservées. Les sauvegardes restent sur cet appareil et ne sont pas synchronisées avec iCloud. Les toiles ne sont pas incluses."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite は、1日1回と、複数の項目をまとめて削除する前に、色とパレットのバックアップをこのデバイスに保存します。最新の10件が保持されます。バックアップはこのデバイスにのみ保存され、iCloud とは同期されません。キャンバスは含まれません。"
           }
         }
       },
@@ -19771,6 +20347,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Restore This Backup?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Restaurar esta copia?"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer cette sauvegarde?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップを復元しますか?"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Restore only adds colors and palettes from %@ that are missing. Nothing you have now is changed or deleted, and anything you deleted since comes back." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar solo agrega los colores y paletas de %@ que faltan. Nada de lo que tienes ahora se cambia ni se elimina, y lo que eliminaste desde entonces vuelve."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La restauration ajoute seulement les couleurs et palettes manquantes de %@. Rien de ce que vous avez actuellement n’est modifié ni supprimé, et ce que vous avez supprimé depuis réapparaît."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元では、%@ のバックアップにあって現在ないカラーとパレットだけが追加されます。現在のデータは変更も削除もされず、その後に削除したものは元に戻ります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Restored %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19790,6 +20414,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@を復元しました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Restored ^[%lld color](inflect: true) and ^[%lld palette](inflect: true)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se restauraron ^[%lld color](inflect: true) y ^[%lld paleta](inflect: true)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld couleur](inflect: true) et ^[%lld palette](inflect: true) restaurées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 色と %lld パレットを復元しました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Restore…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Restoring adds anything that is missing and leaves everything else as it is." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar agrega lo que falta y deja todo lo demás como está."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La restauration ajoute ce qui manque et laisse tout le reste tel quel."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元では不足しているものだけが追加され、それ以外はそのまま残ります。"
           }
         }
       },
@@ -20707,6 +21403,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Saved Backups" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copias guardadas"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegardes enregistrées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存済みのバックアップ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Saved to your Portfolio" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21254,6 +21974,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "共有"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Share Backup File" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir archivo de copia"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager le fichier de sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップファイルを共有"
           }
         }
       },
@@ -21926,6 +22670,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定アプリでiCloudにサインインすると、デバイス間で作業を同期できます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Signed In" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión iniciada"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecté"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サインイン済み"
           }
         }
       },
@@ -23131,6 +23899,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Syncing with iCloud" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizando con iCloud"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation avec iCloud"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud と同期中"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Syncing with iCloud…" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23635,6 +24427,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Temporary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporal"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporaire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時的"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Terms of Use" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23949,6 +24765,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "The backup couldn't be saved." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar la copia."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde n’a pas pu être enregistrée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存できませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The backup couldn't be saved: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar la copia: %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde n’a pas pu être enregistrée : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存できませんでした: %@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "The canvas is empty" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -24213,6 +25077,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "This Device Only" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo este dispositivo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil seulement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスのみ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "This backup was made by a newer version of Opalite. Update Opalite to restore it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta copia la creó una versión más reciente de Opalite. Actualiza Opalite para restaurarla."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette sauvegarde a été créée par une version plus récente d’Opalite. Mettez Opalite à jour pour la restaurer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップは新しいバージョンの Opalite で作成されました。復元するには Opalite をアップデートしてください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "This can't be undone." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -24352,6 +25264,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この書き出しはこのデバイスでは利用できません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "This file isn't an Opalite backup, or it's damaged." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este archivo no es una copia de Opalite o está dañado."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier n’est pas une sauvegarde Opalite ou il est endommagé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは Opalite のバックアップではないか、破損しています。"
           }
         }
       },
@@ -24568,6 +25504,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」（公開者：%@）をコミュニティから完全に削除します。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "This removes the backup file from this device. Your colors and palettes aren't affected." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto elimina el archivo de copia de este dispositivo. Tus colores y paletas no se ven afectados."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela supprime le fichier de sauvegarde de cet appareil. Vos couleurs et palettes ne sont pas touchées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスからバックアップファイルが削除されます。色とパレットには影響しません。"
           }
         }
       },
@@ -27213,6 +28173,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "^[%lld color](inflect: true), ^[%lld palette](inflect: true)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld color](inflect: true), ^[%lld paleta](inflect: true)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld couleur](inflect: true), ^[%lld palette](inflect: true)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 色、%lld パレット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "^[%lld palette](inflect: true)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27405,6 +28389,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "iCloud Account" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta de iCloud"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte iCloud"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud アカウント"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "iCloud Sync" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27424,6 +28432,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud同期"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "iCloud couldn't be set up when Opalite opened, so your library is saved on this device only. Restart Opalite after signing in to iCloud." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo configurar iCloud al abrir Opalite, así que tu biblioteca se guarda solo en este dispositivo. Reinicia Opalite después de iniciar sesión en iCloud."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud n’a pas pu être configuré à l’ouverture d’Opalite; votre bibliothèque est donc enregistrée sur cet appareil seulement. Redémarrez Opalite après vous être connecté à iCloud."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite を開いたときに iCloud を設定できなかったため、ライブラリはこのデバイスにのみ保存されています。iCloud にサインインしてから Opalite を再起動してください。"
           }
         }
       },
