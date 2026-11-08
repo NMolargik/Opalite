@@ -19,9 +19,6 @@ import os
 /// The collapsible cards of the palette detail, in display order.
 nonisolated public enum PaletteDetailSection: String, CaseIterable, Identifiable, Sendable {
     case colors
-    case contrastMatrix
-    case lightnessScale
-    case colorVision
     case notes
     case tags
     case canvas
@@ -58,6 +55,8 @@ final class PaletteDetailViewModel {
     var isConfirmingUnlink = false
 
     // Accessibility tools
+    var isShowingAccessibility = false
+    var accessibilityTool: AccessibilityTool = .contrast
     var contrastMode: ContrastMatrixMode = .wcag
     var contrastPair: ContrastPair?
     var scaleBaseID: UUID?
@@ -80,6 +79,14 @@ final class PaletteDetailViewModel {
         let notes = portfolio.palette(withID: paletteID)?.notes ?? ""
         notesDraft = notes
         lastSavedNotes = notes
+        #if DEBUG
+        // Simulator verification: `--expand-accessibility` opens the accessibility view; `--accessibility-tool=scale|vision` picks the tool.
+        if CommandLine.arguments.contains("--expand-accessibility") {
+            isShowingAccessibility = true
+            if CommandLine.arguments.contains("--accessibility-tool=scale") { accessibilityTool = .scale }
+            if CommandLine.arguments.contains("--accessibility-tool=vision") { accessibilityTool = .colorVision }
+        }
+        #endif
     }
 
     // MARK: - Derived
@@ -377,4 +384,13 @@ nonisolated struct ContrastPair: Identifiable, Hashable, Sendable {
     let backgroundID: UUID
 
     var id: String { "\(textID.uuidString)-\(backgroundID.uuidString)" }
+}
+
+/// The tools in the accessibility view.
+nonisolated enum AccessibilityTool: String, CaseIterable, Identifiable, Sendable {
+    case contrast
+    case scale
+    case colorVision
+
+    var id: String { rawValue }
 }

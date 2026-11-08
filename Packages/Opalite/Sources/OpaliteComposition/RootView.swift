@@ -83,14 +83,22 @@ public struct RootView: View {
 
     #if DEBUG
     /// Verification helpers for simulator runs: `--seed-sample-data`, `--simulate-onyx`,
-    /// `--open-first-palette`, `--open-settings`, and `--open-backups`. Debug builds only.
+    /// `--seed-confusable-palette`, `--open-first-palette` (with `--palette-index=N`), `--open-settings`, and `--open-backups`. Debug builds only.
     private func applyDebugLaunchArguments() async {
         let arguments = CommandLine.arguments
         if arguments.contains("--seed-sample-data"), session.portfolio.colors.isEmpty { session.portfolio.generateSampleData() }
+        if arguments.contains("--seed-confusable-palette"), let palette = session.portfolio.createPalette(name: "Confusable") {
+            // Pairs that collapse under the three dichromacies, for the Color Vision verification shots.
+            for (name, hex) in [("Berry", "#C82563"), ("Olive", "#A68E3D"), ("Ochre", "#B98138"), ("Sky", "#1681D4"), ("Indigo", "#2A13E9")] {
+                _ = session.portfolio.createColor(RGBA(hex: hex) ?? .black, name: name, in: palette)
+            }
+        }
         if arguments.contains("--simulate-onyx") { session.subscriptions.isSimulatingOnyx = true }
         if arguments.contains("--open-first-palette") {
             try? await Task.sleep(for: .seconds(1.5))
-            if let id = session.portfolio.orderedPalettes.first?.id { session.router.open(.palette(id)) }
+            let palettes = session.portfolio.orderedPalettes
+            let index = arguments.compactMap { $0.hasPrefix("--palette-index=") ? Int($0.dropFirst("--palette-index=".count)) : nil }.first ?? 0
+            if palettes.indices.contains(index) { session.router.open(.palette(palettes[index].id)) }
         }
         if arguments.contains("--open-settings") {
             try? await Task.sleep(for: .seconds(1.5))

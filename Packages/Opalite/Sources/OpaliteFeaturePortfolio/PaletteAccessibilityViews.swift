@@ -54,6 +54,77 @@ private extension ContrastMatrix.TextLevel {
     var tint: Color { self == .fail ? .red : .green }
 }
 
+// MARK: - Focused view
+
+/// One place for the three tools: a segmented switch over the matrix, the scale and the
+/// color-vision score, so the palette screen itself gains a single row.
+struct PaletteAccessibilitySheet: View {
+    @Bindable var model: PaletteDetailViewModel
+    let openPalette: @MainActor (UUID) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(PortfolioModel.self) private var portfolio
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Brand.Space.lg) {
+                    Picker("Tool", selection: $model.accessibilityTool) {
+                        Text("Contrast").tag(AccessibilityTool.contrast)
+                        Text("Scale").tag(AccessibilityTool.scale)
+                        Text("Color Vision").tag(AccessibilityTool.colorVision)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("accessibility.tool")
+
+                    VStack(alignment: .leading, spacing: Brand.Space.md) {
+                        tool
+                    }
+                    .padding(Brand.Space.lg)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(secondaryGroupedBackground, in: RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous))
+                }
+                .padding(Brand.Space.lg)
+                .frame(maxWidth: Brand.wideDetailMaxWidth)
+                .frame(maxWidth: .infinity)
+            }
+            .background(groupedBackground)
+            .navigationTitle(model.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        Haptics.selection()
+                        dismiss()
+                    }
+                }
+            }
+            .sharedSheet(item: $model.contrastPair) { pair in ContrastPairSheet(pair: pair) }
+        }
+        .presentationSizing(.page)
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .accessibilityIdentifier("paletteAccessibilitySheet")
+    }
+
+    @ContentBuilder
+    private var tool: some View {
+        switch model.accessibilityTool {
+        case .contrast:
+            ContrastMatrixCard(model: model)
+        case .scale:
+            LightnessScaleCard(model: model) {
+                model.addScaleAsPalette(open: { id in
+                    dismiss()
+                    openPalette(id)
+                })
+            }
+        case .colorVision:
+            ColorVisionCard(model: model)
+        }
+    }
+}
+
 // MARK: - Contrast matrix
 
 struct ContrastMatrixCard: View {

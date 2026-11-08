@@ -97,9 +97,7 @@ private struct PaletteDetailContent: View {
                     .padding(.top, Brand.Space.md)
                 VStack(spacing: Brand.Space.lg) {
                     colorsCard(for: palette)
-                    contrastMatrixCard
-                    lightnessScaleCard
-                    colorVisionCard
+                    accessibilityRow
                     notesCard
                     tagsCard
                     canvasCard(for: palette)
@@ -134,7 +132,9 @@ private struct PaletteDetailContent: View {
         .sharedSheet(isPresented: $model.isShowingCanvasPicker) {
             CanvasPickerSheet { model.link($0) }
         }
-        .sharedSheet(item: $model.contrastPair) { pair in ContrastPairSheet(pair: pair) }
+        .sharedSheet(isPresented: $model.isShowingAccessibility) {
+            PaletteAccessibilitySheet(model: model) { router.open(.palette($0)) }
+        }
         .sharedSheet(item: $movingColor) { color in
             PaletteSelectionSheet(colors: [color])
         }
@@ -443,27 +443,42 @@ private struct PaletteDetailContent: View {
         )
     }
 
-    private var contrastMatrixCard: some View {
-        SectionCard(String(localized: "Contrast Matrix"), systemImage: "square.grid.3x3", tint: .opaliteBlue, isExpanded: expansion(.contrastMatrix)) {
-            ContrastMatrixCard(model: model)
-        }
-        .accessibilityIdentifier("paletteDetail.contrastMatrix")
-    }
-
-    private var lightnessScaleCard: some View {
-        SectionCard(String(localized: "Lightness Scale"), systemImage: "slider.horizontal.3", tint: .opalitePurple, isExpanded: expansion(.lightnessScale)) {
-            LightnessScaleCard(model: model) {
-                model.addScaleAsPalette(open: { router.open(.palette($0)) })
+    /// The single entry point to the accessibility tools.
+    private var accessibilityRow: some View {
+        Button {
+            Haptics.selection()
+            model.isShowingAccessibility = true
+        } label: {
+            HStack(spacing: Brand.Space.md) {
+                Image(systemName: "accessibility")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.opaliteBlue.inkVariant)
+                    .frame(width: 22)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Accessibility")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text("Contrast matrix, lightness scale and color vision")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
             }
+            .padding(.horizontal, Brand.Space.lg)
+            .padding(.vertical, Brand.Space.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(secondaryGroupedBackground, in: RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous))
+            .contentShape(Rectangle())
         }
-        .accessibilityIdentifier("paletteDetail.lightnessScale")
-    }
-
-    private var colorVisionCard: some View {
-        SectionCard(String(localized: "Color Vision"), systemImage: "eye", tint: .opaliteTan, isExpanded: expansion(.colorVision)) {
-            ColorVisionCard(model: model)
-        }
-        .accessibilityIdentifier("paletteDetail.colorVision")
+        .buttonStyle(.plain)
+        .hoverLift()
+        .accessibilityHint(Text("Opens contrast, lightness scale and color-vision tools for this palette"))
+        .accessibilityIdentifier("paletteDetail.accessibility")
     }
 
     private var notesCard: some View {

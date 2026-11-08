@@ -6927,6 +6927,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Contrast matrix, lightness scale and color vision" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matriz de contraste, escala de luminosidad y visión del color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matrice de contraste, échelle de luminosité et vision des couleurs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト表、明度スケール、色覚"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Copied %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17827,6 +17851,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Opens contrast, lightness scale and color-vision tools for this palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre las herramientas de contraste, escala de luminosidad y visión del color de esta paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre les outils de contraste, d'échelle de luminosité et de vision des couleurs pour cette palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパレットのコントラスト、明度スケール、色覚ツールを開きます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Opens palette details" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23035,6 +23083,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Scale" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escala"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échelle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スケール"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Scale hex code" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27520,6 +27592,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文字には低すぎます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Tool" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herramienta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ツール"
           }
         }
       },
