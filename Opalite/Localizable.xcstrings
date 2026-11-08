@@ -20467,6 +20467,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Preview Background" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo de la vista previa"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrière-plan de l'aperçu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビューの背景"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Preview background" : {
       "extractionState" : "manual",
       "localizations" : {

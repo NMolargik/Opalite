@@ -7,3 +7,5 @@ Palettes: 3 colors (Sunrise), 5 (Confusable), 13 (Grayscale). `before-*` are the
 - While renaming, the inline name field still appears above the board (with trailing space reserved for the button).
 - The navigation title now has a title menu (`toolbarTitleMenu`, chevron next to the name) with "Rename…", the same flow as More > Rename….
 - Not run: tapping the title menu (simctl has no tap), Mac Catalyst (build only). No new strings.
+
+- `after-iphone-5-menu-background.png`: final version: preview background moved into More, no corner button (Nov 8).

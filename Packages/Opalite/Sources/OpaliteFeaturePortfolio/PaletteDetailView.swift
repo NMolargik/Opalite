@@ -226,13 +226,12 @@ private struct PaletteDetailContent: View {
         let onDark = !background.prefersDarkText
         return VStack(alignment: .leading, spacing: Brand.Space.md) {
             // The name lives in the nav title; the field only appears while renaming
-            // (title menu or More > Rename…). The background button floats over the corner.
+            // (title menu or More > Rename…). The preview background lives in the More menu.
             if model.isEditingName {
                 HStack(alignment: .center, spacing: Brand.Space.sm) {
                     nameField(onDark: onDark)
                     Spacer(minLength: Brand.Space.sm)
                 }
-                .padding(.trailing, boardBackgroundButtonSize)
             }
 
             if members.isEmpty {
@@ -263,8 +262,6 @@ private struct PaletteDetailContent: View {
                 }
                 addTile(onDark: onDark)
             }
-            // Keeps the first row's name badges clear of the floating button.
-            .padding(.top, model.isEditingName ? 0 : boardBackgroundButtonClearance)
         }
         .onGeometryChange(for: LayoutProbe.self) { LayoutProbe($0) } action: { board = $0 }
         .padding(Brand.Space.lg)
@@ -273,10 +270,6 @@ private struct PaletteDetailContent: View {
                 .fill(background.rgba.color)
         )
         .overlay(RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous).strokeBorder(.white.opacity(0.25)))
-        .overlay(alignment: .topTrailing) {
-            backgroundMenu(onDark: onDark)
-                .padding(Brand.Space.xs)
-        }
         .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
         .animation(reduceMotion ? nil : .snappy, value: background)
         .accessibilityElement(children: .contain)
@@ -284,9 +277,6 @@ private struct PaletteDetailContent: View {
         .accessibilityIdentifier("paletteDetail.board")
     }
 
-    private let boardBackgroundButtonSize: CGFloat = 30
-    /// Extra top inset so a long name badge in the trailing swatch never sits under the button.
-    private let boardBackgroundButtonClearance: CGFloat = 10
 
     private var boardSwatchSide: CGFloat { horizontalSizeClass == .compact ? 96 : 120 }
 
@@ -337,7 +327,10 @@ private struct PaletteDetailContent: View {
         }
     }
 
-    private func backgroundMenu(onDark: Bool) -> some View {
+    /// The preview background, a rarely changed setting, as a More-menu submenu so the board
+    /// stays pure color (a floating corner button collided with the last swatch and was too
+    /// small to tap comfortably).
+    private var backgroundSubmenu: some View {
         Menu {
             Picker("Background", selection: Binding(get: { background }, set: { model.setBackground($0) })) {
                 ForEach(PreviewBackground.allCases) { option in
@@ -345,17 +338,9 @@ private struct PaletteDetailContent: View {
                 }
             }
         } label: {
-            Image(systemName: "paintbrush.pointed")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(onDark ? .white : .black)
-                .frame(width: boardBackgroundButtonSize, height: boardBackgroundButtonSize)
-                .background(Circle().fill((onDark ? Color.black : Color.white).opacity(0.28)))
-                .contentShape(Circle())
+            Label("Preview Background", systemImage: "paintbrush.pointed")
         }
-        .buttonStyle(.plain)
-        .hoverLift()
-        .accessibilityLabel(Text("Preview background"))
-        .accessibilityValue(Text(background.displayName))
+        .disabled(layout == .list)
     }
 
     // MARK: - Add tile and groups
@@ -749,6 +734,7 @@ private struct PaletteDetailContent: View {
                     Label("Board", systemImage: "square.grid.2x2").tag(PaletteColorsLayout.board)
                     Label("List", systemImage: "list.bullet").tag(PaletteColorsLayout.list)
                 }
+                backgroundSubmenu
                 Divider()
                 Button {
                     Haptics.selection()
