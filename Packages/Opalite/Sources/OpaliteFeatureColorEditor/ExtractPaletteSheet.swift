@@ -222,7 +222,7 @@ public struct ExtractPaletteSheet: View {
             .disabled(urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || phase == .working)
             .accessibilityIdentifier("extractPalette.readSite")
 
-            Text("Opalite reads only this page and its stylesheets from the same site, then looks at how the page renders. Nothing is sent anywhere else.")
+            Text("Opalite fetches only this page and its stylesheets, then renders it to sample its colors. Like a browser, rendering also loads the page's own images and fonts. Your palettes never leave your device.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

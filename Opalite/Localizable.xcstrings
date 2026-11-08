@@ -15619,25 +15619,25 @@
       },
       "shouldGenerateSymbol" : false
     },
-    "Opalite reads only this page and its stylesheets from the same site, then looks at how the page renders. Nothing is sent anywhere else." : {
+    "Opalite fetches only this page and its stylesheets, then renders it to sample its colors. Like a browser, rendering also loads the page's own images and fonts. Your palettes never leave your device." : {
       "extractionState" : "manual",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opalite solo lee esta página y sus hojas de estilo del mismo sitio, y luego observa cómo se muestra la página. No se envía nada a ningún otro lugar."
+            "value" : "Opalite solo descarga esta página y sus hojas de estilo, y luego la muestra para tomar sus colores. Como en un navegador, también se cargan las imágenes y fuentes de la página. Tus paletas nunca salen de tu dispositivo."
           }
         },
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opalite lit seulement cette page et ses feuilles de style du même site, puis observe son rendu. Rien n'est envoyé ailleurs."
+            "value" : "Opalite télécharge seulement cette page et ses feuilles de style, puis l'affiche pour en extraire les couleurs. Comme dans un navigateur, ses images et polices se chargent aussi. Vos palettes ne quittent jamais votre appareil."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opalite はこのページと同じサイトのスタイルシートだけを読み込み、ページの表示結果を確認します。他の場所には何も送信されません。"
+            "value" : "Opalite はこのページとスタイルシートだけを取得し、ページを表示して色を抽出します。ブラウザと同様に、ページの画像やフォントも読み込まれます。あなたのパレットがデバイスの外に送信されることはありません。"
           }
         }
       },
