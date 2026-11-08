@@ -88,6 +88,7 @@ private struct PaletteDetailContent: View {
 
     private func content(for palette: OpalitePalette) -> some View {
         ScrollView {
+            ScrollViewReader { proxy in
             VStack(spacing: 0) {
                 board(for: palette)
                     .padding(.horizontal, Brand.Space.lg)
@@ -97,6 +98,7 @@ private struct PaletteDetailContent: View {
                     .padding(.top, Brand.Space.md)
                 VStack(spacing: Brand.Space.lg) {
                     colorsCard(for: palette)
+                    accessibilityRow
                     notesCard
                     tagsCard
                     canvasCard(for: palette)
@@ -104,6 +106,15 @@ private struct PaletteDetailContent: View {
                 .padding(.horizontal, Brand.Space.lg)
                 .padding(.top, Brand.Space.lg)
                 .padding(.bottom, Brand.Space.xxl)
+            }
+            #if DEBUG
+            .task {
+                // Simulator verification: `--scroll-to-accessibility` brings the Accessibility row into view.
+                guard CommandLine.arguments.contains("--scroll-to-accessibility") else { return }
+                try? await Task.sleep(for: .seconds(1))
+                withAnimation { proxy.scrollTo("paletteDetail.accessibilityRow", anchor: .center) }
+            }
+            #endif
             }
             .frame(maxWidth: Brand.detailMaxWidth)
             .frame(maxWidth: .infinity)
@@ -130,6 +141,9 @@ private struct PaletteDetailContent: View {
         .sharedSheet(isPresented: $model.isShowingPublish) { PublishPaletteSheet(palette: palette) }
         .sharedSheet(isPresented: $model.isShowingCanvasPicker) {
             CanvasPickerSheet { model.link($0) }
+        }
+        .sharedSheet(isPresented: $model.isShowingAccessibility) {
+            PaletteAccessibilitySheet(model: model) { router.open(.palette($0)) }
         }
         .sharedSheet(item: $movingColor) { color in
             PaletteSelectionSheet(colors: [color])
@@ -437,6 +451,45 @@ private struct PaletteDetailContent: View {
             onRemoveFromPalette: { withAnimation(reduceMotion ? nil : .snappy) { model.remove(color) } },
             onDelete: { colorToDelete = color }
         )
+    }
+
+    /// The single entry point to the accessibility tools.
+    private var accessibilityRow: some View {
+        Button {
+            Haptics.selection()
+            model.isShowingAccessibility = true
+        } label: {
+            HStack(spacing: Brand.Space.md) {
+                Image(systemName: "accessibility")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.opaliteBlue.inkVariant)
+                    .frame(width: 22)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Accessibility")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text("Contrast matrix, lightness scale and color vision")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, Brand.Space.lg)
+            .padding(.vertical, Brand.Space.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(secondaryGroupedBackground, in: RoundedRectangle(cornerRadius: Brand.Radius.card, style: .continuous))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .hoverLift()
+        .accessibilityHint(Text("Opens contrast, lightness scale and color-vision tools for this palette"))
+        .accessibilityIdentifier("paletteDetail.accessibility")
+        .id("paletteDetail.accessibilityRow")
     }
 
     private var notesCard: some View {

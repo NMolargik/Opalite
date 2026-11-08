@@ -195,6 +195,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ Scale" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escala de %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échelle %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のスケール"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ ago" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -214,6 +238,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@前"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@ and %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ y %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ et %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ と %@"
           }
         }
       },
@@ -541,6 +589,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ on %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sobre %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sur %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ の上の %@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ reported" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -781,6 +853,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@. %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. %@."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@。%@。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@. Distance %@ after simulation, %@ in normal vision." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Distancia %@ tras la simulación, %@ con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Distance de %@ après simulation, %@ en vision normale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@。シミュレーション後の距離は %@、通常の色覚では %@ です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@: %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -925,6 +1045,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%lld of %lld pairs pass AA for normal text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld de %lld pares cumplen AA para texto normal"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld paires sur %lld respectent AA pour le texte normal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld 組中 %1$lld 組が通常テキストの AA を満たしています"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%lld of %lld selected" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -949,6 +1093,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%lld of %lld text and background combinations reach Lc 60" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld de %lld combinaciones de texto y fondo alcanzan Lc 60"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld combinaisons texte et arrière-plan sur %lld atteignent Lc 60"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld 通りの文字色と背景色の組み合わせのうち、%1$lld 通りが Lc 60 に達しています"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%lld pairs are already close in normal vision and are not scored." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pares ya son parecidos con visión normal y no se puntúan."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld paires sont déjà proches en vision normale et ne sont pas notées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 組は通常の色覚でもすでに近い色のため、採点していません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%lld palettes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -968,6 +1160,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld個のパレット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%lld problem pairs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pares problemáticos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld paires problématiques"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "問題のある組 %lld"
           }
         }
       },
@@ -1064,6 +1280,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld°"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "+ %lld more pairs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ %lld pares más"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ %lld paires de plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほか %lld 組"
           }
         }
       },
@@ -1208,6 +1448,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1個のパレット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "1 problem pair" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 par problemático"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paire problématique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "問題のある組 1"
           }
         }
       },
@@ -1765,6 +2029,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "APCA" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APCA"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APCA"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APCA"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "APCA (supplemental)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2197,6 +2485,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Add a color to build a scale from it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade un color para crear una escala a partir de él."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une couleur pour en créer une échelle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色を追加すると、その色からスケールを作成できます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Add a color, or drag swatches here from your Portfolio." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2269,6 +2581,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Add as Palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir como paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter comme palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パレットとして追加"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Add at least one color before publishing." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2288,6 +2624,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "公開する前に、カラーを1色以上追加してください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add at least two colors to compare every pair." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade al menos dos colores para comparar cada par."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez au moins deux couleurs pour comparer chaque paire."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての組み合わせを比較するには、色を2つ以上追加してください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add at least two colors to see how well they hold apart for people with color-vision deficiency." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade al menos dos colores para ver cuánto se distinguen entre sí para personas con deficiencia de visión del color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez au moins deux couleurs pour voir dans quelle mesure elles restent distinctes pour les personnes atteintes d'une déficience de la vision des couleurs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色覚特性のある方にどれだけ見分けられるかを確認するには、色を2つ以上追加してください。"
           }
         }
       },
@@ -2965,6 +3349,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "An 11-step scale from 50 to 950 with the same hue and chroma as the color you start from and evenly spaced perceived lightness (OKLCH)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una escala de 11 pasos, de 50 a 950, con el mismo tono y croma que el color de partida y una luminosidad percibida repartida de forma uniforme (OKLCH)."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une échelle de 11 niveaux, de 50 à 950, avec la même teinte et la même chroma que la couleur de départ et une luminosité perçue répartie uniformément (OKLCH)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50 から 950 までの 11 段階のスケールです。元の色と同じ色相と彩度を保ち、知覚上の明度を均等に配分します (OKLCH)。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Analogous" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3421,6 +3829,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "As designed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como se diseñó"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tel que conçu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デザイン通り"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "As seen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como se ve"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tel que perçu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見え方"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Asks the App Store for a rating" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3872,6 +4328,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "青"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuerpo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本文"
           }
         }
       },
@@ -5026,6 +5506,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択した画像"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Chroma reduced to fit sRGB." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Croma reducido para ajustarse a sRGB."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chroma réduite pour tenir dans sRGB."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sRGB に収めるため彩度を下げています。"
           }
         }
       },
@@ -6423,6 +6927,78 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Contrast %@. Normal text %@. Large text %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraste %@. Texto normal %@. Texto grande %@."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraste %@. Texte normal %@. Grand texte %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト %@。通常テキスト %@。大きいテキスト %@。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Contrast Matrix" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matriz de contraste"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matrice de contraste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト表"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Contrast matrix, lightness scale and color vision" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matriz de contraste, escala de luminosidad y visión del color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matrice de contraste, échelle de luminosité et vision des couleurs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コントラスト表、明度スケール、色覚"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Copied %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6754,6 +7330,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "RGBをコピー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Copy hex" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar hex"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'hex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16進数をコピー"
           }
         }
       },
@@ -7354,6 +7954,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "作成日"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Created %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se creó %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ créée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ を作成しました"
           }
         }
       },
@@ -9231,6 +9855,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Each pair is measured in OKLab after simulating the deficiency. Colors closer than %@ are hard to tell apart. The score is the share of pairs that are clearly different in normal vision and stay that way." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada par se mide en OKLab tras simular la deficiencia. Los colores más cercanos que %@ son difíciles de distinguir. La puntuación es la proporción de pares que son claramente distintos con visión normal y lo siguen siendo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque paire est mesurée en OKLab après simulation de la déficience. Les couleurs plus proches que %@ sont difficiles à distinguer. Le score est la part des paires nettement différentes en vision normale qui le restent."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各組はその色覚をシミュレートしたあと OKLab で測定します。差が %@ より小さい色は見分けにくいと判断します。スコアは、通常の色覚ではっきり違って見える組のうち、そのまま見分けられる組の割合です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Edit" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9658,6 +10306,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りのカラーをすべて、取り込んで、整理して、すぐに使える状態に。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Every pair stays easy to tell apart." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los pares se siguen distinguiendo fácilmente."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les paires restent faciles à distinguer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての組み合わせが見分けやすいままです。"
           }
         }
       },
@@ -10474,6 +11146,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料で5つのパレット、Onyxなら無制限。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Fluent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fluida"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fluide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "流暢な読み"
           }
         }
       },
@@ -11343,6 +12039,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Hard to tell apart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difíciles de distinguir"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficiles à distinguer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見分けにくい"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Hard to tell apart. Distance %@ after simulation, %@ in normal vision." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difíciles de distinguir. Distancia %@ tras la simulación, %@ con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficiles à distinguer. Distance %@ après simulation, %@ en vision normale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見分けにくい組です。シミュレーション後の距離は %@、通常の色覚では %@ です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Harmonies" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11386,6 +12130,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ハーモニー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Headlines" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titulares"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見出し"
           }
         }
       },
@@ -13023,6 +13791,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Lightness Scale" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escala de luminosidad"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échelle de luminosité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "明度スケール"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Like #FF5733 or 3380CC" : {
       "comment" : "Label for the hex code parameter in the Create Color intent.",
       "extractionState" : "manual",
@@ -13596,6 +14388,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マーカー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Measure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medida"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesure"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指標"
           }
         }
       },
@@ -14292,6 +15108,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ネイビー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Nearly identical" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casi idénticos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presque identiques"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほぼ同じ"
           }
         }
       },
@@ -15137,6 +15977,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "No score" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin puntuación"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de score"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアなし"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "No simulation active" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15588,6 +16452,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復元するものはありません。このバックアップの内容はすべてライブラリにあります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Nothing to score yet: every pair is already close in normal vision." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay nada que puntuar: todos los pares ya son parecidos con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à noter pour l'instant : toutes les paires sont déjà proches en vision normale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ採点できません。すべての組が通常の色覚でもすでに近い色です。"
           }
         }
       },
@@ -17059,6 +17947,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Opens contrast, lightness scale and color-vision tools for this palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre las herramientas de contraste, escala de luminosidad y visión del color de esta paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre les outils de contraste, d'échelle de luminosité et de vision des couleurs pour cette palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパレットのコントラスト、明度スケール、色覚ツールを開きます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Opens palette details" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17198,6 +18110,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opaliteでカラーを開きます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opens the contrast checker for this pair" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el comprobador de contraste para este par"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre le vérificateur de contraste pour cette paire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この組のコントラストチェッカーを開きます"
           }
         }
       },
@@ -17390,6 +18326,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オプション"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Or start from a hex code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O parte de un código hex"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ou partez d'un code hex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "または16進コードから開始"
           }
         }
       },
@@ -17678,6 +18638,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ペアリング済み"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Pairs closer than %@ in OKLab after simulation are hard to tell apart. Only pairs that differ in normal vision are scored." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los pares a menos de %@ en OKLab tras la simulación son difíciles de distinguir. Solo se puntúan los pares que se distinguen con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paires distantes de moins de %@ en OKLab après simulation sont difficiles à distinguer. Seules les paires qui diffèrent en vision normale sont notées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シミュレーション後の OKLab での差が %@ 未満の組は見分けにくいと判断します。採点するのは、通常の色覚で違いが分かる組だけです。"
           }
         }
       },
@@ -21211,6 +22195,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Rows are the text color and columns the background. APCA depends on which color is the text. Tap a pair to open the contrast checker." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las filas son el color del texto y las columnas el fondo. APCA depende de cuál sea el color del texto. Toca un par para abrir el comprobador de contraste."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les lignes sont la couleur du texte et les colonnes l'arrière-plan. L'APCA dépend de la couleur qui sert de texte. Touchez une paire pour ouvrir le vérificateur de contraste."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "行は文字色、列は背景色です。APCA はどちらの色を文字にするかで値が変わります。組をタップするとコントラストチェッカーが開きます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Rows are the text color and columns the background. WCAG ratios are the same both ways. Tap a pair to open the contrast checker." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las filas son el color del texto y las columnas el fondo. Los ratios WCAG son iguales en ambos sentidos. Toca un par para abrir el comprobador de contraste."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les lignes sont la couleur du texte et les colonnes l'arrière-plan. Les ratios WCAG sont identiques dans les deux sens. Touchez une paire pour ouvrir le vérificateur de contraste."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "行は文字色、列は背景色です。WCAG の比率はどちらの向きでも同じです。組をタップするとコントラストチェッカーが開きます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "S" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21254,6 +22286,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スタイルシートにそのまま読み込める SCSS 変数です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Same hue and chroma as your color, with evenly spaced lightness (OKLCH). The dot marks the closest step." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo tono y croma que tu color, con luminosidad repartida de forma uniforme (OKLCH). El punto marca el paso más cercano."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même teinte et même chroma que votre couleur, avec une luminosité répartie uniformément (OKLCH). Le point indique le niveau le plus proche."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたの色と同じ色相と彩度で、明度を均等に配分します (OKLCH)。点は最も近いステップを示します。"
           }
         }
       },
@@ -22099,6 +23155,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Saves these 11 colors as a new palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda estos 11 colores como una paleta nueva"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre ces 11 couleurs comme nouvelle palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この11色を新しいパレットとして保存します"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Saving from the Community requires Onyx" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -22142,6 +23222,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存中…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Scale" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escala"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échelle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スケール"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Scale hex code" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código hex de la escala"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code hex de l'échelle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スケールの16進コード"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Score %lld out of 100, %lld problem pairs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puntuación %lld de 100, %lld pares problemáticos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score de %lld sur 100, %lld paires problématiques"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア %lld/100、問題のある組 %lld"
           }
         }
       },
@@ -23083,6 +24235,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Showing the first %lld of %lld colors." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se muestran los primeros %lld de %lld colores."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichage des %lld premières couleurs sur %lld."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld 色のうち最初の %1$lld 色を表示しています。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Shown on colors and palettes you publish to the Community. Leave it blank to stay anonymous." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23803,6 +24979,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Spot only" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo puntual"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponctuel seulement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分的な用途のみ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Square" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23923,6 +25123,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Start from" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir de"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir de"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始する色"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Starts from this color" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23966,6 +25190,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "状態"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Step %lld, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %lld, %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niveau %lld, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ステップ %lld、%@"
           }
         }
       },
@@ -25581,6 +26829,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "The dot marks the step closest in lightness to your color." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El punto marca el paso más cercano en luminosidad a tu color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le point indique le niveau dont la luminosité est la plus proche de votre couleur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点は、あなたの色に明度が最も近いステップを示します。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "The drawing and its placed images are removed from every device. This can't be undone." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26421,6 +27693,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Too low" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiado bajo"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop faible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低すぎる"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Too low for text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26440,6 +27736,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文字には低すぎます"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Tool" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herramienta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ツール"
           }
         }
       },
@@ -27693,6 +29013,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Very hard to tell apart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muy difíciles de distinguir"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Très difficiles à distinguer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非常に見分けにくい"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "View Publisher" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27760,6 +29104,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "鮮やか"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "WCAG" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WCAG"
           }
         }
       },
@@ -28144,6 +29512,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "白"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Wide gamut: Display P3 holds more chroma than the sRGB color above, which is the one saved." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gama amplia: Display P3 admite más croma que el color sRGB de arriba, que es el que se guarda."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gamut étendu : Display P3 contient plus de chroma que la couleur sRGB ci-dessus, qui est celle enregistrée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "広色域: Display P3 では上の sRGB の色より高い彩度を表現できます。保存されるのは sRGB の色です。"
           }
         }
       },

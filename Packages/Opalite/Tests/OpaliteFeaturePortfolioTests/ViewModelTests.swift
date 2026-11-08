@@ -228,6 +228,72 @@ struct PaletteDetailViewModelTests {
         #expect(Set(env.portfolio.colors(in: copy).map(\.hexString)) == Set(env.portfolio.colors(in: palette).map(\.hexString)))
     }
 
+    // MARK: Accessibility tools
+
+    @Test func matrixCoversMembersAndOpensPairs() {
+        let (_, model, _) = makeModel()
+        let members = model.matrixMembers
+        #expect(members.count == min(model.memberCount, PaletteDetailViewModel.maxMatrixColors))
+        #expect(model.contrastMatrix.count == members.count)
+        guard members.count >= 2 else { return }
+        model.openContrast(row: 0, column: 1)
+        #expect(model.contrastPair == ContrastPair(textID: members[0].id, backgroundID: members[1].id))
+        model.contrastPair = nil
+        model.openContrast(row: 0, column: 0)   // diagonal: nothing to check
+        model.openContrast(row: 0, column: 99)
+        #expect(model.contrastPair == nil)
+    }
+
+    @Test func scaleStartsFromFirstMemberAndFollowsSelection() {
+        let (_, model, _) = makeModel()
+        let members = model.members
+        #expect(model.scaleBaseColor?.id == members.first?.id)
+        #expect(model.scaleSteps.count == 11)
+        model.selectScaleBase(members[1])
+        #expect(model.scaleBase == members[1].rgba)
+        #expect(model.applyScaleHex() == false)
+        model.scaleHexDraft = "#3B82F6"
+        #expect(model.applyScaleHex())
+        #expect(model.scaleBase == RGBA(hex: "#3B82F6"))
+        #expect(model.scaleHexDraft.isEmpty)
+        model.selectScaleBase(members[0])
+        #expect(model.scaleCustom == nil)
+    }
+
+    @Test func addScaleAsPaletteCreatesElevenNamedColorsInOrder() throws {
+        let (env, model, _) = makeModel()
+        let before = env.portfolio.palettes.count
+        model.scaleHexDraft = "#3B82F6"
+        _ = model.applyScaleHex()
+        let created = try #require(model.addScaleAsPalette())
+        #expect(env.portfolio.palettes.count == before + 1)
+        #expect(created.name.hasSuffix("Scale"))
+        let colors = env.portfolio.colors(in: created)
+        #expect(colors.count == 11)
+        #expect(Set(colors.compactMap(\.name)) == Set(LightnessScale.stops.map { "#3B82F6 \($0)" }))
+        #expect(colors.map(\.hexString) == model.scaleSteps.map(\.srgb.hexString))
+    }
+
+    @Test func addScaleAsPaletteRespectsTheFreeLimit() {
+        let env = PreviewEnvironment(hasOnyx: false)
+        var guardCount = 0
+        while env.portfolio.palettes.count < OnyxGate.freePaletteLimit, guardCount < 10 {
+            _ = env.portfolio.createPalette(name: "P\(guardCount)")
+            guardCount += 1
+        }
+        let palette = env.portfolio.activePalettes.first!
+        let model = PaletteDetailViewModel(paletteID: palette.id, portfolio: env.portfolio, canvases: env.canvases, toasts: env.toastManager)
+        let before = env.portfolio.palettes.count
+        #expect(model.addScaleAsPalette() == nil)
+        #expect(env.portfolio.palettes.count == before)
+    }
+
+    @Test func colorVisionAnalysisCoversAllMembers() {
+        let (_, model, _) = makeModel()
+        #expect(model.colorVision.colors.count == model.memberCount)
+        #expect(model.colorVision.reports.count == 3)
+    }
+
     @Test func archiveAndDelete() {
         let (env, model, palette) = makeModel()
         model.archive()
