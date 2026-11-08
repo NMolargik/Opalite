@@ -805,6 +805,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%lld of %lld selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld de %lld seleccionados"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld sur %lld sélectionnées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld / %lld 件を選択中"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%lld palettes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2144,6 +2168,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグを追加"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Add to Existing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a una existente"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à une palette existante"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既存のパレットに追加"
           }
         }
       },
@@ -4450,6 +4498,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルを保存するフォルダを選択します"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Chosen image" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen elegida"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image choisie"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択した画像"
           }
         }
       },
@@ -7695,6 +7767,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destino"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Details" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8146,6 +8242,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Double tap to include or leave out this color" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca dos veces para incluir o excluir este color"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez deux fois pour inclure ou exclure cette couleur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダブルタップでこの色を含めるか除外するかを切り替えます"
           }
         }
       },
@@ -9327,6 +9447,126 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Extract Colors" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraer colores"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraire les couleurs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色を抽出"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Extract Palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraer paleta"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraire une palette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パレットを抽出"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Extract Palette from Photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraer paleta de la foto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraire une palette de la photo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真からパレットを抽出"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Extract Palette…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraer paleta…"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extraire une palette…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パレットを抽出…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Extracted Palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paleta extraída"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette extraite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "抽出したパレット"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Eyedropper" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9466,6 +9706,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイル%@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Files" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル"
           }
         }
       },
@@ -9754,6 +10018,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Free accounts can keep %lld palettes. Add to an existing palette, or get Onyx for more." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las cuentas gratuitas pueden tener %lld paletas. Añade a una paleta existente u obtén Onyx para tener más."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes gratuits peuvent garder %lld palettes. Ajoutez à une palette existante ou obtenez Onyx pour en avoir plus."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料版で保存できるパレットは %lld 個までです。既存のパレットに追加するか、Onyx で上限を解除してください。"
           }
         }
       },
@@ -13745,6 +14033,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "No colors could be found in that image." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron colores en esa imagen."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune couleur n'a été trouvée dans cette image."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この画像から色を見つけられませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "No colors could be found on that page." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron colores en esa página."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune couleur n'a été trouvée sur cette page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このページから色を見つけられませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "No colors in this palette yet" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14364,6 +14700,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示するものがありません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Number of colors: %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número de colores: %lld"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de couleurs : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色の数: %lld"
           }
         }
       },
@@ -15139,6 +15499,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Opalite couldn't reach that website. Check the address and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite no pudo acceder a ese sitio web. Revisa la dirección e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite n'a pas pu joindre ce site Web. Vérifiez l'adresse et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite はそのウェブサイトに接続できませんでした。アドレスを確認してもう一度お試しください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opalite couldn't read that website." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite no pudo leer ese sitio web."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite n'a pas pu lire ce site Web."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite はそのウェブサイトを読み込めませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Opalite for Apple TV shows the colors and palettes you've made on your other devices, at the size they deserve." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15206,6 +15614,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opaliteの宝石"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Opalite reads only this page and its stylesheets from the same site, then looks at how the page renders. Nothing is sent anywhere else." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite solo lee esta página y sus hojas de estilo del mismo sitio, y luego observa cómo se muestra la página. No se envía nada a ningún otro lugar."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite lit seulement cette page et ses feuilles de style du même site, puis observe son rendu. Rien n'est envoyé ailleurs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opalite はこのページと同じサイトのスタイルシートだけを読み込み、ページの表示結果を確認します。他の場所には何も送信されません。"
           }
         }
       },
@@ -16675,6 +17107,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Photo Library…" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -16694,6 +17150,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真ライブラリ…"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Photo Palette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paleta de foto"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette de photo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真のパレット"
           }
         }
       },
@@ -16742,6 +17222,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スウォッチを選んでキャンバスのインクカラーを設定します。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Pick an image, or drop one here, and Opalite builds a palette from its colors." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una imagen, o suelta una aquí, y Opalite crea una paleta con sus colores."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une image, ou déposez-en une ici, et Opalite crée une palette à partir de ses couleurs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を選ぶか、ここにドロップすると、Opalite がその色からパレットを作成します。"
           }
         }
       },
@@ -18278,6 +18782,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続可能"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Reading the page" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leyendo la página"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture de la page"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ページを読み込み中"
           }
         }
       },
@@ -20011,6 +20539,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Save To" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar en"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer dans"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Save a few colors and palettes in your Portfolio, then find them here by name, hex code, notes, tag, or color family." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20246,6 +20798,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@をポートフォリオに保存しました。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Saved %lld colors to %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guardaron %lld colores en %@"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld couleurs enregistrées dans %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 色を %@ に保存しました"
           }
         }
       },
@@ -21859,6 +22435,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Source" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Origen"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソース"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Spam" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23299,6 +23899,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "That address didn't return a web page." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esa dirección no devolvió una página web."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette adresse n'a pas renvoyé de page Web."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "そのアドレスはウェブページを返しませんでした。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "That color is already in your Portfolio" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23349,6 +23973,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "That doesn't look like a website address. Try something like example.com." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eso no parece una dirección web. Prueba con algo como example.com."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas une adresse de site Web. Essayez quelque chose comme example.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトのアドレスではないようです。example.com のように入力してください。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "That file isn't an image" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -23368,6 +24016,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "そのファイルは画像ではありません"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "That image couldn't be read." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer esa imagen."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette image n'a pas pu être lue."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その画像を読み込めませんでした。"
           }
         }
       },
@@ -23680,6 +24352,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "補色の両隣の2色。緊張感を抑えたコントラスト。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The website returned an error (%@)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web devolvió un error (%@)."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site Web a renvoyé une erreur (%@)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトがエラーを返しました (%@)。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "The website took too long to respond. Check the address and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web tardó demasiado en responder. Revisa la dirección e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site Web a mis trop de temps à répondre. Vérifiez l'adresse et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトの応答に時間がかかりすぎています。アドレスを確認してもう一度お試しください。"
           }
         }
       },
@@ -25749,6 +26469,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Website address" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del sitio web"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse du site Web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトのアドレス"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Welcome" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26128,6 +26872,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "あなた"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "You appear to be offline. Connect to the internet and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece que no tienes conexión. Conéctate a internet e inténtalo de nuevo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous semblez être hors ligne. Connectez-vous à Internet et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインのようです。インターネットに接続してもう一度お試しください。"
           }
         }
       },
@@ -26848,6 +27616,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@に編集"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "example.com" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
           }
         }
       },

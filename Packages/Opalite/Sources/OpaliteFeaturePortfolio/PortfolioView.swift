@@ -292,6 +292,14 @@ struct PortfolioScreen: View {
                 Label("Add by Hex…", systemImage: "number")
             }
 
+            Button {
+                Haptics.selection()
+                model.activeSheet = .extractPalette
+            } label: {
+                Label("Extract Palette…", systemImage: "wand.and.stars")
+            }
+            .accessibilityIdentifier("portfolio.extractPalette")
+
             #if (os(iOS) && !targetEnvironment(macCatalyst)) || os(visionOS)
             Button {
                 Haptics.selection()
@@ -360,6 +368,8 @@ private struct PortfolioPresentations: ViewModifier {
                 switch sheet {
                 case .quickAddHex:
                     QuickAddHexSheet { model.saveQuickAdd($0) }
+                case .extractPalette:
+                    ExtractPaletteSheet()
                 case .paletteOrder:
                     PaletteOrderSheet()
                 case .archivedPalettes:

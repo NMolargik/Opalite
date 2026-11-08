@@ -14,6 +14,7 @@ import OpaliteCore
 import OpaliteDesignSystem
 import OpaliteServices
 import UIKit
+import UniformTypeIdentifiers
 import os
 #if canImport(PhotosUI)
 import PhotosUI
@@ -235,12 +236,16 @@ struct SamplingImageView: View {
 struct ImageSourceBar: View {
     let onImage: (UIImage) -> Void
     var onScreenSample: ((RGBA) -> Void)? = nil
+    /// Mac only: also offer choosing an image file; the file's name is reported first.
+    var allowsFileImport = false
+    var onFileName: ((String) -> Void)? = nil
 
     #if canImport(PhotosUI)
     @State private var photoItem: PhotosPickerItem?
     #endif
     @State private var isShowingCamera = false
     @State private var isSampling = false
+    @State private var isImportingFile = false
 
     var body: some View {
         HStack(spacing: Brand.Space.sm) {
@@ -270,6 +275,16 @@ struct ImageSourceBar: View {
             #endif
 
             #if targetEnvironment(macCatalyst)
+            if allowsFileImport {
+                Button {
+                    Haptics.lightImpact()
+                    isImportingFile = true
+                } label: {
+                    Label("Files", systemImage: "folder")
+                }
+                .glassActionButton(tint: .opaliteBlue, prominent: false)
+                .accessibilityIdentifier("colorEditor.image.files")
+            }
             if let onScreenSample {
                 Button {
                     Haptics.lightImpact()
@@ -291,12 +306,29 @@ struct ImageSourceBar: View {
             Spacer(minLength: 0)
         }
         .controlSize(.regular)
+        .fileImporter(isPresented: $isImportingFile, allowedContentTypes: [.image]) { result in
+            switch result {
+            case .success(let url): loadFile(url)
+            case .failure(let error): Log.app.error("Image file import failed: \(error.localizedDescription)")
+            }
+        }
         #if os(iOS) && !targetEnvironment(macCatalyst)
         .fullScreenCover(isPresented: $isShowingCamera) {
             CameraCaptureView { image in onImage(image) }
                 .ignoresSafeArea()
         }
         #endif
+    }
+
+    private func loadFile(_ url: URL) {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url), let image = UIImage(data: data) else {
+            Log.app.error("Chosen file is not a decodable image")
+            return
+        }
+        onFileName?(url.deletingPathExtension().lastPathComponent)
+        onImage(image)
     }
 
     #if canImport(PhotosUI)
@@ -365,6 +397,8 @@ struct CameraCaptureView: UIViewControllerRepresentable {
 /// The dashed placeholder shown before an image is chosen; also the drop target hint.
 struct ImageDropPlaceholder: View {
     var isTargeted = false
+    /// The extract-palette sheet reuses the zone but describes a different next step.
+    var buildsPalette = false
 
     var body: some View {
         VStack(spacing: Brand.Space.md) {
@@ -375,7 +409,13 @@ struct ImageDropPlaceholder: View {
                 .symbolEffect(.bounce, value: isTargeted)
             Text("Choose a Photo")
                 .font(.headline)
-            Text("Pick from Photos, take a picture, or drop an image here. Then tap or drag on it to sample a color.")
+            Group {
+                if buildsPalette {
+                    Text("Pick an image, or drop one here, and Opalite builds a palette from its colors.")
+                } else {
+                    Text("Pick from Photos, take a picture, or drop an image here. Then tap or drag on it to sample a color.")
+                }
+            }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
