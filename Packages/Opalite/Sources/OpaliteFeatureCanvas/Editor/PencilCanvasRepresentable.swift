@@ -58,6 +58,7 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
         // Clicking any SwiftUI control in the window can move first responder away from the
         // canvas, after which PencilKit ignores pointer drags. Take it back on touch-down.
         view.addGestureRecognizer(FirstResponderReclaimingRecognizer())
+        Self.routePointerDragsToDrawing(view)
         #endif
         return view
     }
@@ -107,6 +108,24 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
+    #if targetEnvironment(macCatalyst)
+    /// A mouse click-drag reaches the canvas as a single touch. On iPad, `.anyInput` makes
+    /// PencilKit draw with one touch and leaves panning to two fingers, but on the Mac the
+    /// canvas's scroll pan still claimed the single-touch drag: the stroke never started and
+    /// the ink cursor froze until the button came up. Scrolling on the Mac comes from the
+    /// scroll wheel and trackpad scroll events, which do not use the pan's touch path, so the
+    /// pan stops accepting touches at all and the drawing recognizer takes every pointer drag.
+    static func routePointerDragsToDrawing(_ view: PKCanvasView) {
+        let pointerTypes: [NSNumber] = [
+            NSNumber(value: UITouch.TouchType.direct.rawValue),
+            NSNumber(value: UITouch.TouchType.indirectPointer.rawValue),
+            NSNumber(value: UITouch.TouchType.pencil.rawValue),
+        ]
+        view.panGestureRecognizer.allowedTouchTypes = []
+        view.drawingGestureRecognizer.allowedTouchTypes = pointerTypes
+    }
+    #endif
+
     // MARK: - Coordinator
 
     @MainActor
@@ -153,6 +172,9 @@ struct PencilCanvasRepresentable: UIViewRepresentable {
                 picker.addObserver(self)
                 toolPicker = picker
             }
+            #if targetEnvironment(macCatalyst)
+            PencilCanvasRepresentable.routePointerDragsToDrawing(canvasView)
+            #endif
             syncToolPickerVisibility()
             reportViewport(canvasView)
         }
