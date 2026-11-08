@@ -237,10 +237,12 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                 if let sharePreviewImage {
                     ShareLink(item: exported, preview: SharePreview(exported.filename, image: sharePreviewImage)) {
                         Label("Share", systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity)
                     }
                 } else {
                     ShareLink(item: exported, preview: SharePreview(exported.filename)) {
                         Label("Share", systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity)
                     }
                 }
             }
@@ -251,6 +253,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
         } else {
             Button {} label: {
                 Label("Share", systemImage: "square.and.arrow.up")
+                    .frame(maxWidth: .infinity)
             }
             .primaryActionButton()
             .disabled(true)
@@ -264,6 +267,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
             isSavingToFiles = true
         } label: {
             Label("Save to Files", systemImage: "folder")
+                .frame(maxWidth: .infinity)
         }
         .secondaryActionButton()
         .disabled(exported == nil)

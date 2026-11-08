@@ -99,8 +99,10 @@ public struct ReportItemSheet: View {
                                     .controlSize(.small)
                                     .tint(.white)
                             }
+                            .frame(maxWidth: .infinity)
                         } else {
                             Label("Submit Report", systemImage: "flag.fill")
+                            .frame(maxWidth: .infinity)
                         }
                     }
                     .primaryActionButton(tint: .red)

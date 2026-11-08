@@ -181,19 +181,25 @@ extension View {
         #endif
     }
 
-    /// The full-width primary call to action (onboarding, paywall, empty states).
+    /// The primary call to action. Placement is fixed here: capped at the readable width and
+    /// centered in its container, so a button in a leading-aligned card sits where one in a
+    /// centered card does. Width comes from the label: give it `.frame(maxWidth: .infinity)`
+    /// for an action (in cards, sheets and action bars, so every one spans the same width);
+    /// leave it unstretched only for the compact call to action inside an `EmptyStateView`.
     public func primaryActionButton(tint: Color = .opalitePurple) -> some View {
         glassActionButton(tint: tint, prominent: true)
             .controlSize(.large)
             .frame(maxWidth: Brand.readableWidth)
+            .frame(maxWidth: .infinity)
             .hoverHighlight()
     }
 
-    /// The full-width secondary call to action next to a primary one.
+    /// The secondary call to action. Same placement and width rules as `primaryActionButton`.
     public func secondaryActionButton(tint: Color = .opaliteBlue) -> some View {
         glassActionButton(tint: tint, prominent: false)
             .controlSize(.large)
             .frame(maxWidth: Brand.readableWidth)
+            .frame(maxWidth: .infinity)
             .hoverHighlight()
     }
 }

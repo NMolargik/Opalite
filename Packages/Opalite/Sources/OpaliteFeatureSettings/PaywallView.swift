@@ -142,8 +142,10 @@ public struct PaywallView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Button("Done") { dismiss() }
-                .primaryActionButton()
+            Button { dismiss() } label: {
+                Text("Done").frame(maxWidth: .infinity)
+            }
+            .primaryActionButton()
         }
         .padding(.top, Brand.Space.lg)
     }

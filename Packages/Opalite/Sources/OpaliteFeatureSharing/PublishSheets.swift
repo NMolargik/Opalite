@@ -346,8 +346,10 @@ private struct PublishActionBar: View {
                             .controlSize(.small)
                             .tint(.white)
                     }
+                    .frame(maxWidth: .infinity)
                 } else {
                     Label("Publish to Community", systemImage: "person.2.fill")
+                    .frame(maxWidth: .infinity)
                 }
             }
             .primaryActionButton(tint: .teal)

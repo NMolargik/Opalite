@@ -84,6 +84,7 @@ public struct ColorImportConfirmationSheet: View {
                         confirm()
                     } label: {
                         Label(summary.actionTitle, systemImage: summary.canImport ? "square.and.arrow.down" : "checkmark")
+                        .frame(maxWidth: .infinity)
                     }
                     .primaryActionButton()
                     .accessibilityHint(summary.canImport ? Text("Adds the color to your Portfolio") : Text("Closes without changes"))
@@ -187,6 +188,7 @@ public struct PaletteImportConfirmationSheet: View {
                         confirm()
                     } label: {
                         Label(summary.actionTitle, systemImage: summary.isUpdate ? "arrow.triangle.2.circlepath" : "square.and.arrow.down")
+                        .frame(maxWidth: .infinity)
                     }
                     .primaryActionButton()
                     .disabled(!summary.canImport)
