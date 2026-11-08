@@ -35,7 +35,7 @@ struct ExportServiceTests {
         let color = OpaliteColor(name: "Dusty Rose", red: 0.8, green: 0.5, blue: 0.55)
         let url = try ExportService.exportColor(color, format: format, imagePNG: Data([0x89]))
         #expect(url.pathExtension == format.fileExtension)
-        #expect(url.deletingPathExtension().lastPathComponent == "DustyRose")
+        #expect(url.lastPathComponent == "DustyRose" + format.filenameSuffix)
         let data = try read(url)
         #expect(!data.isEmpty)
         switch format {
@@ -46,6 +46,14 @@ struct ExportServiceTests {
         case .gpl: #expect(String(decoding: data, as: UTF8.self).hasPrefix("GIMP Palette"))
         case .css: #expect(String(decoding: data, as: UTF8.self).contains("--dusty-rose: rgb(204, 128, 140);"))
         case .swiftui: #expect(String(decoding: data, as: UTF8.self).contains("static let dustyRose"))
+        case .tailwind: #expect(String(decoding: data, as: UTF8.self).contains("--color-dusty-rose: oklch("))
+        case .dtcg: #expect(String(decoding: data, as: UTF8.self).contains("\"$type\": \"color\""))
+        case .xcassets: #expect([UInt8](data.prefix(2)) == [0x50, 0x4B])
+        case .android: #expect(String(decoding: data, as: UTF8.self).contains("<color name=\"dusty_rose\">#CC808C</color>"))
+        case .flutter: #expect(String(decoding: data, as: UTF8.self).contains("static const Color dustyRose = Color(0xFFCC808C);"))
+        case .scss: #expect(String(decoding: data, as: UTF8.self).contains("$dusty-rose: #CC808C;"))
+        case .json: #expect(String(decoding: data, as: UTF8.self).contains("\"key\": \"dusty-rose\""))
+        case .figma: #expect(String(decoding: data, as: UTF8.self).contains("\"type\": \"COLOR\""))
         }
     }
 
@@ -69,7 +77,7 @@ struct ExportServiceTests {
         }
         let url = try ExportService.exportPalette(palette, format: format, imagePNG: Data([0x89, 0x50]), userName: "Nick")
         #expect(url.pathExtension == format.fileExtension)
-        #expect(url.deletingPathExtension().lastPathComponent == "SummerSunset")
+        #expect(url.lastPathComponent == "SummerSunset" + format.filenameSuffix)
         let data = try read(url)
         #expect(!data.isEmpty)
         switch format {
@@ -93,6 +101,14 @@ struct ExportServiceTests {
             let text = String(decoding: data, as: UTF8.self)
             #expect(text.contains("static let summersunsetDusk = Color("))
             #expect(!text.contains("// Usage"))
+        case .tailwind: #expect(String(decoding: data, as: UTF8.self).contains("--color-summer-sunset-dusk: oklch("))
+        case .dtcg: #expect(String(decoding: data, as: UTF8.self).contains("\"summer-sunset\""))
+        case .xcassets: #expect([UInt8](data.prefix(2)) == [0x50, 0x4B])
+        case .android: #expect(String(decoding: data, as: UTF8.self).contains("<color name=\"summer_sunset_dusk\">"))
+        case .flutter: #expect(String(decoding: data, as: UTF8.self).contains("abstract final class SummerSunsetColors"))
+        case .scss: #expect(String(decoding: data, as: UTF8.self).contains("$summer-sunset-dusk: "))
+        case .json: #expect(String(decoding: data, as: UTF8.self).contains("\"name\": \"Summer Sunset!\""))
+        case .figma: #expect(String(decoding: data, as: UTF8.self).contains("\"summer-sunset/dusk\""))
         }
     }
 

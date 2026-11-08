@@ -35,8 +35,16 @@ nonisolated public enum ExportAccess {
 
 /// The formats each sheet offers, free ones first so the default selection is usable.
 nonisolated public enum ExportFormatCatalog {
-    public static let colorFormats: [ColorExportFormat] = [.image, .opalite, .ase, .procreate, .gpl, .css, .swiftui]
-    public static let paletteFormats: [PaletteExportFormat] = [.image, .pdf, .opalite, .ase, .procreate, .gpl, .css, .swiftui]
+    public static let designTokenColorFormats: [ColorExportFormat] = [.tailwind, .dtcg, .xcassets, .android, .flutter, .scss, .json, .figma]
+    public static let designTokenPaletteFormats: [PaletteExportFormat] = [.tailwind, .dtcg, .xcassets, .android, .flutter, .scss, .json, .figma]
+
+    /// Splits `formats` into the general list and the "Design Tokens" list, keeping order.
+    public static func split<Format: ExportFormat>(_ formats: [Format]) -> (general: [Format], designTokens: [Format]) {
+        (formats.filter { !$0.isDesignToken }, formats.filter(\.isDesignToken))
+    }
+
+    public static let colorFormats: [ColorExportFormat] = [.image, .opalite, .ase, .procreate, .gpl, .css, .swiftui] + designTokenColorFormats
+    public static let paletteFormats: [PaletteExportFormat] = [.image, .pdf, .opalite, .ase, .procreate, .gpl, .css, .swiftui] + designTokenPaletteFormats
 }
 
 // MARK: - Content types
@@ -49,6 +57,20 @@ nonisolated public enum ExportContentType {
     public static let procreateSwatches = UTType(filenameExtension: "swatches") ?? .data
     public static let gimpPalette = UTType(filenameExtension: "gpl", conformingTo: .plainText) ?? .plainText
     public static let css = UTType(filenameExtension: "css", conformingTo: .sourceCode) ?? .sourceCode
+    public static let scss = UTType(filenameExtension: "scss", conformingTo: .sourceCode) ?? .sourceCode
+    public static let dart = UTType(filenameExtension: "dart", conformingTo: .sourceCode) ?? .sourceCode
+
+    /// The type a design-token format is written as.
+    static func utType(for kind: DesignTokenKind) -> UTType {
+        switch kind {
+        case .tailwind: css
+        case .dtcg, .json, .figma: .json
+        case .xcassets: .zip
+        case .android: .xml
+        case .flutter: dart
+        case .scss: scss
+        }
+    }
 
     public static func utType(for format: ColorExportFormat) -> UTType {
         switch format {
@@ -59,6 +81,7 @@ nonisolated public enum ExportContentType {
         case .gpl: gimpPalette
         case .css: css
         case .swiftui: .swiftSource
+        default: utType(for: format.designTokenKind ?? .json)
         }
     }
 
@@ -72,11 +95,12 @@ nonisolated public enum ExportContentType {
         case .gpl: gimpPalette
         case .css: css
         case .swiftui: .swiftSource
+        default: utType(for: format.designTokenKind ?? .json)
         }
     }
 
     /// Every type an export document can be written as.
-    public static let all: [UTType] = [.png, .pdf, opaliteColor, opalitePalette, adobeSwatchExchange, procreateSwatches, gimpPalette, css, .swiftSource, .json, .plainText, .data]
+    public static let all: [UTType] = [.png, .pdf, opaliteColor, opalitePalette, adobeSwatchExchange, procreateSwatches, gimpPalette, css, scss, dart, .swiftSource, .json, .xml, .zip, .plainText, .data]
 }
 
 // MARK: - Exported file

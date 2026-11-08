@@ -281,58 +281,81 @@ nonisolated public enum ExportEncoders {
 
 // MARK: - ZIP (stored, single entry)
 
+/// One file in a stored ZIP.
+nonisolated public struct ZipEntry: Sendable {
+    public let path: String
+    public let content: Data
+
+    public init(path: String, content: Data) {
+        self.path = path
+        self.content = content
+    }
+}
+
 nonisolated public enum ZipArchive {
     /// A minimal ZIP containing one uncompressed entry.
     public static func stored(filename: String, content: Data, date: Date = Date()) -> Data {
+        stored(entries: [ZipEntry(path: filename, content: content)], date: date)
+    }
+
+    /// A ZIP of uncompressed entries (paths use "/" separators).
+    public static func stored(entries: [ZipEntry], date: Date = Date()) -> Data {
         var zip = Data()
-        let filenameData = Data(filename.utf8)
-        let crc = crc32(content)
         let dos = dosDateTime(date)
+        var directory = Data()
 
-        // Local file header
-        zip.append(contentsOf: [0x50, 0x4B, 0x03, 0x04])
-        zip.append(contentsOf: [0x14, 0x00]) // version needed
-        zip.append(contentsOf: [0x00, 0x00]) // flags
-        zip.append(contentsOf: [0x00, 0x00]) // stored
-        zip.append(littleEndian: dos.time)
-        zip.append(littleEndian: dos.date)
-        zip.append(littleEndian: crc)
-        zip.append(littleEndian: UInt32(content.count))
-        zip.append(littleEndian: UInt32(content.count))
-        zip.append(littleEndian: UInt16(filenameData.count))
-        zip.append(contentsOf: [0x00, 0x00]) // extra length
-        zip.append(filenameData)
-        zip.append(content)
+        for entry in entries {
+            let name = Data(entry.path.utf8)
+            let crc = crc32(entry.content)
+            let offset = UInt32(zip.count)
+            let utf8Flag: UInt16 = entry.path.utf8.contains { $0 > 0x7F } ? 0x0800 : 0
 
-        // Central directory
+            // Local file header
+            zip.append(contentsOf: [0x50, 0x4B, 0x03, 0x04])
+            zip.append(contentsOf: [0x14, 0x00]) // version needed
+            zip.append(littleEndian: utf8Flag)
+            zip.append(contentsOf: [0x00, 0x00]) // stored
+            zip.append(littleEndian: dos.time)
+            zip.append(littleEndian: dos.date)
+            zip.append(littleEndian: crc)
+            zip.append(littleEndian: UInt32(entry.content.count))
+            zip.append(littleEndian: UInt32(entry.content.count))
+            zip.append(littleEndian: UInt16(name.count))
+            zip.append(contentsOf: [0x00, 0x00]) // extra length
+            zip.append(name)
+            zip.append(entry.content)
+
+            // Central directory record
+            directory.append(contentsOf: [0x50, 0x4B, 0x01, 0x02])
+            directory.append(contentsOf: [0x14, 0x00]) // version made by
+            directory.append(contentsOf: [0x14, 0x00]) // version needed
+            directory.append(littleEndian: utf8Flag)
+            directory.append(contentsOf: [0x00, 0x00])
+            directory.append(littleEndian: dos.time)
+            directory.append(littleEndian: dos.date)
+            directory.append(littleEndian: crc)
+            directory.append(littleEndian: UInt32(entry.content.count))
+            directory.append(littleEndian: UInt32(entry.content.count))
+            directory.append(littleEndian: UInt16(name.count))
+            directory.append(contentsOf: [0x00, 0x00]) // extra
+            directory.append(contentsOf: [0x00, 0x00]) // comment
+            directory.append(contentsOf: [0x00, 0x00]) // disk
+            directory.append(contentsOf: [0x00, 0x00]) // internal attrs
+            directory.append(contentsOf: [0x00, 0x00, 0x00, 0x00]) // external attrs
+            directory.append(littleEndian: offset)
+            directory.append(name)
+        }
+
         let cdStart = UInt32(zip.count)
-        zip.append(contentsOf: [0x50, 0x4B, 0x01, 0x02])
-        zip.append(contentsOf: [0x14, 0x00]) // version made by
-        zip.append(contentsOf: [0x14, 0x00]) // version needed
-        zip.append(contentsOf: [0x00, 0x00])
-        zip.append(contentsOf: [0x00, 0x00])
-        zip.append(littleEndian: dos.time)
-        zip.append(littleEndian: dos.date)
-        zip.append(littleEndian: crc)
-        zip.append(littleEndian: UInt32(content.count))
-        zip.append(littleEndian: UInt32(content.count))
-        zip.append(littleEndian: UInt16(filenameData.count))
-        zip.append(contentsOf: [0x00, 0x00]) // extra
-        zip.append(contentsOf: [0x00, 0x00]) // comment
-        zip.append(contentsOf: [0x00, 0x00]) // disk
-        zip.append(contentsOf: [0x00, 0x00]) // internal attrs
-        zip.append(contentsOf: [0x00, 0x00, 0x00, 0x00]) // external attrs
-        zip.append(contentsOf: [0x00, 0x00, 0x00, 0x00]) // local header offset
-        zip.append(filenameData)
-        let cdSize = UInt32(zip.count) - cdStart
+        zip.append(directory)
 
         // End of central directory
         zip.append(contentsOf: [0x50, 0x4B, 0x05, 0x06])
         zip.append(contentsOf: [0x00, 0x00])
         zip.append(contentsOf: [0x00, 0x00])
-        zip.append(contentsOf: [0x01, 0x00])
-        zip.append(contentsOf: [0x01, 0x00])
-        zip.append(littleEndian: cdSize)
+        zip.append(littleEndian: UInt16(entries.count))
+        zip.append(littleEndian: UInt16(entries.count))
+        zip.append(littleEndian: UInt32(directory.count))
         zip.append(littleEndian: cdStart)
         zip.append(contentsOf: [0x00, 0x00])
         return zip

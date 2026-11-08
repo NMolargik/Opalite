@@ -49,6 +49,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "A Dart class of Color constants for Flutter." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una clase Dart con constantes Color para Flutter."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une classe Dart de constantes Color pour Flutter."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter 用の Color 定数をまとめた Dart クラスです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "A PDF with color details. Great for printing or sharing with clients." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -92,6 +116,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xcodeプロジェクトですぐに使えるSwiftUIのColor拡張です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A Tailwind v4 theme block with OKLCH colors." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloque de tema de Tailwind v4 con colores OKLCH."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloc de thème Tailwind v4 avec des couleurs OKLCH."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OKLCH カラーを使った Tailwind v4 のテーマブロックです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A colors.xml file for your Android app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo colors.xml para tu app de Android."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier colors.xml pour votre app Android."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android アプリ用の colors.xml ファイルです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A tokens.json file in the W3C Design Tokens format." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo tokens.json en el formato W3C Design Tokens."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier tokens.json au format W3C Design Tokens."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W3C Design Tokens 形式の tokens.json ファイルです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A variables file for Figma import plugins. Colors are flattened to sRGB." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo de variables para plugins de importación de Figma. Los colores se convierten a sRGB."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier de variables pour les plugiciels d’importation Figma. Les couleurs sont converties en sRGB."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Figma のインポート用プラグイン向けの変数ファイルです。色は sRGB に変換されます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A zipped .xcassets folder with one color set per color, ready for Xcode." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una carpeta .xcassets comprimida con un conjunto de color por color, lista para Xcode."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un dossier .xcassets compressé avec un jeu de couleurs par couleur, prêt pour Xcode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色ごとにカラーセットを収めた、Xcode 用の圧縮済み .xcassets フォルダです。"
           }
         }
       },
@@ -236,6 +380,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adobe Swatch Exchange"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Android Resources" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recursos de Android"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ressources Android"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android リソース"
           }
         }
       },
@@ -913,6 +1081,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Design Tokens (W3C)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design Tokens (W3C)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetons de design (W3C)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デザイントークン (W3C)"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Details" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1177,6 +1369,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Figma Variables" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables de Figma"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables Figma"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Figma 変数"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Flutter (Dart)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Forest" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1364,6 +1604,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不適切なコンテンツ"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "JSON with hex, RGB, OKLCH, and Display P3 values for each color." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON con valores hex, RGB, OKLCH y Display P3 para cada color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du JSON avec les valeurs hex, RVB, OKLCH et Display P3 de chaque couleur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各色の16進数、RGB、OKLCH、Display P3 の値を含む JSON です。"
           }
         }
       },
@@ -1921,6 +2185,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Plain JSON" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON simple"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON brut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレーン JSON"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Portfolio" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2257,6 +2545,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "SCSS variables ready to import into your stylesheets." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables SCSS listas para importar en tus hojas de estilo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des variables SCSS prêtes à importer dans vos feuilles de style."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スタイルシートにそのまま読み込める SCSS 変数です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Sample from image" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2276,6 +2588,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像からサンプリング"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Sass Variables" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables de Sass"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables Sass"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sass 変数"
           }
         }
       },
@@ -2713,6 +3049,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Tailwind CSS" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "That item no longer exists." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3092,6 +3452,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GIMP、Inkscape、Kritaなどのオープンソースツールで使えます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Xcode Asset Catalog" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catálogo de recursos de Xcode"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catalogue d’éléments Xcode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode アセットカタログ"
           }
         }
       },

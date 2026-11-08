@@ -195,6 +195,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ becomes the dark appearance of each color set. ^[%lld color](inflect: true) pair by position." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pasa a ser la apariencia oscura de cada conjunto de color. ^[%lld color](inflect: true) se emparejan por posición."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ devient l’apparence sombre de chaque jeu de couleurs. ^[%lld color](inflect: true) s’associent par position."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ が各カラーセットのダークアピアランスになります。^[%lld color](inflect: true) が位置順にペアになります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ becomes the dark value of each adaptive Color. ^[%lld color](inflect: true) pair by position." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -395,6 +419,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@ is added as _dark entries to copy into values-night. ^[%lld color](inflect: true) pair by position." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ se agrega como entradas _dark para copiar en values-night. ^[%lld color](inflect: true) se emparejan por posición."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ajouté sous forme d’entrées _dark à copier dans values-night. ^[%lld color](inflect: true) s’associent par position."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ は _dark エントリとして追加され、values-night にコピーできます。^[%lld color](inflect: true) が位置順にペアになります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@ is empty." : {
       "comment" : "A dialog message describing the colors in a palette. The argument is the palette name, the second argument is a list of the palette's colors.",
       "extractionState" : "manual",
@@ -416,6 +464,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ は空です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%@ is written as the dark value of each color. ^[%lld color](inflect: true) pair by position." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ se escribe como el valor oscuro de cada color. ^[%lld color](inflect: true) se emparejan por posición."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est écrit comme la valeur sombre de chaque couleur. ^[%lld color](inflect: true) s’associent par position."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ が各色のダーク値として書き出されます。^[%lld color](inflect: true) が位置順にペアになります。"
           }
         }
       },
@@ -1093,6 +1165,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "A Dart class of Color constants for Flutter." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una clase Dart con constantes Color para Flutter."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une classe Dart de constantes Color pour Flutter."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter 用の Color 定数をまとめた Dart クラスです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "A PDF with color details. Great for printing or sharing with clients." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1136,6 +1232,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xcodeプロジェクトですぐに使えるSwiftUIのColor拡張です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A Tailwind v4 theme block with OKLCH colors." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloque de tema de Tailwind v4 con colores OKLCH."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloc de thème Tailwind v4 avec des couleurs OKLCH."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OKLCH カラーを使った Tailwind v4 のテーマブロックです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A colors.xml file for your Android app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo colors.xml para tu app de Android."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier colors.xml pour votre app Android."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android アプリ用の colors.xml ファイルです。"
           }
         }
       },
@@ -1304,6 +1448,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スウォッチストリップで、パレットがいつでもワンタップで開けます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A tokens.json file in the W3C Design Tokens format." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo tokens.json en el formato W3C Design Tokens."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier tokens.json au format W3C Design Tokens."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W3C Design Tokens 形式の tokens.json ファイルです。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A variables file for Figma import plugins. Colors are flattened to sRGB." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un archivo de variables para plugins de importación de Figma. Los colores se convierten a sRGB."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier de variables pour les plugiciels d’importation Figma. Les couleurs sont converties en sRGB."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Figma のインポート用プラグイン向けの変数ファイルです。色は sRGB に変換されます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "A zipped .xcassets folder with one color set per color, ready for Xcode." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una carpeta .xcassets comprimida con un conjunto de color por color, lista para Xcode."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un dossier .xcassets compressé avec un jeu de couleurs par couleur, prêt pour Xcode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色ごとにカラーセットを収めた、Xcode 用の圧縮済み .xcassets フォルダです。"
           }
         }
       },
@@ -2624,6 +2840,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "類似色"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Android Resources" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recursos de Android"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ressources Android"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android リソース"
           }
         }
       },
@@ -5295,6 +5535,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los colores conservan sus valores de gama amplia donde el formato lo admite. En los demás se usa una aproximación sRGB."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les couleurs conservent leurs valeurs à large gamme lorsque le format le permet. Les autres formats reçoivent une approximation sRGB."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応する形式では広色域の値がそのまま保たれます。それ以外の形式では sRGB の近似値になります。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Colors pair by position with the palette you choose; without one, the file has a single value per color." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7695,6 +7959,54 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Design Tokens" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design Tokens"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetons de design"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デザイントークン"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Design Tokens (W3C)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design Tokens (W3C)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetons de design (W3C)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デザイントークン (W3C)"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Details" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9447,6 +9759,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Figma Variables" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables de Figma"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables Figma"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Figma 変数"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "File %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9586,6 +9922,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "長文の快適な読み取り"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Flutter (Dart)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter (Dart)"
           }
         }
       },
@@ -11386,6 +11746,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "誰にも表示されなくなります。ポートフォリオ内のコピーには影響しません。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "JSON with hex, RGB, OKLCH, and Display P3 values for each color." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON con valores hex, RGB, OKLCH y Display P3 para cada color."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du JSON avec les valeurs hex, RVB, OKLCH et Display P3 de chaque couleur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各色の16進数、RGB、OKLCH、Display P3 の値を含む JSON です。"
           }
         }
       },
@@ -17035,6 +17419,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Plain JSON" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON simple"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON brut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレーン JSON"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Platform" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19603,6 +20011,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "SCSS variables ready to import into your stylesheets." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables SCSS listas para importar en tus hojas de estilo."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des variables SCSS prêtes à importer dans vos feuilles de style."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スタイルシートにそのまま読み込める SCSS 変数です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Same hue, lightness nudged to reach AA" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19910,6 +20342,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@を%@からサンプリングしました"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Sass Variables" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables de Sass"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables Sass"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sass 変数"
           }
         }
       },
@@ -22886,6 +23342,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグ：\\(tags.joined(separator: "
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Tailwind CSS" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailwind CSS"
           }
         }
       },
@@ -26056,6 +26536,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GIMP、Inkscape、Kritaなどのオープンソースツールで使えます。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Xcode Asset Catalog" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catálogo de recursos de Xcode"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catalogue d’éléments Xcode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode アセットカタログ"
           }
         }
       },

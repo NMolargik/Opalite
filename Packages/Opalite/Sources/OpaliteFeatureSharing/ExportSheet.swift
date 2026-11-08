@@ -83,22 +83,24 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                         .listRowBackground(Color.clear)
                 }
 
+                let groups = ExportFormatCatalog.split(formats)
                 Section {
-                    ForEach(formats) { format in
-                        FormatRow(
-                            format: format,
-                            isSelected: selectedFormat == format,
-                            isLocked: ExportAccess.isLocked(format, hasOnyx: hasOnyx),
-                            isBusy: isPreparing && selectedFormat == format
-                        ) {
-                            choose(format)
-                        }
-                    }
+                    ForEach(groups.general) { format in formatRow(format) }
                 } header: {
                     Text("Format")
                 } footer: {
                     if ExportAccess.hasLockedFormats(in: formats, hasOnyx: hasOnyx) {
                         Text("Formats marked Onyx are part of the Onyx upgrade.")
+                    }
+                }
+
+                if !groups.designTokens.isEmpty {
+                    Section {
+                        ForEach(groups.designTokens) { format in formatRow(format) }
+                    } header: {
+                        Text("Design Tokens")
+                    } footer: {
+                        Text("Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation.")
                     }
                 }
 
@@ -159,6 +161,17 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     }
 
     // MARK: - Rows
+
+    private func formatRow(_ format: Format) -> some View {
+        FormatRow(
+            format: format,
+            isSelected: selectedFormat == format,
+            isLocked: ExportAccess.isLocked(format, hasOnyx: hasOnyx),
+            isBusy: isPreparing && selectedFormat == format
+        ) {
+            choose(format)
+        }
+    }
 
     private var publishRow: some View {
         Button {

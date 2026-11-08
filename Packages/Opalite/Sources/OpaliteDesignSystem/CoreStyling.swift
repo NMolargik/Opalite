@@ -204,6 +204,14 @@ extension ColorExportFormat {
         case .gpl: String(localized: "GIMP Palette")
         case .css: String(localized: "CSS Code")
         case .swiftui: String(localized: "SwiftUI Code")
+        case .tailwind: String(localized: "Tailwind CSS")
+        case .dtcg: String(localized: "Design Tokens (W3C)")
+        case .xcassets: String(localized: "Xcode Asset Catalog")
+        case .android: String(localized: "Android Resources")
+        case .flutter: String(localized: "Flutter (Dart)")
+        case .scss: String(localized: "Sass Variables")
+        case .json: String(localized: "Plain JSON")
+        case .figma: String(localized: "Figma Variables")
         }
     }
 
@@ -216,6 +224,14 @@ extension ColorExportFormat {
         case .gpl: String(localized: "Works with GIMP, Inkscape, Krita, and other open-source tools.")
         case .css: String(localized: "A CSS custom property ready to paste into your stylesheets.")
         case .swiftui: String(localized: "A SwiftUI Color extension ready for your Xcode project.")
+        case .tailwind: String(localized: "A Tailwind v4 theme block with OKLCH colors.")
+        case .dtcg: String(localized: "A tokens.json file in the W3C Design Tokens format.")
+        case .xcassets: String(localized: "A zipped .xcassets folder with one color set per color, ready for Xcode.")
+        case .android: String(localized: "A colors.xml file for your Android app.")
+        case .flutter: String(localized: "A Dart class of Color constants for Flutter.")
+        case .scss: String(localized: "SCSS variables ready to import into your stylesheets.")
+        case .json: String(localized: "JSON with hex, RGB, OKLCH, and Display P3 values for each color.")
+        case .figma: String(localized: "A variables file for Figma import plugins. Colors are flattened to sRGB.")
         }
     }
 
@@ -228,6 +244,14 @@ extension ColorExportFormat {
         case .gpl: .green
         case .css: .blue
         case .swiftui: .orange
+        case .tailwind: .teal
+        case .dtcg: .indigo
+        case .xcassets: .blue
+        case .android: .green
+        case .flutter: .cyan
+        case .scss: .pink
+        case .json: .gray
+        case .figma: .purple
         }
     }
 }
@@ -243,6 +267,14 @@ extension PaletteExportFormat {
         case .gpl: String(localized: "GIMP Palette")
         case .css: String(localized: "CSS Code")
         case .swiftui: String(localized: "SwiftUI Code")
+        case .tailwind: String(localized: "Tailwind CSS")
+        case .dtcg: String(localized: "Design Tokens (W3C)")
+        case .xcassets: String(localized: "Xcode Asset Catalog")
+        case .android: String(localized: "Android Resources")
+        case .flutter: String(localized: "Flutter (Dart)")
+        case .scss: String(localized: "Sass Variables")
+        case .json: String(localized: "Plain JSON")
+        case .figma: String(localized: "Figma Variables")
         }
     }
 
@@ -256,6 +288,14 @@ extension PaletteExportFormat {
         case .gpl: String(localized: "Works with GIMP, Inkscape, Krita, and other open-source tools.")
         case .css: String(localized: "CSS custom properties ready to paste into your stylesheets.")
         case .swiftui: String(localized: "A SwiftUI Color extension ready for your Xcode project.")
+        case .tailwind: String(localized: "A Tailwind v4 theme block with OKLCH colors.")
+        case .dtcg: String(localized: "A tokens.json file in the W3C Design Tokens format.")
+        case .xcassets: String(localized: "A zipped .xcassets folder with one color set per color, ready for Xcode.")
+        case .android: String(localized: "A colors.xml file for your Android app.")
+        case .flutter: String(localized: "A Dart class of Color constants for Flutter.")
+        case .scss: String(localized: "SCSS variables ready to import into your stylesheets.")
+        case .json: String(localized: "JSON with hex, RGB, OKLCH, and Display P3 values for each color.")
+        case .figma: String(localized: "A variables file for Figma import plugins. Colors are flattened to sRGB.")
         }
     }
 
@@ -269,6 +309,14 @@ extension PaletteExportFormat {
         case .gpl: .green
         case .css: .blue
         case .swiftui: .orange
+        case .tailwind: .teal
+        case .dtcg: .indigo
+        case .xcassets: .blue
+        case .android: .green
+        case .flutter: .cyan
+        case .scss: .pink
+        case .json: .gray
+        case .figma: .purple
         }
     }
 }
