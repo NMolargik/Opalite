@@ -73,7 +73,7 @@ struct BackupsView: View {
                 }
             } label: {
                 HStack {
-                    Label("Back Up Now", systemImage: "externaldrive.badge.plus")
+                    Label("Back Up Now", systemImage: "clock.arrow.circlepath")
                         .labelStyle(.settingsIcon(.blue))
                     if backups.isWorking {
                         Spacer()
