@@ -877,6 +877,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "%@. Distance %@ after simulation, %@ in normal vision." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Distancia %@ tras la simulación, %@ con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Distance de %@ après simulation, %@ en vision normale."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@。シミュレーション後の距離は %@、通常の色覚では %@ です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "%@: %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1064,6 +1088,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld / %lld 件を選択中"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "%lld of %lld text and background combinations reach Lc 60" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld de %lld combinaciones de texto y fondo alcanzan Lc 60"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld combinaisons texte et arrière-plan sur %lld atteignent Lc 60"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld 通りの文字色と背景色の組み合わせのうち、%1$lld 通りが Lc 60 に達しています"
           }
         }
       },
@@ -11991,6 +12039,30 @@
       },
       "shouldGenerateSymbol" : false
     },
+    "Hard to tell apart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difíciles de distinguir"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficiles à distinguer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "見分けにくい"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
     "Hard to tell apart. Distance %@ after simulation, %@ in normal vision." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15036,6 +15108,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ネイビー"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Nearly identical" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casi idénticos"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presque identiques"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほぼ同じ"
           }
         }
       },
@@ -18542,6 +18638,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ペアリング済み"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Pairs closer than %@ in OKLab after simulation are hard to tell apart. Only pairs that differ in normal vision are scored." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los pares a menos de %@ en OKLab tras la simulación son difíciles de distinguir. Solo se puntúan los pares que se distinguen con visión normal."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paires distantes de moins de %@ en OKLab après simulation sont difficiles à distinguer. Seules les paires qui diffèrent en vision normale sont notées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シミュレーション後の OKLab での差が %@ 未満の組は見分けにくいと判断します。採点するのは、通常の色覚で違いが分かる組だけです。"
           }
         }
       },
@@ -22166,6 +22286,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スタイルシートにそのまま読み込める SCSS 変数です。"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Same hue and chroma as your color, with evenly spaced lightness (OKLCH). The dot marks the closest step." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo tono y croma que tu color, con luminosidad repartida de forma uniforme (OKLCH). El punto marca el paso más cercano."
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même teinte et même chroma que votre couleur, avec une luminosité répartie uniformément (OKLCH). Le point indique le niveau le plus proche."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたの色と同じ色相と彩度で、明度を均等に配分します (OKLCH)。点は最も近いステップを示します。"
           }
         }
       },
@@ -28864,6 +29008,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン%@"
+          }
+        }
+      },
+      "shouldGenerateSymbol" : false
+    },
+    "Very hard to tell apart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muy difíciles de distinguir"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Très difficiles à distinguer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非常に見分けにくい"
           }
         }
       },

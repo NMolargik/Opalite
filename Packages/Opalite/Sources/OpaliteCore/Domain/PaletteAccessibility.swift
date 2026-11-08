@@ -193,6 +193,22 @@ nonisolated public struct ColorVisionAnalysis: Equatable, Sendable {
         public let simulatedSecond: RGBA
 
         public var id: String { "\(first)-\(second)" }
+
+        /// How badly the pair collapses: under 0.01 is nearly identical, under 0.02 very hard
+        /// to tell apart (about one just-noticeable difference), the rest up to 0.04 hard.
+        public var severity: Severity { Severity(simulatedDistance: simulatedDistance) }
+    }
+
+    public enum Severity: Int, Comparable, Sendable {
+        case nearlyIdentical
+        case veryHard
+        case hard
+
+        public init(simulatedDistance distance: Double) {
+            self = distance < 0.01 ? .nearlyIdentical : (distance < 0.02 ? .veryHard : .hard)
+        }
+
+        public static func < (lhs: Severity, rhs: Severity) -> Bool { lhs.rawValue < rhs.rawValue }
     }
 
     public struct Report: Equatable, Sendable, Identifiable {

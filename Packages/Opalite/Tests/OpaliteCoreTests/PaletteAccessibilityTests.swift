@@ -237,6 +237,17 @@ struct ColorVisionAnalysisTests {
         }
     }
 
+    @Test func severityBands() {
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.0) == .nearlyIdentical)
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.0099) == .nearlyIdentical)
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.01) == .veryHard)
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.0199) == .veryHard)
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.02) == .hard)
+        #expect(ColorVisionAnalysis.Severity(simulatedDistance: 0.039) == .hard)
+        let analysis = ColorVisionAnalysis(colors: [RGBA(hex: "#C82563")!, RGBA(hex: "#A68E3D")!])
+        #expect(analysis.report(for: .protanopia)?.problemPairs.first?.severity == .nearlyIdentical)
+    }
+
     @Test func deterministic() {
         let colors = [red, green, blue, RGBA(hex: "#B07030")!]
         #expect(ColorVisionAnalysis(colors: colors) == ColorVisionAnalysis(colors: colors))

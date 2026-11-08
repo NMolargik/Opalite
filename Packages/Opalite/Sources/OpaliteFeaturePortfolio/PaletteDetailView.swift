@@ -88,6 +88,7 @@ private struct PaletteDetailContent: View {
 
     private func content(for palette: OpalitePalette) -> some View {
         ScrollView {
+            ScrollViewReader { proxy in
             VStack(spacing: 0) {
                 board(for: palette)
                     .padding(.horizontal, Brand.Space.lg)
@@ -105,6 +106,15 @@ private struct PaletteDetailContent: View {
                 .padding(.horizontal, Brand.Space.lg)
                 .padding(.top, Brand.Space.lg)
                 .padding(.bottom, Brand.Space.xxl)
+            }
+            #if DEBUG
+            .task {
+                // Simulator verification: `--scroll-to-accessibility` brings the Accessibility row into view.
+                guard CommandLine.arguments.contains("--scroll-to-accessibility") else { return }
+                try? await Task.sleep(for: .seconds(1))
+                withAnimation { proxy.scrollTo("paletteDetail.accessibilityRow", anchor: .center) }
+            }
+            #endif
             }
             .frame(maxWidth: Brand.detailMaxWidth)
             .frame(maxWidth: .infinity)
@@ -479,6 +489,7 @@ private struct PaletteDetailContent: View {
         .hoverLift()
         .accessibilityHint(Text("Opens contrast, lightness scale and color-vision tools for this palette"))
         .accessibilityIdentifier("paletteDetail.accessibility")
+        .id("paletteDetail.accessibilityRow")
     }
 
     private var notesCard: some View {

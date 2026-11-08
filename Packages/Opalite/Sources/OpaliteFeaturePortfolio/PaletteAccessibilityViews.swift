@@ -42,19 +42,17 @@ extension APCA.Band {
     }
 }
 
-private extension ContrastMatrix.TextLevel {
-    var text: String {
-        switch self {
-        case .aaa: "AAA"
-        case .aa: "AA"
-        case .fail: String(localized: "Fail")
-        }
-    }
-    var symbol: String { self == .fail ? "xmark.circle.fill" : "checkmark.circle.fill" }
-    var tint: Color { self == .fail ? .red : .green }
-}
-
 // MARK: - Focused view
+
+/// On iPad the sheet is wide enough for the matrix and as tall as its content (within reason),
+/// instead of a full page with a large empty block. iPhone sheets ignore it and use detents.
+struct AccessibilitySheetSizing: PresentationSizing {
+    func proposedSize(for root: PresentationSizingRoot, context: PresentationSizingContext) -> ProposedViewSize {
+        let width: CGFloat = 860
+        let height = root.sizeThatFits(ProposedViewSize(width: width, height: nil)).height
+        return ProposedViewSize(width: width, height: min(max(height, 640), 900))
+    }
+}
 
 /// One place for the three tools: a segmented switch over the matrix, the scale and the
 /// color-vision score, so the palette screen itself gains a single row.
@@ -63,7 +61,15 @@ struct PaletteAccessibilitySheet: View {
     let openPalette: @MainActor (UUID) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(PortfolioModel.self) private var portfolio
+    @State private var detent: PresentationDetent = {
+        #if DEBUG
+        // Simulator verification: open the iPhone sheet at its large detent.
+        if CommandLine.arguments.contains("--expand-accessibility") { return .large }
+        #endif
+        return .medium
+    }()
 
     var body: some View {
         NavigationStack {
@@ -101,8 +107,8 @@ struct PaletteAccessibilitySheet: View {
             }
             .sharedSheet(item: $model.contrastPair) { pair in ContrastPairSheet(pair: pair) }
         }
-        .presentationSizing(.page)
-        .presentationDetents([.large])
+        .presentationSizing(AccessibilitySheetSizing())
+        .presentationDetents(horizontalSizeClass == .compact ? [.medium, .large] : [.large], selection: $detent)
         .presentationDragIndicator(.visible)
         .accessibilityIdentifier("paletteAccessibilitySheet")
     }
@@ -127,16 +133,46 @@ struct PaletteAccessibilitySheet: View {
 
 // MARK: - Contrast matrix
 
+/// One quiet result badge per cell: green for a pass, amber for partial, gray for a miss
+/// (most pairs in any palette miss, which is normal, so a miss is not drawn in alarm red).
+private struct ResultBadge: View {
+    enum Tone { case pass, partial, miss }
+
+    let text: String
+    let tone: Tone
+
+    private var tint: Color {
+        switch tone {
+        case .pass: .green
+        case .partial: .orange
+        case .miss: .secondary
+        }
+    }
+
+    var body: some View {
+        Text(verbatim: text)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(tone == .miss ? Color.secondary : tint.mix(with: .primary, by: 0.35))
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(Capsule(style: .continuous).fill(tint.opacity(tone == .miss ? 0.14 : 0.18)))
+    }
+}
+
 struct ContrastMatrixCard: View {
     @Bindable var model: PaletteDetailViewModel
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var availableWidth: CGFloat = 0
+    @State private var hasMoreToTrailing = false
 
     private let spacing: CGFloat = 6
-    private var headerWidth: CGFloat { horizontalSizeClass == .compact ? 60 : 84 }
-    private var minCell: CGFloat { horizontalSizeClass == .compact ? 92 : 108 }
+    private var headerWidth: CGFloat { horizontalSizeClass == .compact ? 68 : 88 }
+    private var minCell: CGFloat { horizontalSizeClass == .compact ? 84 : 104 }
     private var maxCell: CGFloat { 150 }
+    private let cellHeight: CGFloat = 76
 
     /// Fills the card when the grid fits; otherwise cells keep their minimum and it scrolls.
     private func cellWidth(count: Int) -> CGFloat {
@@ -154,26 +190,33 @@ struct ContrastMatrixCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
-                Picker("Measure", selection: $model.contrastMode) {
-                    Text("WCAG").tag(ContrastMatrixMode.wcag)
-                    Text("APCA").tag(ContrastMatrixMode.apca)
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("contrastMatrix.mode")
+                summaryLine(matrix)
 
-                summary(matrix)
-
-                ScrollView(.horizontal, showsIndicators: true) {
+                ScrollView(.horizontal, showsIndicators: false) {
                     grid(matrix, colors: colors)
                         .padding(.vertical, Brand.Space.xs)
                 }
                 .scrollClipDisabled()
+                .onScrollGeometryChange(for: Bool.self) { geometry in
+                    geometry.contentOffset.x + geometry.containerSize.width < geometry.contentSize.width - 2
+                } action: { _, more in
+                    hasMoreToTrailing = more
+                }
                 .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { availableWidth = $0 }
+                .overlay(alignment: .trailing) {
+                    // A trailing fade says "there are more columns".
+                    LinearGradient(colors: [secondaryGroupedBackground.opacity(0), secondaryGroupedBackground], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: 36)
+                        .opacity(hasMoreToTrailing ? 1 : 0)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                        .animation(.easeOut(duration: 0.15), value: hasMoreToTrailing)
+                }
                 .accessibilityIdentifier("contrastMatrix.grid")
 
                 Text(footnote)
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 if model.isMatrixTruncated {
                     Label("Showing the first \(ContrastMatrixLimit.value) of \(model.memberCount) colors.", systemImage: "info.circle")
                         .font(.caption)
@@ -190,18 +233,51 @@ struct ContrastMatrixCard: View {
         }
     }
 
-    private func summary(_ matrix: ContrastMatrix) -> some View {
-        let passingCount: Int = matrix.passingPairCount
-        let totalCount: Int = matrix.pairCount
-        return Label {
-            Text("\(passingCount) of \(totalCount) pairs pass AA for normal text")
+    // MARK: Summary and measure
+
+    private func summaryLine(_ matrix: ContrastMatrix) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: Brand.Space.sm) {
+            summaryText(matrix)
                 .font(.subheadline.weight(.medium))
-        } icon: {
-            Image(systemName: passingCount == totalCount ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(passingCount == totalCount ? Color.green : Color.orange)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: Brand.Space.sm)
+            Menu {
+                Picker("Measure", selection: $model.contrastMode) {
+                    Text("WCAG").tag(ContrastMatrixMode.wcag)
+                    Text("APCA").tag(ContrastMatrixMode.apca)
+                }
+            } label: {
+                HStack(spacing: 3) {
+                    Text(model.contrastMode == .wcag ? "WCAG" : "APCA")
+                    Image(systemName: "chevron.down")
+                        .font(.caption2.weight(.bold))
+                }
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, Brand.Space.md)
+                .padding(.vertical, 6)
+                .background(Capsule(style: .continuous).fill(groupedBackground))
+            }
+            .accessibilityLabel(Text("Measure"))
+            .accessibilityValue(Text(model.contrastMode == .wcag ? "WCAG" : "APCA"))
+            .accessibilityIdentifier("contrastMatrix.mode")
         }
-        .accessibilityElement(children: .combine)
     }
+
+    @ContentBuilder
+    private func summaryText(_ matrix: ContrastMatrix) -> some View {
+        switch model.contrastMode {
+        case .wcag:
+            let passingCount: Int = matrix.passingPairCount
+            let totalCount: Int = matrix.pairCount
+            Text("\(passingCount) of \(totalCount) pairs pass AA for normal text")
+        case .apca:
+            let readableCount: Int = matrix.cells.filter { abs($0.lc) >= 60 }.count
+            let totalCount: Int = matrix.cells.count
+            Text("\(readableCount) of \(totalCount) text and background combinations reach Lc 60")
+        }
+    }
+
+    // MARK: Grid
 
     private func grid(_ matrix: ContrastMatrix, colors: [OpaliteColor]) -> some View {
         let width = cellWidth(count: colors.count)
@@ -209,12 +285,12 @@ struct ContrastMatrixCard: View {
             GridRow {
                 Color.clear.frame(width: headerWidth, height: 1)
                 ForEach(colors.indices, id: \.self) { column in
-                    header(colors[column], width: width, label: String(localized: "Background"))
+                    header(colors[column], width: width)
                 }
             }
             ForEach(colors.indices, id: \.self) { row in
                 GridRow {
-                    header(colors[row], width: headerWidth, label: String(localized: "Text"))
+                    header(colors[row], width: headerWidth)
                     ForEach(colors.indices, id: \.self) { column in
                         if let cell = matrix.cell(row: row, column: column) {
                             cellButton(cell, text: colors[row], background: colors[column], width: width)
@@ -227,7 +303,7 @@ struct ContrastMatrixCard: View {
         }
     }
 
-    private func header(_ color: OpaliteColor, width: CGFloat, label: String) -> some View {
+    private func header(_ color: OpaliteColor, width: CGFloat) -> some View {
         VStack(spacing: 3) {
             RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
                 .fill(color.rgba.color)
@@ -236,22 +312,21 @@ struct ContrastMatrixCard: View {
             Text(color.displayName)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
                 .frame(width: width)
         }
         .frame(width: width)
-        .accessibilityElement(children: .ignore)
         .accessibilityHidden(true)
     }
 
+    /// The pair of a color with itself: empty, but visibly part of the grid.
     private func diagonal(width: CGFloat) -> some View {
         RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
-            .fill(groupedBackground.opacity(0.6))
+            .fill(Color.secondary.opacity(0.1))
             .frame(width: width, height: cellHeight)
             .accessibilityHidden(true)
     }
-
-    private var cellHeight: CGFloat { 84 }
 
     private func cellButton(_ cell: ContrastMatrix.Cell, text: OpaliteColor, background: OpaliteColor, width: CGFloat) -> some View {
         Button {
@@ -260,28 +335,25 @@ struct ContrastMatrixCard: View {
         } label: {
             VStack(spacing: 0) {
                 Text("Aa")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 21, weight: .bold, design: .rounded))
                     .foregroundStyle(text.rgba.color)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 38)
+                    .frame(height: 34)
                     .background(background.rgba.color)
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(spacing: 3) {
                     switch model.contrastMode {
                     case .wcag:
                         Text(verbatim: cell.ratioText)
                             .font(.caption.monospacedDigit().weight(.semibold))
-                        levelLine(String(localized: "Text"), cell.normalLevel)
-                        levelLine(String(localized: "Large"), cell.largeLevel)
+                        wcagBadge(cell)
                     case .apca:
                         Text(verbatim: APCA.lcText(cell.lc))
                             .font(.caption.monospacedDigit().weight(.semibold))
-                        apcaLine(cell.apcaBand)
+                        apcaBadge(cell.apcaBand)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .frame(height: cellHeight - 38)
+                .frame(maxWidth: .infinity)
+                .frame(height: cellHeight - 34)
                 .background(groupedBackground)
             }
             .frame(width: width)
@@ -296,47 +368,39 @@ struct ContrastMatrixCard: View {
         .accessibilityHint(Text("Opens the contrast checker for this pair"))
     }
 
-    private func levelLine(_ title: String, _ level: ContrastMatrix.TextLevel) -> some View {
-        HStack(spacing: 3) {
-            Image(systemName: level.symbol)
-                .font(.system(size: 9))
-                .foregroundStyle(level.tint)
-                .accessibilityHidden(true)
-            Text(verbatim: "\(title) \(level.text)")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+    /// The best WCAG level the ratio reaches: AAA and AA for normal text, AA Large for large text only.
+    @ContentBuilder
+    private func wcagBadge(_ cell: ContrastMatrix.Cell) -> some View {
+        switch cell.normalLevel {
+        case .aaa: ResultBadge(text: "AAA", tone: .pass)
+        case .aa: ResultBadge(text: "AA", tone: .pass)
+        case .fail:
+            if cell.largeLevel == .fail {
+                ResultBadge(text: String(localized: "Fail"), tone: .miss)
+            } else {
+                ResultBadge(text: String(localized: "AA Large"), tone: .partial)
+            }
         }
     }
 
-    private func apcaLine(_ band: APCA.Band) -> some View {
-        let symbol: String
-        let tint: Color
+    private func apcaBadge(_ band: APCA.Band) -> some View {
+        let tone: ResultBadge.Tone
         switch band {
-        case .fail: (symbol, tint) = ("xmark.circle.fill", .red)
-        case .spot, .large: (symbol, tint) = ("exclamationmark.triangle.fill", .orange)
-        case .content, .body, .fluent: (symbol, tint) = ("checkmark.circle.fill", .green)
+        case .fail, .spot: tone = .miss
+        case .large: tone = .partial
+        case .content, .body, .fluent: tone = .pass
         }
-        return HStack(spacing: 3) {
-            Image(systemName: symbol)
-                .font(.system(size: 9))
-                .foregroundStyle(tint)
-                .accessibilityHidden(true)
-            Text(band.shortGuidance)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
+        return ResultBadge(text: band.shortGuidance, tone: tone)
     }
 
     private func accessibilityValue(_ cell: ContrastMatrix.Cell) -> String {
         switch model.contrastMode {
         case .wcag:
-            String(localized: "Contrast \(cell.ratioText). Normal text \(cell.normalLevel.text). Large text \(cell.largeLevel.text).")
+            let normal = cell.normalLevel == .fail ? String(localized: "Fail") : (cell.normalLevel == .aaa ? "AAA" : "AA")
+            let large = cell.largeLevel == .fail ? String(localized: "Fail") : (cell.largeLevel == .aaa ? "AAA" : "AA")
+            return String(localized: "Contrast \(cell.ratioText). Normal text \(normal). Large text \(large).")
         case .apca:
-            String(localized: "\(APCA.lcText(cell.lc)). \(cell.apcaBand.guidance).")
+            return String(localized: "\(APCA.lcText(cell.lc)). \(cell.apcaBand.guidance).")
         }
     }
 }
@@ -418,10 +482,6 @@ struct LightnessScaleCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Brand.Space.md) {
-            Text("An 11-step scale from 50 to 950 with the same hue and chroma as the color you start from and evenly spaced perceived lightness (OKLCH).")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
             baseChooser
             hexField
 
@@ -490,7 +550,7 @@ struct LightnessScaleCard: View {
             }
             TextField(String(localized: "Or start from a hex code"), text: $model.scaleHexDraft)
                 .textFieldStyle(.plain)
-                .font(.body.monospaced())
+                .font(.body)
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
                 .keyboardType(.asciiCapable)
@@ -564,9 +624,9 @@ struct LightnessScaleCard: View {
                 }
             }
             .accessibilityIdentifier("lightnessScale.ramp")
-            Text("The dot marks the step closest in lightness to your color.")
+            Text("Same hue and chroma as your color, with evenly spaced lightness (OKLCH). The dot marks the closest step.")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -636,9 +696,9 @@ struct ColorVisionCard: View {
                 if let report = analysis.report(for: model.visionMode) {
                     problems(report, analysis: analysis)
                 }
-                Text("Each pair is measured in OKLab after simulating the deficiency. Colors closer than \(threshold) are hard to tell apart. The score is the share of pairs that are clearly different in normal vision and stay that way.")
+                Text("Pairs closer than \(threshold) in OKLab after simulation are hard to tell apart. Only pairs that differ in normal vision are scored.")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                 if analysis.similarForEveryonePairCount > 0 {
                     Label("\(analysis.similarForEveryonePairCount) pairs are already close in normal vision and are not scored.", systemImage: "info.circle")
                         .font(.caption)
@@ -730,6 +790,7 @@ struct ColorVisionCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
+                pairHeader
                 ForEach(report.problemPairs.prefix(shownPairLimit)) { pair in
                     if members.indices.contains(pair.first), members.indices.contains(pair.second) {
                         pairRow(pair, first: members[pair.first], second: members[pair.second])
@@ -746,39 +807,59 @@ struct ColorVisionCard: View {
         .accessibilityElement(children: .contain)
     }
 
+    private let swatchWidth: CGFloat = 72
+    private let arrowWidth: CGFloat = 16
+
+    /// Column labels, said once above the list.
+    private var pairHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: Brand.Space.md) {
+            Text("As designed")
+                .frame(width: swatchWidth, alignment: .leading)
+            Color.clear.frame(width: arrowWidth, height: 1)
+            Text("As seen")
+                .frame(width: swatchWidth, alignment: .leading)
+            Spacer(minLength: 0)
+        }
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .accessibilityHidden(true)
+    }
+
+    private func severityText(_ severity: ColorVisionAnalysis.Severity) -> String {
+        switch severity {
+        case .nearlyIdentical: String(localized: "Nearly identical")
+        case .veryHard: String(localized: "Very hard to tell apart")
+        case .hard: String(localized: "Hard to tell apart")
+        }
+    }
+
     private func pairRow(_ pair: ColorVisionAnalysis.Pair, first: OpaliteColor, second: OpaliteColor) -> some View {
         let simulated = String(format: "%.3f", pair.simulatedDistance)
         let normal = String(format: "%.3f", pair.normalDistance)
+        let severity = severityText(pair.severity)
         return HStack(alignment: .center, spacing: Brand.Space.md) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("As designed")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                split(first.rgba, second.rgba)
-            }
+            split(first.rgba, second.rgba)
             Image(systemName: "arrow.right")
                 .font(.footnote)
                 .foregroundStyle(.tertiary)
+                .frame(width: arrowWidth)
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("As seen")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                split(pair.simulatedFirst, pair.simulatedSecond)
-            }
+            split(pair.simulatedFirst, pair.simulatedSecond)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: "\(first.displayName) / \(second.displayName)")
                     .font(.caption.weight(.medium))
                     .lineLimit(2)
-                Text(verbatim: String(format: "ΔE %.3f", pair.simulatedDistance))
-                    .font(.caption2.monospacedDigit())
+                Text(verbatim: severity)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(first.displayName) and \(second.displayName)"))
-        .accessibilityValue(Text("Hard to tell apart. Distance \(simulated) after simulation, \(normal) in normal vision."))
+        .accessibilityValue(Text("\(severity). Distance \(simulated) after simulation, \(normal) in normal vision."))
     }
 
     /// Two colors side by side in one rounded tile, so how close they look is obvious.
@@ -787,7 +868,7 @@ struct ColorVisionCard: View {
             a.color
             b.color
         }
-        .frame(width: 72, height: 36)
+        .frame(width: swatchWidth, height: 36)
         .clipShape(RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous).strokeBorder(.quaternary))
         .accessibilityHidden(true)
