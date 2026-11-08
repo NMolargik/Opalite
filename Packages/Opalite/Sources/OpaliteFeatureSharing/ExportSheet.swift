@@ -63,6 +63,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     @Environment(PortfolioModel.self) private var portfolio
 
     @State private var selectedFormat: Format?
+    @State private var path: [ExportGroup] = []
     @State private var exported: ExportedFile?
     @State private var errorMessage: String?
     @State private var isPreparing = false
@@ -75,8 +76,8 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     private var hasOnyx: Bool { entitlement.hasOnyx }
 
     var body: some View {
-        NavigationStack {
-            ScrollViewReader { proxy in
+        NavigationStack(path: $path) {
+            let layout = ExportFormatCatalog.layout(formats, idOf: \.groupKey)
             List {
                 Section {
                     hero()
@@ -84,26 +85,15 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                         .listRowBackground(Color.clear)
                 }
 
-                let groups = ExportFormatCatalog.split(formats)
                 Section {
-                    ForEach(groups.general) { format in formatRow(format) }
-                } header: {
-                    Text("Format")
-                } footer: {
-                    if ExportAccess.hasLockedFormats(in: formats, hasOnyx: hasOnyx) {
-                        Text("Formats marked Onyx are part of the Onyx upgrade.")
-                    }
+                    ForEach(layout.quick) { format in formatRow(format, showsDetail: false) }
                 }
 
-                if !groups.designTokens.isEmpty {
+                if !layout.groups.isEmpty {
                     Section {
-                        ForEach(groups.designTokens) { format in formatRow(format) }
-                    } header: {
-                        Text("Design Tokens")
-                    } footer: {
-                        Text("Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation.")
+                        if !hasOnyx { onyxNote }
+                        ForEach(layout.groups) { entry in groupRow(entry, layout: layout) }
                     }
-                    .id("designTokens")
                 }
 
                 options(selectedFormat)
@@ -121,15 +111,18 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                 }
             }
             .listStyle(.insetGrouped)
+            .navigationDestination(for: ExportGroup.self) { group in
+                groupList(group, layout: layout)
+            }
             #if DEBUG
             .task {
-                // Simulator verification: `--scroll-to-tokens` brings the Design Tokens section into view.
-                guard CommandLine.arguments.contains("--scroll-to-tokens") else { return }
+                // Simulator verification: `--export-group=code` opens that group's list.
+                guard let argument = CommandLine.arguments.first(where: { $0.hasPrefix("--export-group=") }),
+                      let group = ExportGroup(rawValue: String(argument.dropFirst("--export-group=".count))) else { return }
                 try? await Task.sleep(for: .seconds(1))
-                proxy.scrollTo("designTokens", anchor: UnitPoint(x: 0.5, y: 0.18))
+                path = [group]
             }
             #endif
-            }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -141,7 +134,6 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
                     .accessibilityIdentifier("sharing.export.close")
                 }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
             .task(id: PrepareKey(format: selectedFormat, revision: optionsRevision)) { await prepareSelected() }
             .fileExporter(
                 isPresented: $isSavingToFiles,
@@ -153,6 +145,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
             }
             .sharedSheet(isPresented: $isShowingPublish) { publishSheet() }
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
         .sharingSheet(detents: [.large])
         .onAppear {
             if selectedFormat == nil {
@@ -173,15 +166,92 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
 
     // MARK: - Rows
 
-    private func formatRow(_ format: Format) -> some View {
+    private func formatRow(_ format: Format, showsDetail: Bool = true) -> some View {
         FormatRow(
             format: format,
             isSelected: selectedFormat == format,
             isLocked: ExportAccess.isLocked(format, hasOnyx: hasOnyx),
-            isBusy: isPreparing && selectedFormat == format
+            isBusy: isPreparing && selectedFormat == format,
+            showsDetail: showsDetail
         ) {
             choose(format)
         }
+    }
+
+    /// One group: a single line with the count, or the chosen format when it holds the selection.
+    private func groupRow(_ entry: ExportGroupEntry<Format>, layout: ExportLayout<Format>) -> some View {
+        let selected = selectedFormat.flatMap { format in entry.formats.contains(format) ? format : nil }
+        return NavigationLink(value: entry.group) {
+            HStack(spacing: Brand.Space.md) {
+                IconTile(systemImage: ExportRowCopy.systemImage(for: entry.group), tint: ExportRowCopy.tint(for: entry.group))
+                Text(ExportRowCopy.title(for: entry.group))
+                    .font(.body.weight(.medium))
+                Spacer(minLength: Brand.Space.sm)
+                if let selected {
+                    Text(selected.listTitle)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.tint)
+                        .lineLimit(1)
+                } else {
+                    Text("\(entry.formats.count)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(selected.map { Text(verbatim: $0.listTitle) } ?? Text("^[\(entry.formats.count) format](inflect: true)"))
+        .accessibilityIdentifier("sharing.export.group.\(entry.group.id)")
+    }
+
+    /// The pushed list for one group.
+    private func groupList(_ group: ExportGroup, layout: ExportLayout<Format>) -> some View {
+        let members = layout.groups.first { $0.group == group }?.formats ?? []
+        return List {
+            if !hasOnyx {
+                Section { onyxNote }
+            }
+            Section {
+                ForEach(members) { format in formatRow(format) }
+            } footer: {
+                if group != .designApps {
+                    Text("Colors keep their wide-gamut values where the format supports them. Other formats get an sRGB approximation.")
+                }
+            }
+            options(selectedFormat)
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle(ExportRowCopy.title(for: group))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// The one place Onyx is mentioned instead of a lock on every row.
+    private var onyxNote: some View {
+        Button {
+            Haptics.warning()
+            requestPaywall(context: String(localized: "Exporting files and code requires Onyx"))
+        } label: {
+            HStack(spacing: Brand.Space.md) {
+                Image(systemName: "diamond.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(LinearGradient.onyx)
+                    .frame(width: 24)
+                    .accessibilityHidden(true)
+                Text("Files and code need Onyx")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: Brand.Space.sm)
+                Text("Get Onyx")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.opaliteBlue.inkVariant)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(Text("Opens Onyx"))
+        .accessibilityIdentifier("sharing.export.onyxNote")
     }
 
     private var publishRow: some View {
@@ -304,7 +374,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     private func choose(_ format: Format) {
         if ExportAccess.isLocked(format, hasOnyx: hasOnyx) {
             Haptics.warning()
-            requestPaywall(for: format)
+            requestPaywall(context: String(localized: "Exporting \(format.displayName) files requires Onyx"))
             return
         }
         Haptics.selection()
@@ -314,8 +384,7 @@ struct ExportSheet<Format: PresentableExportFormat, Hero: View, Options: View, P
     }
 
     /// The shell presents the paywall from the root, so this sheet steps aside first.
-    private func requestPaywall(for format: Format) {
-        let context = String(localized: "Exporting \(format.displayName) files requires Onyx")
+    private func requestPaywall(context: String) {
         dismiss()
         Task {
             try? await Task.sleep(for: .milliseconds(450))
@@ -395,13 +464,15 @@ private struct PrepareKey<Format: Hashable>: Hashable {
 
 // MARK: - Format row
 
-/// One format: icon tile in the format's tint, name, description, and a selection mark or
-/// an Onyx badge when gated.
+/// One format on a single line (name plus file extension) with at most one short line
+/// under it, and a selection mark. Gated formats look like the rest: the sheet's one Onyx
+/// note explains the gate and tapping one opens the paywall.
 struct FormatRow<Format: PresentableExportFormat>: View {
     let format: Format
     let isSelected: Bool
     let isLocked: Bool
     let isBusy: Bool
+    var showsDetail = true
     let action: () -> Void
 
     var body: some View {
@@ -409,14 +480,22 @@ struct FormatRow<Format: PresentableExportFormat>: View {
             HStack(spacing: Brand.Space.md) {
                 IconTile(systemImage: format.systemImage, tint: format.tint)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(format.displayName)
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(.primary)
-                    Text(format.formatDescription)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(alignment: .firstTextBaseline, spacing: Brand.Space.xs) {
+                        Text(format.listTitle)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                        Text(verbatim: ".\(format.fileExtension)")
+                            .font(.footnote.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
+                    .lineLimit(1)
+                    if showsDetail, let detail = format.listDetail {
+                        Text(detail)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
                 Spacer(minLength: Brand.Space.sm)
                 trailing
@@ -425,7 +504,7 @@ struct FormatRow<Format: PresentableExportFormat>: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("\(format.displayName), \(format.fileExtension.uppercased())"))
+        .accessibilityLabel(Text("\(format.listTitle), \(format.fileExtension.uppercased())"))
         .accessibilityValue(isSelected ? Text("Selected") : Text(""))
         .accessibilityHint(isLocked ? Text("Requires Onyx. Double-tap to learn more.") : Text("Double-tap to choose this format."))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -434,9 +513,7 @@ struct FormatRow<Format: PresentableExportFormat>: View {
 
     @ContentBuilder
     private var trailing: some View {
-        if isLocked {
-            OnyxBadge(compact: true)
-        } else if isBusy {
+        if isBusy {
             ProgressView()
                 .controlSize(.small)
         } else {

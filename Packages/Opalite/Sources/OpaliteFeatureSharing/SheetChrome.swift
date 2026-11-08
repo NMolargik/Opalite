@@ -134,13 +134,93 @@ protocol PresentableExportFormat: ExportFormat {
     var formatDescription: String { get }
     var tint: Color { get }
     var contentType: UTType { get }
+    /// The format's raw value, which `ExportGroup` uses to place it.
+    var groupKey: String { get }
+}
+
+/// The short copy the compact export rows use: a one-word title and at most one short line.
+enum ExportRowCopy {
+    static func title(_ key: String) -> String {
+        switch key {
+        case "image": String(localized: "Image")
+        case "pdf": String(localized: "PDF")
+        case "opalite": String(localized: "Opalite File")
+        case "procreate": String(localized: "Procreate")
+        case "ase": String(localized: "Adobe ASE")
+        case "gpl": String(localized: "GIMP Palette")
+        case "css": String(localized: "CSS")
+        case "tailwind": String(localized: "Tailwind")
+        case "swiftui": String(localized: "SwiftUI")
+        case "xcassets": String(localized: "Xcode Asset Catalog")
+        case "android": String(localized: "Android")
+        case "flutter": String(localized: "Flutter")
+        case "dtcg": String(localized: "W3C Tokens")
+        case "figma": String(localized: "Figma Variables")
+        case "scss": String(localized: "Sass")
+        case "json": String(localized: "JSON")
+        default: key
+        }
+    }
+
+    static func detail(_ key: String) -> String? {
+        switch key {
+        case "image": String(localized: "Best for sharing and inspiration")
+        case "pdf": String(localized: "Color details for print and clients")
+        case "opalite": String(localized: "Import it back into Opalite")
+        case "procreate": String(localized: "Swatches for Procreate on iPad")
+        case "ase": String(localized: "Photoshop, Illustrator, InDesign")
+        case "gpl": String(localized: "GIMP, Inkscape, Krita")
+        case "css": String(localized: "Custom properties")
+        case "tailwind": String(localized: "Tailwind v4 theme, OKLCH")
+        case "swiftui": String(localized: "Color extension")
+        case "xcassets": String(localized: "One color set per color")
+        case "android": String(localized: "colors.xml resources")
+        case "flutter": String(localized: "Dart color constants")
+        case "dtcg": String(localized: "tokens.json")
+        case "figma": String(localized: "Flattened to sRGB")
+        case "scss": String(localized: "SCSS variables")
+        case "json": String(localized: "Hex, RGB, OKLCH, Display P3")
+        default: nil
+        }
+    }
+
+    static func title(for group: ExportGroup) -> String {
+        switch group {
+        case .designApps: String(localized: "Design Apps")
+        case .code: String(localized: "Code")
+        case .designTokens: String(localized: "Design Tokens")
+        }
+    }
+
+    static func systemImage(for group: ExportGroup) -> String {
+        switch group {
+        case .designApps: "paintbrush.pointed.fill"
+        case .code: "chevron.left.forwardslash.chevron.right"
+        case .designTokens: "curlybraces"
+        }
+    }
+
+    static func tint(for group: ExportGroup) -> Color {
+        switch group {
+        case .designApps: .orange
+        case .code: .blue
+        case .designTokens: .indigo
+        }
+    }
+}
+
+extension PresentableExportFormat {
+    var listTitle: String { ExportRowCopy.title(groupKey) }
+    var listDetail: String? { ExportRowCopy.detail(groupKey) }
 }
 
 extension ColorExportFormat: PresentableExportFormat {
+    var groupKey: String { rawValue }
     var contentType: UTType { ExportContentType.utType(for: self) }
 }
 
 extension PaletteExportFormat: PresentableExportFormat {
+    var groupKey: String { rawValue }
     var contentType: UTType { ExportContentType.utType(for: self) }
 }
 #endif

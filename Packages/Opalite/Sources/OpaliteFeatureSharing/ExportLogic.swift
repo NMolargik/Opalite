@@ -33,15 +33,68 @@ nonisolated public enum ExportAccess {
 
 // MARK: - Catalog
 
+/// The three collapsible groups of file and code formats. The free "quick" formats (image,
+/// PDF, Opalite file) sit above them and belong to no group.
+nonisolated public enum ExportGroup: String, CaseIterable, Hashable, Identifiable, Sendable {
+    case designApps
+    case code
+    case designTokens
+
+    public var id: String { rawValue }
+
+    /// Format ids in the order the group lists them. Also what decides membership.
+    var memberIDs: [String] {
+        switch self {
+        case .designApps: ["procreate", "ase", "gpl"]
+        case .code: ["css", "tailwind", "swiftui", "xcassets", "android", "flutter"]
+        case .designTokens: ["dtcg", "figma", "scss", "json"]
+        }
+    }
+
+    /// The group `id` (a format's raw value) belongs to, nil for the quick formats.
+    static func containing(_ id: String) -> ExportGroup? {
+        allCases.first { $0.memberIDs.contains(id) }
+    }
+}
+
+/// A group and the formats of the sheet that fall in it.
+nonisolated public struct ExportGroupEntry<Format: ExportFormat>: Identifiable {
+    public let group: ExportGroup
+    public let formats: [Format]
+    public var id: ExportGroup { group }
+}
+
+/// The sheet's list: the free quick formats, then the grouped file and code formats.
+nonisolated public struct ExportLayout<Format: ExportFormat> {
+    public let quick: [Format]
+    public let groups: [ExportGroupEntry<Format>]
+
+    /// The group `format` is listed under, nil for the quick formats.
+    public func group(of format: Format) -> ExportGroup? {
+        groups.first { $0.formats.contains(format) }?.group
+    }
+}
+
 /// The formats each sheet offers, free ones first so the default selection is usable.
 nonisolated public enum ExportFormatCatalog {
     public static let designTokenColorFormats: [ColorExportFormat] = [.tailwind, .dtcg, .xcassets, .android, .flutter, .scss, .json, .figma]
     public static let designTokenPaletteFormats: [PaletteExportFormat] = [.tailwind, .dtcg, .xcassets, .android, .flutter, .scss, .json, .figma]
 
-    /// Splits `formats` into the general list and the "Design Tokens" list, keeping order.
-    public static func split<Format: ExportFormat>(_ formats: [Format]) -> (general: [Format], designTokens: [Format]) {
-        (formats.filter { !$0.isDesignToken }, formats.filter(\.isDesignToken))
+    /// Splits `formats` into the quick formats and the three groups, each in its own order.
+    /// `idOf` reads a format's raw value; every format lands in exactly one place.
+    public static func layout<Format: ExportFormat>(_ formats: [Format], idOf: (Format) -> String) -> ExportLayout<Format> {
+        let quick = formats.filter { ExportGroup.containing(idOf($0)) == nil }
+        let groups = ExportGroup.allCases.compactMap { group -> ExportGroupEntry<Format>? in
+            let members = formats
+                .filter { ExportGroup.containing(idOf($0)) == group }
+                .sorted { (group.memberIDs.firstIndex(of: idOf($0)) ?? 0) < (group.memberIDs.firstIndex(of: idOf($1)) ?? 0) }
+            return members.isEmpty ? nil : ExportGroupEntry(group: group, formats: members)
+        }
+        return ExportLayout(quick: quick, groups: groups)
     }
+
+    public static func layout(_ formats: [ColorExportFormat]) -> ExportLayout<ColorExportFormat> { layout(formats, idOf: \.rawValue) }
+    public static func layout(_ formats: [PaletteExportFormat]) -> ExportLayout<PaletteExportFormat> { layout(formats, idOf: \.rawValue) }
 
     public static let colorFormats: [ColorExportFormat] = [.image, .opalite, .ase, .procreate, .gpl, .css, .swiftui] + designTokenColorFormats
     public static let paletteFormats: [PaletteExportFormat] = [.image, .pdf, .opalite, .ase, .procreate, .gpl, .css, .swiftui] + designTokenPaletteFormats

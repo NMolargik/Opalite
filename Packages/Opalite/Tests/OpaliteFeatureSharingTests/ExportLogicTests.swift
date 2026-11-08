@@ -51,6 +51,38 @@ struct ExportAccessTests {
     }
 }
 
+@Suite("Export layout")
+struct ExportLayoutTests {
+    @Test func quickFormatsAreTheFreeOnesAndNothingIsLost() {
+        let color = ExportFormatCatalog.layout(ExportFormatCatalog.colorFormats)
+        #expect(color.quick == [.image, .opalite])
+        let palette = ExportFormatCatalog.layout(ExportFormatCatalog.paletteFormats)
+        #expect(palette.quick == [.image, .pdf, .opalite])
+        #expect(Set(color.quick + color.groups.flatMap(\.formats)) == Set(ColorExportFormat.allCases))
+        #expect(Set(palette.quick + palette.groups.flatMap(\.formats)) == Set(PaletteExportFormat.allCases))
+        #expect((color.quick + color.groups.flatMap(\.formats)).count == ColorExportFormat.allCases.count)
+        #expect((palette.quick + palette.groups.flatMap(\.formats)).count == PaletteExportFormat.allCases.count)
+    }
+
+    @Test func groupsHoldTheExpectedFormatsInOrder() {
+        let layout = ExportFormatCatalog.layout(ExportFormatCatalog.paletteFormats)
+        #expect(layout.groups.map(\.group) == [.designApps, .code, .designTokens])
+        #expect(layout.groups[0].formats == [.procreate, .ase, .gpl])
+        #expect(layout.groups[1].formats == [.css, .tailwind, .swiftui, .xcassets, .android, .flutter])
+        #expect(layout.groups[2].formats == [.dtcg, .figma, .scss, .json])
+        #expect(layout.group(of: .swiftui) == .code)
+        #expect(layout.group(of: .image) == nil)
+    }
+
+    @Test func everyGatedFormatIsInAGroup() {
+        let layout = ExportFormatCatalog.layout(ExportFormatCatalog.colorFormats)
+        for format in ColorExportFormat.allCases where !format.isFreeFormat {
+            #expect(layout.group(of: format) != nil)
+        }
+        for format in layout.quick { #expect(format.isFreeFormat) }
+    }
+}
+
 @Suite("Export content types")
 struct ExportContentTypeTests {
     @Test func everyFormatMapsToAWritableType() {
